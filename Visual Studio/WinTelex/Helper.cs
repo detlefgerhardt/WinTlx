@@ -8,6 +8,7 @@ namespace WinTelex
 {
 	static class Helper
 	{
+
 		/// <summary>
 		/// get systems ticks in ms
 		/// </summary>
