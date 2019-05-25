@@ -99,11 +99,13 @@ namespace WinTelex
 
 		private void MainForm_Load(object sender, EventArgs e)
 		{
+			/*
 			if (Expired())
 			{
 				Close();
 				return;
 			}
+			*/
 		}
 
 		private void Form_KeyPress(object sender, KeyPressEventArgs e)
@@ -899,6 +901,7 @@ namespace WinTelex
 				MessageBoxDefaultButton.Button1);
 		}
 
+		/*
 		private bool Expired()
 		{
 			if (!Helper.IsExpired())
@@ -918,6 +921,7 @@ namespace WinTelex
 
 			return true;
 		}
+		*/
 
 		private ContextMenuStrip CreateContextMenu()
 		{

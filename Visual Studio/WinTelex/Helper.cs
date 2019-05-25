@@ -8,7 +8,6 @@ namespace WinTelex
 {
 	static class Helper
 	{
-
 		/// <summary>
 		/// get systems ticks in ms
 		/// </summary>
@@ -22,13 +21,14 @@ namespace WinTelex
 #if DEBUG
 			// show date and time in debug version
 			string buildTime = Properties.Resources.BuildDate.Trim(new char[] { '\n', '\r' }) + " Debug";
-			int? expireDays = ExpireDays();
-			string expireStr = expireDays != null ? $" expires in {expireDays} days" : "";
+			//int? expireDays = ExpireDays();
+			//string expireStr = expireDays != null ? $" expires in {expireDays} days" : "";
+			string expireStr = "";
 #else
 			// show only date in release version
 			string buildTime = Properties.Resources.BuildDate.Trim(new char[] { '\n', '\r' });
 			buildTime = buildTime.Substring(0, 10);
-			expireStr = "";
+			string expireStr = "";
 #endif
 			return $"{Constants.PROGRAM_NAME}  V{Application.ProductVersion}  (Build={buildTime}) {expireStr}";
 		}
