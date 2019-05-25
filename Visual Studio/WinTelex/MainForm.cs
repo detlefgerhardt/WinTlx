@@ -20,6 +20,8 @@ using System.Windows.Forms;
 ///         - last line was not shown in terminal window
 ///         - Terminal windows is now scrollable
 /// 1.0.0.3 - copy/paste implemented (context menu and ctrl-c/ctrl-v)
+/// 1.0.0.4 - Expire date removed
+///         - The size of the terminal window can be changed dynamically.
 /// </summary>
 
 namespace WinTelex
@@ -37,7 +39,8 @@ namespace WinTelex
 		private bool ctrlKey = false;
 
 		public const int SCREEN_WIDTH = 68;
-		public const int SCREEN_HEIGHT = 25;
+		//public const int SCREEN_HEIGHT = 25;
+		private int _screenHeight = 25;
 		//private char[,] _screen = new char[SCREEN_WIDTH, SCREEN_HEIGHT];
 		private List<ScreenLine> _screen = new List<ScreenLine>();
 		private int _screenX = 0;
@@ -106,6 +109,7 @@ namespace WinTelex
 				return;
 			}
 			*/
+			MainForm_Resize(null, null);
 		}
 
 		private void Form_KeyPress(object sender, KeyPressEventArgs e)
@@ -147,24 +151,24 @@ namespace WinTelex
 					_screenShowPos0++;
 					break;
 				case Keys.PageUp:
-					_screenShowPos0 -= SCREEN_HEIGHT - 1;
+					_screenShowPos0 -= _screenHeight - 1;
 					break;
 				case Keys.PageDown:
-					_screenShowPos0 += SCREEN_HEIGHT - 1;
+					_screenShowPos0 += _screenHeight - 1;
 					break;
 				case Keys.Home:
 					_screenShowPos0 = 0;
 					break;
 				case Keys.End:
-					_screenShowPos0 = _screen.Count - SCREEN_HEIGHT;
+					_screenShowPos0 = _screen.Count - _screenHeight;
 					break;
 			}
 
 			if (_screenShowPos0 != oldShowPos0)
 			{
-				if (_screenShowPos0 > _screen.Count - SCREEN_HEIGHT)
+				if (_screenShowPos0 > _screen.Count - _screenHeight)
 				{
-					_screenShowPos0 = _screen.Count - SCREEN_HEIGHT;
+					_screenShowPos0 = _screen.Count - _screenHeight;
 				}
 				if (_screenShowPos0 < 0)
 				{
@@ -512,6 +516,26 @@ namespace WinTelex
 					SendFiguresBtn.ForeColor = Color.Green;
 				}
 			});
+
+			bool itelex;
+			bool ascii;
+			if (_itelex.IsConnected)
+			{
+				itelex = _itelex.ConnectionState == ItelexProtocol.ConnectionStates.BaudotTexting;
+				ascii = _itelex.ConnectionState == ItelexProtocol.ConnectionStates.AsciiTexting;
+			}
+			else
+			{
+				itelex = false;
+				ascii = false;
+			}
+
+			Helper.ControlInvokeRequired(ProtocolItelexRb, () =>
+				ProtocolItelexRb.Checked = itelex
+			);
+			Helper.ControlInvokeRequired(ProtocolAsciiRb, () =>
+				ProtocolAsciiRb.Checked = ascii
+			);
 		}
 
 		private bool ConnectOut()
@@ -788,7 +812,7 @@ namespace WinTelex
 		{
 			_screen.Add(new ScreenLine());
 			_screenY++;
-			if (_screenY >= SCREEN_HEIGHT)
+			if (_screenY >= _screenHeight)
 			{
 				// scroll
 				/*
@@ -817,7 +841,7 @@ namespace WinTelex
 			string lines = "";
 			int cursorPos = 0;
 			int pos = 0;
-			for (int y = 0; y < SCREEN_HEIGHT; y++)
+			for (int y = 0; y < _screenHeight; y++)
 			{
 				string line = "";
 				for (int x = 0; x < SCREEN_WIDTH; x++)
@@ -841,7 +865,7 @@ namespace WinTelex
 					pos++;
 				}
 				lines += line.TrimEnd();
-				if (y < SCREEN_HEIGHT - 1)
+				if (y < _screenHeight - 1)
 					lines += "\r";
 				pos = lines.Length;
 			}
@@ -859,7 +883,7 @@ namespace WinTelex
 
 			Helper.ControlInvokeRequired(LnColTb, () =>
 			{
-				LnColTb.Text = $"Ln {_screenEditPos0 + _screenY}  Col {_screenX + 1}";
+				LnColTb.Text = $"Ln {_screenEditPos0 + _screenY + 1}  Col {_screenX + 1}";
 			});
 		}
 
@@ -996,6 +1020,26 @@ namespace WinTelex
 			AddText(message.ToUpper());
 			AddText("\r\n");
 			SystemSounds.Exclamation.Play();
+		}
+
+		private void MainForm_Resize(object sender, EventArgs e)
+		{
+			RichTextTb.Height = this.Height - 300 + 50;
+			_screenHeight = RichTextTb.Height / 19;
+			Debug.WriteLine($"{_screenHeight} {RichTextTb.Height}");
+
+			_screenEditPos0 = _screen.Count - _screenHeight;
+			if (_screenEditPos0 < 0)
+				_screenEditPos0 = 0;
+			_screenShowPos0 = _screenEditPos0;
+
+			_screenY = _screen.Count - _screenEditPos0 - 1;
+
+#warning TODO warum ist _screenY<0
+			if (_screenY < 0)
+				_screenY = 0;
+
+			ShowScreen();
 		}
 	}
 

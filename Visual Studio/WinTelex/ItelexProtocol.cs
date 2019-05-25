@@ -506,9 +506,8 @@ namespace WinTelex
 				sendData[1] = 0;
 			}
 
-#if DEBUG
-			ItelexPacket debugPacket = new ItelexPacket(sendData);
-			switch ((ItelexCommands)debugPacket.Command)
+			ItelexPacket sendPacket = new ItelexPacket(sendData);
+			switch ((ItelexCommands)sendPacket.Command)
 			{
 				case ItelexCommands.BaudotData:
 					AddTransCharCount(data.Length);
@@ -524,7 +523,6 @@ namespace WinTelex
 				case ItelexCommands.RemoteConfig:
 					break;
 			}
-#endif
 			try
 			{
 				_client.Client.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, EndSend, null);

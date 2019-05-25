@@ -46,8 +46,8 @@
 			this.ExitBtn = new System.Windows.Forms.Button();
 			this.SendCarriageReturnBtn = new System.Windows.Forms.Button();
 			this.SendLineFeedBtn = new System.Windows.Forms.Button();
-			this.ProtocolItelex = new System.Windows.Forms.RadioButton();
-			this.ProtocolAscii = new System.Windows.Forms.RadioButton();
+			this.ProtocolItelexRb = new System.Windows.Forms.RadioButton();
+			this.ProtocolAsciiRb = new System.Windows.Forms.RadioButton();
 			this.SendTimeBtn = new System.Windows.Forms.Button();
 			this.SendRyBtn = new System.Windows.Forms.Button();
 			this.SendFoxBtn = new System.Windows.Forms.Button();
@@ -126,7 +126,8 @@
 			this.RichTextTb.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.RichTextTb.Location = new System.Drawing.Point(12, 202);
 			this.RichTextTb.Name = "RichTextTb";
-			this.RichTextTb.Size = new System.Drawing.Size(635, 499);
+			this.RichTextTb.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
+			this.RichTextTb.Size = new System.Drawing.Size(634, 390);
 			this.RichTextTb.TabIndex = 5;
 			this.RichTextTb.Text = "";
 			this.RichTextTb.Click += new System.EventHandler(this.RichTextTb_Click);
@@ -222,7 +223,8 @@
 			// 
 			// ExitBtn
 			// 
-			this.ExitBtn.Location = new System.Drawing.Point(654, 678);
+			this.ExitBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.ExitBtn.Location = new System.Drawing.Point(653, 569);
 			this.ExitBtn.Name = "ExitBtn";
 			this.ExitBtn.Size = new System.Drawing.Size(69, 23);
 			this.ExitBtn.TabIndex = 17;
@@ -252,27 +254,27 @@
 			this.SendLineFeedBtn.UseVisualStyleBackColor = true;
 			this.SendLineFeedBtn.Click += new System.EventHandler(this.SendLineFeedBtn_Click);
 			// 
-			// ProtocolItelex
+			// ProtocolItelexRb
 			// 
-			this.ProtocolItelex.AutoSize = true;
-			this.ProtocolItelex.Checked = true;
-			this.ProtocolItelex.Location = new System.Drawing.Point(466, 20);
-			this.ProtocolItelex.Name = "ProtocolItelex";
-			this.ProtocolItelex.Size = new System.Drawing.Size(52, 17);
-			this.ProtocolItelex.TabIndex = 22;
-			this.ProtocolItelex.TabStop = true;
-			this.ProtocolItelex.Text = "i-telex";
-			this.ProtocolItelex.UseVisualStyleBackColor = true;
+			this.ProtocolItelexRb.AutoSize = true;
+			this.ProtocolItelexRb.Checked = true;
+			this.ProtocolItelexRb.Location = new System.Drawing.Point(466, 20);
+			this.ProtocolItelexRb.Name = "ProtocolItelexRb";
+			this.ProtocolItelexRb.Size = new System.Drawing.Size(52, 17);
+			this.ProtocolItelexRb.TabIndex = 22;
+			this.ProtocolItelexRb.TabStop = true;
+			this.ProtocolItelexRb.Text = "i-telex";
+			this.ProtocolItelexRb.UseVisualStyleBackColor = true;
 			// 
-			// ProtocolAscii
+			// ProtocolAsciiRb
 			// 
-			this.ProtocolAscii.AutoSize = true;
-			this.ProtocolAscii.Location = new System.Drawing.Point(466, 39);
-			this.ProtocolAscii.Name = "ProtocolAscii";
-			this.ProtocolAscii.Size = new System.Drawing.Size(52, 17);
-			this.ProtocolAscii.TabIndex = 23;
-			this.ProtocolAscii.Text = "ASCII";
-			this.ProtocolAscii.UseVisualStyleBackColor = true;
+			this.ProtocolAsciiRb.AutoSize = true;
+			this.ProtocolAsciiRb.Location = new System.Drawing.Point(466, 39);
+			this.ProtocolAsciiRb.Name = "ProtocolAsciiRb";
+			this.ProtocolAsciiRb.Size = new System.Drawing.Size(52, 17);
+			this.ProtocolAsciiRb.TabIndex = 23;
+			this.ProtocolAsciiRb.Text = "ASCII";
+			this.ProtocolAsciiRb.UseVisualStyleBackColor = true;
 			// 
 			// SendTimeBtn
 			// 
@@ -413,7 +415,7 @@
 			this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.panel2.Controls.Add(this.KennungLbl);
 			this.panel2.Controls.Add(this.KennungTb);
-			this.panel2.Controls.Add(this.ProtocolAscii);
+			this.panel2.Controls.Add(this.ProtocolAsciiRb);
 			this.panel2.Controls.Add(this.MemberCb);
 			this.panel2.Controls.Add(this.PortTb);
 			this.panel2.Controls.Add(this.ExtensionTb);
@@ -425,7 +427,7 @@
 			this.panel2.Controls.Add(this.SearchTb);
 			this.panel2.Controls.Add(this.PortLbl);
 			this.panel2.Controls.Add(this.SearchLbl);
-			this.panel2.Controls.Add(this.ProtocolItelex);
+			this.panel2.Controls.Add(this.ProtocolItelexRb);
 			this.panel2.Location = new System.Drawing.Point(12, 11);
 			this.panel2.Name = "panel2";
 			this.panel2.Size = new System.Drawing.Size(540, 100);
@@ -537,7 +539,8 @@
 			// 
 			// AboutBtn
 			// 
-			this.AboutBtn.Location = new System.Drawing.Point(654, 649);
+			this.AboutBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.AboutBtn.Location = new System.Drawing.Point(653, 540);
 			this.AboutBtn.Name = "AboutBtn";
 			this.AboutBtn.Size = new System.Drawing.Size(69, 23);
 			this.AboutBtn.TabIndex = 46;
@@ -549,7 +552,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(735, 713);
+			this.ClientSize = new System.Drawing.Size(734, 604);
 			this.Controls.Add(this.AboutBtn);
 			this.Controls.Add(this.panel5);
 			this.Controls.Add(this.panel4);
@@ -559,9 +562,11 @@
 			this.Controls.Add(this.ExitBtn);
 			this.Controls.Add(this.RichTextTb);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(750, 350);
 			this.Name = "MainForm";
 			this.Text = "WinTelex 1.0 beta";
 			this.Load += new System.EventHandler(this.MainForm_Load);
+			this.Resize += new System.EventHandler(this.MainForm_Resize);
 			this.panel1.ResumeLayout(false);
 			this.panel2.ResumeLayout(false);
 			this.panel2.PerformLayout();
@@ -593,8 +598,8 @@
 		private System.Windows.Forms.Button ExitBtn;
 		private System.Windows.Forms.Button SendCarriageReturnBtn;
 		private System.Windows.Forms.Button SendLineFeedBtn;
-		private System.Windows.Forms.RadioButton ProtocolItelex;
-		private System.Windows.Forms.RadioButton ProtocolAscii;
+		private System.Windows.Forms.RadioButton ProtocolItelexRb;
+		private System.Windows.Forms.RadioButton ProtocolAsciiRb;
 		private System.Windows.Forms.Button SendTimeBtn;
 		private System.Windows.Forms.Button SendRyBtn;
 		private System.Windows.Forms.Button SendFoxBtn;
