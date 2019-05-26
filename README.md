@@ -16,6 +16,7 @@ A Windows terminal software for the i-Telex network
         - The size of the terminal window can now be changed dynamically.
         - First GitHub release
 1.0.0.5 - Show messages when connecting to subscribe server```
+```
 
 ## Credits
 
