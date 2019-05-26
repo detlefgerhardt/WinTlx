@@ -15,7 +15,7 @@ A Windows terminal software for the i-Telex network
 1.0.0.4 - Removed expire date
         - The size of the terminal window can now be changed dynamically.
         - First GitHub release
-1.0.0.5 - Show messages when connecting to subscribe server```
+1.0.0.5 - Show messages when connecting to subscribe server
 ```
 
 ## Credits
