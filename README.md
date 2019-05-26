@@ -28,4 +28,6 @@ A Windows terminal software for the i-Telex network
 
 ## Credits
 
+An [i-Telex-Library](https://sourceforge.net/projects/itelex) for Arduino/Atmel.
+
 The [piTelex project](https://github.com/fablab-wue/piTelex) by FabLab Würzburg.
