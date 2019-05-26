@@ -6,72 +6,12 @@ using System.Text;
 
 namespace WinTelex
 {
-	class QueryResult
-	{
-		public string Number { get; set; }
-		public string Name { get; set; }
-		public int? Type { get; set; }
-		public string HostName { get; set; }
-		public int? Port { get; set; }
-		public int? ExtensionNumber { get; set; }
-
-		public override string ToString()
-		{
-			return $"{Number} '{Name}' {Type} {HostName} {Port} {ExtensionNumber}";
-		}
-	}
-
-	class PeerQueryReply
-	{
-		public bool Valid { get; set; }
-		public string Error { get; set; }
-		public PeerQueryData Data { get; set; }
-	}
-
-	class PeerSearchReply
-	{
-		public bool Valid { get; set; }
-		public string Error { get; set; }
-		public PeerQueryData[] List { get; set; }
-	}
-
-	class PeerQueryData
-	{
-		public string Number { get; set; }
-		public string LongName { get; set; }
-		public UInt16 SpecialAttribute { get; set; }
-		public int PeerType { get; set; }
-		public string IpAddress { get; set; }
-		public string HostName { get; set; }
-		public int PortNumber { get; set; }
-		public int ExtensionNumber { get; set; }
-		public int Pin { get; set; }
-		public DateTime LastChange { get; set; }
-
-		public string Address
-		{
-			get
-			{
-				return !string.IsNullOrEmpty(HostName) ? HostName : IpAddress;
-			}
-		}
-
-		public string Display
-		{
-			get
-			{
-				return $"{Number} {LongName} {PeerType}";
-			}
-		}
-
-		public override string ToString()
-		{
-			return $"{Number} {LongName} {PeerType} {Address} {PortNumber} {ExtensionNumber}";
-		}
-	}
 
 	class SubscriberServer
 	{
+		public delegate void MessageEventHandler(string message);
+		public event MessageEventHandler Message;
+
 		private const string TAG = nameof(SubscriberServer);
 
 		private TcpClient client = null;
@@ -88,7 +28,8 @@ namespace WinTelex
 			catch(Exception ex)
 			{
 				Logging.Instance.Log(LogTypes.Error,TAG, nameof(Connect),
-					$"error connection to subscribe server {Constants.SUBSCRIBE_SERVER}:{Constants.SUBSCRIBE_SERVER_PORT}");
+					$"error connecting to subscribe server {Constants.SUBSCRIBE_SERVER}:{Constants.SUBSCRIBE_SERVER_PORT}");
+				Message?.Invoke($"ERROR CONNECTING TO SUBSCRIBE SERVER {Constants.SUBSCRIBE_SERVER}:{Constants.SUBSCRIBE_SERVER_PORT}");
 				stream?.Close();
 				client?.Close();
 				client = null;
@@ -104,7 +45,7 @@ namespace WinTelex
 		}
 
 #if false
-		public QueryResult PeerQueryAscii(string number)
+		public AsciiQueryResult PeerQueryAscii(string number)
 		{
 			Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendPeerQuery), $"number='{number}'");
 
@@ -184,22 +125,28 @@ namespace WinTelex
 		{
 			Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendPeerQuery), $"number='{number}'");
 
+			PeerQueryReply reply = new PeerQueryReply();
+
 			if (client==null)
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), "no server connection");
-				return null;
+				reply.Error = "no server connection";
+				return reply;
 			}
 
 			if (string.IsNullOrEmpty(number))
 			{
-				return null;
+				reply.Error = "no query number";
+				return reply;
 			}
 
 			// convert number to Int32
 			number = number.Replace(" ", "");
 			UInt32 num;
 			if (!UInt32.TryParse(number, out num))
+			{
 				return null;
+			}
 
 			byte[] sendData = new byte[2 + 5];
 			sendData[0] = 0x03; // Peer_query
@@ -207,6 +154,7 @@ namespace WinTelex
 			byte[] numData = BitConverter.GetBytes(num);
 			Buffer.BlockCopy(numData, 0, sendData, 2, 4);
 			sendData[6] = 0x01; ; // version 1
+
 			try
 			{
 				stream.Write(sendData, 0, sendData.Length);
@@ -214,10 +162,10 @@ namespace WinTelex
 			catch(Exception ex)
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error sending data to subscribe server", ex);
-				return null;
+				reply.Error = "reply server error";
+				return reply;
 			}
 
-			PeerQueryReply reply = new PeerQueryReply();
 			byte[] recvData = new byte[102];
 			int recvLen = 0;
 			try
@@ -227,7 +175,8 @@ namespace WinTelex
 			catch(Exception ex)
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error receiving data from subscribe server", ex);
-				return null;
+				reply.Error = "reply server error";
+				return reply;
 			}
 
 			if (recvLen == 0)
@@ -282,16 +231,19 @@ namespace WinTelex
 		public PeerSearchReply SendPeerSearch(string name)
 		{
 			Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendPeerSearch), $"name='{name}'");
+			PeerSearchReply reply = new PeerSearchReply();
 
 			if (client == null)
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerSearch), "no server connection");
-				return null;
+				reply.Error = "no server connection";
+				return reply;
 			}
 
 			if (string.IsNullOrEmpty(name))
 			{
-				return null;
+				reply.Error = "no search name";
+				return reply;
 			}
 
 			byte[] sendData = new byte[43];
@@ -306,11 +258,13 @@ namespace WinTelex
 			}
 			catch(Exception ex)
 			{
+				Message?.Invoke($"SUBSCRIBE SERVER ERROR");
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error sending data to subscribe server", ex);
-				return null;
+				reply.Valid = false;
+				reply.Error = "reply server error";
+				return reply;
 			}
 
-			PeerSearchReply reply = new PeerSearchReply();
 			byte[] ack = new byte[] { 0x08, 0x00 };
 			List<PeerQueryData> list = new List<PeerQueryData>();
 			while (true)
@@ -324,7 +278,9 @@ namespace WinTelex
 				catch(Exception ex)
 				{
 					Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error receiving data from subscribe server", ex);
-					return null;
+					reply.Valid = false;
+					reply.Error = "reply server error";
+					return reply;
 				}
 				Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendPeerSearch), $"recvLen={recvLen}");
 
@@ -405,4 +361,57 @@ namespace WinTelex
 		}
 	}
 
+	/*
+	class AsciiQueryResult
+	{
+		public string Number { get; set; }
+		public string Name { get; set; }
+		public int? Type { get; set; }
+		public string HostName { get; set; }
+		public int? Port { get; set; }
+		public int? ExtensionNumber { get; set; }
+
+		public override string ToString()
+		{
+			return $"{Number} '{Name}' {Type} {HostName} {Port} {ExtensionNumber}";
+		}
+	}
+	*/
+
+	class PeerQueryReply
+	{
+		public bool Valid { get; set; }
+		public string Error { get; set; }
+		public PeerQueryData Data { get; set; }
+	}
+
+	class PeerSearchReply
+	{
+		public bool Valid { get; set; }
+		public string Error { get; set; }
+		public PeerQueryData[] List { get; set; }
+	}
+
+	class PeerQueryData
+	{
+		public string Number { get; set; }
+		public string LongName { get; set; }
+		public UInt16 SpecialAttribute { get; set; }
+		public int PeerType { get; set; }
+		public string IpAddress { get; set; }
+		public string HostName { get; set; }
+		public int PortNumber { get; set; }
+		public int ExtensionNumber { get; set; }
+		public int Pin { get; set; }
+		public DateTime LastChange { get; set; }
+
+		public string Address => !string.IsNullOrEmpty(HostName) ? HostName : IpAddress;
+
+		public string Display => $"{Number} {LongName} {PeerType}";
+
+		public override string ToString()
+		{
+			return $"{Number} {LongName} {PeerType} {Address} {PortNumber} {ExtensionNumber}";
+		}
+	}
 }

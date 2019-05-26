@@ -4,24 +4,26 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Media;
+using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
 
 /// <summary>
 /// Todo:
-/// - Telnet-Modus testen
 /// - eingehende Anrufe testen (funktioniert prinzipiell, verhaspelt sich ab und zu)
 /// 
 /// Version history
-/// 1.0.0.1 - logging, improved error handling, timout timer
-///         - direct entry of address, port an extension is now possible
-/// 1.0.0.2 - take address, port and extension from textboxes on outgoing call
-///         - fix error on incoming coming connection (there is still a problem)
+/// 1.0.0.1 - logging, improved error handling, inactivity timer
+/// 1.0.0.2 - direct entry of peer address, port and extension is now possible
+///         - fixed error on incoming connection (there still seems to be a problem)
 ///         - last line was not shown in terminal window
 ///         - Terminal windows is now scrollable
 /// 1.0.0.3 - copy/paste implemented (context menu and ctrl-c/ctrl-v)
-/// 1.0.0.4 - Expire date removed
-///         - The size of the terminal window can be changed dynamically.
+/// 1.0.0.4 - Removed expire date
+///         - The size of the terminal window can now be changed dynamically.
+///         - First GitHub release
+/// 1.0.0.5 - Show messages when connecting to subscribe server
+/// 
 /// </summary>
 
 namespace WinTelex
@@ -32,11 +34,11 @@ namespace WinTelex
 
 		private System.Timers.Timer _clockTimer;
 
-		private SubscriberServer _subscriberServer = new SubscriberServer();
+		private SubscriberServer _subscriberServer;
 		private ItelexProtocol _itelex;
 		//private PeerQueryData _queryData;
 		//private string _kennung = "\r\n123456 test d";
-		private bool ctrlKey = false;
+		//private bool ctrlKey = false;
 
 		public const int SCREEN_WIDTH = 68;
 		//public const int SCREEN_HEIGHT = 25;
@@ -82,13 +84,14 @@ namespace WinTelex
 			_itelex.Update += UpdatedHandler;
 			_itelex.Error += ErrorHandler;
 
+			_subscriberServer = new SubscriberServer();
+			_subscriberServer.Message += SubcribeServerMessageHandler;
+
 			_clockTimer = new System.Timers.Timer(500);
 			_clockTimer.Elapsed += ClockTimer_Elapsed;
 			_clockTimer.Start();
 
 			RichTextTb.ContextMenuStrip = CreateContextMenu();
-
-			_subscriberServer = new SubscriberServer();
 
 			SetConnectState();
 			UpdatedHandler();
@@ -218,18 +221,6 @@ namespace WinTelex
 			{
 				return;
 			}
-
-			/*
-			SubscriberServer server = new SubscriberServer();
-			PeerQueryData selectItem = MemberCb.SelectedItem as PeerQueryData;
-			if (selectItem == null)
-			{
-				return;
-			}
-
-			//_queryData = selectItem;
-			*/
-
 			ConnectOut();
 			SetConnectState();
 		}
@@ -475,6 +466,11 @@ namespace WinTelex
 			AddText(dispText);
 		}
 
+		private void SubcribeServerMessageHandler(string message)
+		{
+			AddText("\r\n" + message.ToUpper() + "\r\n");
+		}
+
 		private void ConnectedHandler()
 		{
 			AddText("\r\nCONNECTED\r\n");
@@ -675,51 +671,73 @@ namespace WinTelex
 			}
 		}
 
-		private void QueryBtn_Click(object sender, EventArgs e)
+		private async void QueryBtn_Click(object sender, EventArgs e)
 		{
 			SearchTb.Text = SearchTb.Text.Trim();
 
-			if (string.IsNullOrWhiteSpace(SearchTb.Text))
-			{
-				return;
-			}
+			//if (string.IsNullOrWhiteSpace(SearchTb.Text))
+			//{
+			//	return;
+			//}
 
 			Logging.Instance.Log(LogTypes.Info, TAG, nameof(QueryBtn_Click), $"SearchText='{SearchTb.Text}'");
 
-			uint num;
 			PeerQueryData[] list = null;
+
+			uint num;
 			if (!uint.TryParse(SearchTb.Text, out num))
 				num = 0;
 
-			if (num > 0)
+			await Task.Run(() =>
 			{
-				// query number
-				_subscriberServer.Connect();
-				PeerQueryReply queryReply = _subscriberServer.SendPeerQuery(num.ToString());
-				_subscriberServer.Disconnect();
-				if (queryReply == null || !queryReply.Valid)
+				if (!_subscriberServer.Connect())
 				{
 					return;
 				}
-				list = new PeerQueryData[] { queryReply.Data };
-			}
-			else
-			{
-				// search member
-				_subscriberServer.Connect();
-				PeerSearchReply searchReply = _subscriberServer.SendPeerSearch(SearchTb.Text);
-				_subscriberServer.Disconnect();
-				if (searchReply == null || !searchReply.Valid)
+				if (num > 0)
 				{
-					return;
+					// query number
+					PeerQueryReply queryReply = _subscriberServer.SendPeerQuery(num.ToString());
+					_subscriberServer.Disconnect();
+					if (!queryReply.Valid)
+					{
+						SubcribeServerMessageHandler(queryReply.Error);
+						return;
+					}
+					list = new PeerQueryData[] { queryReply.Data };
 				}
-				list = searchReply.List;
-			}
+				else
+				{
+					// search member
+					PeerSearchReply searchReply = _subscriberServer.SendPeerSearch(SearchTb.Text);
+					_subscriberServer.Disconnect();
+					if (!searchReply.Valid)
+					{
+						SubcribeServerMessageHandler(searchReply.Error);
+						return;
+					}
+					list = searchReply.List;
+				}
+			});
+
+			SubcribeServerMessageHandler($"{list.Length} member(s) found");
 
 			MemberCb.DataSource = list;
 			MemberCb.DisplayMember = "Display";
-			if (list != null && list.Length > 0)
+			if (list==null)
+			{
+			}
+			else if (list.Length==0)
+			{
+				MemberCb.Text = "";
+				AddressTb.Text = "";
+				PortTb.Text = "";
+				ExtensionTb.Text = "";
+			}
+			else
+			{
 				MemberCb.SelectedIndex = 0;
+			}
 
 			SetConnectState();
 		}
