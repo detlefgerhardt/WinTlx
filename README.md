@@ -6,7 +6,7 @@ A Windows terminal software for the i-Telex network
 - Outgoing and incoming connection (fixed port 134)
 - Subscriber server query
 - Automatic ITA2 code conversion
-- Resizable and scrollable terminal windows
+- Resizable and scrollable terminal window
 - Runs on any Windows version with .NET Framework 4.5 and above 
 
 ![Screenshot](https://github.com/detlefgerhardt/WinTelex/blob/master/WinTelexScreen.png)
