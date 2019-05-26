@@ -8,6 +8,7 @@ A Windows terminal software for the i-Telex network
 - Automatic ITA2 code conversion
 - Resizable and scrollable terminal window
 - Inactivity timeout (2 minutes)
+- copy and paste function
 - Sending text files
 - Logging all communication to a text file.
 - Runs on any Windows version with .NET Framework 4.5 and above 
