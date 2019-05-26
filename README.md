@@ -7,6 +7,8 @@ A Windows terminal software for the i-Telex network
 - Subscriber server query
 - Automatic ITA2 code conversion
 - Resizable and scrollable terminal window
+- Sending text files
+- Logging all communication to a text file.
 - Runs on any Windows version with .NET Framework 4.5 and above 
 
 ![Screenshot](https://github.com/detlefgerhardt/WinTelex/blob/master/WinTelexScreen.png)
