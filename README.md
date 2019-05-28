@@ -7,6 +7,10 @@ A Windows terminal software for the i-Telex network
 - Subscriber server query
 - Automatic ITA2 code conversion
 - Resizable and scrollable terminal window
+- Inactivity timeout (2 minutes)
+- copy and paste function
+- Sending text files
+- Logging all communication to a text file.
 - Runs on any Windows version with .NET Framework 4.5 and above 
 
 ![Screenshot](https://github.com/detlefgerhardt/WinTelex/blob/master/WinTelexScreen.png)
@@ -27,5 +31,7 @@ A Windows terminal software for the i-Telex network
 ```
 
 ## Credits
+
+An [i-Telex-Library](https://sourceforge.net/projects/itelex) for Arduino/Atmel by Fred Sonnenrein.
 
 The [piTelex project](https://github.com/fablab-wue/piTelex) by FabLab Würzburg.
