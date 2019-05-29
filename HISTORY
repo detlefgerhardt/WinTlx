@@ -14,3 +14,4 @@ Version history
         - Fixed a bug that occurred if the query did not find a number
         - Locking for logfiles access
         - New config menu
+
