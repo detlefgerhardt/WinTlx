@@ -10,4 +10,7 @@ Version history
         - The size of the terminal window can now be changed dynamically.
         - First GitHub release
 1.0.0.5 - Show messages when connecting to subscribe server
-
+1.0.0.6 - Send always "wintelex" after WRU
+        - Fixed a bug that occurred if the query did not find a number
+        - Locking for logfiles access
+        - New config menu
