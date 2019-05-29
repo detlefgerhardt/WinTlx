@@ -7,7 +7,7 @@ A Windows terminal and test software for the i-Telex network
 - Subscriber server query
 - Automatic ITA2 code conversion
 - Resizable and scrollable terminal window
-- Inactivity timeout (2 minutes)
+- Inactivity timeout
 - copy and paste function
 - Sending text files
 - Logging all communication to a text file.
