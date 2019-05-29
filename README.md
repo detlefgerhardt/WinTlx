@@ -1,9 +1,9 @@
 # WinTelex
-A Windows terminal and test software for the i-Telex network
+A Windows test und diagnostic tool for the i-Telex network
 
 ## Features
 - No i-telex hardware needed (direct TCP/IP connection)
-- Outgoing and incoming connection (fixed port 134)
+- Outgoing and incoming connection
 - Subscriber server query
 - Automatic ITA2 code conversion
 - Resizable and scrollable terminal window
@@ -11,7 +11,8 @@ A Windows terminal and test software for the i-Telex network
 - copy and paste function
 - Sending text files
 - Logging all communication to a text file.
-- Runs on any Windows version with .NET Framework 4.5 and above 
+- Runs on any Windows version with .NET Framework 4.5 and above
+- NEW: Now with configuration menu
 
 ![Screenshot](https://github.com/detlefgerhardt/WinTelex/blob/master/WinTelexScreen.png)
 
