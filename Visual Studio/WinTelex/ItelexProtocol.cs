@@ -57,17 +57,14 @@ namespace WinTelex
 		private const int RECV_BUFFERSIZE = 255 + 2;
 
 		private TcpListener _tcpListener;
-		//private Task _listenerTask;
 
 		private TcpClient _client;
-		//private NetworkStream _stream;
 		private byte[] _incomingData = new byte[0];
 
 		private Timer _sendTimer;
 		private bool _sendTimerActive;
 		private Timer _ackTimer;
 		private bool _ackTimerActive;
-		//private Timer _lastSendTimer;
 		private long _lastSentMs;
 
 		private DateTime? _connStartTime = null;
@@ -75,7 +72,7 @@ namespace WinTelex
 		{
 			get
 			{
-				if (_connStartTime == null)
+				if (_connStartTime == null || !IsConnected)
 				{
 					return 0;
 				}
@@ -99,7 +96,7 @@ namespace WinTelex
 
 		private CodeConversion.ShiftStates _echoShiftState;
 
-		private bool _startAck;
+		//private bool _startAck;
 		private int _n_recv;
 		private int _n_trans;
 		private int _n_ack;
@@ -117,7 +114,6 @@ namespace WinTelex
 		{
 			get
 			{
-				//Debug.WriteLine($"trans={_n_trans} ack={_n_ack}");
 				int trans = _n_trans;
 				if (_n_ack > trans)
 					trans += 256;
@@ -127,28 +123,42 @@ namespace WinTelex
 
 		public bool Local { get; set; } = true;
 
-		public ConnectionStates ConnectionState { get; set; }
-		private bool _incoming;
-		private bool _outgoing;
+		public bool IsConnected => ConnectionState != ConnectionStates.Disconnected && ConnectionState != ConnectionStates.BaudotDisconnected;
 
-		public bool Start()
+		public bool RecvOn { get; set; }
+
+		public ConnectionStates ConnectionState { get; set; }
+		private bool _incoming = false;
+		private bool _outgoing = false;
+
+		public bool SetRecvOn(int port)
 		{
-			_incoming = false;
-			_outgoing = false;
+			Logging.Instance.Debug(TAG, nameof(SetRecvOn), "");
 			try
 			{
-				_tcpListener = new TcpListener(IPAddress.Any, Constants.INCOMING_PORT);
+				_tcpListener = new TcpListener(IPAddress.Any, port);
 				_tcpListener.Start();
 
+				// start listener task for incoming connections
 				Task _listenerTask = Task.Run(() => Listener());
-
+				RecvOn = true;
+				Update?.Invoke();
 				return true;
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
-				Logging.Instance.Error(TAG, nameof(Start), "", ex);
+				Logging.Instance.Error(TAG, nameof(SetRecvOn), "", ex);
 				return false;
 			}
+		}
+
+		public bool SetRecvOff()
+		{
+			Logging.Instance.Debug(TAG, nameof(SetRecvOff), "");
+			_tcpListener.Stop();
+			RecvOn = false;
+			Update?.Invoke();
+			return true;
 		}
 
 		private void Listener()
@@ -157,6 +167,11 @@ namespace WinTelex
 			{
 				try
 				{
+					if (!RecvOn)
+					{
+						return;
+					}
+
 					Debug.WriteLine("wait for incoming connection");
 					// wait for connection
 					_client = _tcpListener.AcceptTcpClient();
@@ -165,6 +180,7 @@ namespace WinTelex
 
 					IPAddress remoteAddr = ((IPEndPoint)_client.Client.RemoteEndPoint).Address;
 					Send?.Invoke($"INCOMING CONNECTION FROM {remoteAddr}");
+					Debug.WriteLine($"incoming connection from {remoteAddr}");
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"incoming connection from {remoteAddr}");
 
 					while (true)
@@ -232,7 +248,7 @@ namespace WinTelex
 			_n_recv = 0;
 			_n_trans = 0;
 			_n_ack = 0;
-			_startAck = false;
+			//_startAck = false;
 			_sendBuffer = new Queue<byte>();
 			_ackTimerActive = false;
 			_ackTimer = new Timer(2000);
@@ -261,10 +277,12 @@ namespace WinTelex
 			return true;
 		}
 
+		/*
 		public void StartAck()
 		{
 			_startAck = true;
 		}
+		*/
 
 		public void Disconnect()
 		{
@@ -295,7 +313,7 @@ namespace WinTelex
 				return;
 			}
 
-			InactivityTimer = (int)(Constants.TIMEOUT_SEC -
+			InactivityTimer = (int)(Constants.DEFAULT_INACTIVITY_TIMEOUT -
 										DateTime.Now.Subtract(_lastSendRecvTime).Ticks / 10000000);
 			if (InactivityTimer < 0)
 				InactivityTimer = 0;
@@ -313,26 +331,26 @@ namespace WinTelex
 			}
 
 			if (_sendBuffer.Count == 0)
-			{	// nothing to send
+			{   // nothing to send
 				return;
 			}
 
 			if (Helper.GetTicksMs() - _lastSentMs < Constants.WAIT_BEFORE_SEND_MSEC)
-			{	
+			{
 				// wait xxx sec before sending
 				return;
 			}
 
 			_sendTimerActive = true;
 
-			if (CharsAckCount < Constants.WAIT_BEFORE_SEND_ACK)
+			if (CharsAckCount < Constants.WAIT_BEFORE_SEND_ACK && _sendBuffer.Count > 0)
 			{
 				// all characters processed at receiver side
 				int cnt = _sendBuffer.Count;
 				if (cnt > Constants.WAIT_BEFORE_SEND_ACK)
 					cnt = Constants.WAIT_BEFORE_SEND_ACK;
 				byte[] baudotData = new byte[cnt];
-				for (int i = 0; i < cnt; i++)
+				for (int i = 0; i < cnt && _sendBuffer.Count > 0; i++)
 				{
 					baudotData[i] = _sendBuffer.Dequeue();
 				}
@@ -378,13 +396,11 @@ namespace WinTelex
 			}
 		}
 
-		public bool IsConnected => ConnectionState != ConnectionStates.Disconnected && ConnectionState != ConnectionStates.BaudotDisconnected;
-
 		public void SendAsciiChar(char asciiChr)
 		{
+			SetLastSendRecv();
 			string asciiStr = asciiChr.ToString();
 			SendAsciiText(asciiStr);
-			SetLastSendRecv();
 		}
 
 		public void SendAsciiText(string asciiStr)
@@ -414,44 +430,40 @@ namespace WinTelex
 			}
 		}
 
+		/*
 		public void SendBaudotChar(byte baudotChr)
 		{
 			SendBaudotCode(baudotChr, ref _shiftState);
 			Update?.Invoke();
 		}
+		*/
 
 		public void SendDirectDialCmd(int code)
 		{
-			if (!IsConnected)
+			if (IsConnected)
 			{
-				return;
+				Logging.Instance.Log(LogTypes.Info, TAG, nameof(SendDirectDialCmd), $"code={code}");
+				byte[] data = new byte[] { (byte)code };
+				SendCmd(ItelexCommands.DirectDial, data);
 			}
-
-			Logging.Instance.Log(LogTypes.Info, TAG, nameof(SendDirectDialCmd), $"code={code}");
-
-			byte[] data = new byte[] { (byte)code };
-			SendCmd(ItelexCommands.DirectDial, data);
 		}
 
 		public void SendVersionCodeCmd()
 		{
-			if (!IsConnected)
+			if (IsConnected)
 			{
-				return;
+				byte[] data = new byte[] { 0x01 }; // version = 1
+				SendCmd(ItelexCommands.ProtocolVersion, data);
 			}
-
-			byte[] data = new byte[] { 0x01 }; // version = 1
-			SendCmd(ItelexCommands.ProtocolVersion, data);
 		}
 
 		public void SendEndCmd()
 		{
-			if (!IsConnected)
+			if (IsConnected)
 			{
-				return;
+				SendCmd(ItelexCommands.End);
 			}
 
-			SendCmd(ItelexCommands.End);
 		}
 
 		private void SendBaudotCode(byte baudotCode, ref CodeConversion.ShiftStates shiftState)
@@ -620,7 +632,7 @@ namespace WinTelex
 			StartReceive();
 
 #if false
-			// if data comes in different frame
+			// if data comes in different frame (untested)
 			if (newData.Length > 0)
 			{
 				// append newData to _incommingData

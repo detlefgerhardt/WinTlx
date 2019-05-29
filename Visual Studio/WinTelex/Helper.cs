@@ -33,7 +33,7 @@ namespace WinTelex
 			return $"{Constants.PROGRAM_NAME}  V{Application.ProductVersion}  (Build={buildTime}) {expireStr}";
 		}
 
-#if DEBUG
+#if false
 		public static bool IsExpired()
 		{
 			int? expireDays = ExpireDays();

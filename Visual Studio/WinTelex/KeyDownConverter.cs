@@ -107,6 +107,9 @@ namespace WinTelex
 						case 8: // Backspace
 							str = "xxx ";
 							break;
+						case 13: // shift enter = new line
+							str = "\n";
+							break;
 						case 48:
 							str = "=";
 							break;
@@ -161,6 +164,14 @@ namespace WinTelex
 						default:
 							if (keyValue > 0x40 && keyValue <= 0x5A)
 								str = ((char)keyValue).ToString();
+							break;
+					}
+					break;
+				case Keys.Control:
+					switch (keyValue)
+					{
+						case 13: // ctrl enter = carriage return
+							str = "\r";
 							break;
 					}
 					break;

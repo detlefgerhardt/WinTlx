@@ -16,6 +16,8 @@ namespace WinTelex
 
 		private static Logging instance;
 
+		private object _lock = new object();
+
 		public static Logging Instance
 		{
 			get
@@ -84,14 +86,17 @@ namespace WinTelex
 
 		private void AppendLog(LogTypes logType, string section, string method, string text)
 		{
-			try
+			lock(_lock)
 			{
-				//string fullName = Path.Combine(Global.DATA_PATH, Global.LOG_NAME);
-				string fullName = "error.log";
-				File.AppendAllText(fullName, $"{DateTime.Now:dd.MM.yyyy HH:mm:ss} {logType.ToString().PadRight(5)} [{section}] [{method}] {text}\r\n");
-			}
-			catch(Exception)
-			{
+				try
+				{
+					//string fullName = Path.Combine(Global.DATA_PATH, Global.LOG_NAME);
+					string fullName = "error.log";
+					File.AppendAllText(fullName, $"{DateTime.Now:dd.MM.yyyy HH:mm:ss} {logType.ToString().PadRight(5)} [{section}] [{method}] {text}\r\n");
+				}
+				catch (Exception)
+				{
+				}
 			}
 		}
 

@@ -13,16 +13,20 @@ using System.Windows.Forms;
 /// - eingehende Anrufe testen (funktioniert prinzipiell, verhaspelt sich ab und zu)
 /// 
 /// Version history
-/// 1.0.0.1 - logging, improved error handling, inactivity timer
-/// 1.0.0.2 - direct entry of peer address, port and extension is now possible
-///         - fixed error on incoming connection (there still seems to be a problem)
-///         - last line was not shown in terminal window
+/// 1.0.0.1 - Logging, improved error handling, inactivity timer
+/// 1.0.0.2 - Direct entry of peer address, port and extension is now possible
+///         - Fixed error on incoming connection (there still seems to be a problem)
+///         - Last line was not shown in terminal window
 ///         - Terminal windows is now scrollable
-/// 1.0.0.3 - copy/paste implemented (context menu and ctrl-c/ctrl-v)
+/// 1.0.0.3 - Copy/paste implemented (context menu and ctrl-c/ctrl-v)
 /// 1.0.0.4 - Removed expire date
 ///         - The size of the terminal window can now be changed dynamically.
 ///         - First GitHub release
 /// 1.0.0.5 - Show messages when connecting to subscribe server
+/// 1.0.0.6 - Send always "wintelex" after WRU
+///         - Fixed a bug that occurred if the query did not find a number
+///         - Locking for logfiles access
+///         - New config menu
 /// 
 /// </summary>
 
@@ -34,16 +38,13 @@ namespace WinTelex
 
 		private System.Timers.Timer _clockTimer;
 
+		private ConfigData _configData;
+
 		private SubscriberServer _subscriberServer;
 		private ItelexProtocol _itelex;
-		//private PeerQueryData _queryData;
-		//private string _kennung = "\r\n123456 test d";
-		//private bool ctrlKey = false;
 
 		public const int SCREEN_WIDTH = 68;
-		//public const int SCREEN_HEIGHT = 25;
 		private int _screenHeight = 25;
-		//private char[,] _screen = new char[SCREEN_WIDTH, SCREEN_HEIGHT];
 		private List<ScreenLine> _screen = new List<ScreenLine>();
 		private int _screenX = 0;
 		private int _screenY = 0;
@@ -63,7 +64,6 @@ namespace WinTelex
 			MemberCb.DataSource = null;
 			MemberCb.DisplayMember = "DisplayName";
 
-			KennungTb.Text = Constants.DEFAULT_KENNUNG;
 			SendLineFeedBtn.Text = "\u2261";
 			//TimeBtn.Text = "\u2299";
 
@@ -71,6 +71,8 @@ namespace WinTelex
 			ConnTimeTb.Text = "";
 			LnColTb.Text = "";
 			SendAckTb.Text = "";
+
+			RecvOnOffBtn.Enabled = true;
 
 			this.KeyPreview = true;
 			this.KeyDown += Form_KeyDown;
@@ -93,14 +95,17 @@ namespace WinTelex
 
 			RichTextTb.ContextMenuStrip = CreateContextMenu();
 
+			_configData = ConfigManager.Instance.LoadConfig();
+			if (_configData==null)
+			{
+				_configData = ConfigManager.Instance.GetDefaultConfig();
+			}
+
 			SetConnectState();
 			UpdatedHandler();
 
 			ClearScreen();
 			ShowScreen();
-
-
-			_itelex.Start();
 		}
 
 		private void MainForm_Load(object sender, EventArgs e)
@@ -280,7 +285,6 @@ namespace WinTelex
 
 		private void SendWruBtn_Click(object sender, EventArgs e)
 		{
-			//AddText("\u2629");
 			SendWerDa();
 			SetFocus();
 		}
@@ -294,26 +298,25 @@ namespace WinTelex
 		private void SendBellBtn_Click(object sender, EventArgs e)
 		{
 			SendAsciiText("\x7");
-			//SystemSounds.Beep.Play();
-			//AddText("\u04E8");
 			SetFocus();
 		}
 
 		private void SendLettersBtn_Click(object sender, EventArgs e)
 		{
-			_itelex.SendBaudotChar(CodeConversion.LTR_SHIFT);
+			//_itelex.SendBaudotChar(CodeConversion.LTR_SHIFT);
+			_itelex.SendAsciiChar(CodeConversion.ASC_LTRS);
 			SetFocus();
 		}
 
 		private void SendFiguresBtn_Click(object sender, EventArgs e)
 		{
-			_itelex.SendBaudotChar(CodeConversion.FIG_SHIFT);
+			//_itelex.SendBaudotChar(CodeConversion.FIG_SHIFT);
+			_itelex.SendAsciiChar(CodeConversion.ASC_FIGS);
 			SetFocus();
 		}
 
 		private void SendCarriageReturnBtn_Click(object sender, EventArgs e)
 		{
-			//_itelex.SendBaudotChar(CodeConversion.BAU_CR);
 			_itelex.SendAsciiText("\r");
 			SetFocus();
 		}
@@ -399,18 +402,16 @@ namespace WinTelex
 					SendWerDa();
 					break;
 				case Keys.N: // letter switch
-					_itelex.SendBaudotChar(CodeConversion.LTR_SHIFT);
+					_itelex.SendAsciiChar(CodeConversion.ASC_LTRS);
 					break;
 				case Keys.O: // figures switch
-					_itelex.SendBaudotChar(CodeConversion.FIG_SHIFT);
+					_itelex.SendAsciiChar(CodeConversion.ASC_FIGS);
 					break;
 				case Keys.G: // bell
-					_itelex.SendBaudotChar(CodeConversion.BAU_BEL);
-					AddText("%");
+					_itelex.SendAsciiChar(CodeConversion.ASC_BEL);
 					break;
 				case Keys.I: // inquire, eigene kennung senden
-					_itelex.SendBaudotChar(CodeConversion.BAU_WRU);
-					AddText("@");
+					_itelex.SendAsciiChar(CodeConversion.ASC_WRU);
 					break;
 			}
 
@@ -489,6 +490,8 @@ namespace WinTelex
 			Helper.ControlInvokeRequired(InactivityTimoutTb, () => InactivityTimoutTb.Text = $"Timeout {_itelex.InactivityTimer} sec" );
 			Helper.ControlInvokeRequired(ConnTimeTb, () => ConnTimeTb.Text = $"Conn {_itelex.ConnTimeMin} min" );
 
+			Helper.ControlInvokeRequired(KennungTb, () => KennungTb.Text = _configData.Kennung);
+
 			Helper.ControlInvokeRequired(SendLettersBtn, () =>
 			{
 				if (_itelex.ShiftState == CodeConversion.ShiftStates.Unknown || _itelex.ShiftState == CodeConversion.ShiftStates.Figs)
@@ -532,6 +535,22 @@ namespace WinTelex
 			Helper.ControlInvokeRequired(ProtocolAsciiRb, () =>
 				ProtocolAsciiRb.Checked = ascii
 			);
+
+			Helper.ControlInvokeRequired(RecvOnOffBtn, () =>
+			{
+				if (_itelex.RecvOn)
+				{
+					RecvOnOffBtn.ForeColor = Color.Green;
+					RecvOnOffBtn.Text = "Recv Off";
+					//UpdateIpAddressBtn.Enabled = true;
+				}
+				else
+				{
+					RecvOnOffBtn.ForeColor = Color.Black;
+					RecvOnOffBtn.Text = "Recv On";
+					//UpdateIpAddressBtn.Enabled = false;
+				}
+			});
 		}
 
 		private bool ConnectOut()
@@ -576,7 +595,7 @@ namespace WinTelex
 				_itelex.SendDirectDialCmd(extension.Value);
 			}
 
-			_itelex.StartAck();
+			//_itelex.StartAck();
 
 			return true;
 		}
@@ -590,15 +609,12 @@ namespace WinTelex
 
 		private void SendWerDa()
 		{
-			//_itelex.SendBaudotChar(CodeConversion.BAU_WRU);
 			SendAsciiText("\x9");
-			//AddText("\u2629");
-			//AddText("@");
 		}
 
 		private void SendHereIs()
 		{
-			SendAsciiText("\r\n" + KennungTb.Text);
+			SendAsciiText($"\r\n{KennungTb.Text} (wintelex)");
 		}
 
 		private void SetConnectState()
@@ -632,7 +648,6 @@ namespace WinTelex
 					DisconnectBtn.ForeColor = Color.Black;
 				}
 			}
-
 		}
 
 		private void ClearBtn_Click(object sender, EventArgs e)
@@ -675,12 +690,13 @@ namespace WinTelex
 		{
 			SearchTb.Text = SearchTb.Text.Trim();
 
-			//if (string.IsNullOrWhiteSpace(SearchTb.Text))
-			//{
-			//	return;
-			//}
-
 			Logging.Instance.Log(LogTypes.Info, TAG, nameof(QueryBtn_Click), $"SearchText='{SearchTb.Text}'");
+
+			if (string.IsNullOrWhiteSpace(_configData.SubscribeServerAddress) || _configData.SubscribeServerPort==0)
+			{
+				SubcribeServerMessageHandler("invalid subscribe server address or port");
+				return;
+			}
 
 			PeerQueryData[] list = null;
 
@@ -690,7 +706,7 @@ namespace WinTelex
 
 			await Task.Run(() =>
 			{
-				if (!_subscriberServer.Connect())
+				if (!_subscriberServer.Connect(_configData.SubscribeServerAddress, _configData.SubscribeServerPort))
 				{
 					return;
 				}
@@ -704,7 +720,14 @@ namespace WinTelex
 						SubcribeServerMessageHandler(queryReply.Error);
 						return;
 					}
-					list = new PeerQueryData[] { queryReply.Data };
+					if (queryReply.Data != null)
+					{
+						list = new PeerQueryData[] { queryReply.Data };
+					}
+					else
+					{
+						list = new PeerQueryData[0];
+					}
 				}
 				else
 				{
@@ -720,7 +743,7 @@ namespace WinTelex
 				}
 			});
 
-			SubcribeServerMessageHandler($"{list.Length} member(s) found");
+			SubcribeServerMessageHandler($"{list?.Length} member(s) found");
 
 			MemberCb.DataSource = list;
 			MemberCb.DisplayMember = "Display";
@@ -798,7 +821,7 @@ namespace WinTelex
 			_screenShowPos0 = _screenEditPos0;
 
 			ShowScreen();
-			Log(text);
+			CommLog(text);
 		}
 
 		private void IncScreenX()
@@ -813,17 +836,6 @@ namespace WinTelex
 			{
 				SystemSounds.Exclamation.Play();
 			}
-
-
-			/*
-			if (_screenX >= SCREEN_WIDTH)
-			{
-				_screenX = 0;
-				IncScreenY();
-			}
-			*/
-
-			Debug.WriteLine($"{_screenX} {_screenY}");
 		}
 
 		private void IncScreenY()
@@ -832,26 +844,11 @@ namespace WinTelex
 			_screenY++;
 			if (_screenY >= _screenHeight)
 			{
-				// scroll
-				/*
-				for (int y = 0; y < SCREEN_HEIGHT - 1; y++)
-				{
-					for (int x = 0; x < SCREEN_WIDTH; x++)
-					{
-						_screen[x, y] = _screen[x, y + 1];
-					}
-				}
-				for (int x = 0; x < SCREEN_WIDTH; x++)
-				{
-					_screen[x, SCREEN_HEIGHT - 1] = ' ';
-				}
-				*/
 				_screenEditPos0++;
 				_screenShowPos0 = _screenEditPos0;
 				_screenY--;
 				ShowScreen();
 			}
-			Debug.WriteLine($"{_screenX} {_screenY}");
 		}
 
 		private void ShowScreen()
@@ -888,7 +885,6 @@ namespace WinTelex
 				pos = lines.Length;
 			}
 
-			//lines += "*";
 			lines = lines.Replace('_', ' ');
 
 			Helper.ControlInvokeRequired(RichTextTb, () =>
@@ -923,9 +919,21 @@ namespace WinTelex
 			RichTextTb.Focus();
 		}
 
-		private void Log(string text)
+		private object _commLogLock = new object();
+
+		private void CommLog(string text)
 		{
-			File.AppendAllText($"{Constants.PROGRAM_NAME}.log", text);
+			lock (_commLogLock)
+			{
+				try
+				{
+					File.AppendAllText($"{Constants.PROGRAM_NAME}.log", text);
+				}
+				catch (Exception ex)
+				{
+					Logging.Instance.Error(TAG, nameof(CommLog), "", ex);
+				}
+			}
 		}
 
 		private void AboutBtn_Click(object sender, EventArgs e)
@@ -991,7 +999,6 @@ namespace WinTelex
 		{
 			if (e.Button == MouseButtons.Right)
 			{   //click event
-				//MessageBox.Show("you got it!");
 				ContextMenu contextMenu = new ContextMenu();
 				MenuItem menuItem = new MenuItem("Clear");
 				menuItem.Click += new EventHandler(ClearAction);
@@ -1053,11 +1060,67 @@ namespace WinTelex
 
 			_screenY = _screen.Count - _screenEditPos0 - 1;
 
-#warning TODO warum ist _screenY<0
+#warning TODO why is _screenY < 0 sometimes?
 			if (_screenY < 0)
 				_screenY = 0;
 
 			ShowScreen();
+		}
+
+		private void UpdateIpAddressBtn_Click(object sender, EventArgs e)
+		{
+			/*
+			_subscriberServer.Connect();
+			SendClientUpdate(905258, xxxx, 8134);
+			SendClientUpdate(905259, xxxx, 8134);
+			_subscriberServer.Disconnect();
+			*/
+		}
+
+		private void SendClientUpdate(int number, int pin, int port)
+		{
+			ClientUpdateReply reply = _subscriberServer.SendClientUpdate(number, pin, port);
+			if (reply.Success)
+			{
+				SubcribeServerMessageHandler($"{number} {reply.IpAddress}:{port}");
+			}
+			else
+			{
+				SubcribeServerMessageHandler($"{number} {reply.Error}");
+			}
+		}
+
+		private void RecvOnOffBtn_Click(object sender, EventArgs e)
+		{
+			if (!_itelex.RecvOn)
+			{
+				_itelex.SetRecvOn(_configData.IncomingPort);
+			}
+			else
+			{
+				_itelex.SetRecvOff();
+			}
+		}
+
+		/*
+		private void PuncherBtn_Click(object sender, EventArgs e)
+		{
+			PunchTapeForm punchTapeForm = new PunchTapeForm();
+			punchTapeForm.Show();
+		}
+		*/
+
+		private void ConfigBtn_Click(object sender, EventArgs e)
+		{
+			ConfigForm configForm = new ConfigForm();
+			configForm.SetData(_configData);
+			configForm.ShowDialog();
+			if (!configForm.Canceled)
+			{
+				_configData = configForm.GetData();
+				ConfigManager.Instance.SaveConfig(_configData);
+				UpdatedHandler();
+			}
 		}
 	}
 

@@ -74,6 +74,9 @@
 			this.DateTb = new System.Windows.Forms.TextBox();
 			this.TimeTb = new System.Windows.Forms.TextBox();
 			this.AboutBtn = new System.Windows.Forms.Button();
+			this.RecvOnOffBtn = new System.Windows.Forms.Button();
+			this.UpdateIpAddressBtn = new System.Windows.Forms.Button();
+			this.ConfigBtn = new System.Windows.Forms.Button();
 			this.panel1.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.panel3.SuspendLayout();
@@ -226,7 +229,7 @@
 			this.ExitBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ExitBtn.Location = new System.Drawing.Point(653, 569);
 			this.ExitBtn.Name = "ExitBtn";
-			this.ExitBtn.Size = new System.Drawing.Size(69, 23);
+			this.ExitBtn.Size = new System.Drawing.Size(74, 23);
 			this.ExitBtn.TabIndex = 17;
 			this.ExitBtn.Text = "Exit";
 			this.ExitBtn.UseVisualStyleBackColor = true;
@@ -446,7 +449,8 @@
 			// 
 			this.KennungTb.Location = new System.Drawing.Point(8, 65);
 			this.KennungTb.Name = "KennungTb";
-			this.KennungTb.Size = new System.Drawing.Size(103, 20);
+			this.KennungTb.ReadOnly = true;
+			this.KennungTb.Size = new System.Drawing.Size(131, 20);
 			this.KennungTb.TabIndex = 38;
 			this.KennungTb.Leave += new System.EventHandler(this.KennungTb_Leave);
 			// 
@@ -542,17 +546,55 @@
 			this.AboutBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.AboutBtn.Location = new System.Drawing.Point(653, 540);
 			this.AboutBtn.Name = "AboutBtn";
-			this.AboutBtn.Size = new System.Drawing.Size(69, 23);
+			this.AboutBtn.Size = new System.Drawing.Size(74, 23);
 			this.AboutBtn.TabIndex = 46;
 			this.AboutBtn.Text = "About";
 			this.AboutBtn.UseVisualStyleBackColor = true;
 			this.AboutBtn.Click += new System.EventHandler(this.AboutBtn_Click);
+			// 
+			// RecvOnOffBtn
+			// 
+			this.RecvOnOffBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.RecvOnOffBtn.Enabled = false;
+			this.RecvOnOffBtn.Location = new System.Drawing.Point(652, 204);
+			this.RecvOnOffBtn.Name = "RecvOnOffBtn";
+			this.RecvOnOffBtn.Size = new System.Drawing.Size(75, 23);
+			this.RecvOnOffBtn.TabIndex = 47;
+			this.RecvOnOffBtn.Text = "Recv On";
+			this.RecvOnOffBtn.UseVisualStyleBackColor = true;
+			this.RecvOnOffBtn.Click += new System.EventHandler(this.RecvOnOffBtn_Click);
+			// 
+			// UpdateIpAddressBtn
+			// 
+			this.UpdateIpAddressBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.UpdateIpAddressBtn.Enabled = false;
+			this.UpdateIpAddressBtn.Location = new System.Drawing.Point(652, 233);
+			this.UpdateIpAddressBtn.Name = "UpdateIpAddressBtn";
+			this.UpdateIpAddressBtn.Size = new System.Drawing.Size(75, 23);
+			this.UpdateIpAddressBtn.TabIndex = 48;
+			this.UpdateIpAddressBtn.Text = "Update";
+			this.UpdateIpAddressBtn.UseVisualStyleBackColor = true;
+			this.UpdateIpAddressBtn.Click += new System.EventHandler(this.UpdateIpAddressBtn_Click);
+			// 
+			// ConfigBtn
+			// 
+			this.ConfigBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.ConfigBtn.Location = new System.Drawing.Point(653, 511);
+			this.ConfigBtn.Name = "ConfigBtn";
+			this.ConfigBtn.Size = new System.Drawing.Size(74, 23);
+			this.ConfigBtn.TabIndex = 50;
+			this.ConfigBtn.Text = "Config";
+			this.ConfigBtn.UseVisualStyleBackColor = true;
+			this.ConfigBtn.Click += new System.EventHandler(this.ConfigBtn_Click);
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(734, 604);
+			this.Controls.Add(this.ConfigBtn);
+			this.Controls.Add(this.UpdateIpAddressBtn);
+			this.Controls.Add(this.RecvOnOffBtn);
 			this.Controls.Add(this.AboutBtn);
 			this.Controls.Add(this.panel5);
 			this.Controls.Add(this.panel4);
@@ -626,6 +668,9 @@
 		private System.Windows.Forms.TextBox ConnTimeTb;
 		private System.Windows.Forms.TextBox TimeTb;
 		private System.Windows.Forms.TextBox DateTb;
+		private System.Windows.Forms.Button RecvOnOffBtn;
+		private System.Windows.Forms.Button UpdateIpAddressBtn;
+		private System.Windows.Forms.Button ConfigBtn;
 	}
 }
 

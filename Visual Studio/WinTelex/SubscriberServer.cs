@@ -6,7 +6,6 @@ using System.Text;
 
 namespace WinTelex
 {
-
 	class SubscriberServer
 	{
 		public delegate void MessageEventHandler(string message);
@@ -17,19 +16,19 @@ namespace WinTelex
 		private TcpClient client = null;
 		private NetworkStream stream = null;
 
-		public bool Connect()
+		public bool Connect(string address, int port)
 		{
 			try
 			{
-				client = new TcpClient(Constants.SUBSCRIBE_SERVER, Constants.SUBSCRIBE_SERVER_PORT);
+				client = new TcpClient(address, port);
 				stream = client.GetStream();
 				return true;
 			}
 			catch(Exception ex)
 			{
 				Logging.Instance.Log(LogTypes.Error,TAG, nameof(Connect),
-					$"error connecting to subscribe server {Constants.SUBSCRIBE_SERVER}:{Constants.SUBSCRIBE_SERVER_PORT}");
-				Message?.Invoke($"ERROR CONNECTING TO SUBSCRIBE SERVER {Constants.SUBSCRIBE_SERVER}:{Constants.SUBSCRIBE_SERVER_PORT}");
+					$"error connecting to subscribe server {address}:{port}");
+				Message?.Invoke($"ERROR CONNECTING TO SUBSCRIBE SERVER {address}:{port}");
 				stream?.Close();
 				client?.Close();
 				client = null;
@@ -47,7 +46,7 @@ namespace WinTelex
 #if false
 		public AsciiQueryResult PeerQueryAscii(string number)
 		{
-			Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendPeerQuery), $"number='{number}'");
+			Logging.Instance.Log(LogTypes.Debug, TAG, nameof(PeerQueryAscii), $"number='{number}'");
 
 			if (client == null)
 			{
@@ -189,7 +188,7 @@ namespace WinTelex
 			{
 				// peer not found
 				Logging.Instance.Log(LogTypes.Info, TAG, nameof(SendPeerSearch), $"peer not found");
-				reply.Error = "peer not found";
+				reply.Valid = true;
 				return reply;
 			}
 
@@ -359,6 +358,87 @@ namespace WinTelex
 
 			return data;
 		}
+
+		/// <summary>
+		/// Update own ip-number
+		/// </summary>
+		/// <param name="number"></param>
+		/// <returns>peer or null</returns>
+		public ClientUpdateReply SendClientUpdate(int number, int pin, int port)
+		{
+			Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendClientUpdate), $"number='{number}'");
+			ClientUpdateReply reply = new ClientUpdateReply();
+
+			if (client == null)
+			{
+				Logging.Instance.Error(TAG, nameof(SendPeerQuery), "no server connection");
+				reply.Error = "no server connection";
+				return reply;
+			}
+
+			/*
+			• 1 byte Packet type: 01
+• 1 byte length: 08
+• 4 byte call-number: The own number of the client as a 32 bit integer value
+• 2 byte PIN number: A number chosen by the user to authentificate
+• 2 byte port number: The port number opened for incoming calls (usually 134).
+• Example: 01 08 16 AA 34 00 34 12 86 00(hex)
+*/
+
+			byte[] sendData = new byte[2 + 8];
+			sendData[0] = 0x01; // packet type: client update
+			sendData[1] = 0x08; // length
+			byte[] data = BitConverter.GetBytes((UInt32)number);
+			Buffer.BlockCopy(data, 0, sendData, 2, 4);
+			data = BitConverter.GetBytes((UInt16)pin);
+			Buffer.BlockCopy(data, 0, sendData, 6, 2);
+			data = BitConverter.GetBytes((UInt16)port);
+			Buffer.BlockCopy(data, 0, sendData, 8, 2);
+
+			try
+			{
+				stream.Write(sendData, 0, sendData.Length);
+			}
+			catch (Exception ex)
+			{
+				Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error sending data to subscribe server", ex);
+				reply.Error = "reply server error";
+				return reply;
+			}
+
+			byte[] recvData = new byte[6];
+			int recvLen = 0;
+			try
+			{
+				recvLen = stream.Read(recvData, 0, recvData.Length);
+			}
+			catch (Exception ex)
+			{
+				Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error receiving data from subscribe server", ex);
+				reply.Error = "reply server error";
+				return reply;
+			}
+
+			if (recvLen != 6)
+			{
+				Logging.Instance.Log(LogTypes.Info, TAG, nameof(SendPeerSearch), $"wrong reply packet size ({recvLen})");
+				return reply;
+			}
+
+			if (recvData[0] != 0x02)
+			{
+				// peer not found
+				Logging.Instance.Log(LogTypes.Info, TAG, nameof(SendPeerSearch), $"wrong reply packet, type={recvData[0]:X2}");
+				return reply;
+			}
+
+			reply.Success = true;
+			reply.IpAddress = $"{recvData[2]}.{recvData[3]}.{recvData[4]}.{recvData[5]}";
+			reply.Error = "ok";
+
+			return reply;
+		}
+
 	}
 
 	/*
@@ -378,16 +458,23 @@ namespace WinTelex
 	}
 	*/
 
+	class ClientUpdateReply
+	{
+		public bool Success { get; set; } = false;
+		public string Error { get; set; }
+		public string IpAddress { get; set; }
+	}
+
 	class PeerQueryReply
 	{
-		public bool Valid { get; set; }
+		public bool Valid { get; set; } = false;
 		public string Error { get; set; }
 		public PeerQueryData Data { get; set; }
 	}
 
 	class PeerSearchReply
 	{
-		public bool Valid { get; set; }
+		public bool Valid { get; set; } = false;
 		public string Error { get; set; }
 		public PeerQueryData[] List { get; set; }
 	}
