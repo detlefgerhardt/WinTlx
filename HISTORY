@@ -1,3 +1,4 @@
+
 Version history
 
 1.0.0.1 - logging, improved error handling, inactivity timer
@@ -20,3 +21,5 @@ Version history
         - Added pin and own i-telex number to config
         - Added local and public code to config
         - Added virtual tape punch
+1.0.0.8 - Project renamed to WinTlx
+

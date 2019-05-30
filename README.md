@@ -1,4 +1,4 @@
-# WinTelex
+﻿# WinTlx
 A Windows test und diagnostic tool for the i-Telex network
 
 ## Features
@@ -15,7 +15,7 @@ A Windows test und diagnostic tool for the i-Telex network
 - NEW: Now with configuration menu
 - NEW: Virtual tape punch
 
-![Screenshot](https://github.com/detlefgerhardt/WinTelex/blob/master/WinTelexScreen.png)
+![Screenshot](https://github.com/detlefgerhardt/WinTlx/blob/master/WinTlxScreen.png)
 
 ## Credits
 
