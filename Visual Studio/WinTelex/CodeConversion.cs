@@ -2,7 +2,7 @@
 
 namespace WinTelex
 {
-	static class CodeConversion
+	public static class CodeConversion
 	{
 		public enum ShiftStates
 		{
@@ -36,9 +36,9 @@ namespace WinTelex
 			return asciiStr;
 		}
 
-		public static char BaudotCharToAscii(byte baudotChar, ShiftStates shiftState)
+		public static char BaudotCharToAscii(byte baudotCode, ShiftStates shiftState)
 		{
-			if (baudotChar > 0x1F)
+			if (baudotCode > 0x1F)
 			{
 				return (char)ASC_INV;
 			}
@@ -49,9 +49,22 @@ namespace WinTelex
 				default:
 					return (char)ASC_INV;
 				case ShiftStates.Ltr:
-					return _codeTabLtrs[baudotChar];
+					return _codeTabLtrs[baudotCode];
 				case ShiftStates.Figs:
-					return _codeTabFigs[baudotChar];
+					return _codeTabFigs[baudotCode];
+			}
+		}
+
+		public static string BaudotCodeToPuncherText(byte baudotCode, ShiftStates shiftState)
+		{
+			switch (shiftState)
+			{
+				case ShiftStates.Ltr:
+					return _codeTabLtrsPuncher[baudotCode];
+				case ShiftStates.Figs:
+					return _codeTabFigsPuncher[baudotCode];
+				default:
+					return "";
 			}
 		}
 
@@ -395,149 +408,6 @@ namespace WinTelex
 		public const byte LTR_SHIFT = 0x1F;
 		public const byte FIG_SHIFT = 0x1B;
 
-		#region ASCII -> Baudot / ITA 2 table
-
-		//private const string INV1 = "\x33"; // ?
-
-		/*
-	// 0x00..0X1F: baudot letters
-	// 0x20..0X3F: baudot figures
-	// 0x40..0x5F: both
-	private static string[] _asciiToBaudotTab =
-	{
-		"",		// 00 invalid skip
-		"",		// 01 invalid skip
-		"",		// 02 invalid skip
-		"",		// 03 invalid skip
-		"",		// 04 invalid skip
-		"",		// 05 invalid skip
-		"",		// 06 invalid skip
-		"",		// 07 bell
-		"",		// 08 invalid skip
-		"",		// 09 invalid skip
-		"\x48",	// 0A line feed
-		"",		// 0B invalid skip
-		"",		// 0C invalid skip
-		"\x42",	// 0D carrige return
-		"",		// 0E invalid skip
-		"",		// 0F invalid skip
-		"",		// 10 invalid skip
-		"",		// 11 invalid skip
-		"",		// 12 invalid skip
-		"",		// 13 invalid skip
-		"",		// 14 invalid skip
-		"",		// 15 invalid skip
-		"",		// 16 invalid skip
-		"",		// 17 invalid skip
-		"",		// 18 invalid skip
-		"",		// 19 invalid skip
-		"",		// 1A invalid skip
-		"",		// 1B invalid skip
-		"",		// 1C invalid skip
-		"",		// 1D invalid skip
-		"",		// 1E invalid skip
-		"",		// 1F invalid skip
-		"\x44",	// 20 blank
-		"\x27",	// 21 ! -> .
-		"\x34\x34",	// 22 " -> ''
-		"\x03\x03",	// 23 # -> //
-		"\x14",	// 24 $ -> s
-		"\x03\x37\x03",	// 25 % -> o/o
-		"\x31",	// 26 & -> +
-		"\x34",	// 27 '
-		"\x3E",	// 28 (
-		"\x29",	// 29 )
-		"\x17",	// 2A * -> x
-		"\x31",	// 2B +
-		"\x26",	// 2C ,
-		"\x38",	// 2D - 
-		"\x27",	// 2E .
-		"\x37",	// 2F /
-		"\x2D",	// 30 0
-		"\x3D",	// 31 1
-		"\x39",	// 32 2
-		"\x30",	// 33 3
-		"\x2A",	// 34 4
-		"\x21",	// 35 5
-		"\x35",	// 36 6
-		"\x3C",	// 37 7
-		"\x2C",	// 38 8
-		"\x23",	// 39 9
-		"\x2E",	// 3A :
-		"\x26",	// 3B ; -> ,
-		"\x3E",	// 3C < -> (
-		"\x2F",	// 3D =
-		"\x29",	// 3E > -> )
-		"\x33",	// 3F ?
-		"\x3E\x18\x01\x29",	// 40 @ -> (at)
-		"\x18",	// 41 A
-		"\x13",	// 42 B
-		"\x0E",	// 43 C
-		"\x12",	// 44 D
-		"\x10",	// 45 E
-		"\x16",	// 46 F
-		"\x0B",	// 47 G
-		"\x05",	// 48 H
-		"\x0C",	// 49 I
-		"\x1A",	// 4A J
-		"\x1E",	// 4B K
-		"\x09",	// 4C L
-		"\x07",	// 4D M
-		"\x06",	// 4E N
-		"\x03",	// 4F O
-		"\x0D",	// 50 P
-		"\x1D",	// 51 Q
-		"\x0A",	// 52 R
-		"\x14",	// 53 S
-		"\x01",	// 54 T
-		"\x1C",	// 55 U
-		"\x1F",	// 56 V
-		"\x1B",	// 57 W
-		"\x17",	// 58 X
-		"\x15",	// 59 Y
-		"\x11",	// 5A Z
-		"\x3E",	// 5B [ -> (:
-		"\x37",	// 5C \ -> /
-		"\x29",	// 5D ] -> )
-		"\x33",	// 5E ^ -> ?
-		"\x38",	// 5F _ -> -
-		"\x34",	// 60 ` -> '
-		"\x18",	// 61 a
-		"\x13",	// 62 b
-		"\x0E",	// 63 c
-		"\x12",	// 64 d
-		"\x10",	// 65 e
-		"\x16",	// 66 f
-		"\x0B",	// 67 g
-		"\x05",	// 68 h
-		"\x0C",	// 69 i
-		"\x1A",	// 6A j
-		"\x1E",	// 6B k
-		"\x09",	// 6C l
-		"\x07",	// 6D m
-		"\x06",	// 6E n
-		"\x03",	// 6F o
-		"\x0D",	// 70 p
-		"\x1D",	// 71 q
-		"\x0A",	// 72 r
-		"\x14",	// 73 s
-		"\x01",	// 74 t
-		"\x1C",	// 75 u
-		"\x0F",	// 76 v
-		"\x19",	// 77 w
-		"\x17",	// 78 x
-		"\x15",	// 79 y
-		"\x11",	// 7A z
-		"\x3E",	// 7B { -> (
-		"\x37",	// 7C | -> /
-		"\x29",	// 7D } -> )
-		"\x38",	// 7E ~ -> -
-		"",		// 7F invalid skip
-		};
-		*/
-
-		#endregion
-
 		#region ASCII -> Telex character set
 
 		private static string[] _asciiToTelexTab =
@@ -672,7 +542,6 @@ namespace WinTelex
 			"",		// 7F invalid skip
 		};
 
-
 		#endregion
 
 		#region Baudot / ITA 2 -> ASCII
@@ -747,6 +616,82 @@ namespace WinTelex
 			'1',		// 1D
 			'(',		// 1E
 			ASC_LTRS	// 1F letters
+		};
+
+		#endregion
+
+		#region Baudot / ITA 2 -> Puncher test
+
+		private static string[] _codeTabLtrsPuncher =
+		{
+			"",			// 00
+			"t",		// 01
+			"CR",		// 02
+			"o",		// 03
+			"BL",		// 04 blank
+			"h",		// 05
+			"n",		// 06
+			"m",		// 07
+			"LF",		// 08
+			"l",		// 09
+			"r",		// 0A
+			"g",		// 0B
+			"i",		// 0C
+			"p",		// 0D
+			"c",		// 0E
+			"v",		// 0F
+			"e",		// 10
+			"z",		// 11
+			"d",		// 12
+			"b",		// 13
+			"s",		// 14
+			"y",		// 15
+			"f",		// 16
+			"x",		// 17
+			"a",		// 18
+			"w",		// 19
+			"j",		// 1A
+			"FIG",		// 1B figures
+			"u",		// 1C
+			"q",		// 1D
+			"k",		// 1E
+			"LTR"		// 1F letters
+		};
+
+		private static string[] _codeTabFigsPuncher =
+		{
+			"",			// 00
+			"5",		// 01
+			"CR",		// 02 carriage return
+			"9",		// 03
+			"BL",		// 04 blank
+			"",			// 05 $ / pound
+			",",		// 06
+			".",		// 07
+			"LF",		// 08 new line
+			")",		// 09
+			"4",		// 0A
+			"",			// 0B @
+			"8",		// 0C
+			"0",		// 0D
+			":",		// 0E
+			"=",		// 0F
+			"3",		// 10
+			"+",		// 11
+			"WRU",		// 12 who are you
+			"?",		// 13
+			"",			// 14 or $
+			"6",		// 15
+			"",			// 16 ! / %
+			"/",		// 17
+			"-",		// 18
+			"2",		// 19
+			"BEL",		// 1A
+			"FIG",		// 1B figures
+			"7",		// 1C
+			"1",		// 1D
+			"(",		// 1E
+			"LTR"		// 1F letters
 		};
 
 		#endregion

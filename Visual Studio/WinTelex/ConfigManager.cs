@@ -27,7 +27,7 @@ namespace WinTelex
 			{
 				InactivityTimeout = Constants.DEFAULT_INACTIVITY_TIMEOUT,
 				Kennung = Constants.DEFAULT_KENNUNG,
-				IncomingPort = Constants.DEFAULT_INCOMING_PORT
+				IncomingLocalPort = Constants.DEFAULT_INCOMING_PORT
 			};
 		}
 

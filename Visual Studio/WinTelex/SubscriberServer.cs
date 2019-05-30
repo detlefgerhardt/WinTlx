@@ -376,15 +376,6 @@ namespace WinTelex
 				return reply;
 			}
 
-			/*
-			• 1 byte Packet type: 01
-• 1 byte length: 08
-• 4 byte call-number: The own number of the client as a 32 bit integer value
-• 2 byte PIN number: A number chosen by the user to authentificate
-• 2 byte port number: The port number opened for incoming calls (usually 134).
-• Example: 01 08 16 AA 34 00 34 12 86 00(hex)
-*/
-
 			byte[] sendData = new byte[2 + 8];
 			sendData[0] = 0x01; // packet type: client update
 			sendData[1] = 0x08; // length

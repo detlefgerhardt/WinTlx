@@ -14,4 +14,9 @@ Version history
         - Fixed a bug that occurred if the query did not find a number
         - Locking for logfiles access
         - New config menu
-
+1.0.0.7 - Inactivity timeout config did not work (was always 120 sec)
+        - New program icon
+        - Added update function to update own ip number on subscribe server
+        - Added pin and own i-telex number to config
+        - Added local and public code to config
+        - Added virtual tape punch

@@ -51,8 +51,11 @@ namespace WinTelex
 		public delegate void SendEventHandler(string asciiText);
 		public event SendEventHandler Send;
 
-		public delegate void ErrorEventHandler(string asciiText);
-		public event ErrorEventHandler Error;
+		public delegate void BaudotSendRecvEventHandler(byte[] code);
+		public event BaudotSendRecvEventHandler BaudotSendRecv;
+
+		public delegate void MessageEventHandler(string asciiText);
+		public event MessageEventHandler Message;
 
 		private const int RECV_BUFFERSIZE = 255 + 2;
 
@@ -84,8 +87,9 @@ namespace WinTelex
 		}
 
 		private DateTime _lastSendRecvTime;
-		private int _lastInactivityTimeout;
+		private int _lastInactivityTimer;
 		public int InactivityTimer { get; set; }
+		public int InactivityTimeout { get; set; }
 
 		private CodeConversion.ShiftStates _shiftState;
 		public CodeConversion.ShiftStates ShiftState
@@ -179,7 +183,7 @@ namespace WinTelex
 					_incoming = true;
 
 					IPAddress remoteAddr = ((IPEndPoint)_client.Client.RemoteEndPoint).Address;
-					Send?.Invoke($"INCOMING CONNECTION FROM {remoteAddr}");
+					Message?.Invoke($"INCOMING CONNECTION FROM {remoteAddr}");
 					Debug.WriteLine($"incoming connection from {remoteAddr}");
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"incoming connection from {remoteAddr}");
 
@@ -263,7 +267,7 @@ namespace WinTelex
 			ConnectionState = ConnectionStates.Connected;
 			_shiftState = CodeConversion.ShiftStates.Unknown;
 			_echoShiftState = CodeConversion.ShiftStates.Unknown;
-			_lastInactivityTimeout = 0;
+			_lastInactivityTimer = 0;
 			StartReceive();
 
 			Local = false;
@@ -313,19 +317,19 @@ namespace WinTelex
 				return;
 			}
 
-			InactivityTimer = (int)(Constants.DEFAULT_INACTIVITY_TIMEOUT -
+			InactivityTimer = (int)(InactivityTimeout -
 										DateTime.Now.Subtract(_lastSendRecvTime).Ticks / 10000000);
 			if (InactivityTimer < 0)
 				InactivityTimer = 0;
-			if (InactivityTimer != _lastInactivityTimeout)
+			if (InactivityTimer != _lastInactivityTimer)
 			{
 				Update?.Invoke();
 			}
-			_lastInactivityTimeout = InactivityTimer;
+			_lastInactivityTimer = InactivityTimer;
 
 			if (InactivityTimer == 0)
 			{
-				Error?.Invoke("INACTIVITY TIMEOUT");
+				Message?.Invoke("INACTIVITY TIMEOUT");
 				SendEndCmd();
 				Disconnect();
 			}
@@ -418,7 +422,7 @@ namespace WinTelex
 			else
 			{
 				byte[] baudotData = CodeConversion.AsciiStringToBaudot(asciiStr, ref _shiftState);
-				if (IsConnected)
+				//if (IsConnected)
 				{
 					for (int i = 0; i < baudotData.Length; i++)
 					{
@@ -463,25 +467,30 @@ namespace WinTelex
 			{
 				SendCmd(ItelexCommands.End);
 			}
-
 		}
 
 		private void SendBaudotCode(byte baudotCode, ref CodeConversion.ShiftStates shiftState)
 		{
+			byte[] codes = CodeConversion.BaudotCodeToBaudotWithShift(baudotCode, shiftState, ref shiftState);
+			BaudotSendRecv?.Invoke(codes);
+
 			if (Local)
 			{
-				byte[] codes = CodeConversion.BaudotCodeToBaudotWithShift(baudotCode, shiftState, ref shiftState);
 				Update?.Invoke();
 				return;
 			}
 
 			if (!IsConnected)
-				return;
-
-			byte[] code = CodeConversion.BaudotCodeToBaudotWithShift(baudotCode, shiftState, ref shiftState);
-			for (int i = 0; i < code.Length; i++)
 			{
-				_sendBuffer.Enqueue(code[i]);
+				return;
+			}
+
+			for (int i = 0; i < codes.Length; i++)
+			{
+				if (IsConnected)
+				{
+					_sendBuffer.Enqueue(codes[i]);
+				}
 			}
 			Update?.Invoke();
 			//Debug.WriteLine($"enqueue {baudotCode:X2}");
@@ -662,6 +671,8 @@ namespace WinTelex
 
 		private void DecodePacket(ItelexPacket packet)
 		{
+			Debug.WriteLine($"incoming {packet}");
+
 			switch ((ItelexCommands)packet.Command)
 			{
 				case ItelexCommands.Heartbeart:
@@ -675,6 +686,7 @@ namespace WinTelex
 						string asciiStr = CodeConversion.BaudotStringToAscii(packet.Data, ref _shiftState);
 						AddReceivedCharCount(packet.Data.Length);
 						Received?.Invoke(asciiStr);
+						BaudotSendRecv?.Invoke(packet.Data);
 						Update?.Invoke();
 						SetLastSendRecv();
 					}
@@ -686,7 +698,7 @@ namespace WinTelex
 				case ItelexCommands.Reject:
 					string reason = Encoding.ASCII.GetString(packet.Data, 0, packet.Data.Length);
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(DecodePacket), $"reject command, reason={reason}");
-					Error?.Invoke($"REJECT {reason.ToUpper()} ({ReasonToString(reason).ToUpper()})");
+					Message?.Invoke($"REJECT {reason.ToUpper()} ({ReasonToString(reason).ToUpper()})");
 					Disconnect();
 					break;
 				case ItelexCommands.Ack:

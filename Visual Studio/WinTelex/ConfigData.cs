@@ -12,13 +12,22 @@ namespace WinTelex
 		public int SubscribeServerPort { get; set; }
 
 		[DataMember]
+		public int SubscribeServerUpdatePin { get; set; }
+
+		[DataMember]
 		public string Kennung { get; set; }
 
 		[DataMember]
 		public int InactivityTimeout { get; set; }
 
 		[DataMember]
-		public int IncomingPort { get; set; }
+		public int OwnNumber { get; set; }
+
+		[DataMember]
+		public int IncomingLocalPort { get; set; }
+
+		[DataMember]
+		public int IncomingPublicPort { get; set; }
 
 		public void SetDefaults()
 		{
@@ -30,9 +39,9 @@ namespace WinTelex
 			{
 				InactivityTimeout = Constants.DEFAULT_INACTIVITY_TIMEOUT;
 			}
-			if (IncomingPort == 0)
+			if (IncomingLocalPort == 0)
 			{
-				IncomingPort = Constants.DEFAULT_INCOMING_PORT;
+				IncomingLocalPort = Constants.DEFAULT_INCOMING_PORT;
 			}
 		}
 	}

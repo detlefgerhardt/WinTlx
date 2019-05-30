@@ -27,7 +27,12 @@ using System.Windows.Forms;
 ///         - Fixed a bug that occurred if the query did not find a number
 ///         - Locking for logfiles access
 ///         - New config menu
-/// 
+/// 1.0.0.7 - Inactivity timeout config did not work (was always 120 sec)
+///         - New program icon
+///         - Added pin and own i-telex number to config
+///         - Added local and public code to config
+///         - Added update function to update own ip number on subscribe server
+///         - Added tape punch simulation
 /// </summary>
 
 namespace WinTelex
@@ -42,6 +47,7 @@ namespace WinTelex
 
 		private SubscriberServer _subscriberServer;
 		private ItelexProtocol _itelex;
+		TapePunchForm _tapePunchForm;
 
 		public const int SCREEN_WIDTH = 68;
 		private int _screenHeight = 25;
@@ -81,10 +87,11 @@ namespace WinTelex
 			_itelex = new ItelexProtocol();
 			_itelex.Received += ReceivedHandler;
 			_itelex.Send += SendHandler;
+			_itelex.BaudotSendRecv += BaudotSendRecvHandler;
 			_itelex.Connected += ConnectedHandler;
 			_itelex.Dropped += DroppedHandler;
 			_itelex.Update += UpdatedHandler;
-			_itelex.Error += ErrorHandler;
+			_itelex.Message += MessageHandler;
 
 			_subscriberServer = new SubscriberServer();
 			_subscriberServer.Message += SubcribeServerMessageHandler;
@@ -100,6 +107,7 @@ namespace WinTelex
 			{
 				_configData = ConfigManager.Instance.GetDefaultConfig();
 			}
+			_itelex.InactivityTimeout = _configData.InactivityTimeout;
 
 			SetConnectState();
 			UpdatedHandler();
@@ -461,10 +469,26 @@ namespace WinTelex
 					case '\t': //
 						c = '\u2629';
 						break;
+					case CodeConversion.ASC_LTRS:
+					case CodeConversion.ASC_FIGS:
+						continue;
 				}
 				dispText += c;
 			}
 			AddText(dispText);
+		}
+
+		private void BaudotSendRecvHandler(byte[] code)
+		{
+			if (_tapePunchForm == null)
+			{
+				return;
+			}
+
+			for (int i = 0; i < code.Length; i++)
+			{
+				_tapePunchForm.PunchCode(code[i], _itelex.ShiftState);
+			}
 		}
 
 		private void SubcribeServerMessageHandler(string message)
@@ -790,16 +814,16 @@ namespace WinTelex
 			ShowScreen();
 		}
 
-		private void AddText(string text)
+		private void AddText(string asciiText)
 		{
-			if (string.IsNullOrEmpty(text))
+			if (string.IsNullOrEmpty(asciiText))
 			{
 				return;
 			}
 
-			for (int i = 0; i < text.Length; i++)
+			for (int i = 0; i < asciiText.Length; i++)
 			{
-				switch (text[i])
+				switch (asciiText[i])
 				{
 					case '\n':
 						IncScreenY();
@@ -812,7 +836,7 @@ namespace WinTelex
 						{
 							_screen.Add(new ScreenLine());
 						}
-						_screen[_screenEditPos0 + _screenY].Line[_screenX] = text[i];
+						_screen[_screenEditPos0 + _screenY].Line[_screenX] = asciiText[i];
 						IncScreenX();
 						break;
 				}
@@ -821,7 +845,7 @@ namespace WinTelex
 			_screenShowPos0 = _screenEditPos0;
 
 			ShowScreen();
-			CommLog(text);
+			CommLog(asciiText);
 		}
 
 		private void IncScreenX()
@@ -1032,26 +1056,25 @@ namespace WinTelex
 			}
 		}
 
-		private void ErrorHandler(string asciiText)
+		private void MessageHandler(string asciiText)
 		{
 			Helper.ControlInvokeRequired(RichTextTb, () =>
 			{
-				ShowLocalError(asciiText);
+				ShowLocalMessage(asciiText);
 			});
 		}
 
-		private void ShowLocalError(string message)
+		private void ShowLocalMessage(string message)
 		{
 			AddText(message.ToUpper());
 			AddText("\r\n");
-			SystemSounds.Exclamation.Play();
+			//SystemSounds.Exclamation.Play();
 		}
 
 		private void MainForm_Resize(object sender, EventArgs e)
 		{
 			RichTextTb.Height = this.Height - 300 + 50;
 			_screenHeight = RichTextTb.Height / 19;
-			Debug.WriteLine($"{_screenHeight} {RichTextTb.Height}");
 
 			_screenEditPos0 = _screen.Count - _screenHeight;
 			if (_screenEditPos0 < 0)
@@ -1065,28 +1088,37 @@ namespace WinTelex
 				_screenY = 0;
 
 			ShowScreen();
+
+			_tapePunchForm?.SetPosition(this.Bounds);
+		}
+
+		private void MainForm_LocationChanged(object sender, EventArgs e)
+		{
+			_tapePunchForm?.SetPosition(this.Bounds);
 		}
 
 		private void UpdateIpAddressBtn_Click(object sender, EventArgs e)
 		{
-			/*
-			_subscriberServer.Connect();
-			SendClientUpdate(905258, xxxx, 8134);
-			SendClientUpdate(905259, xxxx, 8134);
+			if (_configData.SubscribeServerUpdatePin==0 || _configData.OwnNumber==0 || _configData.IncomingLocalPort==0)
+			{
+				return;
+			}
+
+			_subscriberServer.Connect(_configData.SubscribeServerAddress, _configData.SubscribeServerPort);
+			SendClientUpdate(_configData.OwnNumber, _configData.SubscribeServerUpdatePin, _configData.IncomingPublicPort);
 			_subscriberServer.Disconnect();
-			*/
 		}
 
-		private void SendClientUpdate(int number, int pin, int port)
+		private void SendClientUpdate(int number, int pin, int publicPort)
 		{
-			ClientUpdateReply reply = _subscriberServer.SendClientUpdate(number, pin, port);
+			ClientUpdateReply reply = _subscriberServer.SendClientUpdate(number, pin, publicPort);
 			if (reply.Success)
 			{
-				SubcribeServerMessageHandler($"{number} {reply.IpAddress}:{port}");
+				SubcribeServerMessageHandler($"update {number} {reply.IpAddress}:{publicPort}");
 			}
 			else
 			{
-				SubcribeServerMessageHandler($"{number} {reply.Error}");
+				SubcribeServerMessageHandler($"update {number} {reply.Error}");
 			}
 		}
 
@@ -1094,7 +1126,7 @@ namespace WinTelex
 		{
 			if (!_itelex.RecvOn)
 			{
-				_itelex.SetRecvOn(_configData.IncomingPort);
+				_itelex.SetRecvOn(_configData.IncomingLocalPort);
 			}
 			else
 			{
@@ -1102,26 +1134,34 @@ namespace WinTelex
 			}
 		}
 
-		/*
-		private void PuncherBtn_Click(object sender, EventArgs e)
+		private void TapePunchBtn_Click(object sender, EventArgs e)
 		{
-			PunchTapeForm punchTapeForm = new PunchTapeForm();
-			punchTapeForm.Show();
+			if (_tapePunchForm == null)
+			{
+				_tapePunchForm = new TapePunchForm(this.Bounds);
+				_tapePunchForm.Show();
+			}
+			else
+			{
+				_tapePunchForm.Close();
+				_tapePunchForm = null;
+			}
 		}
-		*/
 
 		private void ConfigBtn_Click(object sender, EventArgs e)
 		{
-			ConfigForm configForm = new ConfigForm();
+			ConfigForm configForm = new ConfigForm(this.Bounds);
 			configForm.SetData(_configData);
 			configForm.ShowDialog();
 			if (!configForm.Canceled)
 			{
 				_configData = configForm.GetData();
 				ConfigManager.Instance.SaveConfig(_configData);
+				_itelex.InactivityTimeout = _configData.InactivityTimeout;
 				UpdatedHandler();
 			}
 		}
+
 	}
 
 	class ScreenLine

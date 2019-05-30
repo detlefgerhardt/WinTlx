@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
@@ -161,6 +162,33 @@ namespace WinTelex
 			{
 				a();
 			}
+		}
+
+		public static Point CenterForm(Form form, Rectangle parentPos)
+		{
+			int screenNr = GetScreenNr(parentPos);
+			Rectangle sc = Screen.AllScreens[screenNr].WorkingArea;
+
+			int x = sc.Left + (sc.Width - form.Width) / 2;
+			int y = sc.Top + (sc.Height - form.Height) / 2;
+
+			return new Point(x, y);
+		}
+
+		// Error if parentPos = Fullscreen
+		public static int GetScreenNr(Rectangle parentPos)
+		{
+			int mx = parentPos.Left + (parentPos.Right - parentPos.Left) / 2;
+
+			Screen[] screens = Screen.AllScreens;
+			int screenNr = 1;
+			for (int i = 0; i < screens.Length; i++)
+			{
+				Rectangle scrnBounds = screens[i].WorkingArea;
+				if (mx >= scrnBounds.Left && mx <= scrnBounds.Left + scrnBounds.Width)
+					screenNr = i;
+			}
+			return screenNr;
 		}
 	}
 }

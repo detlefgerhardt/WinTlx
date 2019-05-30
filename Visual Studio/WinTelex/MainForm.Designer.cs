@@ -77,6 +77,7 @@
 			this.RecvOnOffBtn = new System.Windows.Forms.Button();
 			this.UpdateIpAddressBtn = new System.Windows.Forms.Button();
 			this.ConfigBtn = new System.Windows.Forms.Button();
+			this.TapePunchBtn = new System.Windows.Forms.Button();
 			this.panel1.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.panel3.SuspendLayout();
@@ -227,9 +228,9 @@
 			// ExitBtn
 			// 
 			this.ExitBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.ExitBtn.Location = new System.Drawing.Point(653, 569);
+			this.ExitBtn.Location = new System.Drawing.Point(652, 569);
 			this.ExitBtn.Name = "ExitBtn";
-			this.ExitBtn.Size = new System.Drawing.Size(74, 23);
+			this.ExitBtn.Size = new System.Drawing.Size(75, 23);
 			this.ExitBtn.TabIndex = 17;
 			this.ExitBtn.Text = "Exit";
 			this.ExitBtn.UseVisualStyleBackColor = true;
@@ -544,9 +545,9 @@
 			// AboutBtn
 			// 
 			this.AboutBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.AboutBtn.Location = new System.Drawing.Point(653, 540);
+			this.AboutBtn.Location = new System.Drawing.Point(652, 540);
 			this.AboutBtn.Name = "AboutBtn";
-			this.AboutBtn.Size = new System.Drawing.Size(74, 23);
+			this.AboutBtn.Size = new System.Drawing.Size(75, 23);
 			this.AboutBtn.TabIndex = 46;
 			this.AboutBtn.Text = "About";
 			this.AboutBtn.UseVisualStyleBackColor = true;
@@ -554,9 +555,8 @@
 			// 
 			// RecvOnOffBtn
 			// 
-			this.RecvOnOffBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.RecvOnOffBtn.Enabled = false;
-			this.RecvOnOffBtn.Location = new System.Drawing.Point(652, 204);
+			this.RecvOnOffBtn.Location = new System.Drawing.Point(652, 117);
 			this.RecvOnOffBtn.Name = "RecvOnOffBtn";
 			this.RecvOnOffBtn.Size = new System.Drawing.Size(75, 23);
 			this.RecvOnOffBtn.TabIndex = 47;
@@ -566,9 +566,7 @@
 			// 
 			// UpdateIpAddressBtn
 			// 
-			this.UpdateIpAddressBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.UpdateIpAddressBtn.Enabled = false;
-			this.UpdateIpAddressBtn.Location = new System.Drawing.Point(652, 233);
+			this.UpdateIpAddressBtn.Location = new System.Drawing.Point(652, 146);
 			this.UpdateIpAddressBtn.Name = "UpdateIpAddressBtn";
 			this.UpdateIpAddressBtn.Size = new System.Drawing.Size(75, 23);
 			this.UpdateIpAddressBtn.TabIndex = 48;
@@ -579,19 +577,31 @@
 			// ConfigBtn
 			// 
 			this.ConfigBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.ConfigBtn.Location = new System.Drawing.Point(653, 511);
+			this.ConfigBtn.Location = new System.Drawing.Point(652, 511);
 			this.ConfigBtn.Name = "ConfigBtn";
-			this.ConfigBtn.Size = new System.Drawing.Size(74, 23);
+			this.ConfigBtn.Size = new System.Drawing.Size(75, 23);
 			this.ConfigBtn.TabIndex = 50;
 			this.ConfigBtn.Text = "Config";
 			this.ConfigBtn.UseVisualStyleBackColor = true;
 			this.ConfigBtn.Click += new System.EventHandler(this.ConfigBtn_Click);
+			// 
+			// TapePunchBtn
+			// 
+			this.TapePunchBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.TapePunchBtn.Location = new System.Drawing.Point(652, 482);
+			this.TapePunchBtn.Name = "TapePunchBtn";
+			this.TapePunchBtn.Size = new System.Drawing.Size(75, 23);
+			this.TapePunchBtn.TabIndex = 51;
+			this.TapePunchBtn.Text = "Tape Punch";
+			this.TapePunchBtn.UseVisualStyleBackColor = true;
+			this.TapePunchBtn.Click += new System.EventHandler(this.TapePunchBtn_Click);
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(734, 604);
+			this.Controls.Add(this.TapePunchBtn);
 			this.Controls.Add(this.ConfigBtn);
 			this.Controls.Add(this.UpdateIpAddressBtn);
 			this.Controls.Add(this.RecvOnOffBtn);
@@ -608,6 +618,7 @@
 			this.Name = "MainForm";
 			this.Text = "WinTelex 1.0 beta";
 			this.Load += new System.EventHandler(this.MainForm_Load);
+			this.LocationChanged += new System.EventHandler(this.MainForm_LocationChanged);
 			this.Resize += new System.EventHandler(this.MainForm_Resize);
 			this.panel1.ResumeLayout(false);
 			this.panel2.ResumeLayout(false);
@@ -671,6 +682,7 @@
 		private System.Windows.Forms.Button RecvOnOffBtn;
 		private System.Windows.Forms.Button UpdateIpAddressBtn;
 		private System.Windows.Forms.Button ConfigBtn;
+		private System.Windows.Forms.Button TapePunchBtn;
 	}
 }
 
