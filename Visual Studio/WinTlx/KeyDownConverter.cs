@@ -177,8 +177,6 @@ namespace WinTlx
 					break;
 			}
 
-			//Debug.WriteLine($"{keyValue} {modifier} {str}");
-
 			return str;
 		}
 	}

@@ -17,5 +17,7 @@ namespace WinTlx
 		public const int WAIT_BEFORE_SEND_MSEC = 500; // 0.5 seconds
 		public const int WAIT_BEFORE_SEND_ACK = 16; // 16 characters
 
+		public const int EXPIRE_DAYS = 90;
+
 	}
 }

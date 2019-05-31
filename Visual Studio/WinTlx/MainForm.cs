@@ -8,33 +8,6 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
 
-/// <summary>
-/// Todo:
-/// - eingehende Anrufe testen (funktioniert prinzipiell, verhaspelt sich ab und zu)
-/// 
-/// Version history
-/// 1.0.0.1 - Logging, improved error handling, inactivity timer
-/// 1.0.0.2 - Direct entry of peer address, port and extension is now possible
-///         - Fixed error on incoming connection (there still seems to be a problem)
-///         - Last line was not shown in terminal window
-///         - Terminal windows is now scrollable
-/// 1.0.0.3 - Copy/paste implemented (context menu and ctrl-c/ctrl-v)
-/// 1.0.0.4 - Removed expire date
-///         - The size of the terminal window can now be changed dynamically.
-///         - First GitHub release
-/// 1.0.0.5 - Show messages when connecting to subscribe server
-/// 1.0.0.6 - Send always "wintelex" after WRU
-///         - Fixed a bug that occurred if the query did not find a number
-///         - Locking for logfiles access
-///         - New config menu
-/// 1.0.0.7 - Inactivity timeout config did not work (was always 120 sec)
-///         - New program icon
-///         - Added pin and own i-telex number to config
-///         - Added local and public code to config
-///         - Added update function to update own ip number on subscribe server
-///         - Added tape punch simulation
-/// </summary>
-
 namespace WinTlx
 {
 	public partial class MainForm : Form
@@ -118,14 +91,24 @@ namespace WinTlx
 
 		private void MainForm_Load(object sender, EventArgs e)
 		{
-			/*
-			if (Expired())
-			{
-				Close();
-				return;
-			}
-			*/
 			MainForm_Resize(null, null);
+
+#if !DEBUG
+			string text =
+				$"{Helper.GetVersion()}\r\r" +
+				"by *dg* Detlef Gerhardt\r\r" +
+				"Please note that this is a test and diagnostic tool for the i-Telex network. " +
+				"The participants have real teletype machines connected to their i-telex ports. " +
+				"Please do not send longer text files or spam to i-Telex numbers.";
+			MessageBox.Show(
+				text,
+				$"{Constants.PROGRAM_NAME}",
+				MessageBoxButtons.OK,
+				MessageBoxIcon.Information,
+				MessageBoxDefaultButton.Button1);
+
+#endif
+			//Expired();
 		}
 
 		private void Form_KeyPress(object sender, KeyPressEventArgs e)
@@ -394,7 +377,6 @@ namespace WinTlx
 				return;
 			}
 
-			Debug.WriteLine($"{e.KeyCode} {e.KeyData} {e.KeyValue:X2}");
 			switch (e.KeyCode)
 			{
 				default:
@@ -975,7 +957,6 @@ namespace WinTlx
 				MessageBoxDefaultButton.Button1);
 		}
 
-		/*
 		private bool Expired()
 		{
 			if (!Helper.IsExpired())
@@ -985,7 +966,8 @@ namespace WinTlx
 
 			string text =
 				$"{Helper.GetVersion()}\r\r" +
-				"This test version expired";
+				"This test version expired\r\r" +
+				"Please get a new version at\rhttps://github.com/detlefgerhardt/WinTlx/tree/master/Binaries";
 			MessageBox.Show(
 				text,
 				$"Expired",
@@ -995,7 +977,6 @@ namespace WinTlx
 
 			return true;
 		}
-		*/
 
 		private ContextMenuStrip CreateContextMenu()
 		{
@@ -1095,6 +1076,11 @@ namespace WinTlx
 		private void MainForm_LocationChanged(object sender, EventArgs e)
 		{
 			_tapePunchForm?.SetPosition(this.Bounds);
+		}
+
+		private void MainForm_Activated(object sender, EventArgs e)
+		{
+			_tapePunchForm?.Activate();
 		}
 
 		private void UpdateIpAddressBtn_Click(object sender, EventArgs e)

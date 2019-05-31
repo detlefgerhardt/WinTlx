@@ -617,6 +617,7 @@
 			this.MinimumSize = new System.Drawing.Size(750, 350);
 			this.Name = "MainForm";
 			this.Text = "WinTelex 1.0 beta";
+			this.Activated += new System.EventHandler(this.MainForm_Activated);
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.LocationChanged += new System.EventHandler(this.MainForm_LocationChanged);
 			this.Resize += new System.EventHandler(this.MainForm_Resize);

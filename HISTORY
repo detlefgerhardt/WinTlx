@@ -22,4 +22,5 @@ Version history
         - Added local and public code to config
         - Added virtual tape punch
 1.0.0.8 - Project renamed to WinTlx
-
+1.0.0.9 - Code cleanup and some improvements
+        - Note at program start

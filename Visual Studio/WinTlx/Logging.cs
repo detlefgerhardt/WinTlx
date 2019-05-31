@@ -80,7 +80,6 @@ namespace WinTlx
 
 		public void OnLog(LogArgs e)
 		{
-			//Debug.WriteLine("OnLog");
 			RecvLog?.Invoke(this, e);
 		}
 

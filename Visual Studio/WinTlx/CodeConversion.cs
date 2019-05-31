@@ -47,11 +47,11 @@ namespace WinTlx
 			{
 				case ShiftStates.Unknown:
 				default:
-					return (char)ASC_INV;
+					return ASC_INV;
 				case ShiftStates.Ltr:
-					return _codeTabLtrs[baudotCode];
+					return _codeTab[LTRS, baudotCode];
 				case ShiftStates.Figs:
-					return _codeTabFigs[baudotCode];
+					return _codeTab[FIGS, baudotCode];
 			}
 		}
 
@@ -60,9 +60,9 @@ namespace WinTlx
 			switch (shiftState)
 			{
 				case ShiftStates.Ltr:
-					return _codeTabLtrsPuncher[baudotCode];
+					return _codeTabPuncher[LTRS, baudotCode];
 				case ShiftStates.Figs:
-					return _codeTabFigsPuncher[baudotCode];
+					return _codeTabPuncher[FIGS, baudotCode];
 				default:
 					return "";
 			}
@@ -88,7 +88,7 @@ namespace WinTlx
 		public static string AsciiStringToTelex(string asciiStr)
 		{
 			string telexStr = "";
-			for (int i=0; i<asciiStr.Length; i++)
+			for (int i = 0; i < asciiStr.Length; i++)
 			{
 				telexStr += AsciiCharToTelex(asciiStr[i]);
 			}
@@ -112,9 +112,9 @@ namespace WinTlx
 		}
 
 		public static byte[] TelexStringToBaudot(string telexStr, ref ShiftStates shiftState)
-		{ 
+		{
 			byte[] buffer = new byte[0];
-			for (int i=0; i< telexStr.Length; i++)
+			for (int i = 0; i < telexStr.Length; i++)
 			{
 				byte[] baudotData = TelexCharToBaudotWithShift(telexStr[i], ref shiftState);
 				buffer = buffer.Concat(baudotData).ToArray();
@@ -207,16 +207,16 @@ namespace WinTlx
 
 		public static byte[] TelexCharToBaudotWithShift(char telexChr, ref ShiftStates shiftState)
 		{
-			byte? ltrCode = FindBaudot(_codeTabLtrs, telexChr);
-			byte? figCode = FindBaudot(_codeTabFigs, telexChr);
+			byte? ltrCode = FindBaudot(LTRS, telexChr);
+			byte? figCode = FindBaudot(FIGS, telexChr);
 			byte baudCode;
 			ShiftStates newShiftState;
-			if (ltrCode!=null && figCode!=null)
+			if (ltrCode != null && figCode != null)
 			{
 				baudCode = ltrCode.Value;
 				newShiftState = ShiftStates.Both;
 			}
-			else if (ltrCode!=null)
+			else if (ltrCode != null)
 			{
 				baudCode = ltrCode.Value;
 				newShiftState = ShiftStates.Ltr;
@@ -230,57 +230,11 @@ namespace WinTlx
 			return BaudotCodeToBaudotWithShift(baudCode, newShiftState, ref shiftState);
 		}
 
-		/*
-		public static byte[] BaudotCodeToBaudotWithShift_old(byte? ltrCode, byte? figCode, ref ShiftStates shiftState)
-		{ 
-			byte[] buffer = new byte[0];
-
-			if (ltrCode == LTR_SHIFT || figCode == LTR_SHIFT)
-			{
-				shiftState = ShiftStates.Ltr;
-				buffer = Helper.AddByte(buffer, LTR_SHIFT);
-			}
-			else if (ltrCode == FIG_SHIFT || figCode == FIG_SHIFT)
-			{
-				shiftState = ShiftStates.Ltr;
-				buffer = Helper.AddByte(buffer, FIG_SHIFT);
-			}
-
-			if (ltrCode != null & figCode != null)
-			{   // is letters or figures (code in both groups)
-				buffer = Helper.AddByte(buffer, ltrCode.Value);
-			}
-			else if (ltrCode != null)
-			{   // is letter
-				if (shiftState == ShiftStates.Unknown || shiftState == ShiftStates.Figs)
-				{
-					buffer = Helper.AddByte(buffer, LTR_SHIFT);
-					shiftState = ShiftStates.Ltr;
-				}
-				buffer = Helper.AddByte(buffer, ltrCode.Value);
-			}
-			else if (figCode != null)
-			{   // is figure 
-				if (shiftState == ShiftStates.Unknown || shiftState == ShiftStates.Ltr)
-				{
-					buffer = Helper.AddByte(buffer, FIG_SHIFT);
-					shiftState = ShiftStates.Figs;
-				}
-				buffer = Helper.AddByte(buffer, figCode.Value);
-			}
-			else
-			{   // is invalid
-				return new byte[0];
-			}
-			return buffer;
-		}
-		*/
-
 		public static byte[] BaudotCodeToBaudotWithShift(byte baudCode, ShiftStates newShiftState, ref ShiftStates shiftState)
 		{
 			byte[] buffer = new byte[0];
 
-			if (baudCode==LTR_SHIFT)
+			if (baudCode == LTR_SHIFT)
 			{
 				buffer = Helper.AddByte(buffer, LTR_SHIFT);
 				shiftState = ShiftStates.Ltr;
@@ -294,13 +248,13 @@ namespace WinTlx
 				return buffer;
 			}
 
-			if (shiftState==ShiftStates.Unknown && newShiftState==ShiftStates.Unknown)
+			if (shiftState == ShiftStates.Unknown && newShiftState == ShiftStates.Unknown)
 			{
 				buffer = Helper.AddByte(buffer, LTR_SHIFT);
 				newShiftState = ShiftStates.Ltr;
 			}
 
-			if (shiftState==ShiftStates.Unknown && newShiftState==ShiftStates.Ltr ||
+			if (shiftState == ShiftStates.Unknown && newShiftState == ShiftStates.Ltr ||
 				shiftState == ShiftStates.Figs && newShiftState == ShiftStates.Ltr)
 			{
 				buffer = Helper.AddByte(buffer, LTR_SHIFT);
@@ -318,7 +272,7 @@ namespace WinTlx
 				return buffer;
 			}
 
-			if (shiftState== newShiftState || newShiftState==ShiftStates.Both)
+			if (shiftState == newShiftState || newShiftState == ShiftStates.Both)
 			{
 				buffer = Helper.AddByte(buffer, baudCode);
 				return buffer;
@@ -328,11 +282,12 @@ namespace WinTlx
 			return new byte[0];
 		}
 
-		private static byte? FindBaudot(char[] tab, char telexChar)
+		private static byte? FindBaudot(int shift, char telexChar)
 		{
-			for (int c = 0; c < tab.Length; c++)
+			// search ascii char to find baudot code
+			for (int c = 0; c < 32; c++)
 			{
-				if (tab[c] == telexChar)
+				if (_codeTab[shift, c] == telexChar)
 				{
 					return (byte)c;
 				}
@@ -340,8 +295,24 @@ namespace WinTlx
 			return null;
 		}
 
+		private const int LTRS = 0;
+		private const int FIGS = 1;
+
+		private const char ASC_INV = '#'; // replace invalid baudot character
+		public const char ASC_WRU = '\x09'; // Ctrl-I, Kennungsgeber-Abfrage (wer da?)
+		public const char ASC_BEL = '\x07'; // Ctrl-G, Bell
+		public const char ASC_LTRS = '\x1E';
+		public const char ASC_FIGS = '\x1F';
+
+		//public const byte BAU_WRU = 0x12; // figure enquiry (wer da?)
+		//public const byte BAU_BEL = 0x1A; // figure bell
+		//public const byte BAU_CR = 0x02; // letter+figure carriage return
+		//public const byte BAU_LF = 0x08; // letter+figure linefeed
+		public const byte LTR_SHIFT = 0x1F;
+		public const byte FIG_SHIFT = 0x1B;
+
 		/// <summary>
-		/// Code page 437 to Ascii conversion table
+		/// Code page 437 to Ascii conversion
 		/// </summary>
 		/// <param name="asciiChar"></param>
 		/// <returns></returns>
@@ -395,18 +366,6 @@ namespace WinTlx
 			}
 		}
 
-		private const char ASC_INV = '#'; // replace invalid baudot character
-		public const char ASC_WRU = '\x09'; // Ctrl-I, Kennungsgeber-Abfrage (wer da?)
-		public const char ASC_BEL = '\x07'; // Ctrl-G, Bell
-		public const char ASC_LTRS = '\x1E';
-		public const char ASC_FIGS = '\x1F';
-
-		public const byte BAU_WRU = 0x12; // figure enquiry (wer da?)
-		public const byte BAU_BEL = 0x1A; // figure bell
-		public const byte BAU_CR = 0x02; // letter+figure carriage return
-		public const byte BAU_LF = 0x08; // letter+figure linefeed
-		public const byte LTR_SHIFT = 0x1F;
-		public const byte FIG_SHIFT = 0x1B;
 
 		#region ASCII -> Telex character set
 
@@ -444,7 +403,7 @@ namespace WinTlx
 			"",		// 1D invalid skip
 			"\x1E",	// 1E ITA2 letters
 			"\x1F", // 1F ITA2 figures
-			" ",	// 20 blank
+			" ",	// 20 space
 			".",	// 21 ! -> .
 			"''",	// 22 " -> ''
 			"//",	// 23 # -> //
@@ -546,211 +505,163 @@ namespace WinTlx
 
 		#region Baudot / ITA 2 -> ASCII
 
-		private static char[] _codeTabLtrs =
-		{
-			ASC_INV,	// 00
-			't',		// 01
-			'\r',		// 02
-			'o',		// 03
-			' ',		// 04 blank
-			'h',		// 05
-			'n',		// 06
-			'm',		// 07
-			'\n',		// 08
-			'l',		// 09
-			'r',		// 0A
-			'g',		// 0B
-			'i',		// 0C
-			'p',		// 0D
-			'c',		// 0E
-			'v',		// 0F
-			'e',		// 10
-			'z',		// 11
-			'd',		// 12
-			'b',		// 13
-			's',		// 14
-			'y',		// 15
-			'f',		// 16
-			'x',		// 17
-			'a',		// 18
-			'w',		// 19
-			'j',		// 1A
-			ASC_FIGS,	// 1B figures
-			'u',		// 1C
-			'q',		// 1D
-			'k',		// 1E
-			ASC_LTRS	// 1F letters
-		};
+		// bitorder is: 54.321
 
-		private static char[] _codeTabFigs =
+		private static char[,] _codeTab =
 		{
-			ASC_INV,	// 00
-			'5',		// 01
-			'\r',		// 02 carriage return
-			'9',		// 03
-			' ',		// 04 blank
-			ASC_INV,	// 05 $ / pound
-			',',		// 06
-			'.',		// 07
-			'\n',		// 08 new line
-			')',		// 09
-			'4',		// 0A
-			ASC_INV,	// 0B @
-			'8',		// 0C
-			'0',		// 0D
-			':',		// 0E
-			'=',		// 0F
-			'3',		// 10
-			'+',		// 11
-			ASC_WRU,	// 12 who are you / enquiry / Kreuz
-			'?',		// 13
-			'\'',		// 14 or $
-			'6',		// 15
-			ASC_INV,	// 16 ! / %
-			'/',		// 17
-			'-',		// 18
-			'2',		// 19
-			ASC_BEL,	// 1A
-			ASC_FIGS,	// 1B figures
-			'7',		// 1C
-			'1',		// 1D
-			'(',		// 1E
-			ASC_LTRS	// 1F letters
+			{
+				ASC_INV,	// 00
+				't',		// 01
+				'\r',		// 02
+				'o',		// 03
+				' ',		// 04 space
+				'h',		// 05
+				'n',		// 06
+				'm',		// 07
+				'\n',		// 08
+				'l',		// 09
+				'r',		// 0A
+				'g',		// 0B
+				'i',		// 0C
+				'p',		// 0D
+				'c',		// 0E
+				'v',		// 0F
+				'e',		// 10
+				'z',		// 11
+				'd',		// 12
+				'b',		// 13
+				's',		// 14
+				'y',		// 15
+				'f',		// 16
+				'x',		// 17
+				'a',		// 18
+				'w',		// 19
+				'j',		// 1A
+				ASC_FIGS,	// 1B figures
+				'u',		// 1C
+				'q',		// 1D
+				'k',		// 1E
+				ASC_LTRS    // 1F letters
+			},
+
+			// figures
+			{
+				ASC_INV,	// 00
+				'5',		// 01
+				'\r',		// 02 carriage return
+				'9',		// 03
+				' ',		// 04 space
+				ASC_INV,	// 05 $ / pound
+				',',		// 06
+				'.',		// 07
+				'\n',		// 08 new line
+				')',		// 09
+				'4',		// 0A
+				ASC_INV,	// 0B @
+				'8',		// 0C
+				'0',		// 0D
+				':',		// 0E
+				'=',		// 0F
+				'3',		// 10
+				'+',		// 11
+				ASC_WRU,	// 12 who are you / enquiry / Kreuz
+				'?',		// 13
+				'\'',		// 14 or $
+				'6',		// 15
+				ASC_INV,	// 16 ! / %
+				'/',		// 17
+				'-',		// 18
+				'2',		// 19
+				ASC_BEL,	// 1A
+				ASC_FIGS,	// 1B figures
+				'7',		// 1C
+				'1',		// 1D
+				'(',		// 1E
+				ASC_LTRS	// 1F letters
+			}
 		};
 
 		#endregion
 
-		#region Baudot / ITA 2 -> Puncher test
+		#region Baudot / ITA 2 -> Puncher
 
-		private static string[] _codeTabLtrsPuncher =
-		{
-			"",			// 00
-			"t",		// 01
-			"CR",		// 02
-			"o",		// 03
-			"BL",		// 04 blank
-			"h",		// 05
-			"n",		// 06
-			"m",		// 07
-			"LF",		// 08
-			"l",		// 09
-			"r",		// 0A
-			"g",		// 0B
-			"i",		// 0C
-			"p",		// 0D
-			"c",		// 0E
-			"v",		// 0F
-			"e",		// 10
-			"z",		// 11
-			"d",		// 12
-			"b",		// 13
-			"s",		// 14
-			"y",		// 15
-			"f",		// 16
-			"x",		// 17
-			"a",		// 18
-			"w",		// 19
-			"j",		// 1A
-			"FIG",		// 1B figures
-			"u",		// 1C
-			"q",		// 1D
-			"k",		// 1E
-			"LTR"		// 1F letters
-		};
+		// bitorder is: 54.321
 
-		private static string[] _codeTabFigsPuncher =
+		private static string[,] _codeTabPuncher =
 		{
-			"",			// 00
-			"5",		// 01
-			"CR",		// 02 carriage return
-			"9",		// 03
-			"BL",		// 04 blank
-			"",			// 05 $ / pound
-			",",		// 06
-			".",		// 07
-			"LF",		// 08 new line
-			")",		// 09
-			"4",		// 0A
-			"",			// 0B @
-			"8",		// 0C
-			"0",		// 0D
-			":",		// 0E
-			"=",		// 0F
-			"3",		// 10
-			"+",		// 11
-			"WRU",		// 12 who are you
-			"?",		// 13
-			"",			// 14 or $
-			"6",		// 15
-			"",			// 16 ! / %
-			"/",		// 17
-			"-",		// 18
-			"2",		// 19
-			"BEL",		// 1A
-			"FIG",		// 1B figures
-			"7",		// 1C
-			"1",		// 1D
-			"(",		// 1E
-			"LTR"		// 1F letters
+			// letters
+			{
+				"",			// 00
+				"t",		// 01
+				"CR",		// 02
+				"o",		// 03
+				"SP",		// 04 space
+				"h",		// 05
+				"n",		// 06
+				"m",		// 07
+				"LF",		// 08
+				"l",		// 09
+				"r",		// 0A
+				"g",		// 0B
+				"i",		// 0C
+				"p",		// 0D
+				"c",		// 0E
+				"v",		// 0F
+				"e",		// 10
+				"z",		// 11
+				"d",		// 12
+				"b",		// 13
+				"s",		// 14
+				"y",		// 15
+				"f",		// 16
+				"x",		// 17
+				"a",		// 18
+				"w",		// 19
+				"j",		// 1A
+				"FIG",		// 1B figures
+				"u",		// 1C
+				"q",		// 1D
+				"k",		// 1E
+				"LTR"       // 1F letters
+			},
+
+			// figures
+			{
+				"",			// 00
+				"5",		// 01
+				"CR",		// 02 carriage return
+				"9",		// 03
+				"SP",		// 04 space
+				"",			// 05 $ / pound
+				",",		// 06
+				".",		// 07
+				"LF",		// 08 new line
+				")",		// 09
+				"4",		// 0A
+				"",			// 0B @
+				"8",		// 0C
+				"0",		// 0D
+				":",		// 0E
+				"=",		// 0F
+				"3",		// 10
+				"+",		// 11
+				"WRU",		// 12 who are you
+				"?",		// 13
+				"",			// 14 or $
+				"6",		// 15
+				"",			// 16 ! / %
+				"/",		// 17
+				"-",		// 18
+				"2",		// 19
+				"BEL",		// 1A
+				"FIG",		// 1B figures
+				"7",		// 1C
+				"1",		// 1D
+				"(",		// 1E
+				"LTR"       // 1F letters
+			}
 		};
 
 		#endregion
-
-		public static string DebugBaudotStringToAscii(byte[] baudotData, ShiftStates shiftState)
-		{
-			string asciiStr = "";
-			for (int i = 0; i < baudotData.Length; i++)
-			{
-				byte baudotChr = baudotData[i];
-				if (baudotChr == LTR_SHIFT)
-				{
-					shiftState = ShiftStates.Ltr;
-				}
-				else if (baudotChr == FIG_SHIFT)
-				{
-					shiftState = ShiftStates.Figs;
-				}
-				else
-				{
-					string asciiChr = DebugBaudotCharToAscii(baudotData[i], shiftState);
-					asciiStr += asciiChr;
-				}
-			}
-			return asciiStr;
-		}
-
-		public static string DebugBaudotCharToAscii(byte baudotChar, ShiftStates shiftState)
-		{
-			if (baudotChar > 0x1F)
-			{
-				return $"<{baudotChar:X2}>";
-			}
-
-			switch (shiftState)
-			{
-				case ShiftStates.Unknown:
-				default:
-				case ShiftStates.Ltr:
-					return "<is>";
-					return DebugTabLtrs[baudotChar];
-				case ShiftStates.Figs:
-					return DebugTabFigs[baudotChar];
-			}
-		}
-
-		private static string[] DebugTabLtrs =
-		//     0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   
-			{ "<0>", "t", "<cr>", "o", " ", "h", "n", "m", "<lf>", "l", "r", "g", "i", "p", "c", "v", 
-
-		//    16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31
-			  "e", "z", "d", "b", "s", "y", "f", "x", "a", "w", "j", "<27>", "u", "q", "k", "<31>" };
-
-		private static string[] DebugTabFigs =
-		//      0     1    2      3    4     5     6    7    8      9   10    11   12   13   14   15   
-			{ "<0>", "5","<cr>", "9", " ", "<5>", ",", ".","<lf>", ")", "4", "<11>", "8", "0", ":", "=", 
-
-		//    16   17    18      19  20   21     22   23   24   25     26       27    28   29   30   31
-		      "3", "+", "<WRU>", "?","'", "6", "<22>","/", "-", "2", "<BEL>", "<27>", "7", "1", "(", "<31>" };
-
 	}
 }

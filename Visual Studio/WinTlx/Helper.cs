@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using System.Configuration;
 
 namespace WinTlx
 {
@@ -19,22 +20,22 @@ namespace WinTlx
 
 		public static string GetVersion()
 		{
-#if DEBUG
-			// show date and time in debug version
-			string buildTime = Properties.Resources.BuildDate.Trim(new char[] { '\n', '\r' }) + " Debug";
 			//int? expireDays = ExpireDays();
 			//string expireStr = expireDays != null ? $" expires in {expireDays} days" : "";
 			string expireStr = "";
+#if DEBUG
+			// show date and time in debug version
+			string buildTime = Properties.Resources.BuildDate.Trim(new char[] { '\n', '\r' }) + " Debug";
+			//string buildTime = ConfigurationManager.AppSettings.Get("builddate") + " Debug";
+
 #else
 			// show only date in release version
 			string buildTime = Properties.Resources.BuildDate.Trim(new char[] { '\n', '\r' });
 			buildTime = buildTime.Substring(0, 10);
-			string expireStr = "";
 #endif
 			return $"{Constants.PROGRAM_NAME}  V{Application.ProductVersion}  (Build={buildTime}) {expireStr}";
 		}
 
-#if false
 		public static bool IsExpired()
 		{
 			int? expireDays = ExpireDays();
@@ -70,8 +71,10 @@ namespace WinTlx
 			}
 			return buildTime.Value.AddDays(Constants.EXPIRE_DAYS);
 		}
+
 		public static DateTime? BuildTime()
 		{
+			//string dateStr = ConfigurationManager.AppSettings.Get("builddate");
 			string dateStr = Properties.Resources.BuildDate.Trim();
 			DateTime dt;
 			if (!DateTime.TryParse(dateStr, out dt))
@@ -81,7 +84,6 @@ namespace WinTlx
 			}
 			return dt;
 		}
-#endif
 
 		public static List<string> DumpByteArray(byte[] buffer, int pos, int len = -1)
 		{
@@ -116,7 +118,6 @@ namespace WinTlx
 				}
 				line += l1 + " " + l2;
 				list.Add(line);
-				Debug.WriteLine(line);
 			}
 			return list;
 		}

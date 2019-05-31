@@ -176,7 +176,6 @@ namespace WinTlx
 						return;
 					}
 
-					Debug.WriteLine("wait for incoming connection");
 					// wait for connection
 					_client = _tcpListener.AcceptTcpClient();
 					ConnectInit();
@@ -184,7 +183,6 @@ namespace WinTlx
 
 					IPAddress remoteAddr = ((IPEndPoint)_client.Client.RemoteEndPoint).Address;
 					Message?.Invoke($"INCOMING CONNECTION FROM {remoteAddr}");
-					Debug.WriteLine($"incoming connection from {remoteAddr}");
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"incoming connection from {remoteAddr}");
 
 					while (true)
@@ -197,12 +195,10 @@ namespace WinTlx
 
 					Disconnect();
 					_incoming = false;
-					Debug.WriteLine("incoming disconnected");
 				}
 				catch (Exception ex)
 				{
 					Logging.Instance.Error(TAG, nameof(Listener), "", ex);
-					Debug.WriteLine($"{_client} {ex.Message}");
 				}
 			}
 		}
@@ -221,7 +217,6 @@ namespace WinTlx
 			catch(Exception ex)
 			{
 				Logging.Instance.Error(TAG, nameof(ConnectOut), "", ex);
-				Debug.WriteLine(ex.Message);
 				return false;
 			}
 
@@ -294,8 +289,6 @@ namespace WinTlx
 			{
 				return;
 			}
-
-			Debug.WriteLine("DropConnection");
 
 			_ackTimer.Stop();
 			_sendTimer.Stop();
@@ -493,7 +486,6 @@ namespace WinTlx
 				}
 			}
 			Update?.Invoke();
-			//Debug.WriteLine($"enqueue {baudotCode:X2}");
 			_lastSentMs = Helper.GetTicksMs();
 		}
 
@@ -631,7 +623,6 @@ namespace WinTlx
 					if (packetData.Length >= 2 && packetData.Length >= packetData[1] + 2)
 					{
 						ItelexPacket packet = new ItelexPacket(packetData);
-						Debug.WriteLine(packet);
 						DecodePacket(packet);
 					}
 				}
@@ -671,8 +662,6 @@ namespace WinTlx
 
 		private void DecodePacket(ItelexPacket packet)
 		{
-			Debug.WriteLine($"incoming {packet}");
-
 			switch ((ItelexCommands)packet.Command)
 			{
 				case ItelexCommands.Heartbeart:

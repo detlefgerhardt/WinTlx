@@ -46,6 +46,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
@@ -127,6 +128,7 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Properties\BuildDate.txt" />
     <Content Include="WinTlx.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -141,7 +143,8 @@
   <PropertyGroup>
     <PreBuildEvent>set hour=%25time:~0,2%25
 set min=%25time:~3,2%25
-echo %25date%25 %25hour%25:%25min%25 &gt; "$(ProjectDir)\Resources\BuildDate.txt"
+echo %25date%25 %25hour%25:%25min%25 &gt; "$(ProjectDir)\Properties\BuildDate.txt"
+rem "$(SolutionDir)Tools\ChangeAppConfig" "$(ProjectDir)App.config.template" "$(ProjectDir)App.config"
 </PreBuildEvent>
   </PropertyGroup>
 </Project>
