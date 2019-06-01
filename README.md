@@ -10,9 +10,9 @@ A Windows test und diagnostic tool for the i-Telex network
 - Inactivity timeout
 - copy and paste function
 - Sending text files
-- Logging all communication to a text file.
+- Logging all communication to a text file
 - Runs on any Windows version with .NET Framework 4.5 and above
-- Virtual tape punch with eyeball characters
+- NEW: Virtual tape punch with eyeball characters
 
 ![Screenshot](https://github.com/detlefgerhardt/WinTlx/blob/master/WinTlxScreen.png)
 
