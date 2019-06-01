@@ -12,8 +12,7 @@ A Windows test und diagnostic tool for the i-Telex network
 - Sending text files
 - Logging all communication to a text file.
 - Runs on any Windows version with .NET Framework 4.5 and above
-- NEW: Now with configuration menu
-- NEW: Virtual tape punch
+- Virtual tape punch with eyeball characters
 
 ![Screenshot](https://github.com/detlefgerhardt/WinTlx/blob/master/WinTlxScreen.png)
 
