@@ -91,6 +91,9 @@ namespace WinTlx
 		public int InactivityTimer { get; set; }
 		public int InactivityTimeout { get; set; }
 
+		private EyeballChar _eyeballChar;
+		public bool EyeballCharActive { get; set; }
+
 		private CodeConversion.ShiftStates _shiftState;
 		public CodeConversion.ShiftStates ShiftState
 		{
@@ -134,6 +137,14 @@ namespace WinTlx
 		public ConnectionStates ConnectionState { get; set; }
 		private bool _incoming = false;
 		private bool _outgoing = false;
+
+		/// <summary>
+		/// Contructor
+		/// </summary>
+		public ItelexProtocol()
+		{
+			_eyeballChar = EyeballChar.Instance;
+		}
 
 		public bool SetRecvOn(int port)
 		{
@@ -203,43 +214,50 @@ namespace WinTlx
 			}
 		}
 
-		public bool ConnectOut(string host, int port, bool asciiMode=false)
+		public async Task<bool> ConnectOut(string host, int port, bool asciiMode=false)
 		{
-			try
+			bool status = false;
+			await Task.Run(() =>
 			{
-				_client = new TcpClient(host, port);
-				if (_client == null || !_client.Connected)
+				try
 				{
-					Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"outgoing connection {host}:{port} failed");
+					_client = new TcpClient(host, port);
+					if (_client == null || !_client.Connected)
+					{
+						Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"outgoing connection {host}:{port} failed");
+						return false;
+					}
+				}
+				catch (Exception ex)
+				{
+					Logging.Instance.Error(TAG, nameof(ConnectOut), "", ex);
 					return false;
 				}
-			}
-			catch(Exception ex)
-			{
-				Logging.Instance.Error(TAG, nameof(ConnectOut), "", ex);
-				return false;
-			}
 
-			if (!ConnectInit())
-			{
-				return false;
-			}
+				if (!ConnectInit())
+				{
+					return false;
+				}
 
-			Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"outgoing connection {host}:{port}");
+				Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"outgoing connection {host}:{port}");
 
-			if (asciiMode)
-			{
-				ConnectionState = ConnectionStates.AsciiTexting;
-				SendAsciiText("\r\n");
-			}
-			else
-			{
-				SendBaudotCode(CodeConversion.FIG_SHIFT, ref _shiftState);
-				Update?.Invoke();
-			}
+				if (asciiMode)
+				{
+					ConnectionState = ConnectionStates.AsciiTexting;
+					SendAsciiText("\r\n");
+				}
+				else
+				{
+					SendBaudotCode(CodeConversion.FIG_SHIFT, ref _shiftState);
+					Update?.Invoke();
+				}
 
-			_outgoing = true;
-			return true;
+				_outgoing = true;
+				status = true;
+				return true;
+			});
+
+			return status;
 		}
 
 		private bool ConnectInit()
@@ -258,6 +276,8 @@ namespace WinTlx
 			_sendTimer = new Timer(100);
 			_sendTimer.Elapsed += SendTimer_Elapsed;
 			_sendTimer.Start();
+
+			EyeballCharActive = false;
 
 			ConnectionState = ConnectionStates.Connected;
 			_shiftState = CodeConversion.ShiftStates.Unknown;
@@ -465,6 +485,18 @@ namespace WinTlx
 		private void SendBaudotCode(byte baudotCode, ref CodeConversion.ShiftStates shiftState)
 		{
 			byte[] codes = CodeConversion.BaudotCodeToBaudotWithShift(baudotCode, shiftState, ref shiftState);
+
+			if (EyeballCharActive)
+			{
+				byte[] buffer = new byte[0];
+				for (int i=0; i<codes.Length; i++)
+				{
+					byte[] newCodes = _eyeballChar.GetPunchCodes(codes[i], shiftState == CodeConversion.ShiftStates.Ltr ? 0 : 1);
+					buffer = Helper.AddBytes(buffer, newCodes);
+				}
+				codes = buffer;
+			}
+
 			BaudotSendRecv?.Invoke(codes);
 
 			if (Local)
@@ -692,6 +724,7 @@ namespace WinTlx
 					break;
 				case ItelexCommands.Ack:
 					_n_ack = packet.Data[0];
+					Debug.WriteLine($"Ack {_n_ack} received");
 					Update?.Invoke();
 					break;
 				case ItelexCommands.ProtocolVersion:

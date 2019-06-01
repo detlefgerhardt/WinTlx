@@ -61,6 +61,7 @@
 			this.SendLineBtn = new System.Windows.Forms.Button();
 			this.ClearBtn = new System.Windows.Forms.Button();
 			this.panel1 = new System.Windows.Forms.Panel();
+			this.Code32Btn = new System.Windows.Forms.Button();
 			this.panel2 = new System.Windows.Forms.Panel();
 			this.KennungLbl = new System.Windows.Forms.Label();
 			this.KennungTb = new System.Windows.Forms.TextBox();
@@ -78,6 +79,7 @@
 			this.UpdateIpAddressBtn = new System.Windows.Forms.Button();
 			this.ConfigBtn = new System.Windows.Forms.Button();
 			this.TapePunchBtn = new System.Windows.Forms.Button();
+			this.EyeballCharCb = new System.Windows.Forms.CheckBox();
 			this.panel1.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.panel3.SuspendLayout();
@@ -396,6 +398,7 @@
 			// panel1
 			// 
 			this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.panel1.Controls.Add(this.Code32Btn);
 			this.panel1.Controls.Add(this.ClearBtn);
 			this.panel1.Controls.Add(this.SendHereIsBtn);
 			this.panel1.Controls.Add(this.SendWruBtn);
@@ -413,6 +416,16 @@
 			this.panel1.Name = "panel1";
 			this.panel1.Size = new System.Drawing.Size(426, 76);
 			this.panel1.TabIndex = 41;
+			// 
+			// Code32Btn
+			// 
+			this.Code32Btn.Location = new System.Drawing.Point(177, 39);
+			this.Code32Btn.Name = "Code32Btn";
+			this.Code32Btn.Size = new System.Drawing.Size(50, 23);
+			this.Code32Btn.TabIndex = 41;
+			this.Code32Btn.Text = ".....";
+			this.Code32Btn.UseVisualStyleBackColor = true;
+			this.Code32Btn.Click += new System.EventHandler(this.Code32Btn_Click);
 			// 
 			// panel2
 			// 
@@ -587,8 +600,7 @@
 			// 
 			// TapePunchBtn
 			// 
-			this.TapePunchBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.TapePunchBtn.Location = new System.Drawing.Point(652, 482);
+			this.TapePunchBtn.Location = new System.Drawing.Point(652, 188);
 			this.TapePunchBtn.Name = "TapePunchBtn";
 			this.TapePunchBtn.Size = new System.Drawing.Size(75, 23);
 			this.TapePunchBtn.TabIndex = 51;
@@ -596,11 +608,23 @@
 			this.TapePunchBtn.UseVisualStyleBackColor = true;
 			this.TapePunchBtn.Click += new System.EventHandler(this.TapePunchBtn_Click);
 			// 
+			// EyeballCharCb
+			// 
+			this.EyeballCharCb.Appearance = System.Windows.Forms.Appearance.Button;
+			this.EyeballCharCb.Location = new System.Drawing.Point(652, 217);
+			this.EyeballCharCb.Name = "EyeballCharCb";
+			this.EyeballCharCb.Size = new System.Drawing.Size(75, 23);
+			this.EyeballCharCb.TabIndex = 52;
+			this.EyeballCharCb.Text = "Eyeball Char";
+			this.EyeballCharCb.UseVisualStyleBackColor = true;
+			this.EyeballCharCb.CheckedChanged += new System.EventHandler(this.EyeballCharCb_CheckedChanged);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(734, 604);
+			this.Controls.Add(this.EyeballCharCb);
 			this.Controls.Add(this.TapePunchBtn);
 			this.Controls.Add(this.ConfigBtn);
 			this.Controls.Add(this.UpdateIpAddressBtn);
@@ -614,7 +638,7 @@
 			this.Controls.Add(this.ExitBtn);
 			this.Controls.Add(this.RichTextTb);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(750, 350);
+			this.MinimumSize = new System.Drawing.Size(750, 380);
 			this.Name = "MainForm";
 			this.Text = "WinTelex 1.0 beta";
 			this.Activated += new System.EventHandler(this.MainForm_Activated);
@@ -684,6 +708,8 @@
 		private System.Windows.Forms.Button UpdateIpAddressBtn;
 		private System.Windows.Forms.Button ConfigBtn;
 		private System.Windows.Forms.Button TapePunchBtn;
+		private System.Windows.Forms.Button Code32Btn;
+		private System.Windows.Forms.CheckBox EyeballCharCb;
 	}
 }
 

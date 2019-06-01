@@ -122,11 +122,31 @@ namespace WinTlx
 			return list;
 		}
 
-		public static byte[] AddByte(byte[] arr, byte data)
+		public static byte[] AddByte(byte[] arr, byte addByte)
 		{
+			if (arr == null)
+			{
+				return null;
+			}
 			byte[] newArr = new byte[arr.Length + 1];
 			Buffer.BlockCopy(arr, 0, newArr, 0, arr.Length);
-			newArr[arr.Length] = data;
+			newArr[arr.Length] = addByte;
+			return newArr;
+		}
+
+		public static byte[] AddBytes(byte[] arr, byte[] addArr)
+		{
+			if (arr==null)
+			{
+				return null;
+			}
+			if (addArr==null)
+			{
+				return arr;
+			}
+			byte[] newArr = new byte[arr.Length + addArr.Length];
+			Buffer.BlockCopy(arr, 0, newArr, 0, arr.Length);
+			Buffer.BlockCopy(addArr, 0, newArr, arr.Length, addArr.Length);
 			return newArr;
 		}
 

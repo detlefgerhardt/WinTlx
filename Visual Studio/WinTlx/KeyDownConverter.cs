@@ -54,9 +54,9 @@ namespace WinTlx
 						case 105:
 							str = "9";
 							break;
-						case 106:
-							str = "@";
-							break;
+						//case 106:
+						//	str = "@";
+						//	break;
 						case 111:
 							str = "\x07";
 							break;
@@ -83,6 +83,9 @@ namespace WinTlx
 						//case 220:
 						//	str = "^";
 						//	break;
+						case 221:
+							str = "'";
+							break;
 						case 222:
 							str = "ä";
 							break;
@@ -109,6 +112,8 @@ namespace WinTlx
 							break;
 						case 13: // shift enter = new line
 							str = "\n";
+							break;
+						case 16: // right shift
 							break;
 						case 48:
 							str = "=";
@@ -157,6 +162,9 @@ namespace WinTlx
 							break;
 						case 219:
 							str = "?";
+							break;
+						case 221:
+							str = "'";
 							break;
 						case 226:
 							str = ">";

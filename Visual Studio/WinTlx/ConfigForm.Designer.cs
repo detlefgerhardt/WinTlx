@@ -45,6 +45,8 @@
 			this.SubscribeServerUpdatePinLbl = new System.Windows.Forms.Label();
 			this.IncomingPublicPortTb = new System.Windows.Forms.TextBox();
 			this.IncomingPublicPortLbl = new System.Windows.Forms.Label();
+			this.InactivityTimeoutTb = new System.Windows.Forms.TextBox();
+			this.InactivityTimeoutLbl = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// KennungLbl
@@ -65,21 +67,21 @@
 			// 
 			// IncommingLocalPortTb
 			// 
-			this.IncommingLocalPortTb.Location = new System.Drawing.Point(145, 146);
+			this.IncommingLocalPortTb.Location = new System.Drawing.Point(145, 172);
 			this.IncommingLocalPortTb.Name = "IncommingLocalPortTb";
 			this.IncommingLocalPortTb.Size = new System.Drawing.Size(132, 20);
 			this.IncommingLocalPortTb.TabIndex = 3;
 			// 
 			// SubscribeServerAddressTb
 			// 
-			this.SubscribeServerAddressTb.Location = new System.Drawing.Point(145, 42);
+			this.SubscribeServerAddressTb.Location = new System.Drawing.Point(145, 68);
 			this.SubscribeServerAddressTb.Name = "SubscribeServerAddressTb";
 			this.SubscribeServerAddressTb.Size = new System.Drawing.Size(132, 20);
 			this.SubscribeServerAddressTb.TabIndex = 5;
 			// 
 			// SubscribeServerPortTb
 			// 
-			this.SubscribeServerPortTb.Location = new System.Drawing.Point(145, 68);
+			this.SubscribeServerPortTb.Location = new System.Drawing.Point(145, 94);
 			this.SubscribeServerPortTb.Name = "SubscribeServerPortTb";
 			this.SubscribeServerPortTb.Size = new System.Drawing.Size(132, 20);
 			this.SubscribeServerPortTb.TabIndex = 7;
@@ -87,7 +89,7 @@
 			// IncomingLocalPortLbl
 			// 
 			this.IncomingLocalPortLbl.AutoSize = true;
-			this.IncomingLocalPortLbl.Location = new System.Drawing.Point(13, 149);
+			this.IncomingLocalPortLbl.Location = new System.Drawing.Point(13, 175);
 			this.IncomingLocalPortLbl.Name = "IncomingLocalPortLbl";
 			this.IncomingLocalPortLbl.Size = new System.Drawing.Size(96, 13);
 			this.IncomingLocalPortLbl.TabIndex = 2;
@@ -96,7 +98,7 @@
 			// SubscribeServerAddressLbl
 			// 
 			this.SubscribeServerAddressLbl.AutoSize = true;
-			this.SubscribeServerAddressLbl.Location = new System.Drawing.Point(13, 45);
+			this.SubscribeServerAddressLbl.Location = new System.Drawing.Point(13, 71);
 			this.SubscribeServerAddressLbl.Name = "SubscribeServerAddressLbl";
 			this.SubscribeServerAddressLbl.Size = new System.Drawing.Size(126, 13);
 			this.SubscribeServerAddressLbl.TabIndex = 4;
@@ -105,7 +107,7 @@
 			// SubscribeServerPortLbl
 			// 
 			this.SubscribeServerPortLbl.AutoSize = true;
-			this.SubscribeServerPortLbl.Location = new System.Drawing.Point(13, 71);
+			this.SubscribeServerPortLbl.Location = new System.Drawing.Point(13, 97);
 			this.SubscribeServerPortLbl.Name = "SubscribeServerPortLbl";
 			this.SubscribeServerPortLbl.Size = new System.Drawing.Size(107, 13);
 			this.SubscribeServerPortLbl.TabIndex = 6;
@@ -113,7 +115,7 @@
 			// 
 			// SaveBtn
 			// 
-			this.SaveBtn.Location = new System.Drawing.Point(16, 208);
+			this.SaveBtn.Location = new System.Drawing.Point(16, 236);
 			this.SaveBtn.Name = "SaveBtn";
 			this.SaveBtn.Size = new System.Drawing.Size(75, 23);
 			this.SaveBtn.TabIndex = 8;
@@ -123,7 +125,7 @@
 			// 
 			// CancelBtn
 			// 
-			this.CancelBtn.Location = new System.Drawing.Point(202, 208);
+			this.CancelBtn.Location = new System.Drawing.Point(202, 236);
 			this.CancelBtn.Name = "CancelBtn";
 			this.CancelBtn.Size = new System.Drawing.Size(75, 23);
 			this.CancelBtn.TabIndex = 9;
@@ -133,7 +135,7 @@
 			// 
 			// OwnNumberTb
 			// 
-			this.OwnNumberTb.Location = new System.Drawing.Point(145, 120);
+			this.OwnNumberTb.Location = new System.Drawing.Point(145, 146);
 			this.OwnNumberTb.Name = "OwnNumberTb";
 			this.OwnNumberTb.Size = new System.Drawing.Size(132, 20);
 			this.OwnNumberTb.TabIndex = 10;
@@ -141,7 +143,7 @@
 			// OwnNumberLbl
 			// 
 			this.OwnNumberLbl.AutoSize = true;
-			this.OwnNumberLbl.Location = new System.Drawing.Point(13, 123);
+			this.OwnNumberLbl.Location = new System.Drawing.Point(13, 149);
 			this.OwnNumberLbl.Name = "OwnNumberLbl";
 			this.OwnNumberLbl.Size = new System.Drawing.Size(67, 13);
 			this.OwnNumberLbl.TabIndex = 11;
@@ -149,7 +151,7 @@
 			// 
 			// SubscribeServerUpdatePinTb
 			// 
-			this.SubscribeServerUpdatePinTb.Location = new System.Drawing.Point(145, 94);
+			this.SubscribeServerUpdatePinTb.Location = new System.Drawing.Point(145, 120);
 			this.SubscribeServerUpdatePinTb.Name = "SubscribeServerUpdatePinTb";
 			this.SubscribeServerUpdatePinTb.Size = new System.Drawing.Size(132, 20);
 			this.SubscribeServerUpdatePinTb.TabIndex = 12;
@@ -157,7 +159,7 @@
 			// SubscribeServerUpdatePinLbl
 			// 
 			this.SubscribeServerUpdatePinLbl.AutoSize = true;
-			this.SubscribeServerUpdatePinLbl.Location = new System.Drawing.Point(13, 97);
+			this.SubscribeServerUpdatePinLbl.Location = new System.Drawing.Point(13, 123);
 			this.SubscribeServerUpdatePinLbl.Name = "SubscribeServerUpdatePinLbl";
 			this.SubscribeServerUpdatePinLbl.Size = new System.Drawing.Size(103, 13);
 			this.SubscribeServerUpdatePinLbl.TabIndex = 13;
@@ -165,7 +167,7 @@
 			// 
 			// IncomingPublicPortTb
 			// 
-			this.IncomingPublicPortTb.Location = new System.Drawing.Point(145, 172);
+			this.IncomingPublicPortTb.Location = new System.Drawing.Point(145, 198);
 			this.IncomingPublicPortTb.Name = "IncomingPublicPortTb";
 			this.IncomingPublicPortTb.Size = new System.Drawing.Size(132, 20);
 			this.IncomingPublicPortTb.TabIndex = 14;
@@ -173,17 +175,35 @@
 			// IncomingPublicPortLbl
 			// 
 			this.IncomingPublicPortLbl.AutoSize = true;
-			this.IncomingPublicPortLbl.Location = new System.Drawing.Point(13, 175);
+			this.IncomingPublicPortLbl.Location = new System.Drawing.Point(13, 201);
 			this.IncomingPublicPortLbl.Name = "IncomingPublicPortLbl";
 			this.IncomingPublicPortLbl.Size = new System.Drawing.Size(102, 13);
 			this.IncomingPublicPortLbl.TabIndex = 15;
 			this.IncomingPublicPortLbl.Text = "Incoming public port";
 			// 
+			// InactivityTimeoutTb
+			// 
+			this.InactivityTimeoutTb.Location = new System.Drawing.Point(145, 42);
+			this.InactivityTimeoutTb.Name = "InactivityTimeoutTb";
+			this.InactivityTimeoutTb.Size = new System.Drawing.Size(132, 20);
+			this.InactivityTimeoutTb.TabIndex = 16;
+			// 
+			// InactivityTimeoutLbl
+			// 
+			this.InactivityTimeoutLbl.AutoSize = true;
+			this.InactivityTimeoutLbl.Location = new System.Drawing.Point(12, 45);
+			this.InactivityTimeoutLbl.Name = "InactivityTimeoutLbl";
+			this.InactivityTimeoutLbl.Size = new System.Drawing.Size(112, 13);
+			this.InactivityTimeoutLbl.TabIndex = 17;
+			this.InactivityTimeoutLbl.Text = "Inactivity timeout (sec)";
+			// 
 			// ConfigForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(296, 246);
+			this.ClientSize = new System.Drawing.Size(296, 279);
+			this.Controls.Add(this.InactivityTimeoutLbl);
+			this.Controls.Add(this.InactivityTimeoutTb);
 			this.Controls.Add(this.IncomingPublicPortLbl);
 			this.Controls.Add(this.IncomingPublicPortTb);
 			this.Controls.Add(this.SubscribeServerUpdatePinLbl);
@@ -227,5 +247,7 @@
 		private System.Windows.Forms.Label SubscribeServerUpdatePinLbl;
 		private System.Windows.Forms.TextBox IncomingPublicPortTb;
 		private System.Windows.Forms.Label IncomingPublicPortLbl;
+		private System.Windows.Forms.TextBox InactivityTimeoutTb;
+		private System.Windows.Forms.Label InactivityTimeoutLbl;
 	}
 }

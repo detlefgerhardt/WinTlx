@@ -304,12 +304,13 @@ namespace WinTlx
 		public const char ASC_LTRS = '\x1E';
 		public const char ASC_FIGS = '\x1F';
 
+		public const byte BAU_CODE32 = 0x00;
+		public const byte LTR_SHIFT = 0x1F;
+		public const byte FIG_SHIFT = 0x1B;
 		//public const byte BAU_WRU = 0x12; // figure enquiry (wer da?)
 		//public const byte BAU_BEL = 0x1A; // figure bell
 		//public const byte BAU_CR = 0x02; // letter+figure carriage return
 		//public const byte BAU_LF = 0x08; // letter+figure linefeed
-		public const byte LTR_SHIFT = 0x1F;
-		public const byte FIG_SHIFT = 0x1B;
 
 		/// <summary>
 		/// Code page 437 to Ascii conversion
@@ -371,7 +372,7 @@ namespace WinTlx
 
 		private static string[] _asciiToTelexTab =
 		{
-			"",		// 00 invalid skip
+			"\x00",	// 00 Code32
 			"",		// 01 invalid skip
 			"",		// 02 invalid skip
 			"",		// 03 invalid skip
@@ -510,74 +511,74 @@ namespace WinTlx
 		private static char[,] _codeTab =
 		{
 			{
-				ASC_INV,	// 00
-				't',		// 01
-				'\r',		// 02
-				'o',		// 03
-				' ',		// 04 space
-				'h',		// 05
-				'n',		// 06
-				'm',		// 07
-				'\n',		// 08
-				'l',		// 09
-				'r',		// 0A
-				'g',		// 0B
-				'i',		// 0C
-				'p',		// 0D
-				'c',		// 0E
-				'v',		// 0F
-				'e',		// 10
-				'z',		// 11
-				'd',		// 12
-				'b',		// 13
-				's',		// 14
-				'y',		// 15
-				'f',		// 16
-				'x',		// 17
-				'a',		// 18
-				'w',		// 19
-				'j',		// 1A
-				ASC_FIGS,	// 1B figures
-				'u',		// 1C
-				'q',		// 1D
-				'k',		// 1E
-				ASC_LTRS    // 1F letters
+				'\x00',		// 00 C32
+				't',		// 01 t
+				'\r',		// 02 CR
+				'o',		// 03 o
+				' ',		// 04 BL
+				'h',		// 05 h
+				'n',		// 06 n
+				'm',		// 07 m
+				'\n',		// 08 LF
+				'l',		// 09 l
+				'r',		// 0A r
+				'g',		// 0B g
+				'i',		// 0C i
+				'p',		// 0D p
+				'c',		// 0E c
+				'v',		// 0F v
+				'e',		// 10 e
+				'z',		// 11 z
+				'd',		// 12 d
+				'b',		// 13 b
+				's',		// 14 s
+				'y',		// 15 y
+				'f',		// 16 f
+				'x',		// 17 x
+				'a',		// 18 a
+				'w',		// 19 w
+				'j',		// 1A j
+				ASC_FIGS,	// 1B FIG
+				'u',		// 1C u
+				'q',		// 1D q
+				'k',		// 1E k
+				ASC_LTRS    // 1F LTR
 			},
 
 			// figures
 			{
-				ASC_INV,	// 00
-				'5',		// 01
-				'\r',		// 02 carriage return
-				'9',		// 03
-				' ',		// 04 space
-				ASC_INV,	// 05 $ / pound
-				',',		// 06
-				'.',		// 07
-				'\n',		// 08 new line
+				'\x00',		// 00 C32
+				'5',		// 01 5
+				'\r',		// 02 CR
+				'9',		// 03 9
+				' ',		// 04 BL
+				ASC_INV,	// 05      Pnd
+				',',		// 06 ,    ,
+				'.',		// 07 .    .
+				'\n',		// 08 NL
 				')',		// 09
-				'4',		// 0A
-				ASC_INV,	// 0B @
-				'8',		// 0C
-				'0',		// 0D
-				':',		// 0E
-				'=',		// 0F
-				'3',		// 10
-				'+',		// 11
-				ASC_WRU,	// 12 who are you / enquiry / Kreuz
-				'?',		// 13
-				'\'',		// 14 or $
-				'6',		// 15
-				ASC_INV,	// 16 ! / %
+				'4',		// 0A 4
+				ASC_INV,	// 0B      &
+				'8',		// 0C 8
+				'0',		// 0D 0
+				':',		// 0E :    :
+				'=',		// 0F =    ;
+				'3',		// 10 3
+				'+',		// 11      "
+				ASC_WRU,	// 12 WRU  $
+				'?',		// 13 ?    ?
+				'\'',		// 14      
+				'6',		// 15 6
+				ASC_INV,	// 16      % / #
 				'/',		// 17
 				'-',		// 18
-				'2',		// 19
-				ASC_BEL,	// 1A
-				ASC_FIGS,	// 1B figures
-				'7',		// 1C
-				'1',		// 1D
+				'2',		// 19 2
+				ASC_BEL,	// 1A BEL  BEL
+				ASC_FIGS,	// 1B FIG
+				'7',		// 1C 7
+				'1',		// 1D 1
 				'(',		// 1E
-				ASC_LTRS	// 1F letters
+				ASC_LTRS	// 1F LTR
 			}
 		};
 

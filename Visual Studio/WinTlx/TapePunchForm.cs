@@ -152,6 +152,7 @@ namespace WinTlx
 		private void ClearBtn_Click(object sender, EventArgs e)
 		{
 			_bufferPos = 0;
+			PunchedTapePb.Refresh();
 		}
 
 		private void OnCb_CheckedChanged(object sender, EventArgs e)

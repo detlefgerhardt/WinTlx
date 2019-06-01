@@ -21,6 +21,7 @@ namespace WinTlx
 		private SubscriberServer _subscriberServer;
 		private ItelexProtocol _itelex;
 		TapePunchForm _tapePunchForm;
+		EyeballChar _eyeballChar;
 
 		public const int SCREEN_WIDTH = 68;
 		private int _screenHeight = 25;
@@ -69,6 +70,8 @@ namespace WinTlx
 			_subscriberServer = new SubscriberServer();
 			_subscriberServer.Message += SubcribeServerMessageHandler;
 
+			_eyeballChar = EyeballChar.Instance;
+
 			_clockTimer = new System.Timers.Timer(500);
 			_clockTimer.Elapsed += ClockTimer_Elapsed;
 			_clockTimer.Start();
@@ -76,7 +79,7 @@ namespace WinTlx
 			RichTextTb.ContextMenuStrip = CreateContextMenu();
 
 			_configData = ConfigManager.Instance.LoadConfig();
-			if (_configData==null)
+			if (_configData == null)
 			{
 				_configData = ConfigManager.Instance.GetDefaultConfig();
 			}
@@ -98,8 +101,8 @@ namespace WinTlx
 				$"{Helper.GetVersion()}\r\r" +
 				"by *dg* Detlef Gerhardt\r\r" +
 				"Please note that this is a test and diagnostic tool for the i-Telex network. " +
-				"The participants have real teletype machines connected to their i-telex ports. " +
-				"Please do not send longer text files or spam to i-Telex numbers.";
+				"The participants have real teletype machines connected to their i-Telex ports. " +
+				"Please do not send longer text files or spam to i-Telex numbers!";
 			MessageBox.Show(
 				text,
 				$"{Constants.PROGRAM_NAME}",
@@ -200,18 +203,21 @@ namespace WinTlx
 			ExtensionTb.Text = entry.ExtensionNumber != 0 ? entry.ExtensionNumber.ToString() : "";
 		}
 
-		private void ConnectBtn_Click(object sender, EventArgs e)
+		private async void ConnectBtn_Click(object sender, EventArgs e)
 		{
 			if (_itelex.IsConnected)
 			{
 				return;
 			}
-			ConnectOut();
+			ConnectBtn.Enabled = false;
+			await ConnectOut();
+			ConnectBtn.Enabled = true;
 			SetConnectState();
 			SetFocus();
 		}
 
-		private void ConnectBtn_DoClick()
+		/*
+		private async void ConnectBtn_DoClick()
 		{
 			if (_itelex.IsConnected)
 			{
@@ -220,6 +226,7 @@ namespace WinTlx
 			ConnectOut();
 			SetConnectState();
 		}
+		*/
 
 		private void DisconnectBtn_Click(object sender, EventArgs e)
 		{
@@ -325,6 +332,11 @@ namespace WinTlx
 			SetFocus();
 		}
 
+		private void Code32Btn_Click(object sender, EventArgs e)
+		{
+			SendAsciiText("\x00");
+		}
+
 		private void SendLineBtn_Click(object sender, EventArgs e)
 		{
 			SendAsciiText(new string('-', 66));
@@ -382,9 +394,9 @@ namespace WinTlx
 				default:
 					//e.Handled = false;
 					break;
-				case Keys.A:
-					ConnectOut();
-					break;
+				//case Keys.A:
+				//	await ConnectOut();
+				//	break;
 				case Keys.S:
 					Disconnect();
 					break;
@@ -444,6 +456,8 @@ namespace WinTlx
 				char c = asciiText[i];
 				switch (c)
 				{
+					case '\x00':
+						continue;
 					case '\a': // bel
 						SystemSounds.Beep.Play();
 						c = '\u04E8';
@@ -559,7 +573,7 @@ namespace WinTlx
 			});
 		}
 
-		private bool ConnectOut()
+		private async Task<bool> ConnectOut()
 		{
 			AddressTb.Text = AddressTb.Text.Trim();
 			if (string.IsNullOrWhiteSpace(AddressTb.Text))
@@ -588,7 +602,7 @@ namespace WinTlx
 				}
 			}
 
-			bool success = _itelex.ConnectOut(AddressTb.Text, port.Value, false);
+			bool success = await _itelex.ConnectOut(AddressTb.Text, port.Value, false);
 			if (!success)
 			{
 				AddText("CONNECTION ERROR\r\n");
@@ -1054,6 +1068,8 @@ namespace WinTlx
 
 		private void MainForm_Resize(object sender, EventArgs e)
 		{
+			Debug.WriteLine(this.Height);
+
 			RichTextTb.Height = this.Height - 300 + 50;
 			_screenHeight = RichTextTb.Height / 19;
 
@@ -1080,7 +1096,7 @@ namespace WinTlx
 
 		private void MainForm_Activated(object sender, EventArgs e)
 		{
-			_tapePunchForm?.Activate();
+			//_tapePunchForm?.Activate();
 		}
 
 		private void UpdateIpAddressBtn_Click(object sender, EventArgs e)
@@ -1146,6 +1162,15 @@ namespace WinTlx
 				_itelex.InactivityTimeout = _configData.InactivityTimeout;
 				UpdatedHandler();
 			}
+		}
+
+		private void EyeballCharCb_CheckedChanged(object sender, EventArgs e)
+		{
+			if (EyeballCharCb.Checked)
+			{
+				_itelex.SendAsciiText("eyeball char active - start tape punch\r\n");
+			}
+			_itelex.EyeballCharActive = EyeballCharCb.Checked;
 		}
 
 	}
