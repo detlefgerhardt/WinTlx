@@ -3,7 +3,7 @@ A Windows test und diagnostic tool for the i-Telex network
 
 ## Features
 - No i-telex hardware needed (direct TCP/IP connection)
-- Outgoing and incoming connection
+- Outgoing and incoming connections
 - Subscriber server query
 - Automatic ITA2 code conversion
 - Resizable and scrollable terminal window
