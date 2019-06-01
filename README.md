@@ -5,7 +5,7 @@ A Windows test und diagnostic tool for the i-Telex network
 - No i-telex hardware needed (direct TCP/IP connection)
 - Outgoing and incoming connections
 - Subscriber server query
-- Automatic ITA2 code conversion
+- Automatic ITA2 (Baudot-Murray) code conversion
 - Resizable and scrollable terminal window
 - Inactivity timeout
 - copy and paste function
