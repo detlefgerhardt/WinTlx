@@ -3,17 +3,16 @@ A Windows test und diagnostic tool for the i-Telex network
 
 ## Features
 - No i-telex hardware needed (direct TCP/IP connection)
-- Outgoing and incoming connection
+- Outgoing and incoming connections
 - Subscriber server query
-- Automatic ITA2 code conversion
+- Automatic CCITT-2 (Baudot-Murray) code conversion
 - Resizable and scrollable terminal window
 - Inactivity timeout
-- copy and paste function
+- Copy and paste function
 - Sending text files
-- Logging all communication to a text file.
+- Logging all communication to a text file
 - Runs on any Windows version with .NET Framework 4.5 and above
-- NEW: Now with configuration menu
-- NEW: Virtual tape punch
+- NEW: Virtual tape punch with eyeball characters (Bildlocher)
 
 ![Screenshot](https://github.com/detlefgerhardt/WinTlx/blob/master/WinTlxScreen.png)
 
