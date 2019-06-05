@@ -27,3 +27,5 @@ Version history
 1.0.1.0 - Eyeball characters on tape punch (use with care on real machines!)
         - Improvements and cleanup
         - Fix: Inactivity timeout was missing in the config dialog
+1.0.1.1 - Virtual tape punch changed to horizontal view
+        - Improvements and cleanup

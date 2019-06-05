@@ -248,7 +248,7 @@ namespace WinTlx
 				}
 				else
 				{
-					SendBaudotCode(CodeConversion.FIG_SHIFT, ref _shiftState);
+					SendBaudotCode(CodeConversion.BAU_FIG, ref _shiftState);
 					Update?.Invoke();
 				}
 

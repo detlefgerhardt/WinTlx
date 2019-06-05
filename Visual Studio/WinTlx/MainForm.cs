@@ -20,7 +20,8 @@ namespace WinTlx
 
 		private SubscriberServer _subscriberServer;
 		private ItelexProtocol _itelex;
-		TapePunchForm _tapePunchForm;
+		//TapePunchForm _tapePunchForm;
+		TapePunchHorizontalForm _tapePunchForm;
 		EyeballChar _eyeballChar;
 
 		public const int SCREEN_WIDTH = 68;
@@ -339,7 +340,8 @@ namespace WinTlx
 
 		private void SendLineBtn_Click(object sender, EventArgs e)
 		{
-			SendAsciiText(new string('-', 66));
+			SendAsciiText("\r\n");
+			SendAsciiText(new string('-', 68));
 			SendAsciiText("\r\n");
 		}
 
@@ -349,13 +351,14 @@ namespace WinTlx
 			{
 				SendAsciiText("ry");
 			}
-			SendAsciiText("\r\n");
+			//SendAsciiText("\r\n");
 			SetFocus();
 		}
 
 		private void SendFoxBtn_Click(object sender, EventArgs e)
 		{
-			SendAsciiText("the quick brown fox jumps over the lazy dog 1234567890/:,-=()\r\n");
+			SendAsciiText("the quick brown fox jumps over the lazy dog 1234567890/:,-=()");
+			//SendAsciiText("\r\n");
 			SetFocus();
 		}
 
@@ -456,13 +459,13 @@ namespace WinTlx
 				char c = asciiText[i];
 				switch (c)
 				{
-					case '\x00':
+					case CodeConversion.ASC_CODE32:
 						continue;
-					case '\a': // bel
+					case CodeConversion.ASC_BEL:
 						SystemSounds.Beep.Play();
 						c = '\u04E8';
 						break;
-					case '\t': //
+					case CodeConversion.ASC_WRU:
 						c = '\u2629';
 						break;
 					case CodeConversion.ASC_LTRS:
@@ -629,12 +632,16 @@ namespace WinTlx
 
 		private void SendWerDa()
 		{
-			SendAsciiText("\x9");
+			SendAsciiText(CodeConversion.ASC_WRU.ToString());
 		}
 
 		private void SendHereIs()
 		{
+#if DEBUG
+			SendAsciiText($"\r\n{KennungTb.Text}");
+#else
 			SendAsciiText($"\r\n{KennungTb.Text} (wintlx)");
+#endif
 		}
 
 		private void SetConnectState()
@@ -1140,7 +1147,8 @@ namespace WinTlx
 		{
 			if (_tapePunchForm == null)
 			{
-				_tapePunchForm = new TapePunchForm(this.Bounds);
+				//_tapePunchForm = new TapePunchForm(this.Bounds);
+				_tapePunchForm = new TapePunchHorizontalForm(this.Bounds);
 				_tapePunchForm.Show();
 			}
 			else
@@ -1168,7 +1176,7 @@ namespace WinTlx
 		{
 			if (EyeballCharCb.Checked)
 			{
-				_itelex.SendAsciiText("eyeball char active - start tape punch\r\n");
+				_itelex.SendAsciiText("\r\neyeball char active - start tape punch\r\n");
 			}
 			_itelex.EyeballCharActive = EyeballCharCb.Checked;
 		}

@@ -19,11 +19,11 @@ namespace WinTlx
 			for (int i = 0; i < baudotData.Length; i++)
 			{
 				byte baudotChr = baudotData[i];
-				if (baudotChr == LTR_SHIFT)
+				if (baudotChr == BAU_LTR)
 				{
 					shiftState = ShiftStates.Ltr;
 				}
-				else if (baudotChr == FIG_SHIFT)
+				else if (baudotChr == BAU_FIG)
 				{
 					shiftState = ShiftStates.Figs;
 				}
@@ -234,30 +234,30 @@ namespace WinTlx
 		{
 			byte[] buffer = new byte[0];
 
-			if (baudCode == LTR_SHIFT)
+			if (baudCode == BAU_LTR)
 			{
-				buffer = Helper.AddByte(buffer, LTR_SHIFT);
+				buffer = Helper.AddByte(buffer, BAU_LTR);
 				shiftState = ShiftStates.Ltr;
 				return buffer;
 			}
 
-			if (baudCode == FIG_SHIFT)
+			if (baudCode == BAU_FIG)
 			{
-				buffer = Helper.AddByte(buffer, FIG_SHIFT);
+				buffer = Helper.AddByte(buffer, BAU_FIG);
 				shiftState = ShiftStates.Figs;
 				return buffer;
 			}
 
 			if (shiftState == ShiftStates.Unknown && newShiftState == ShiftStates.Unknown)
 			{
-				buffer = Helper.AddByte(buffer, LTR_SHIFT);
+				buffer = Helper.AddByte(buffer, BAU_LTR);
 				newShiftState = ShiftStates.Ltr;
 			}
 
 			if (shiftState == ShiftStates.Unknown && newShiftState == ShiftStates.Ltr ||
 				shiftState == ShiftStates.Figs && newShiftState == ShiftStates.Ltr)
 			{
-				buffer = Helper.AddByte(buffer, LTR_SHIFT);
+				buffer = Helper.AddByte(buffer, BAU_LTR);
 				buffer = Helper.AddByte(buffer, baudCode);
 				shiftState = ShiftStates.Ltr;
 				return buffer;
@@ -266,7 +266,7 @@ namespace WinTlx
 			if (shiftState == ShiftStates.Unknown && newShiftState == ShiftStates.Figs ||
 				shiftState == ShiftStates.Ltr && newShiftState == ShiftStates.Figs)
 			{
-				buffer = Helper.AddByte(buffer, FIG_SHIFT);
+				buffer = Helper.AddByte(buffer, BAU_FIG);
 				buffer = Helper.AddByte(buffer, baudCode);
 				shiftState = ShiftStates.Figs;
 				return buffer;
@@ -299,18 +299,19 @@ namespace WinTlx
 		private const int FIGS = 1;
 
 		private const char ASC_INV = '#'; // replace invalid baudot character
-		public const char ASC_WRU = '\x09'; // Ctrl-I, Kennungsgeber-Abfrage (wer da?)
+		public const char ASC_WRU = '\x05'; // Ctrl-E, Kennungsgeber-Abfrage (wer da?)
 		public const char ASC_BEL = '\x07'; // Ctrl-G, Bell
 		public const char ASC_LTRS = '\x1E';
 		public const char ASC_FIGS = '\x1F';
+		public const char ASC_CODE32 = '\x00';
 
 		public const byte BAU_CODE32 = 0x00;
-		public const byte LTR_SHIFT = 0x1F;
-		public const byte FIG_SHIFT = 0x1B;
-		//public const byte BAU_WRU = 0x12; // figure enquiry (wer da?)
-		//public const byte BAU_BEL = 0x1A; // figure bell
-		//public const byte BAU_CR = 0x02; // letter+figure carriage return
-		//public const byte BAU_LF = 0x08; // letter+figure linefeed
+		public const byte BAU_LTR = 0x1F;
+		public const byte BAU_FIG = 0x1B;
+		public const byte BAU_WRU = 0x12;
+		public const byte BAU_BEL = 0x1A;
+		public const byte BAU_CR = 0x02;
+		public const byte BAU_LF = 0x08;
 
 		/// <summary>
 		/// Code page 437 to Ascii conversion
@@ -377,7 +378,7 @@ namespace WinTlx
 			"",		// 02 invalid skip
 			"",		// 03 invalid skip
 			"",		// 04 invalid skip
-			"",		// 05 invalid skip
+			"\x05",	// 05 invalid skip
 			"",		// 06 invalid skip
 			"\x07",	// 07 ITA2 bel
 			"",		// 08 invalid skip
@@ -511,7 +512,7 @@ namespace WinTlx
 		private static char[,] _codeTab =
 		{
 			{
-				'\x00',		// 00 C32
+				ASC_CODE32,	// 00 C32
 				't',		// 01 t
 				'\r',		// 02 CR
 				'o',		// 03 o
@@ -547,7 +548,7 @@ namespace WinTlx
 
 			// figures
 			{
-				'\x00',		// 00 C32
+				ASC_CODE32,	// 00 C32
 				'5',		// 01 5
 				'\r',		// 02 CR
 				'9',		// 03 9

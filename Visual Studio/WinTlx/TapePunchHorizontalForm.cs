@@ -11,13 +11,13 @@ using System.Windows.Forms;
 
 namespace WinTlx
 {
-	public partial class TapePunchForm : Form
+	public partial class TapePunchHorizontalForm : Form
 	{
 		private Rectangle _parentWindowsPosition;
 
 		private TapePunch _tapePunch;
 
-		public TapePunchForm(Rectangle position)
+		public TapePunchHorizontalForm(Rectangle position)
 		{
 			InitializeComponent();
 
@@ -25,7 +25,7 @@ namespace WinTlx
 
 			_tapePunch = new TapePunch();
 			_tapePunch.Init();
-			_tapePunch.SetPuncherLinesVertical(PunchedTapePb.Height);
+			_tapePunch.SetPuncherLinesHorizontal(PunchedTapePb.Width);
 		}
 
 		private void BuildForm_Vertical()
@@ -39,7 +39,7 @@ namespace WinTlx
 
 		private void PunchTapeForm_ResizeEnd(object sender, EventArgs e)
 		{
-			_tapePunch.SetPuncherLinesVertical(PunchedTapePb.Height);
+			_tapePunch.SetPuncherLinesHorizontal(PunchedTapePb.Width);
 			PunchedTapePb.Refresh();
 		}
 
@@ -74,7 +74,7 @@ namespace WinTlx
 		private void PunchedTapePb_Paint(object sender, PaintEventArgs e)
 		{
 			Graphics g = e.Graphics;
-			_tapePunch.DrawTapeVertical(g, PunchedTapePb.Height);
+			_tapePunch.DrawTapeHorizontal(g, PunchedTapePb.Width, PunchedTapePb.Height);
 		}
 
 		private void ClearBtn_Click(object sender, EventArgs e)
