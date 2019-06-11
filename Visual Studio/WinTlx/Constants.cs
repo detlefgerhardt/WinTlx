@@ -10,6 +10,8 @@ namespace WinTlx
 	{
 		public const string PROGRAM_NAME = "WinTlx";
 
+		public const string DEBUG_LOG = "debug.log";
+
 		public const string DEFAULT_KENNUNG = "12345 wintlx";
 		public const int DEFAULT_INACTIVITY_TIMEOUT = 120; // disconnect after 2 minutes without communication
 		public const int DEFAULT_INCOMING_PORT = 134;

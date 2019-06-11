@@ -53,7 +53,7 @@ namespace WinTlx
 			LnColTb.Text = "";
 			SendAckTb.Text = "";
 
-			RecvOnOffBtn.Enabled = true;
+			RecvOnCb.Enabled = true;
 
 			this.KeyPreview = true;
 			this.KeyDown += Form_KeyDown;
@@ -113,6 +113,16 @@ namespace WinTlx
 
 #endif
 			//Expired();
+		}
+
+		private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+		{
+			Disconnect();
+		}
+
+		private void ExitBtn_Click(object sender, EventArgs e)
+		{
+			Close();
 		}
 
 		private void Form_KeyPress(object sender, KeyPressEventArgs e)
@@ -258,11 +268,6 @@ namespace WinTlx
 			SetConnectState();
 		}
 
-		private void ExitBtn_Click(object sender, EventArgs e)
-		{
-			_itelex.Disconnect();
-			Close();
-		}
 
 		private void KennungTb_Leave(object sender, EventArgs e)
 		{
@@ -559,8 +564,11 @@ namespace WinTlx
 				ProtocolAsciiRb.Checked = ascii
 			);
 
-			Helper.ControlInvokeRequired(RecvOnOffBtn, () =>
+			Helper.ControlInvokeRequired(RecvOnCb, () =>
 			{
+				RecvOnCb.Checked = _itelex.RecvOn;
+
+				/*
 				if (_itelex.RecvOn)
 				{
 					RecvOnOffBtn.ForeColor = Color.Green;
@@ -573,6 +581,7 @@ namespace WinTlx
 					RecvOnOffBtn.Text = "Recv On";
 					//UpdateIpAddressBtn.Enabled = false;
 				}
+				*/
 			});
 		}
 
@@ -625,9 +634,12 @@ namespace WinTlx
 
 		private void Disconnect()
 		{
-			_itelex.SendEndCmd();
-			_itelex.Disconnect();
-			SetConnectState();
+			if (_itelex != null)
+			{
+				_itelex.SendEndCmd();
+				_itelex.Disconnect();
+				SetConnectState();
+			}
 		}
 
 		private void SendWerDa()
@@ -834,6 +846,8 @@ namespace WinTlx
 					case '\r':
 						_screenX = 0;
 						break;
+					case '\x0': // code32
+						break;
 					default:
 						if (_screenY + _screenEditPos0 >= _screen.Count)
 						{
@@ -892,6 +906,10 @@ namespace WinTlx
 					if (y + _screenShowPos0 < _screen.Count)
 					{
 						chr = _screen[_screenShowPos0 + y].Line[x];
+						if (chr == 0x00)
+						{	// char 0x00 terminates the rich text display
+							chr = ' ';
+						}
 					}
 					else
 					{
@@ -1131,7 +1149,7 @@ namespace WinTlx
 			}
 		}
 
-		private void RecvOnOffBtn_Click(object sender, EventArgs e)
+		private void RecvOnCb_Click(object sender, EventArgs e)
 		{
 			if (!_itelex.RecvOn)
 			{

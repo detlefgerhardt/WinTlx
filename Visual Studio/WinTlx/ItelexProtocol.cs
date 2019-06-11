@@ -209,7 +209,10 @@ namespace WinTlx
 				}
 				catch (Exception ex)
 				{
-					Logging.Instance.Error(TAG, nameof(Listener), "", ex);
+					if (ex.HResult != -2147467259)
+					{
+						Logging.Instance.Error(TAG, nameof(Listener), "", ex);
+					}
 				}
 			}
 		}

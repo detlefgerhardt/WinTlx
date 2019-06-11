@@ -75,11 +75,11 @@
 			this.DateTb = new System.Windows.Forms.TextBox();
 			this.TimeTb = new System.Windows.Forms.TextBox();
 			this.AboutBtn = new System.Windows.Forms.Button();
-			this.RecvOnOffBtn = new System.Windows.Forms.Button();
 			this.UpdateIpAddressBtn = new System.Windows.Forms.Button();
 			this.ConfigBtn = new System.Windows.Forms.Button();
 			this.TapePunchBtn = new System.Windows.Forms.Button();
 			this.EyeballCharCb = new System.Windows.Forms.CheckBox();
+			this.RecvOnCb = new System.Windows.Forms.CheckBox();
 			this.panel1.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.panel3.SuspendLayout();
@@ -566,17 +566,6 @@
 			this.AboutBtn.UseVisualStyleBackColor = true;
 			this.AboutBtn.Click += new System.EventHandler(this.AboutBtn_Click);
 			// 
-			// RecvOnOffBtn
-			// 
-			this.RecvOnOffBtn.Enabled = false;
-			this.RecvOnOffBtn.Location = new System.Drawing.Point(652, 117);
-			this.RecvOnOffBtn.Name = "RecvOnOffBtn";
-			this.RecvOnOffBtn.Size = new System.Drawing.Size(75, 23);
-			this.RecvOnOffBtn.TabIndex = 47;
-			this.RecvOnOffBtn.Text = "Recv On";
-			this.RecvOnOffBtn.UseVisualStyleBackColor = true;
-			this.RecvOnOffBtn.Click += new System.EventHandler(this.RecvOnOffBtn_Click);
-			// 
 			// UpdateIpAddressBtn
 			// 
 			this.UpdateIpAddressBtn.Location = new System.Drawing.Point(652, 146);
@@ -619,16 +608,28 @@
 			this.EyeballCharCb.UseVisualStyleBackColor = true;
 			this.EyeballCharCb.CheckedChanged += new System.EventHandler(this.EyeballCharCb_CheckedChanged);
 			// 
+			// RecvOnCb
+			// 
+			this.RecvOnCb.Appearance = System.Windows.Forms.Appearance.Button;
+			this.RecvOnCb.Location = new System.Drawing.Point(652, 117);
+			this.RecvOnCb.Name = "RecvOnCb";
+			this.RecvOnCb.Size = new System.Drawing.Size(75, 23);
+			this.RecvOnCb.TabIndex = 53;
+			this.RecvOnCb.Text = "Recv On";
+			this.RecvOnCb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.RecvOnCb.UseVisualStyleBackColor = true;
+			this.RecvOnCb.Click += new System.EventHandler(this.RecvOnCb_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(734, 604);
+			this.Controls.Add(this.RecvOnCb);
 			this.Controls.Add(this.EyeballCharCb);
 			this.Controls.Add(this.TapePunchBtn);
 			this.Controls.Add(this.ConfigBtn);
 			this.Controls.Add(this.UpdateIpAddressBtn);
-			this.Controls.Add(this.RecvOnOffBtn);
 			this.Controls.Add(this.AboutBtn);
 			this.Controls.Add(this.panel5);
 			this.Controls.Add(this.panel4);
@@ -642,6 +643,7 @@
 			this.Name = "MainForm";
 			this.Text = "WinTelex 1.0 beta";
 			this.Activated += new System.EventHandler(this.MainForm_Activated);
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.LocationChanged += new System.EventHandler(this.MainForm_LocationChanged);
 			this.Resize += new System.EventHandler(this.MainForm_Resize);
@@ -704,12 +706,12 @@
 		private System.Windows.Forms.TextBox ConnTimeTb;
 		private System.Windows.Forms.TextBox TimeTb;
 		private System.Windows.Forms.TextBox DateTb;
-		private System.Windows.Forms.Button RecvOnOffBtn;
 		private System.Windows.Forms.Button UpdateIpAddressBtn;
 		private System.Windows.Forms.Button ConfigBtn;
 		private System.Windows.Forms.Button TapePunchBtn;
 		private System.Windows.Forms.Button Code32Btn;
 		private System.Windows.Forms.CheckBox EyeballCharCb;
+		private System.Windows.Forms.CheckBox RecvOnCb;
 	}
 }
 

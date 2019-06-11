@@ -34,6 +34,7 @@ namespace WinTlx
 			buildTime = buildTime.Substring(0, 10);
 #endif
 			return $"{Constants.PROGRAM_NAME}  V{Application.ProductVersion}  (Build={buildTime}) {expireStr}";
+			//return $"{Constants.PROGRAM_NAME}  V{Application.ProductVersion}  (Build={buildTime}) - Special Carsten Version";
 		}
 
 		public static bool IsExpired()

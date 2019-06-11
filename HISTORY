@@ -29,3 +29,9 @@ Version history
         - Fix: Inactivity timeout was missing in the config dialog
 1.0.1.1 - Virtual tape punch changed to horizontal view
         - Improvements and cleanup
+1.0.1.2 - Connection was not closed correctly on exit
+        - Fix: If a Baudot code 00 (Code 32) was received, the output in the terminal
+          window was stopped.
+        - Display of the Recv On button changed
+        - error.log renamed to debug.log
+
