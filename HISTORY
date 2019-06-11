@@ -5,7 +5,7 @@ Version history
 1.0.0.2 - Direct entry of peer address, port and extension is now possible
         - Fixed error on incoming connection (there still seems to be a problem)
         - Last line was not shown in terminal window
-        - Terminal windows is now scrollable
+        - Terminal window is now scrollable
 1.0.0.3 - Copy/paste implemented (context menu and ctrl-c/ctrl-v)
 1.0.0.4 - Removed expire date
         - The size of the terminal window can now be changed dynamically.
@@ -30,8 +30,6 @@ Version history
 1.0.1.1 - Virtual tape punch changed to horizontal view
         - Improvements and cleanup
 1.0.1.2 - Connection was not closed correctly on exit
-        - Fix: If a Baudot code 00 (Code 32) was received, the output in the terminal
-          window was stopped.
+        - Fix: If a CCITT-2 code 0 (Code 32) was received, the output in the terminal window was stopped.
         - Display of the Recv On button changed
         - error.log renamed to debug.log
-
