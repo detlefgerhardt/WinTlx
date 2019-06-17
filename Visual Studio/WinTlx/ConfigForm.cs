@@ -37,6 +37,7 @@ namespace WinTlx
 			_config = configData;
 			KennungTb.Text = _config.Kennung;
 			InactivityTimeoutTb.Text = IntToStr(_config.InactivityTimeout);
+			OutputSpeedTb.Text = IntToStr(_config.OutputSpeed);
 			SubscribeServerAddressTb.Text = _config.SubscribeServerAddress;
 			SubscribeServerPortTb.Text = IntToStr(_config.SubscribeServerPort);
 			SubscribeServerUpdatePinTb.Text = IntToStr(_config.SubscribeServerUpdatePin);
@@ -49,6 +50,7 @@ namespace WinTlx
 		{
 			_config.Kennung = KennungTb.Text.Trim();
 			_config.InactivityTimeout = StrToInt(InactivityTimeoutTb.Text);
+			_config.OutputSpeed = StrToInt(OutputSpeedTb.Text);
 			_config.SubscribeServerAddress = SubscribeServerAddressTb.Text.Trim();
 			_config.SubscribeServerPort = StrToInt(SubscribeServerPortTb.Text);
 			_config.SubscribeServerUpdatePin = StrToInt(SubscribeServerUpdatePinTb.Text);

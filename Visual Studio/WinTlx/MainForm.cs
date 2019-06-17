@@ -16,25 +16,38 @@ namespace WinTlx
 
 		private System.Timers.Timer _clockTimer;
 
+		private int _fixedWidth;
+
 		private ConfigData _configData;
 
 		private SubscriberServer _subscriberServer;
 		private ItelexProtocol _itelex;
-		//TapePunchForm _tapePunchForm;
 		TapePunchHorizontalForm _tapePunchForm;
 		EyeballChar _eyeballChar;
 
 		public const int SCREEN_WIDTH = 68;
+		public const int CHAR_HEIGHT = 19;
+		public const int CHAR_WIDTH = 9;
+
 		private int _screenHeight = 25;
 		private List<ScreenLine> _screen = new List<ScreenLine>();
 		private int _screenX = 0;
 		private int _screenY = 0;
 		private int _screenEditPos0 = 0;
 		private int _screenShowPos0 = 0;
+		//private bool _screenDirty = false;
+
+		private System.Timers.Timer _outputTimer;
+		private Queue<ScreenChar> _outputBuffer;
+
+		//private bool _refreshActive;
+		//private System.Timers.Timer _refreshTimer;
 
 		public MainForm()
 		{
 			InitializeComponent();
+			_fixedWidth = this.Width;
+			TerminalPb.ContextMenuStrip = CreateContextMenu();
 
 			Logging.Instance.Log(LogTypes.Info, TAG, "Start", $"{Helper.GetVersion()}");
 
@@ -44,6 +57,8 @@ namespace WinTlx
 
 			MemberCb.DataSource = null;
 			MemberCb.DisplayMember = "DisplayName";
+
+			//ConnectBtn.Enabled = false;
 
 			SendLineFeedBtn.Text = "\u2261";
 			//TimeBtn.Text = "\u2299";
@@ -59,6 +74,12 @@ namespace WinTlx
 			this.KeyDown += Form_KeyDown;
 			this.KeyPress += Form_KeyPress;
 
+			_configData = ConfigManager.Instance.LoadConfig();
+			if (_configData == null)
+			{
+				_configData = ConfigManager.Instance.GetDefaultConfig();
+			}
+
 			_itelex = new ItelexProtocol();
 			_itelex.Received += ReceivedHandler;
 			_itelex.Send += SendHandler;
@@ -67,6 +88,7 @@ namespace WinTlx
 			_itelex.Dropped += DroppedHandler;
 			_itelex.Update += UpdatedHandler;
 			_itelex.Message += MessageHandler;
+			_itelex.InactivityTimeout = _configData.InactivityTimeout;
 
 			_subscriberServer = new SubscriberServer();
 			_subscriberServer.Message += SubcribeServerMessageHandler;
@@ -77,32 +99,32 @@ namespace WinTlx
 			_clockTimer.Elapsed += ClockTimer_Elapsed;
 			_clockTimer.Start();
 
-			RichTextTb.ContextMenuStrip = CreateContextMenu();
+			_outputBuffer = new Queue<ScreenChar>();
+			_outputTimer = new System.Timers.Timer();
+			_outputTimer.Elapsed += _outputTimer_Elapsed;
+			SetOutputTimer(_configData.OutputSpeed);
 
-			_configData = ConfigManager.Instance.LoadConfig();
-			if (_configData == null)
-			{
-				_configData = ConfigManager.Instance.GetDefaultConfig();
-			}
-			_itelex.InactivityTimeout = _configData.InactivityTimeout;
+			ClearScreen();
 
 			SetConnectState();
 			UpdatedHandler();
 
-			ClearScreen();
-			ShowScreen();
+			SetFocus();
+			SearchTb.Focus();
 		}
 
 		private void MainForm_Load(object sender, EventArgs e)
 		{
 			MainForm_Resize(null, null);
+			SetFocus();
+			SearchTb.Focus();
 
 #if !DEBUG
 			string text =
 				$"{Helper.GetVersion()}\r\r" +
 				"by *dg* Detlef Gerhardt\r\r" +
 				"Please note that this is a test and diagnostic tool for the i-Telex network. " +
-				"The participants have real teletype machines connected to their i-Telex ports. " +
+				"The participants have real teletype machines connected to there i-Telex ports. " +
 				"Please do not send longer text files or spam to i-Telex numbers!";
 			MessageBox.Show(
 				text,
@@ -188,6 +210,7 @@ namespace WinTlx
 					_screenShowPos0 = 0;
 				}
 				ShowScreen();
+				//_screenDirty = true;
 				e.Handled = true;
 				e.SuppressKeyPress = true;
 				return;
@@ -216,42 +239,34 @@ namespace WinTlx
 
 		private async void ConnectBtn_Click(object sender, EventArgs e)
 		{
-			if (_itelex.IsConnected)
+			SetFocus();
+			if (_itelex.IsConnected || string.IsNullOrEmpty(PortTb.Text))
 			{
 				return;
 			}
+
 			ConnectBtn.Enabled = false;
 			await ConnectOut();
 			ConnectBtn.Enabled = true;
 			SetConnectState();
-			SetFocus();
 		}
-
-		/*
-		private async void ConnectBtn_DoClick()
-		{
-			if (_itelex.IsConnected)
-			{
-				return;
-			}
-			ConnectOut();
-			SetConnectState();
-		}
-		*/
 
 		private void DisconnectBtn_Click(object sender, EventArgs e)
 		{
+			SetFocus();
+			_outputBuffer.Clear();
 			Disconnect();
 		}
 
 		private void LocalBtn_Click(object sender, EventArgs e)
 		{
-			LocalBtn_DoClick();
 			SetFocus();
+			LocalBtn_DoClick();
 		}
 
 		private void LocalBtn_DoClick()
 		{
+			SetFocus();
 			if (!_itelex.IsConnected)
 			{
 				return;
@@ -289,62 +304,61 @@ namespace WinTlx
 
 		private void SendWruBtn_Click(object sender, EventArgs e)
 		{
-			SendWerDa();
 			SetFocus();
+			SendWerDa();
 		}
 
 		private void SendHereIsBtn_Click(object sender, EventArgs e)
 		{
-			SendHereIs();
 			SetFocus();
+			SendHereIs();
 		}
 
 		private void SendBellBtn_Click(object sender, EventArgs e)
 		{
-			SendAsciiText("\x7");
 			SetFocus();
+			SendAsciiText("\x7");
 		}
 
 		private void SendLettersBtn_Click(object sender, EventArgs e)
 		{
-			//_itelex.SendBaudotChar(CodeConversion.LTR_SHIFT);
-			_itelex.SendAsciiChar(CodeConversion.ASC_LTRS);
 			SetFocus();
+			_itelex.SendAsciiChar(CodeConversion.ASC_LTRS);
 		}
 
 		private void SendFiguresBtn_Click(object sender, EventArgs e)
 		{
-			//_itelex.SendBaudotChar(CodeConversion.FIG_SHIFT);
-			_itelex.SendAsciiChar(CodeConversion.ASC_FIGS);
 			SetFocus();
+			_itelex.SendAsciiChar(CodeConversion.ASC_FIGS);
 		}
 
 		private void SendCarriageReturnBtn_Click(object sender, EventArgs e)
 		{
-			_itelex.SendAsciiText("\r");
 			SetFocus();
+			_itelex.SendAsciiText("\r");
 		}
 
 		private void SendLineFeedBtn_Click(object sender, EventArgs e)
 		{
-			//_itelex.SendBaudotChar(CodeConversion.BAU_LF);
-			_itelex.SendAsciiText("\n");
 			SetFocus();
+			_itelex.SendAsciiText("\n");
 		}
 
 		private void SendTimeBtn_Click(object sender, EventArgs e)
 		{
-			SendAsciiText($"{DateTime.Now:dd.MM.yyyy  HH:mm}\r\n");
 			SetFocus();
+			SendAsciiText($"{DateTime.Now:dd.MM.yyyy  HH:mm}\r\n");
 		}
 
 		private void Code32Btn_Click(object sender, EventArgs e)
 		{
+			SetFocus();
 			SendAsciiText("\x00");
 		}
 
 		private void SendLineBtn_Click(object sender, EventArgs e)
 		{
+			SetFocus();
 			SendAsciiText("\r\n");
 			SendAsciiText(new string('-', 68));
 			SendAsciiText("\r\n");
@@ -352,88 +366,27 @@ namespace WinTlx
 
 		private void SendRyBtn_Click(object sender, EventArgs e)
 		{
-			for (int i = 0; i < 33; i++)
-			{
-				SendAsciiText("ry");
-			}
-			//SendAsciiText("\r\n");
 			SetFocus();
+			for (int l = 0; l < 10; l++)
+			{
+				for (int i = 0; i < 33; i++)
+				{
+					SendAsciiText("ry");
+				}
+				SendAsciiText("\r\n");
+			}
 		}
 
 		private void SendFoxBtn_Click(object sender, EventArgs e)
 		{
+			SetFocus();
 			SendAsciiText("the quick brown fox jumps over the lazy dog 1234567890/:,-=()");
 			//SendAsciiText("\r\n");
+		}
+
+		private void TerminalPb_MouseClick(object sender, MouseEventArgs e)
+		{
 			SetFocus();
-		}
-
-		private void RichTextTb_KeyPress(object sender, KeyPressEventArgs e)
-		{
-			char chr = e.KeyChar;
-
-			string chrs = "";
-			switch (chr)
-			{
-				default:
-					chrs = chr.ToString();
-					break;
-				case '\r':
-					chrs = "\r\n";
-					break;
-			}
-			SendAsciiText(chrs);
-			e.Handled = true;
-		}
-
-		private void RichTextTb_Click(object sender, EventArgs e)
-		{
-			//ShowScreen();
-		}
-
-		private void RichTextTb_KeyDown(object sender, KeyEventArgs e)
-		{
-			if (!e.Control)
-			{
-				return;
-			}
-
-			switch (e.KeyCode)
-			{
-				default:
-					//e.Handled = false;
-					break;
-				//case Keys.A:
-				//	await ConnectOut();
-				//	break;
-				case Keys.S:
-					Disconnect();
-					break;
-				case Keys.W:
-					SendWerDa();
-					break;
-				case Keys.N: // letter switch
-					_itelex.SendAsciiChar(CodeConversion.ASC_LTRS);
-					break;
-				case Keys.O: // figures switch
-					_itelex.SendAsciiChar(CodeConversion.ASC_FIGS);
-					break;
-				case Keys.G: // bell
-					_itelex.SendAsciiChar(CodeConversion.ASC_BEL);
-					break;
-				case Keys.I: // inquire, eigene kennung senden
-					_itelex.SendAsciiChar(CodeConversion.ASC_WRU);
-					break;
-			}
-
-			e.SuppressKeyPress = true;
-			e.Handled = true;
-
-		}
-
-		private void RichTextTb_TextChanged(object sender, EventArgs e)
-		{
-			RichTextTb.SelectionStart = RichTextTb.Text.Length;
-			RichTextTb.ScrollToCaret();
 		}
 
 		private void ReceivedHandler(string asciiText)
@@ -445,15 +398,15 @@ namespace WinTlx
 				{
 					case CodeConversion.ASC_BEL:
 						SystemSounds.Beep.Play();
-						AddText("\u04E8");
+						AddText("\u04E8", CharAttributes.Recv);
 						return;
 					case CodeConversion.ASC_WRU:
 						SendHereIs();
-						AddText("\u2629");
+						AddText("\u2629", CharAttributes.Recv);
 						return;
 				}
 			}
-			AddText(asciiText);
+			AddText(asciiText, CharAttributes.Recv);
 		}
 
 		private void SendHandler(string asciiText)
@@ -479,7 +432,7 @@ namespace WinTlx
 				}
 				dispText += c;
 			}
-			AddText(dispText);
+			AddText(dispText, CharAttributes.Send);
 		}
 
 		private void BaudotSendRecvHandler(byte[] code)
@@ -497,26 +450,26 @@ namespace WinTlx
 
 		private void SubcribeServerMessageHandler(string message)
 		{
-			AddText("\r\n" + message.ToUpper() + "\r\n");
+			ShowLocalMessage(message);
 		}
 
 		private void ConnectedHandler()
 		{
-			AddText("\r\nCONNECTED\r\n");
+			ShowLocalMessage("CONNECTED");
 			SetConnectState();
 		}
 
 		private void DroppedHandler()
 		{
-			AddText("\r\nDISCONNECTED\r\n");
+			ShowLocalMessage("DISCONNECTED");
 			SetConnectState();
 		}
 
 		private void UpdatedHandler()
 		{
-			Helper.ControlInvokeRequired(SendAckTb, () => SendAckTb.Text = $"Snd {_itelex.CharsToSendCount}  Ack {_itelex.CharsAckCount}" );
-			Helper.ControlInvokeRequired(InactivityTimoutTb, () => InactivityTimoutTb.Text = $"Timeout {_itelex.InactivityTimer} sec" );
-			Helper.ControlInvokeRequired(ConnTimeTb, () => ConnTimeTb.Text = $"Conn {_itelex.ConnTimeMin} min" );
+			Helper.ControlInvokeRequired(SendAckTb, () => SendAckTb.Text = $"Snd {_itelex.CharsToSendCount}  Ack {_itelex.CharsAckCount}");
+			Helper.ControlInvokeRequired(InactivityTimoutTb, () => InactivityTimoutTb.Text = $"Timeout {_itelex.InactivityTimer} sec");
+			Helper.ControlInvokeRequired(ConnTimeTb, () => ConnTimeTb.Text = $"Conn {_itelex.ConnTimeMin} min");
 
 			Helper.ControlInvokeRequired(KennungTb, () => KennungTb.Text = _configData.Kennung);
 
@@ -590,7 +543,7 @@ namespace WinTlx
 			AddressTb.Text = AddressTb.Text.Trim();
 			if (string.IsNullOrWhiteSpace(AddressTb.Text))
 			{
-				AddText("NO ADDRESS");
+				ShowLocalMessage("NO ADDRESS");
 				return false;
 			}
 
@@ -598,7 +551,7 @@ namespace WinTlx
 			int? port = Helper.ToInt(PortTb.Text);
 			if (port == null)
 			{
-				AddText("INVALID PORT\r\n");
+				ShowLocalMessage("INVALID PORT");
 				return false;
 			}
 
@@ -609,7 +562,7 @@ namespace WinTlx
 				extension = Helper.ToInt(ExtensionTb.Text);
 				if (extension == null)
 				{
-					AddText("INVALID EXTENSION NUMBER\r\n");
+					ShowLocalMessage("INVALID EXTENSION NUMBER");
 					return false;
 				}
 			}
@@ -617,7 +570,7 @@ namespace WinTlx
 			bool success = await _itelex.ConnectOut(AddressTb.Text, port.Value, false);
 			if (!success)
 			{
-				AddText("CONNECTION ERROR\r\n");
+				ShowLocalMessage("CONNECTION ERROR");
 				return false;
 			}
 
@@ -691,47 +644,32 @@ namespace WinTlx
 
 		private void ClearBtn_Click(object sender, EventArgs e)
 		{
+			SetFocus();
 			ClearScreen();
 		}
 
 		private void SendFileBtn_Click(object sender, EventArgs e)
 		{
-			OpenFileDialog openFileDialog = new OpenFileDialog();
-			openFileDialog.InitialDirectory = "c:\\";
-			openFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
-			openFileDialog.FilterIndex = 1;
-			openFileDialog.RestoreDirectory = true;
+			SetFocus();
+			SendFileForm sendFileForm = new SendFileForm();
+			sendFileForm.ShowDialog();
 
-			if (openFileDialog.ShowDialog() != DialogResult.OK)
-				return;
-
-
-			string[] lines = null;
-			try
+			if (sendFileForm.AsciiText != null)
 			{
-				string fullName = openFileDialog.FileName;
-				lines = File.ReadAllLines(fullName);
-				foreach (string line in lines)
-				{
-					// convert to replacements for real length
-					string sendLine = CodeConversion.AsciiStringToTelex(line);
-					if (sendLine.Length > 68)
-						sendLine = sendLine.Substring(0, 68);
-					SendAsciiText(sendLine + "\r\n");
-				}
+				SendAsciiText(sendFileForm.AsciiText);
 			}
-			catch (Exception ex)
-			{
-			}
+			return;
 		}
 
 		private async void QueryBtn_Click(object sender, EventArgs e)
 		{
+			SetFocus();
+
 			SearchTb.Text = SearchTb.Text.Trim();
 
 			Logging.Instance.Log(LogTypes.Info, TAG, nameof(QueryBtn_Click), $"SearchText='{SearchTb.Text}'");
 
-			if (string.IsNullOrWhiteSpace(_configData.SubscribeServerAddress) || _configData.SubscribeServerPort==0)
+			if (string.IsNullOrWhiteSpace(_configData.SubscribeServerAddress) || _configData.SubscribeServerPort == 0)
 			{
 				SubcribeServerMessageHandler("invalid subscribe server address or port");
 				return;
@@ -786,10 +724,10 @@ namespace WinTlx
 
 			MemberCb.DataSource = list;
 			MemberCb.DisplayMember = "Display";
-			if (list==null)
+			if (list == null)
 			{
 			}
-			else if (list.Length==0)
+			else if (list.Length == 0)
 			{
 				MemberCb.Text = "";
 				AddressTb.Text = "";
@@ -806,20 +744,7 @@ namespace WinTlx
 
 		private void ClearScreen()
 		{
-			Helper.ControlInvokeRequired(RichTextTb, () =>
-			{
-				RichTextTb.Text = "";
-			});
-
-			/*
-			for (int y = 0; y < SCREEN_HEIGHT; y++)
-			{
-				for (int x = 0; x < SCREEN_WIDTH; x++)
-				{
-					_screen[x, y] = ' ';
-				}
-			}
-			*/
+			_outputBuffer.Clear();
 
 			_screen.Clear();
 			_screenX = 0;
@@ -829,7 +754,57 @@ namespace WinTlx
 			ShowScreen();
 		}
 
-		private void AddText(string asciiText)
+		private void AddText(string asciiText, CharAttributes attr, bool fast = false)
+		{
+			if (fast || _configData.OutputSpeed==0)
+			{
+				// output immediatly
+				OutputText(asciiText, attr);
+			}
+			else
+			{
+				// put into output queue
+				foreach(char chr in asciiText)
+				{
+					_outputBuffer.Enqueue(new ScreenChar(chr, attr));
+				}
+			}
+		}
+
+		private void SetOutputTimer(int charSec)
+		{
+			_outputTimer.Stop();
+			if (charSec != 0)
+			{
+				_outputTimer.Interval = 1000 / charSec * 5 + 1;
+				_outputTimer.Start();
+			}
+		}
+
+		private void ClearOutputBuffer()
+		{
+			_outputBuffer.Clear();
+		}
+
+		private void _outputTimer_Elapsed(object sender, ElapsedEventArgs e)
+		{
+			if (_outputBuffer.Count > 0)
+			{
+				ScreenChar chr = _outputBuffer.Dequeue();
+				OutputText(chr.Char.ToString(), chr.Attr);
+			}
+		}
+
+		private void ShowLocalMessage(string message)
+		{
+			if (_screenX > 0)
+			{
+				AddText("\r\n", CharAttributes.Message, true);
+			}
+			AddText($"{message.ToUpper()}\r\n", CharAttributes.Message, true);
+		}
+
+		private void OutputText(string asciiText, CharAttributes attr)
 		{
 			if (string.IsNullOrEmpty(asciiText))
 			{
@@ -853,7 +828,7 @@ namespace WinTlx
 						{
 							_screen.Add(new ScreenLine());
 						}
-						_screen[_screenEditPos0 + _screenY].Line[_screenX] = asciiText[i];
+						_screen[_screenEditPos0 + _screenY].Line[_screenX] = new ScreenChar(asciiText[i], attr);
 						IncScreenX();
 						break;
 				}
@@ -862,12 +837,13 @@ namespace WinTlx
 			_screenShowPos0 = _screenEditPos0;
 
 			ShowScreen();
+			//_screenDirty = true;
 			CommLog(asciiText);
 		}
 
 		private void IncScreenX()
 		{
-			if (_screenX < SCREEN_WIDTH - 1)
+			if (_screenX < SCREEN_WIDTH)
 			{
 				_screenX++;
 				if (_screenX == 60)
@@ -889,55 +865,15 @@ namespace WinTlx
 				_screenShowPos0 = _screenEditPos0;
 				_screenY--;
 				ShowScreen();
+				//_screenDirty = true;
 			}
 		}
 
 		private void ShowScreen()
 		{
-			string lines = "";
-			int cursorPos = 0;
-			int pos = 0;
-			for (int y = 0; y < _screenHeight; y++)
+			Helper.ControlInvokeRequired(TerminalPb, () =>
 			{
-				string line = "";
-				for (int x = 0; x < SCREEN_WIDTH; x++)
-				{
-					char chr;
-					if (y + _screenShowPos0 < _screen.Count)
-					{
-						chr = _screen[_screenShowPos0 + y].Line[x];
-						if (chr == 0x00)
-						{	// char 0x00 terminates the rich text display
-							chr = ' ';
-						}
-					}
-					else
-					{
-						chr = ' ';
-					}
-					if (x == _screenX && y == _screenY && _screenShowPos0 == _screenEditPos0)
-					{
-						cursorPos = pos;
-						if (chr == ' ')
-							chr = '_';
-					}
-					line += chr;
-					pos++;
-				}
-				lines += line.TrimEnd();
-				if (y < _screenHeight - 1)
-					lines += "\r";
-				pos = lines.Length;
-			}
-
-			lines = lines.Replace('_', ' ');
-
-			Helper.ControlInvokeRequired(RichTextTb, () =>
-			{
-				RichTextTb.Text = lines;
-
-				RichTextTb.Focus();
-				RichTextTb.SelectionStart = cursorPos;
+				TerminalPb.Refresh();
 			});
 
 			Helper.ControlInvokeRequired(LnColTb, () =>
@@ -961,7 +897,7 @@ namespace WinTlx
 
 		private void SetFocus()
 		{
-			RichTextTb.Focus();
+			TerminalPb.Focus();
 		}
 
 		private object _commLogLock = new object();
@@ -983,6 +919,7 @@ namespace WinTlx
 
 		private void AboutBtn_Click(object sender, EventArgs e)
 		{
+			SetFocus();
 			string text =
 				$"{Helper.GetVersion()}\r\r" +
 				"by *dg* Detlef Gerhardt\r\r" +
@@ -1039,7 +976,7 @@ namespace WinTlx
 			ToolStripItem tsi = e.ClickedItem;
 		}
 
-		private void RichTextTb_MouseUp(object sender, MouseEventArgs e)
+		private void TerminalPb_MouseUp(object sender, MouseEventArgs e)
 		{
 			if (e.Button == MouseButtons.Right)
 			{   //click event
@@ -1053,7 +990,7 @@ namespace WinTlx
 				menuItem = new MenuItem("Paste");
 				menuItem.Click += new EventHandler(PasteAction);
 				contextMenu.MenuItems.Add(menuItem);
-				RichTextTb.ContextMenu = contextMenu;
+				TerminalPb.ContextMenu = contextMenu;
 			}
 		}
 
@@ -1064,8 +1001,12 @@ namespace WinTlx
 
 		private void CopyAction(object sender, EventArgs e)
 		{
-			string selectedText = RichTextTb.SelectedText;
-			Clipboard.SetData(DataFormats.Text, selectedText);
+			string str = "";
+			foreach(ScreenLine line in _screen)
+			{
+				str += line.LineStr + "\r\n";
+			}
+			Clipboard.SetData(DataFormats.Text, str);
 		}
 
 		private void PasteAction(object sender, EventArgs e)
@@ -1078,25 +1019,19 @@ namespace WinTlx
 
 		private void MessageHandler(string asciiText)
 		{
-			Helper.ControlInvokeRequired(RichTextTb, () =>
-			{
-				ShowLocalMessage(asciiText);
-			});
-		}
-
-		private void ShowLocalMessage(string message)
-		{
-			AddText(message.ToUpper());
-			AddText("\r\n");
-			//SystemSounds.Exclamation.Play();
+			ShowLocalMessage(asciiText);
 		}
 
 		private void MainForm_Resize(object sender, EventArgs e)
 		{
 			Debug.WriteLine(this.Height);
 
-			RichTextTb.Height = this.Height - 300 + 50;
-			_screenHeight = RichTextTb.Height / 19;
+			// prevent width change
+			this.Width = _fixedWidth;
+
+			TerminalPb.Height = this.Height - 310 + 50;
+			_screenHeight = TerminalPb.Height / CHAR_HEIGHT;
+
 
 			_screenEditPos0 = _screen.Count - _screenHeight;
 			if (_screenEditPos0 < 0)
@@ -1110,6 +1045,7 @@ namespace WinTlx
 				_screenY = 0;
 
 			ShowScreen();
+			//_screenDirty = true;
 
 			_tapePunchForm?.SetPosition(this.Bounds);
 		}
@@ -1122,18 +1058,6 @@ namespace WinTlx
 		private void MainForm_Activated(object sender, EventArgs e)
 		{
 			//_tapePunchForm?.Activate();
-		}
-
-		private void UpdateIpAddressBtn_Click(object sender, EventArgs e)
-		{
-			if (_configData.SubscribeServerUpdatePin==0 || _configData.OwnNumber==0 || _configData.IncomingLocalPort==0)
-			{
-				return;
-			}
-
-			_subscriberServer.Connect(_configData.SubscribeServerAddress, _configData.SubscribeServerPort);
-			SendClientUpdate(_configData.OwnNumber, _configData.SubscribeServerUpdatePin, _configData.IncomingPublicPort);
-			_subscriberServer.Disconnect();
 		}
 
 		private void SendClientUpdate(int number, int pin, int publicPort)
@@ -1154,6 +1078,7 @@ namespace WinTlx
 			if (!_itelex.RecvOn)
 			{
 				_itelex.SetRecvOn(_configData.IncomingLocalPort);
+				UpdateIpAddress();
 			}
 			else
 			{
@@ -1161,11 +1086,28 @@ namespace WinTlx
 			}
 		}
 
+		private void UpdateIpAddressBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			UpdateIpAddress();
+		}
+
+		private void UpdateIpAddress()
+		{
+			if (_configData.SubscribeServerUpdatePin == 0 || _configData.OwnNumber == 0 || _configData.IncomingLocalPort == 0)
+			{
+				return;
+			}
+
+			_subscriberServer.Connect(_configData.SubscribeServerAddress, _configData.SubscribeServerPort);
+			SendClientUpdate(_configData.OwnNumber, _configData.SubscribeServerUpdatePin, _configData.IncomingPublicPort);
+			_subscriberServer.Disconnect();
+		}
+
 		private void TapePunchBtn_Click(object sender, EventArgs e)
 		{
 			if (_tapePunchForm == null)
 			{
-				//_tapePunchForm = new TapePunchForm(this.Bounds);
 				_tapePunchForm = new TapePunchHorizontalForm(this.Bounds);
 				_tapePunchForm.Show();
 			}
@@ -1174,10 +1116,12 @@ namespace WinTlx
 				_tapePunchForm.Close();
 				_tapePunchForm = null;
 			}
+			SetFocus();
 		}
 
 		private void ConfigBtn_Click(object sender, EventArgs e)
 		{
+			SetFocus();
 			ConfigForm configForm = new ConfigForm(this.Bounds);
 			configForm.SetData(_configData);
 			configForm.ShowDialog();
@@ -1186,6 +1130,7 @@ namespace WinTlx
 				_configData = configForm.GetData();
 				ConfigManager.Instance.SaveConfig(_configData);
 				_itelex.InactivityTimeout = _configData.InactivityTimeout;
+				SetOutputTimer(_configData.OutputSpeed);
 				UpdatedHandler();
 			}
 		}
@@ -1194,23 +1139,63 @@ namespace WinTlx
 		{
 			if (EyeballCharCb.Checked)
 			{
-				_itelex.SendAsciiText("\r\neyeball char active - start tape punch\r\n");
+				_itelex.SendAsciiText("\r\neyeball char mode active - start tape punch\r\n");
 			}
 			_itelex.EyeballCharActive = EyeballCharCb.Checked;
 		}
 
-	}
-
-	class ScreenLine
-	{
-		public char[] Line { get; set; }
-
-		public ScreenLine()
+		private void LinealPnl_Paint(object sender, PaintEventArgs e)
 		{
-			Line = new char[MainForm.SCREEN_WIDTH];
-			for (int i=0; i<MainForm.SCREEN_WIDTH; i++)
+			Helper.PaintRuler(e.Graphics, SCREEN_WIDTH, 8.98F);
+		}
+
+		private void MainForm_Paint(object sender, PaintEventArgs e)
+		{
+			/*
+			if (_screenDirty)
 			{
-				Line[i] = ' ';
+				Debug.WriteLine(_screenDirty);
+				_screenDirty = false;
+				ShowScreen();
+			}
+			*/
+		}
+
+		private void TerminalPb_Paint(object sender, PaintEventArgs e)
+		{
+			Graphics g = e.Graphics;
+			TerminalRefresh(g);
+		}
+
+		private void TerminalRefresh(Graphics g)
+		{
+			Font font = new Font("Consolas", 12);
+			//g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+			g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+			//g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+			g.Clear(Color.White);
+
+			Debug.WriteLine($"{_screen.Count} {_screenShowPos0} {_screenEditPos0} {_screenX} {_screenY}");
+
+			for (int y = 0; y < _screenHeight; y++)
+			{
+				for (int x = 0; x < SCREEN_WIDTH + 1; x++)
+				{
+					ScreenChar scrChr = null;
+					if (y + _screenShowPos0 < _screen.Count)
+					{
+						scrChr = _screen[_screenShowPos0 + y].Line[x];
+					}
+					if (x == _screenX && y == _screenY && _screenShowPos0 == _screenEditPos0)
+					{
+						scrChr = new ScreenChar('_', CharAttributes.Send);
+					}
+					if (scrChr != null && scrChr.Char != ' ' && scrChr.Char != 0x00)
+					{
+						Point p = new Point(x * CHAR_WIDTH, y * CHAR_HEIGHT);
+						g.DrawString(scrChr.Char.ToString(), font, new SolidBrush(scrChr.AttrColor), p);
+					}
+				}
 			}
 		}
 	}

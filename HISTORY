@@ -33,3 +33,9 @@ Version history
         - Fix: If a CCITT-2 code 0 (Code 32) was received, the output in the terminal window was stopped.
         - Display of the Recv On button changed
         - error.log renamed to debug.log
+1.0.1.3 - New: configurable delay for terminal output
+        - New: Automatically update ip address on subscribe server when setting RecvOn
+        - New: Extended send file dialog
+        - New: Ruler obove terminal windows
+        - New: Complete rework of the terminal output (now with color and without flickerung)
+        - Fix: Some minor bugfixes

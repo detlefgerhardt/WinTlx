@@ -66,6 +66,8 @@ namespace WinTlx
 
 		private Timer _sendTimer;
 		private bool _sendTimerActive;
+		private Timer _outputTimer;
+		private bool _outputTimerActive;
 		private Timer _ackTimer;
 		private bool _ackTimerActive;
 		private long _lastSentMs;
@@ -584,6 +586,11 @@ namespace WinTlx
 
 		private void EndSend(IAsyncResult ar)
 		{
+			if (!IsConnected)
+			{
+				return;
+			}
+
 			try
 			{
 				_client.Client.EndSend(ar);

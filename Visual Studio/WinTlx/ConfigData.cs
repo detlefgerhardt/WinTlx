@@ -29,6 +29,9 @@ namespace WinTlx
 		[DataMember]
 		public int IncomingPublicPort { get; set; }
 
+		[DataMember]
+		public int OutputSpeed { get; set; }
+
 		public void SetDefaults()
 		{
 			if (string.IsNullOrWhiteSpace(Kennung))

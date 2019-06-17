@@ -33,7 +33,6 @@
 			this.DisconnectBtn = new System.Windows.Forms.Button();
 			this.SendHereIsBtn = new System.Windows.Forms.Button();
 			this.SendWruBtn = new System.Windows.Forms.Button();
-			this.RichTextTb = new System.Windows.Forms.RichTextBox();
 			this.SendBellBtn = new System.Windows.Forms.Button();
 			this.SendLettersBtn = new System.Windows.Forms.Button();
 			this.SendFiguresBtn = new System.Windows.Forms.Button();
@@ -80,11 +79,14 @@
 			this.TapePunchBtn = new System.Windows.Forms.Button();
 			this.EyeballCharCb = new System.Windows.Forms.CheckBox();
 			this.RecvOnCb = new System.Windows.Forms.CheckBox();
+			this.LinealPnl = new System.Windows.Forms.Panel();
+			this.TerminalPb = new System.Windows.Forms.PictureBox();
 			this.panel1.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.panel3.SuspendLayout();
 			this.panel4.SuspendLayout();
 			this.panel5.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.TerminalPb)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// ConnectBtn
@@ -92,7 +94,7 @@
 			this.ConnectBtn.Location = new System.Drawing.Point(8, 7);
 			this.ConnectBtn.Name = "ConnectBtn";
 			this.ConnectBtn.Size = new System.Drawing.Size(69, 23);
-			this.ConnectBtn.TabIndex = 0;
+			this.ConnectBtn.TabIndex = 9;
 			this.ConnectBtn.Text = "Connect";
 			this.ConnectBtn.UseVisualStyleBackColor = true;
 			this.ConnectBtn.Click += new System.EventHandler(this.ConnectBtn_Click);
@@ -102,7 +104,7 @@
 			this.DisconnectBtn.Location = new System.Drawing.Point(8, 36);
 			this.DisconnectBtn.Name = "DisconnectBtn";
 			this.DisconnectBtn.Size = new System.Drawing.Size(69, 23);
-			this.DisconnectBtn.TabIndex = 2;
+			this.DisconnectBtn.TabIndex = 10;
 			this.DisconnectBtn.Text = "Disconnect";
 			this.DisconnectBtn.UseVisualStyleBackColor = true;
 			this.DisconnectBtn.Click += new System.EventHandler(this.DisconnectBtn_Click);
@@ -112,7 +114,7 @@
 			this.SendHereIsBtn.Location = new System.Drawing.Point(9, 40);
 			this.SendHereIsBtn.Name = "SendHereIsBtn";
 			this.SendHereIsBtn.Size = new System.Drawing.Size(50, 23);
-			this.SendHereIsBtn.TabIndex = 3;
+			this.SendHereIsBtn.TabIndex = 13;
 			this.SendHereIsBtn.Text = "Here is";
 			this.SendHereIsBtn.UseVisualStyleBackColor = true;
 			this.SendHereIsBtn.Click += new System.EventHandler(this.SendHereIsBtn_Click);
@@ -122,32 +124,17 @@
 			this.SendWruBtn.Location = new System.Drawing.Point(9, 11);
 			this.SendWruBtn.Name = "SendWruBtn";
 			this.SendWruBtn.Size = new System.Drawing.Size(50, 23);
-			this.SendWruBtn.TabIndex = 4;
+			this.SendWruBtn.TabIndex = 12;
 			this.SendWruBtn.Text = "WRU";
 			this.SendWruBtn.UseVisualStyleBackColor = true;
 			this.SendWruBtn.Click += new System.EventHandler(this.SendWruBtn_Click);
-			// 
-			// RichTextTb
-			// 
-			this.RichTextTb.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.RichTextTb.Location = new System.Drawing.Point(12, 202);
-			this.RichTextTb.Name = "RichTextTb";
-			this.RichTextTb.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-			this.RichTextTb.Size = new System.Drawing.Size(634, 390);
-			this.RichTextTb.TabIndex = 5;
-			this.RichTextTb.Text = "";
-			this.RichTextTb.Click += new System.EventHandler(this.RichTextTb_Click);
-			this.RichTextTb.TextChanged += new System.EventHandler(this.RichTextTb_TextChanged);
-			this.RichTextTb.KeyDown += new System.Windows.Forms.KeyEventHandler(this.RichTextTb_KeyDown);
-			this.RichTextTb.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.RichTextTb_KeyPress);
-			this.RichTextTb.MouseUp += new System.Windows.Forms.MouseEventHandler(this.RichTextTb_MouseUp);
 			// 
 			// SendBellBtn
 			// 
 			this.SendBellBtn.Location = new System.Drawing.Point(177, 11);
 			this.SendBellBtn.Name = "SendBellBtn";
 			this.SendBellBtn.Size = new System.Drawing.Size(50, 23);
-			this.SendBellBtn.TabIndex = 6;
+			this.SendBellBtn.TabIndex = 18;
 			this.SendBellBtn.Text = "Bell";
 			this.SendBellBtn.UseVisualStyleBackColor = true;
 			this.SendBellBtn.Click += new System.EventHandler(this.SendBellBtn_Click);
@@ -158,7 +145,7 @@
 			this.SendLettersBtn.Location = new System.Drawing.Point(65, 11);
 			this.SendLettersBtn.Name = "SendLettersBtn";
 			this.SendLettersBtn.Size = new System.Drawing.Size(50, 23);
-			this.SendLettersBtn.TabIndex = 7;
+			this.SendLettersBtn.TabIndex = 14;
 			this.SendLettersBtn.Text = "A...";
 			this.SendLettersBtn.UseVisualStyleBackColor = true;
 			this.SendLettersBtn.Click += new System.EventHandler(this.SendLettersBtn_Click);
@@ -169,7 +156,7 @@
 			this.SendFiguresBtn.Location = new System.Drawing.Point(65, 40);
 			this.SendFiguresBtn.Name = "SendFiguresBtn";
 			this.SendFiguresBtn.Size = new System.Drawing.Size(50, 23);
-			this.SendFiguresBtn.TabIndex = 8;
+			this.SendFiguresBtn.TabIndex = 15;
 			this.SendFiguresBtn.Text = "1...";
 			this.SendFiguresBtn.UseVisualStyleBackColor = true;
 			this.SendFiguresBtn.Click += new System.EventHandler(this.SendFiguresBtn_Click);
@@ -181,7 +168,7 @@
 			this.MemberCb.Location = new System.Drawing.Point(174, 23);
 			this.MemberCb.Name = "MemberCb";
 			this.MemberCb.Size = new System.Drawing.Size(271, 21);
-			this.MemberCb.TabIndex = 9;
+			this.MemberCb.TabIndex = 3;
 			this.MemberCb.SelectedIndexChanged += new System.EventHandler(this.PhoneEntryCb_SelectedIndexChanged);
 			// 
 			// PortTb
@@ -189,7 +176,7 @@
 			this.PortTb.Location = new System.Drawing.Point(347, 65);
 			this.PortTb.Name = "PortTb";
 			this.PortTb.Size = new System.Drawing.Size(46, 20);
-			this.PortTb.TabIndex = 10;
+			this.PortTb.TabIndex = 5;
 			this.PortTb.Leave += new System.EventHandler(this.PortTb_Leave);
 			// 
 			// AddressTb
@@ -197,7 +184,7 @@
 			this.AddressTb.Location = new System.Drawing.Point(174, 65);
 			this.AddressTb.Name = "AddressTb";
 			this.AddressTb.Size = new System.Drawing.Size(165, 20);
-			this.AddressTb.TabIndex = 11;
+			this.AddressTb.TabIndex = 4;
 			this.AddressTb.Leave += new System.EventHandler(this.AddressTb_Leave);
 			// 
 			// MemberLbl
@@ -206,7 +193,7 @@
 			this.MemberLbl.Location = new System.Drawing.Point(171, 6);
 			this.MemberLbl.Name = "MemberLbl";
 			this.MemberLbl.Size = new System.Drawing.Size(146, 13);
-			this.MemberLbl.TabIndex = 13;
+			this.MemberLbl.TabIndex = 0;
 			this.MemberLbl.Text = "Search result (select member)";
 			// 
 			// AddressLbl
@@ -215,7 +202,7 @@
 			this.AddressLbl.Location = new System.Drawing.Point(171, 48);
 			this.AddressLbl.Name = "AddressLbl";
 			this.AddressLbl.Size = new System.Drawing.Size(45, 13);
-			this.AddressLbl.TabIndex = 15;
+			this.AddressLbl.TabIndex = 0;
 			this.AddressLbl.Text = "Address";
 			// 
 			// PortLbl
@@ -224,7 +211,7 @@
 			this.PortLbl.Location = new System.Drawing.Point(344, 48);
 			this.PortLbl.Name = "PortLbl";
 			this.PortLbl.Size = new System.Drawing.Size(26, 13);
-			this.PortLbl.TabIndex = 16;
+			this.PortLbl.TabIndex = 0;
 			this.PortLbl.Text = "Port";
 			// 
 			// ExitBtn
@@ -233,7 +220,7 @@
 			this.ExitBtn.Location = new System.Drawing.Point(652, 569);
 			this.ExitBtn.Name = "ExitBtn";
 			this.ExitBtn.Size = new System.Drawing.Size(75, 23);
-			this.ExitBtn.TabIndex = 17;
+			this.ExitBtn.TabIndex = 32;
 			this.ExitBtn.Text = "Exit";
 			this.ExitBtn.UseVisualStyleBackColor = true;
 			this.ExitBtn.Click += new System.EventHandler(this.ExitBtn_Click);
@@ -244,7 +231,7 @@
 			this.SendCarriageReturnBtn.Location = new System.Drawing.Point(121, 11);
 			this.SendCarriageReturnBtn.Name = "SendCarriageReturnBtn";
 			this.SendCarriageReturnBtn.Size = new System.Drawing.Size(50, 23);
-			this.SendCarriageReturnBtn.TabIndex = 18;
+			this.SendCarriageReturnBtn.TabIndex = 16;
 			this.SendCarriageReturnBtn.Text = "<";
 			this.SendCarriageReturnBtn.UseVisualStyleBackColor = true;
 			this.SendCarriageReturnBtn.Click += new System.EventHandler(this.SendCarriageReturnBtn_Click);
@@ -255,7 +242,7 @@
 			this.SendLineFeedBtn.Location = new System.Drawing.Point(121, 40);
 			this.SendLineFeedBtn.Name = "SendLineFeedBtn";
 			this.SendLineFeedBtn.Size = new System.Drawing.Size(50, 23);
-			this.SendLineFeedBtn.TabIndex = 19;
+			this.SendLineFeedBtn.TabIndex = 17;
 			this.SendLineFeedBtn.Text = "=";
 			this.SendLineFeedBtn.UseVisualStyleBackColor = true;
 			this.SendLineFeedBtn.Click += new System.EventHandler(this.SendLineFeedBtn_Click);
@@ -267,7 +254,7 @@
 			this.ProtocolItelexRb.Location = new System.Drawing.Point(466, 20);
 			this.ProtocolItelexRb.Name = "ProtocolItelexRb";
 			this.ProtocolItelexRb.Size = new System.Drawing.Size(52, 17);
-			this.ProtocolItelexRb.TabIndex = 22;
+			this.ProtocolItelexRb.TabIndex = 7;
 			this.ProtocolItelexRb.TabStop = true;
 			this.ProtocolItelexRb.Text = "i-telex";
 			this.ProtocolItelexRb.UseVisualStyleBackColor = true;
@@ -278,7 +265,7 @@
 			this.ProtocolAsciiRb.Location = new System.Drawing.Point(466, 39);
 			this.ProtocolAsciiRb.Name = "ProtocolAsciiRb";
 			this.ProtocolAsciiRb.Size = new System.Drawing.Size(52, 17);
-			this.ProtocolAsciiRb.TabIndex = 23;
+			this.ProtocolAsciiRb.TabIndex = 8;
 			this.ProtocolAsciiRb.Text = "ASCII";
 			this.ProtocolAsciiRb.UseVisualStyleBackColor = true;
 			// 
@@ -288,7 +275,7 @@
 			this.SendTimeBtn.Location = new System.Drawing.Point(233, 11);
 			this.SendTimeBtn.Name = "SendTimeBtn";
 			this.SendTimeBtn.Size = new System.Drawing.Size(50, 23);
-			this.SendTimeBtn.TabIndex = 24;
+			this.SendTimeBtn.TabIndex = 20;
 			this.SendTimeBtn.Text = "Time";
 			this.SendTimeBtn.UseVisualStyleBackColor = true;
 			this.SendTimeBtn.Click += new System.EventHandler(this.SendTimeBtn_Click);
@@ -298,7 +285,7 @@
 			this.SendRyBtn.Location = new System.Drawing.Point(289, 11);
 			this.SendRyBtn.Name = "SendRyBtn";
 			this.SendRyBtn.Size = new System.Drawing.Size(50, 23);
-			this.SendRyBtn.TabIndex = 25;
+			this.SendRyBtn.TabIndex = 22;
 			this.SendRyBtn.Text = "RY";
 			this.SendRyBtn.UseVisualStyleBackColor = true;
 			this.SendRyBtn.Click += new System.EventHandler(this.SendRyBtn_Click);
@@ -308,7 +295,7 @@
 			this.SendFoxBtn.Location = new System.Drawing.Point(289, 40);
 			this.SendFoxBtn.Name = "SendFoxBtn";
 			this.SendFoxBtn.Size = new System.Drawing.Size(50, 23);
-			this.SendFoxBtn.TabIndex = 26;
+			this.SendFoxBtn.TabIndex = 23;
 			this.SendFoxBtn.Text = "Fox";
 			this.SendFoxBtn.UseVisualStyleBackColor = true;
 			this.SendFoxBtn.Click += new System.EventHandler(this.SendFoxBtn_Click);
@@ -318,7 +305,7 @@
 			this.LocalBtn.Location = new System.Drawing.Point(8, 65);
 			this.LocalBtn.Name = "LocalBtn";
 			this.LocalBtn.Size = new System.Drawing.Size(69, 23);
-			this.LocalBtn.TabIndex = 27;
+			this.LocalBtn.TabIndex = 11;
 			this.LocalBtn.Text = "Local";
 			this.LocalBtn.UseVisualStyleBackColor = true;
 			this.LocalBtn.Click += new System.EventHandler(this.LocalBtn_Click);
@@ -328,7 +315,7 @@
 			this.SendFileBtn.Location = new System.Drawing.Point(345, 40);
 			this.SendFileBtn.Name = "SendFileBtn";
 			this.SendFileBtn.Size = new System.Drawing.Size(69, 23);
-			this.SendFileBtn.TabIndex = 32;
+			this.SendFileBtn.TabIndex = 25;
 			this.SendFileBtn.Text = "Send file";
 			this.SendFileBtn.UseVisualStyleBackColor = true;
 			this.SendFileBtn.Click += new System.EventHandler(this.SendFileBtn_Click);
@@ -339,7 +326,7 @@
 			this.SearchLbl.Location = new System.Drawing.Point(8, 7);
 			this.SearchLbl.Name = "SearchLbl";
 			this.SearchLbl.Size = new System.Drawing.Size(61, 13);
-			this.SearchLbl.TabIndex = 33;
+			this.SearchLbl.TabIndex = 0;
 			this.SearchLbl.Text = "Search text";
 			// 
 			// SearchTb
@@ -347,14 +334,14 @@
 			this.SearchTb.Location = new System.Drawing.Point(8, 24);
 			this.SearchTb.Name = "SearchTb";
 			this.SearchTb.Size = new System.Drawing.Size(103, 20);
-			this.SearchTb.TabIndex = 34;
+			this.SearchTb.TabIndex = 1;
 			// 
 			// QueryBtn
 			// 
 			this.QueryBtn.Location = new System.Drawing.Point(115, 21);
 			this.QueryBtn.Name = "QueryBtn";
 			this.QueryBtn.Size = new System.Drawing.Size(52, 23);
-			this.QueryBtn.TabIndex = 35;
+			this.QueryBtn.TabIndex = 2;
 			this.QueryBtn.Text = "Search";
 			this.QueryBtn.UseVisualStyleBackColor = true;
 			this.QueryBtn.Click += new System.EventHandler(this.QueryBtn_Click);
@@ -365,7 +352,7 @@
 			this.ExtensionLbl.Location = new System.Drawing.Point(396, 48);
 			this.ExtensionLbl.Name = "ExtensionLbl";
 			this.ExtensionLbl.Size = new System.Drawing.Size(53, 13);
-			this.ExtensionLbl.TabIndex = 36;
+			this.ExtensionLbl.TabIndex = 0;
 			this.ExtensionLbl.Text = "Extension";
 			// 
 			// ExtensionTb
@@ -373,14 +360,14 @@
 			this.ExtensionTb.Location = new System.Drawing.Point(399, 65);
 			this.ExtensionTb.Name = "ExtensionTb";
 			this.ExtensionTb.Size = new System.Drawing.Size(46, 20);
-			this.ExtensionTb.TabIndex = 37;
+			this.ExtensionTb.TabIndex = 6;
 			// 
 			// SendLineBtn
 			// 
 			this.SendLineBtn.Location = new System.Drawing.Point(233, 40);
 			this.SendLineBtn.Name = "SendLineBtn";
 			this.SendLineBtn.Size = new System.Drawing.Size(50, 23);
-			this.SendLineBtn.TabIndex = 38;
+			this.SendLineBtn.TabIndex = 21;
 			this.SendLineBtn.Text = "-----";
 			this.SendLineBtn.UseVisualStyleBackColor = true;
 			this.SendLineBtn.Click += new System.EventHandler(this.SendLineBtn_Click);
@@ -390,7 +377,7 @@
 			this.ClearBtn.Location = new System.Drawing.Point(345, 11);
 			this.ClearBtn.Name = "ClearBtn";
 			this.ClearBtn.Size = new System.Drawing.Size(69, 23);
-			this.ClearBtn.TabIndex = 40;
+			this.ClearBtn.TabIndex = 24;
 			this.ClearBtn.Text = "Clear";
 			this.ClearBtn.UseVisualStyleBackColor = true;
 			this.ClearBtn.Click += new System.EventHandler(this.ClearBtn_Click);
@@ -415,14 +402,14 @@
 			this.panel1.Location = new System.Drawing.Point(12, 117);
 			this.panel1.Name = "panel1";
 			this.panel1.Size = new System.Drawing.Size(426, 76);
-			this.panel1.TabIndex = 41;
+			this.panel1.TabIndex = 0;
 			// 
 			// Code32Btn
 			// 
 			this.Code32Btn.Location = new System.Drawing.Point(177, 39);
 			this.Code32Btn.Name = "Code32Btn";
 			this.Code32Btn.Size = new System.Drawing.Size(50, 23);
-			this.Code32Btn.TabIndex = 41;
+			this.Code32Btn.TabIndex = 19;
 			this.Code32Btn.Text = ".....";
 			this.Code32Btn.UseVisualStyleBackColor = true;
 			this.Code32Btn.Click += new System.EventHandler(this.Code32Btn_Click);
@@ -448,7 +435,7 @@
 			this.panel2.Location = new System.Drawing.Point(12, 11);
 			this.panel2.Name = "panel2";
 			this.panel2.Size = new System.Drawing.Size(540, 100);
-			this.panel2.TabIndex = 42;
+			this.panel2.TabIndex = 0;
 			// 
 			// KennungLbl
 			// 
@@ -456,7 +443,7 @@
 			this.KennungLbl.Location = new System.Drawing.Point(8, 48);
 			this.KennungLbl.Name = "KennungLbl";
 			this.KennungLbl.Size = new System.Drawing.Size(82, 13);
-			this.KennungLbl.TabIndex = 39;
+			this.KennungLbl.TabIndex = 0;
 			this.KennungLbl.Text = "Kennungsgeber";
 			// 
 			// KennungTb
@@ -465,7 +452,8 @@
 			this.KennungTb.Name = "KennungTb";
 			this.KennungTb.ReadOnly = true;
 			this.KennungTb.Size = new System.Drawing.Size(131, 20);
-			this.KennungTb.TabIndex = 38;
+			this.KennungTb.TabIndex = 0;
+			this.KennungTb.TabStop = false;
 			this.KennungTb.Leave += new System.EventHandler(this.KennungTb_Leave);
 			// 
 			// panel3
@@ -478,7 +466,7 @@
 			this.panel3.Location = new System.Drawing.Point(444, 117);
 			this.panel3.Name = "panel3";
 			this.panel3.Size = new System.Drawing.Size(203, 76);
-			this.panel3.TabIndex = 43;
+			this.panel3.TabIndex = 0;
 			// 
 			// ConnTimeTb
 			// 
@@ -486,7 +474,8 @@
 			this.ConnTimeTb.Name = "ConnTimeTb";
 			this.ConnTimeTb.ReadOnly = true;
 			this.ConnTimeTb.Size = new System.Drawing.Size(90, 20);
-			this.ConnTimeTb.TabIndex = 44;
+			this.ConnTimeTb.TabIndex = 0;
+			this.ConnTimeTb.TabStop = false;
 			// 
 			// LnColTb
 			// 
@@ -494,7 +483,8 @@
 			this.LnColTb.Name = "LnColTb";
 			this.LnColTb.ReadOnly = true;
 			this.LnColTb.Size = new System.Drawing.Size(90, 20);
-			this.LnColTb.TabIndex = 43;
+			this.LnColTb.TabIndex = 0;
+			this.LnColTb.TabStop = false;
 			// 
 			// InactivityTimoutTb
 			// 
@@ -502,7 +492,8 @@
 			this.InactivityTimoutTb.Name = "InactivityTimoutTb";
 			this.InactivityTimoutTb.ReadOnly = true;
 			this.InactivityTimoutTb.Size = new System.Drawing.Size(90, 20);
-			this.InactivityTimoutTb.TabIndex = 42;
+			this.InactivityTimoutTb.TabIndex = 0;
+			this.InactivityTimoutTb.TabStop = false;
 			// 
 			// SendAckTb
 			// 
@@ -510,7 +501,8 @@
 			this.SendAckTb.Name = "SendAckTb";
 			this.SendAckTb.ReadOnly = true;
 			this.SendAckTb.Size = new System.Drawing.Size(90, 20);
-			this.SendAckTb.TabIndex = 40;
+			this.SendAckTb.TabIndex = 0;
+			this.SendAckTb.TabStop = false;
 			// 
 			// panel4
 			// 
@@ -521,7 +513,7 @@
 			this.panel4.Location = new System.Drawing.Point(558, 11);
 			this.panel4.Name = "panel4";
 			this.panel4.Size = new System.Drawing.Size(89, 100);
-			this.panel4.TabIndex = 44;
+			this.panel4.TabIndex = 0;
 			// 
 			// panel5
 			// 
@@ -531,27 +523,29 @@
 			this.panel5.Location = new System.Drawing.Point(653, 12);
 			this.panel5.Name = "panel5";
 			this.panel5.Size = new System.Drawing.Size(74, 99);
-			this.panel5.TabIndex = 45;
+			this.panel5.TabIndex = 0;
 			// 
 			// DateTb
 			// 
-			this.DateTb.Font = new System.Drawing.Font("Impact", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.DateTb.Font = new System.Drawing.Font("Arial Narrow", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.DateTb.Location = new System.Drawing.Point(3, 32);
 			this.DateTb.Name = "DateTb";
 			this.DateTb.ReadOnly = true;
-			this.DateTb.Size = new System.Drawing.Size(67, 23);
+			this.DateTb.Size = new System.Drawing.Size(67, 22);
 			this.DateTb.TabIndex = 47;
+			this.DateTb.TabStop = false;
 			this.DateTb.Text = "00.00.0000";
 			this.DateTb.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
 			// 
 			// TimeTb
 			// 
-			this.TimeTb.Font = new System.Drawing.Font("Impact", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.TimeTb.Font = new System.Drawing.Font("Arial Narrow", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.TimeTb.Location = new System.Drawing.Point(3, 6);
 			this.TimeTb.Name = "TimeTb";
 			this.TimeTb.ReadOnly = true;
-			this.TimeTb.Size = new System.Drawing.Size(67, 23);
+			this.TimeTb.Size = new System.Drawing.Size(67, 22);
 			this.TimeTb.TabIndex = 45;
+			this.TimeTb.TabStop = false;
 			this.TimeTb.Text = "00:00:00";
 			this.TimeTb.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
 			// 
@@ -561,7 +555,7 @@
 			this.AboutBtn.Location = new System.Drawing.Point(652, 540);
 			this.AboutBtn.Name = "AboutBtn";
 			this.AboutBtn.Size = new System.Drawing.Size(75, 23);
-			this.AboutBtn.TabIndex = 46;
+			this.AboutBtn.TabIndex = 31;
 			this.AboutBtn.Text = "About";
 			this.AboutBtn.UseVisualStyleBackColor = true;
 			this.AboutBtn.Click += new System.EventHandler(this.AboutBtn_Click);
@@ -571,7 +565,7 @@
 			this.UpdateIpAddressBtn.Location = new System.Drawing.Point(652, 146);
 			this.UpdateIpAddressBtn.Name = "UpdateIpAddressBtn";
 			this.UpdateIpAddressBtn.Size = new System.Drawing.Size(75, 23);
-			this.UpdateIpAddressBtn.TabIndex = 48;
+			this.UpdateIpAddressBtn.TabIndex = 27;
 			this.UpdateIpAddressBtn.Text = "Update";
 			this.UpdateIpAddressBtn.UseVisualStyleBackColor = true;
 			this.UpdateIpAddressBtn.Click += new System.EventHandler(this.UpdateIpAddressBtn_Click);
@@ -582,7 +576,7 @@
 			this.ConfigBtn.Location = new System.Drawing.Point(652, 511);
 			this.ConfigBtn.Name = "ConfigBtn";
 			this.ConfigBtn.Size = new System.Drawing.Size(75, 23);
-			this.ConfigBtn.TabIndex = 50;
+			this.ConfigBtn.TabIndex = 30;
 			this.ConfigBtn.Text = "Config";
 			this.ConfigBtn.UseVisualStyleBackColor = true;
 			this.ConfigBtn.Click += new System.EventHandler(this.ConfigBtn_Click);
@@ -592,7 +586,7 @@
 			this.TapePunchBtn.Location = new System.Drawing.Point(652, 188);
 			this.TapePunchBtn.Name = "TapePunchBtn";
 			this.TapePunchBtn.Size = new System.Drawing.Size(75, 23);
-			this.TapePunchBtn.TabIndex = 51;
+			this.TapePunchBtn.TabIndex = 28;
 			this.TapePunchBtn.Text = "Tape Punch";
 			this.TapePunchBtn.UseVisualStyleBackColor = true;
 			this.TapePunchBtn.Click += new System.EventHandler(this.TapePunchBtn_Click);
@@ -603,7 +597,7 @@
 			this.EyeballCharCb.Location = new System.Drawing.Point(652, 217);
 			this.EyeballCharCb.Name = "EyeballCharCb";
 			this.EyeballCharCb.Size = new System.Drawing.Size(75, 23);
-			this.EyeballCharCb.TabIndex = 52;
+			this.EyeballCharCb.TabIndex = 29;
 			this.EyeballCharCb.Text = "Eyeball Char";
 			this.EyeballCharCb.UseVisualStyleBackColor = true;
 			this.EyeballCharCb.CheckedChanged += new System.EventHandler(this.EyeballCharCb_CheckedChanged);
@@ -614,17 +608,39 @@
 			this.RecvOnCb.Location = new System.Drawing.Point(652, 117);
 			this.RecvOnCb.Name = "RecvOnCb";
 			this.RecvOnCb.Size = new System.Drawing.Size(75, 23);
-			this.RecvOnCb.TabIndex = 53;
+			this.RecvOnCb.TabIndex = 26;
 			this.RecvOnCb.Text = "Recv On";
 			this.RecvOnCb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			this.RecvOnCb.UseVisualStyleBackColor = true;
 			this.RecvOnCb.Click += new System.EventHandler(this.RecvOnCb_Click);
+			// 
+			// LinealPnl
+			// 
+			this.LinealPnl.Location = new System.Drawing.Point(13, 201);
+			this.LinealPnl.Name = "LinealPnl";
+			this.LinealPnl.Size = new System.Drawing.Size(633, 12);
+			this.LinealPnl.TabIndex = 0;
+			this.LinealPnl.Paint += new System.Windows.Forms.PaintEventHandler(this.LinealPnl_Paint);
+			// 
+			// TerminalPb
+			// 
+			this.TerminalPb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.TerminalPb.Location = new System.Drawing.Point(12, 217);
+			this.TerminalPb.Name = "TerminalPb";
+			this.TerminalPb.Size = new System.Drawing.Size(634, 375);
+			this.TerminalPb.TabIndex = 55;
+			this.TerminalPb.TabStop = false;
+			this.TerminalPb.Paint += new System.Windows.Forms.PaintEventHandler(this.TerminalPb_Paint);
+			this.TerminalPb.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TerminalPb_MouseClick);
+			this.TerminalPb.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TerminalPb_MouseUp);
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(734, 604);
+			this.Controls.Add(this.TerminalPb);
+			this.Controls.Add(this.LinealPnl);
 			this.Controls.Add(this.RecvOnCb);
 			this.Controls.Add(this.EyeballCharCb);
 			this.Controls.Add(this.TapePunchBtn);
@@ -637,15 +653,16 @@
 			this.Controls.Add(this.panel2);
 			this.Controls.Add(this.panel1);
 			this.Controls.Add(this.ExitBtn);
-			this.Controls.Add(this.RichTextTb);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MaximizeBox = false;
 			this.MinimumSize = new System.Drawing.Size(750, 380);
 			this.Name = "MainForm";
-			this.Text = "WinTelex 1.0 beta";
+			this.Text = "WinTlx";
 			this.Activated += new System.EventHandler(this.MainForm_Activated);
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.LocationChanged += new System.EventHandler(this.MainForm_LocationChanged);
+			this.Paint += new System.Windows.Forms.PaintEventHandler(this.MainForm_Paint);
 			this.Resize += new System.EventHandler(this.MainForm_Resize);
 			this.panel1.ResumeLayout(false);
 			this.panel2.ResumeLayout(false);
@@ -655,6 +672,7 @@
 			this.panel4.ResumeLayout(false);
 			this.panel5.ResumeLayout(false);
 			this.panel5.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.TerminalPb)).EndInit();
 			this.ResumeLayout(false);
 
 		}
@@ -665,7 +683,6 @@
 		private System.Windows.Forms.Button DisconnectBtn;
 		private System.Windows.Forms.Button SendHereIsBtn;
 		private System.Windows.Forms.Button SendWruBtn;
-		private System.Windows.Forms.RichTextBox RichTextTb;
 		private System.Windows.Forms.Button SendBellBtn;
 		private System.Windows.Forms.Button SendLettersBtn;
 		private System.Windows.Forms.Button SendFiguresBtn;
@@ -712,6 +729,8 @@
 		private System.Windows.Forms.Button Code32Btn;
 		private System.Windows.Forms.CheckBox EyeballCharCb;
 		private System.Windows.Forms.CheckBox RecvOnCb;
+		private System.Windows.Forms.Panel LinealPnl;
+		private System.Windows.Forms.PictureBox TerminalPb;
 	}
 }
 

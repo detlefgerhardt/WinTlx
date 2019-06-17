@@ -212,5 +212,22 @@ namespace WinTlx
 			}
 			return screenNr;
 		}
+
+		public static void PaintRuler(Graphics g, int screenWidth, float scale)
+		{
+			for (int i = 0; i < screenWidth + 3; i++)
+			{
+				float x = (float)(2 + i * scale);
+				Pen pen = (i == screenWidth) ? new Pen(Color.Red, 1) : new Pen(Color.Black, 1);
+				if (i % 10 == 0)
+				{
+					g.DrawLine(pen, x, 0, x, 10);
+				}
+				else
+				{
+					g.DrawLine(pen, x, 5, x, 10);
+				}
+			}
+		}
 	}
 }

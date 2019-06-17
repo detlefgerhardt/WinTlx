@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace WinTlx
 {
@@ -49,9 +50,9 @@ namespace WinTlx
 				default:
 					return ASC_INV;
 				case ShiftStates.Ltr:
-					return _codeTab[LTRS, baudotCode];
+					return _codeTabEu[LTRS, baudotCode];
 				case ShiftStates.Figs:
-					return _codeTab[FIGS, baudotCode];
+					return _codeTabEu[FIGS, baudotCode];
 			}
 		}
 
@@ -60,9 +61,9 @@ namespace WinTlx
 			switch (shiftState)
 			{
 				case ShiftStates.Ltr:
-					return _codeTabPuncher[LTRS, baudotCode];
+					return _codeTabPuncherEu[LTRS, baudotCode];
 				case ShiftStates.Figs:
-					return _codeTabPuncher[FIGS, baudotCode];
+					return _codeTabPuncherEu[FIGS, baudotCode];
 				default:
 					return "";
 			}
@@ -106,7 +107,8 @@ namespace WinTlx
 			string telexData = "";
 			for (int i = 0; i < asciiData.Length; i++)
 			{
-				telexData += _asciiToTelexTab[(int)asciiData[i]];
+				//telexData += _asciiToTelexTab[(int)asciiData[i]];
+				telexData += _asciiToTelexTabEu[(byte)asciiData[i]];
 			}
 			return telexData;
 		}
@@ -121,89 +123,6 @@ namespace WinTlx
 			}
 			return buffer;
 		}
-
-		/*
-		private static byte[] TelexCharToBaudot(char telexChar, ref ShiftStates shiftState)
-		{
-			int ltrCode = FindBaudot(_codeTabLtrs, telexChar);
-			int ltrCode = FindBaudot(_codeTabLtrs, telexChar);
-
-			char[] tab = null;
-			switch (shiftState)
-			{
-				case ShiftStates.Ltr:
-					tab = _codeTabLtrs;
-					break;
-				case ShiftStates.Figs:
-					tab = _codeTabFigs;
-					break;
-			}
-
-			byte[] baudotData = new byte[] { (byte)ASC_INV };
-			if (tab == null)
-				return baudotData;
-
-			int baudotCode = -1;
-			for (int c = 0; c < tab.Length; c++)
-			{
-				if (tab[c] == telexChar)
-				{
-					baudotCode = c;
-					break;
-				}
-			}
-			if (baudotCode == -1)
-				return baudotData; // invalid
-
-			baudotData = BaudotCodeToBufferWithShift((byte)baudotCode, ref shiftState);
-			return baudotData;
-		}
-		*/
-
-#if false
-		byte[] buffer = new byte[0];
-			for (int i = 0; i < codeData.Length; i++)
-			{
-				byte[] codes = BaudotCodeToBufferWithShift(codeData[i], ref shiftState);
-				if (codes.Length == 0)
-				{	// should not happen
-					return codes;
-				}
-				buffer = buffer.Concat(codes).ToArray();
-
-				//int code = codeData[i];
-				//if ((code & 0x40) == 0x40)
-				//{   // is letters or figures (code in both groups)
-				//	buffer = Helper.AddByte(buffer, (byte)(code & 0x1F));
-				//}
-				//else if ((code & 0x20) == 0x00)
-				//{   // is letter
-				//	if (shiftState == ShiftStates.Unknown || shiftState == ShiftStates.Figs)
-				//	{
-				//		buffer = Helper.AddByte(buffer, LTR_SHIFT);
-				//		shiftState = ShiftStates.Ltr;
-				//	}
-				//	buffer = Helper.AddByte(buffer, (byte)(code & 0x1F));
-				//}
-				//else if ((code & 0x20) == 0x20)
-				//{   // is figure 
-				//	if (shiftState == ShiftStates.Unknown || shiftState == ShiftStates.Ltr)
-				//	{
-				//		buffer = Helper.AddByte(buffer, FIG_SHIFT);
-				//		shiftState = ShiftStates.Figs;
-				//	}
-				//	buffer = Helper.AddByte(buffer, (byte)(code & 0x1F));
-				//}
-				//else
-				//{   // is invalid
-				//	return new byte[0];
-				//}
-
-			}
-
-			return buffer;
-		}
-#endif
 
 		public static byte[] TelexCharToBaudotWithShift(char telexChr, ref ShiftStates shiftState)
 		{
@@ -287,7 +206,7 @@ namespace WinTlx
 			// search ascii char to find baudot code
 			for (int c = 0; c < 32; c++)
 			{
-				if (_codeTab[shift, c] == telexChar)
+				if (_codeTabEu[shift, c] == telexChar)
 				{
 					return (byte)c;
 				}
@@ -301,6 +220,8 @@ namespace WinTlx
 		private const char ASC_INV = '#'; // replace invalid baudot character
 		public const char ASC_WRU = '\x05'; // Ctrl-E, Kennungsgeber-Abfrage (wer da?)
 		public const char ASC_BEL = '\x07'; // Ctrl-G, Bell
+		public const char ASC_LF = '\x0A';
+		public const char ASC_CR = '\x0D';
 		public const char ASC_LTRS = '\x1E';
 		public const char ASC_FIGS = '\x1F';
 		public const char ASC_CODE32 = '\x00';
@@ -371,6 +292,210 @@ namespace WinTlx
 
 		#region ASCII -> Telex character set
 
+		// ASCII -> ASCII conversion Europe
+		private static Dictionary<byte, string> _asciiToTelexTabEu = new Dictionary<byte, string>
+		{
+			{ 0x00, ASC_CODE32.ToString() },
+			{ 0x05, ASC_WRU.ToString() },
+			{ 0x07, ASC_BEL.ToString() }, // bell
+			{ 0x0A, ASC_LF.ToString() }, // LF
+			{ 0x0D, ASC_CR.ToString() }, // CR
+			{ 0x1E, ASC_LTRS.ToString() }, // ITA2 letters
+			{ 0x1F, ASC_FIGS.ToString() }, // ITA2 figurs
+			{ 0x20, " " },  // space
+			{ 0x22, "''" }, // " -> ''
+			{ 0x27, "'" },	// ' -> '
+			{ 0x28, "(" },	// ( -> (
+			{ 0x29, ")" },	// ) -> )
+			{ 0x2B, "+" },	// + -> +
+			{ 0x2C, "," },	// , -> ,
+			{ 0x2D, "-" },	// - -> -
+			{ 0x2E, "." },	// . -> .
+			{ 0x2F, "/" },	// / -> /
+			{ 0x30, "0" },	// 0 -> 0
+			{ 0x31, "1" },	// 1 -> 1
+			{ 0x32, "2" },	// 2 -> 2
+			{ 0x33, "3" },	// 3 -> 3
+			{ 0x34, "4" },	// 4 -> 4
+			{ 0x35, "5" },	// 5 -> 5
+			{ 0x36, "6" },	// 6 -> 6
+			{ 0x37, "7" },	// 7 -> 7
+			{ 0x38, "8" },	// 8 -> 8
+			{ 0x39, "9" },	// 9 -> 9
+			{ 0x3A, ":" },	// : -> :
+			{ 0x3C, "(." },	// < -> (.
+			{ 0x3D, "=" },	// = -> =
+			{ 0x3E, ".)" },	// > -> .)
+			{ 0x3F, "?" },	// ? -> ?
+			{ 0x40, "(at)" }, // @ -> (at)
+			{ 0x41, "a" },	// A -> a
+			{ 0x42, "b" },	// B -> b
+			{ 0x43, "c" },	// C -> c
+			{ 0x44, "d" },	// D -> d
+			{ 0x45, "e" },	// E -> e
+			{ 0x46, "f" },	// F -> f
+			{ 0x47, "g" },	// G -> g
+			{ 0x48, "h" },	// H -> h
+			{ 0x49, "i" },	// I -> i
+			{ 0x4A, "j" },	// J -> j
+			{ 0x4B, "k" },	// K -> k
+			{ 0x4C, "l" },	// L -> l
+			{ 0x4D, "m" },	// M -> m
+			{ 0x4E, "n" },	// N -> n
+			{ 0x4F, "o" },	// O -> o
+			{ 0x50, "p" },	// P -> p
+			{ 0x51, "q" },	// Q -> q
+			{ 0x52, "r" },	// R -> r
+			{ 0x53, "s" },	// S -> s
+			{ 0x54, "t" },	// T -> t
+			{ 0x55, "u" },	// U -> u
+			{ 0x56, "v" },	// V -> v
+			{ 0x57, "w" },	// W -> w
+			{ 0x58, "x" },	// X -> x
+			{ 0x59, "y" },	// Y -> y
+			{ 0x5A, "z" },	// Z -> z
+			{ 0x5B, "(:" },	// [ -> (:
+			{ 0x5C, "" },	// \
+			{ 0x5D, ":)" },	// ] -> :)
+			{ 0x5E, "^" },	// ^
+			{ 0x5F, " " },	// _ -> SP
+			{ 0x60, "'" },	// ` -> '
+			{ 0x61, "a" },	// a -> a
+			{ 0x62, "b" },	// b -> b
+			{ 0x63, "c" },	// c -> c
+			{ 0x64, "d" },	// d -> d
+			{ 0x65, "e" },	// e -> e
+			{ 0x66, "f" },	// f -> f
+			{ 0x67, "g" },	// g -> g
+			{ 0x68, "h" },	// h -> h
+			{ 0x69, "i" },	// i -> i
+			{ 0x6A, "j" },	// j -> j
+			{ 0x6B, "k" },	// k -> k
+			{ 0x6C, "l" },	// l -> l
+			{ 0x6D, "m" },	// m -> m
+			{ 0x6E, "n" },	// n -> n
+			{ 0x6F, "o" },	// o -> o
+			{ 0x70, "p" },	// p -> p
+			{ 0x71, "q" },	// q -> q
+			{ 0x72, "r" },	// r -> r
+			{ 0x73, "s" },	// S -> s
+			{ 0x74, "t" },	// t -> t
+			{ 0x75, "u" },	// u -> u
+			{ 0x76, "v" },	// v -> v
+			{ 0x77, "w" },	// w -> w
+			{ 0x78, "x" },	// x -> x
+			{ 0x79, "y" },	// y -> y
+			{ 0x7A, "z" },	// z -> z
+			{ 0x7B, "(," },	// { -> (,
+			{ 0x7C, "/" },	// / -> /
+			{ 0x7D, ")," },	// } -> ,)
+			{ 0x7E, "-" },	// ~ -> -
+		};
+
+		// ASCII -> ASCII conversion US
+		private static Dictionary<byte, string> _asciiToTelexTabUs = new Dictionary<byte, string>
+		{
+			{ 0x00, ASC_CODE32.ToString() },
+			//{ 0x05, ASC_WRU.ToString() }, no WRU
+			{ 0x07, ASC_BEL.ToString() }, // bell
+			{ 0x0A, ASC_LF.ToString() }, // LF
+			{ 0x0D, ASC_CR.ToString() }, // CR
+			{ 0x1E, ASC_LTRS.ToString() }, // ITA2 letters
+			{ 0x1F, ASC_FIGS.ToString() }, // ITA2 figurs
+			{ 0x20, " " },  // space
+			{ 0x21, "!" },  // !
+			{ 0x22, "\"" }, // " -> "
+			{ 0x23, "#" },	// # -> #
+			{ 0x24, "$" },  // $ -> $
+			{ 0x26, "&" },  // & -> &
+			{ 0x27, "'" },	// ' -> '
+			{ 0x28, "(" },	// ( -> (
+			{ 0x29, ")" },	// ) -> )
+			{ 0x2C, "," },	// , -> ,
+			{ 0x2D, "-" },	// - -> -
+			{ 0x2E, "." },	// . -> .
+			{ 0x2F, "/" },	// / -> /
+			{ 0x30, "0" },	// 0 -> 0
+			{ 0x31, "1" },	// 1 -> 1
+			{ 0x32, "2" },	// 2 -> 2
+			{ 0x33, "3" },	// 3 -> 3
+			{ 0x34, "4" },	// 4 -> 4
+			{ 0x35, "5" },	// 5 -> 5
+			{ 0x36, "6" },	// 6 -> 6
+			{ 0x37, "7" },	// 7 -> 7
+			{ 0x38, "8" },	// 8 -> 8
+			{ 0x39, "9" },	// 9 -> 9
+			{ 0x3A, ":" },	// : -> :
+			{ 0x3B, ";" },	// ; -> ;
+			{ 0x3C, "(." },	// < -> (.
+			{ 0x3E, ".)" },	// > -> .)
+			{ 0x3F, "?" },	// ? -> ?
+			{ 0x40, "(at)" }, // @ -> (at)
+			{ 0x41, "a" },	// A -> a
+			{ 0x42, "b" },	// B -> b
+			{ 0x43, "c" },	// C -> c
+			{ 0x44, "d" },	// D -> d
+			{ 0x45, "e" },	// E -> e
+			{ 0x46, "f" },	// F -> f
+			{ 0x47, "g" },	// G -> g
+			{ 0x48, "h" },	// H -> h
+			{ 0x49, "i" },	// I -> i
+			{ 0x4A, "j" },	// J -> j
+			{ 0x4B, "k" },	// K -> k
+			{ 0x4C, "l" },	// L -> l
+			{ 0x4D, "m" },	// M -> m
+			{ 0x4E, "n" },	// N -> n
+			{ 0x4F, "o" },	// O -> o
+			{ 0x50, "p" },	// P -> p
+			{ 0x51, "q" },	// Q -> q
+			{ 0x52, "r" },	// R -> r
+			{ 0x53, "s" },	// S -> s
+			{ 0x54, "t" },	// T -> t
+			{ 0x55, "u" },	// U -> u
+			{ 0x56, "v" },	// V -> v
+			{ 0x57, "w" },	// W -> w
+			{ 0x58, "x" },	// X -> x
+			{ 0x59, "y" },	// Y -> y
+			{ 0x5A, "z" },	// Z -> z
+			{ 0x5B, "(:" },	// [ -> (:
+			{ 0x5C, "" },	// \
+			{ 0x5D, ":)" },	// ] -> :)
+			{ 0x5E, "^" },	// ^
+			{ 0x5F, " " },	// _ -> SP
+			{ 0x60, "'" },	// ` -> '
+			{ 0x61, "a" },	// a -> a
+			{ 0x62, "b" },	// b -> b
+			{ 0x63, "c" },	// c -> c
+			{ 0x64, "d" },	// d -> d
+			{ 0x65, "e" },	// e -> e
+			{ 0x66, "f" },	// f -> f
+			{ 0x67, "g" },	// g -> g
+			{ 0x68, "h" },	// h -> h
+			{ 0x69, "i" },	// i -> i
+			{ 0x6A, "j" },	// j -> j
+			{ 0x6B, "k" },	// k -> k
+			{ 0x6C, "l" },	// l -> l
+			{ 0x6D, "m" },	// m -> m
+			{ 0x6E, "n" },	// n -> n
+			{ 0x6F, "o" },	// o -> o
+			{ 0x70, "p" },	// p -> p
+			{ 0x71, "q" },	// q -> q
+			{ 0x72, "r" },	// r -> r
+			{ 0x73, "s" },	// S -> s
+			{ 0x74, "t" },	// t -> t
+			{ 0x75, "u" },	// u -> u
+			{ 0x76, "v" },	// v -> v
+			{ 0x77, "w" },	// w -> w
+			{ 0x78, "x" },	// x -> x
+			{ 0x79, "y" },	// y -> y
+			{ 0x7A, "z" },	// z -> z
+			{ 0x7B, "(," },	// { -> (,
+			{ 0x7C, "/" },	// / -> /
+			{ 0x7D, ")," },	// } -> ,)
+			{ 0x7E, "-" },	// ~ -> -
+		};
+
+#if false
 		private static string[] _asciiToTelexTab =
 		{
 			"\x00",	// 00 Code32
@@ -403,19 +528,19 @@ namespace WinTlx
 			"",		// 1B invalid skip
 			"",		// 1C invalid skip
 			"",		// 1D invalid skip
-			"\x1E",	// 1E ITA2 letters
-			"\x1F", // 1F ITA2 figures
+			ASC_LTRS.ToString(), // 1E ITA2 letters
+			ASC_FIGS.ToString(), // 1F ITA2 figures
 			" ",	// 20 space
-			".",	// 21 ! -> .
+			"",		// 21 ! -> .
 			"''",	// 22 " -> ''
-			"//",	// 23 # -> //
-			"s/",	// 24 $ -> s/
-			"o/o",	// 25 % -> o/o
+			"",		// 23 #
+			"",		// 24 $
+			"",		// 25 %
 			"+",	// 26 & -> +
 			"'",	// 27 '
 			"(",	// 28 (
 			")",	// 29 )
-			"x",	// 2A * -> x
+			"",		// 2A *
 			"+",	// 2B +
 			",",	// 2C ,
 			"-",	// 2D - 
@@ -502,6 +627,7 @@ namespace WinTlx
 			"-",	// 7E ~ -> -
 			"",		// 7F invalid skip
 		};
+#endif
 
 		#endregion
 
@@ -509,14 +635,14 @@ namespace WinTlx
 
 		// bitorder is: 54.321
 
-		private static char[,] _codeTab =
+		private static char[,] _codeTabEu =
 		{
 			{
 				ASC_CODE32,	// 00 C32
 				't',		// 01 t
 				'\r',		// 02 CR
 				'o',		// 03 o
-				' ',		// 04 BL
+				' ',		// 04 SP
 				'h',		// 05 h
 				'n',		// 06 n
 				'm',		// 07 m
@@ -553,43 +679,118 @@ namespace WinTlx
 				'\r',		// 02 CR
 				'9',		// 03 9
 				' ',		// 04 BL
-				ASC_INV,	// 05      Pnd
-				',',		// 06 ,    ,
-				'.',		// 07 .    .
-				'\n',		// 08 NL
-				')',		// 09
+				ASC_INV,	// 05      #
+				',',		// 06 ,
+				'.',		// 07 .
+				'\n',		// 08 LF
+				')',		// 09 )
 				'4',		// 0A 4
 				ASC_INV,	// 0B      &
 				'8',		// 0C 8
 				'0',		// 0D 0
-				':',		// 0E :    :
+				':',		// 0E :
 				'=',		// 0F =    ;
 				'3',		// 10 3
-				'+',		// 11      "
+				'+',		// 11 +    "
 				ASC_WRU,	// 12 WRU  $
 				'?',		// 13 ?    ?
-				'\'',		// 14      
+				'\'',		// 14 '    BEL
 				'6',		// 15 6
-				ASC_INV,	// 16      % / #
-				'/',		// 17
-				'-',		// 18
+				ASC_INV,	// 16      !
+				'/',		// 17 /
+				'-',		// 18 -
 				'2',		// 19 2
-				ASC_BEL,	// 1A BEL  BEL
+				ASC_BEL,	// 1A BEL  '
 				ASC_FIGS,	// 1B FIG
 				'7',		// 1C 7
 				'1',		// 1D 1
-				'(',		// 1E
+				'(',		// 1E (
 				ASC_LTRS	// 1F LTR
 			}
 		};
 
-		#endregion
+		private static char[,] _codeTabUs =
+		{
+			{
+				ASC_CODE32,	// 00 C32
+				't',		// 01 t
+				'\r',		// 02 CR
+				'o',		// 03 o
+				' ',		// 04 SP
+				'h',		// 05 h
+				'n',		// 06 n
+				'm',		// 07 m
+				'\n',		// 08 LF
+				'l',		// 09 l
+				'r',		// 0A r
+				'g',		// 0B g
+				'i',		// 0C i
+				'p',		// 0D p
+				'c',		// 0E c
+				'v',		// 0F v
+				'e',		// 10 e
+				'z',		// 11 z
+				'd',		// 12 d
+				'b',		// 13 b
+				's',		// 14 s
+				'y',		// 15 y
+				'f',		// 16 f
+				'x',		// 17 x
+				'a',		// 18 a
+				'w',		// 19 w
+				'j',		// 1A j
+				ASC_FIGS,	// 1B FIG
+				'u',		// 1C u
+				'q',		// 1D q
+				'k',		// 1E k
+				ASC_LTRS    // 1F LTR
+			},
 
-		#region Baudot / ITA 2 -> Puncher
+			// figures
+			{
+				ASC_CODE32,	// 00 C32
+				'5',		// 01 5
+				'\r',		// 02 CR
+				'9',		// 03 9
+				' ',		// 04 SP
+				'#',		// 05 #
+				',',		// 06 ,
+				'.',		// 07 .
+				'\n',		// 08 NL
+				')',		// 09 )
+				'4',		// 0A 4
+				'&',		// 0B &
+				'8',		// 0C 8
+				'0',		// 0D 0
+				':',		// 0E :
+				';',		// 0F ;    =
+				'3',		// 10 3
+				'"',		// 11 "    +
+				'$',		// 12 $    WRU
+				'?',		// 13 ?    ?
+				ASC_BEL,	// 14 BEL  '
+				'6',		// 15 6
+				'!',		// 16 !
+				'/',		// 17 /
+				'-',		// 18 -
+				'2',		// 19 2
+				'\'',		// 1A '     BEL
+				ASC_FIGS,	// 1B FIG
+				'7',		// 1C 7
+				'1',		// 1D 1
+				'(',		// 1E (
+				ASC_LTRS	// 1F LTR
+			}
+
+		};
+
+#endregion
+
+#region Baudot / ITA 2 -> Puncher
 
 		// bitorder is: 54.321
 
-		private static string[,] _codeTabPuncher =
+		private static string[,] _codeTabPuncherEu =
 		{
 			// letters
 			{
@@ -662,6 +863,80 @@ namespace WinTlx
 				"(",		// 1E
 				"LTR"       // 1F letters
 			}
+		};
+		private static string[,] _codeTabPuncherUs =
+		{
+			{
+				"",			// 00 C32
+				"t",		// 01 t
+				"CR",		// 02 CR
+				"o",		// 03 o
+				" ",		// 04 SP
+				"h",		// 05 h
+				"n",		// 06 n
+				"m",		// 07 m
+				"LF",		// 08 LF
+				"l",		// 09 l
+				"r",		// 0A r
+				"g",		// 0B g
+				"i",		// 0C i
+				"p",		// 0D p
+				"c",		// 0E c
+				"v",		// 0F v
+				"e",		// 10 e
+				"z",		// 11 z
+				"d",		// 12 d
+				"b",		// 13 b
+				"s",		// 14 s
+				"y",		// 15 y
+				"f",		// 16 f
+				"x",		// 17 x
+				"a",		// 18 a
+				"w",		// 19 w
+				"j",		// 1A j
+				"FIG",		// 1B FIG
+				"u",		// 1C u
+				"q",		// 1D q
+				"k",		// 1E k
+				"LTR"	    // 1F LTR
+			},
+
+			// figures
+			{
+				"",			// 00 C32
+				"5",		// 01 5
+				"CR",		// 02 CR
+				"9",		// 03 9
+				" ",		// 04 SP
+				"#",		// 05 #
+				",",		// 06 ,
+				".",		// 07 .
+				"LF",		// 08 NL
+				")",		// 09 )
+				"4",		// 0A 4
+				"&",		// 0B &
+				"8",		// 0C 8
+				"0",		// 0D 0
+				":",		// 0E :
+				";",		// 0F ;    =
+				"3",		// 10 3
+				"\"",		// 11 "    +
+				"$",		// 12 $    WRU
+				"?",		// 13 ?    ?
+				"BEL",		// 14 BEL  '
+				"6",		// 15 6
+				"!",		// 16 !
+				"/",		// 17 /
+				"-",		// 18 -
+				"2",		// 19 2
+				"\'",		// 1A '     BEL
+				"FIG",		// 1B FIG
+				"7",		// 1C 7
+				"1",		// 1D 1
+				"(",		// 1E (
+				"LTR"		// 1F LTR
+			}
+
 		};
 
 		#endregion
