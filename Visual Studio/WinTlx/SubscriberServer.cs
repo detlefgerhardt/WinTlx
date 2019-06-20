@@ -26,9 +26,9 @@ namespace WinTlx
 			}
 			catch(Exception ex)
 			{
-				Logging.Instance.Log(LogTypes.Error,TAG, nameof(Connect),
-					$"error connecting to subscribe server {address}:{port}");
-				Message?.Invoke($"ERROR CONNECTING TO SUBSCRIBE SERVER {address}:{port}");
+				string errStr = $"error connecting to subscribe server {address}:{port}";
+				Logging.Instance.Log(LogTypes.Error, TAG, nameof(Connect), errStr);
+				Message?.Invoke(errStr);
 				stream?.Close();
 				client?.Close();
 				client = null;
@@ -257,7 +257,7 @@ namespace WinTlx
 			}
 			catch(Exception ex)
 			{
-				Message?.Invoke($"SUBSCRIBE SERVER ERROR");
+				Message?.Invoke(Constants.MSG_SUBSCRIBE_SERVER_ERROR);
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error sending data to subscribe server", ex);
 				reply.Valid = false;
 				reply.Error = "reply server error";

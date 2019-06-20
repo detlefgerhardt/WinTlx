@@ -42,6 +42,7 @@ namespace WinTlx
 			SubscribeServerPortTb.Text = IntToStr(_config.SubscribeServerPort);
 			SubscribeServerUpdatePinTb.Text = IntToStr(_config.SubscribeServerUpdatePin);
 			OwnNumberTb.Text = IntToStr(_config.OwnNumber);
+			ExtensionNumberTb.Text = IntToStr(_config.IncomingExtensionNumber);
 			IncommingLocalPortTb.Text = IntToStr(_config.IncomingLocalPort);
 			IncomingPublicPortTb.Text = IntToStr(_config.IncomingPublicPort);
 		}
@@ -55,6 +56,7 @@ namespace WinTlx
 			_config.SubscribeServerPort = StrToInt(SubscribeServerPortTb.Text);
 			_config.SubscribeServerUpdatePin = StrToInt(SubscribeServerUpdatePinTb.Text);
 			_config.OwnNumber = StrToInt(OwnNumberTb.Text);
+			_config.IncomingExtensionNumber = StrToInt(ExtensionNumberTb.Text);
 			_config.IncomingLocalPort = StrToInt(IncommingLocalPortTb.Text);
 			_config.IncomingPublicPort = StrToInt(IncomingPublicPortTb.Text);
 			_config.SetDefaults();

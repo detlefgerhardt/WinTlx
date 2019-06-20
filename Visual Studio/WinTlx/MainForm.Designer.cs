@@ -65,6 +65,7 @@
 			this.KennungLbl = new System.Windows.Forms.Label();
 			this.KennungTb = new System.Windows.Forms.TextBox();
 			this.panel3 = new System.Windows.Forms.Panel();
+			this.ConnectionStateTb = new System.Windows.Forms.TextBox();
 			this.ConnTimeTb = new System.Windows.Forms.TextBox();
 			this.LnColTb = new System.Windows.Forms.TextBox();
 			this.InactivityTimoutTb = new System.Windows.Forms.TextBox();
@@ -459,6 +460,7 @@
 			// panel3
 			// 
 			this.panel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.panel3.Controls.Add(this.ConnectionStateTb);
 			this.panel3.Controls.Add(this.ConnTimeTb);
 			this.panel3.Controls.Add(this.LnColTb);
 			this.panel3.Controls.Add(this.InactivityTimoutTb);
@@ -468,9 +470,18 @@
 			this.panel3.Size = new System.Drawing.Size(203, 76);
 			this.panel3.TabIndex = 0;
 			// 
+			// ConnectionStateTb
+			// 
+			this.ConnectionStateTb.Location = new System.Drawing.Point(103, 51);
+			this.ConnectionStateTb.Name = "ConnectionStateTb";
+			this.ConnectionStateTb.ReadOnly = true;
+			this.ConnectionStateTb.Size = new System.Drawing.Size(90, 20);
+			this.ConnectionStateTb.TabIndex = 1;
+			this.ConnectionStateTb.TabStop = false;
+			// 
 			// ConnTimeTb
 			// 
-			this.ConnTimeTb.Location = new System.Drawing.Point(103, 42);
+			this.ConnTimeTb.Location = new System.Drawing.Point(103, 28);
 			this.ConnTimeTb.Name = "ConnTimeTb";
 			this.ConnTimeTb.ReadOnly = true;
 			this.ConnTimeTb.Size = new System.Drawing.Size(90, 20);
@@ -479,7 +490,7 @@
 			// 
 			// LnColTb
 			// 
-			this.LnColTb.Location = new System.Drawing.Point(8, 42);
+			this.LnColTb.Location = new System.Drawing.Point(8, 28);
 			this.LnColTb.Name = "LnColTb";
 			this.LnColTb.ReadOnly = true;
 			this.LnColTb.Size = new System.Drawing.Size(90, 20);
@@ -488,7 +499,7 @@
 			// 
 			// InactivityTimoutTb
 			// 
-			this.InactivityTimoutTb.Location = new System.Drawing.Point(103, 13);
+			this.InactivityTimoutTb.Location = new System.Drawing.Point(103, 5);
 			this.InactivityTimoutTb.Name = "InactivityTimoutTb";
 			this.InactivityTimoutTb.ReadOnly = true;
 			this.InactivityTimoutTb.Size = new System.Drawing.Size(90, 20);
@@ -497,7 +508,7 @@
 			// 
 			// SendAckTb
 			// 
-			this.SendAckTb.Location = new System.Drawing.Point(8, 13);
+			this.SendAckTb.Location = new System.Drawing.Point(8, 5);
 			this.SendAckTb.Name = "SendAckTb";
 			this.SendAckTb.ReadOnly = true;
 			this.SendAckTb.Size = new System.Drawing.Size(90, 20);
@@ -731,6 +742,7 @@
 		private System.Windows.Forms.CheckBox RecvOnCb;
 		private System.Windows.Forms.Panel LinealPnl;
 		private System.Windows.Forms.PictureBox TerminalPb;
+		private System.Windows.Forms.TextBox ConnectionStateTb;
 	}
 }
 

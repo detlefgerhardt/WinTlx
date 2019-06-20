@@ -39,3 +39,4 @@ Version history
         - New: Ruler obove terminal windows
         - New: Complete rework of the terminal output (now with color and without flickerung)
         - Fix: Some minor bugfixes
+1.0.1.4 - Fix: Handling of extension numbers on incoming connections

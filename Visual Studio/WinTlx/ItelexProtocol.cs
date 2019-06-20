@@ -30,10 +30,11 @@ namespace WinTlx
 		public enum ConnectionStates
 		{
 			Disconnected,
-			Connected, // after TCP connect and before first data (texting mode unknown)
+			TcpConnected, // after TCP connect and before first data (texting mode unknown)
+			Connected, // after direct dial cmd was received or direct dial = 0
 			AsciiTexting,
-			BaudotTexting,
-			BaudotDisconnected // waiting for reconnect
+			ItelexTexting, // = baudot texting
+			ItelexDisconnected // waiting for reconnect
 		}
 
 		public delegate void ConnectEventHandler();
@@ -93,6 +94,8 @@ namespace WinTlx
 		public int InactivityTimer { get; set; }
 		public int InactivityTimeout { get; set; }
 
+		public int ExtensionNumber { get; set; }
+
 		private EyeballChar _eyeballChar;
 		public bool EyeballCharActive { get; set; }
 
@@ -132,13 +135,45 @@ namespace WinTlx
 
 		public bool Local { get; set; } = true;
 
-		public bool IsConnected => ConnectionState != ConnectionStates.Disconnected && ConnectionState != ConnectionStates.BaudotDisconnected;
+		public bool IsConnected => ConnectionState != ConnectionStates.Disconnected && ConnectionState != ConnectionStates.ItelexDisconnected;
 
 		public bool RecvOn { get; set; }
 
 		public ConnectionStates ConnectionState { get; set; }
 		private bool _incoming = false;
 		private bool _outgoing = false;
+
+		public string ConnectionStateStr
+		{
+			get
+			{
+				switch(ConnectionState)
+				{
+					case ConnectionStates.Disconnected:
+						return "Disconnected";
+					case ConnectionStates.TcpConnected:
+						return "TCP connection";
+					case ConnectionStates.Connected:
+						if (_incoming)
+						{
+							return $"Connected # {ExtensionNumber}";
+						}
+						else
+						{
+							return $"Connected";
+						}
+					case ConnectionStates.AsciiTexting:
+						return "Ascii";
+					case ConnectionStates.ItelexTexting:
+						return "i-Telex";
+					case ConnectionStates.ItelexDisconnected:
+						return "Pause";
+					default:
+						return "???";
+				}
+			}
+		}
+
 
 		/// <summary>
 		/// Contructor
@@ -191,12 +226,23 @@ namespace WinTlx
 
 					// wait for connection
 					_client = _tcpListener.AcceptTcpClient();
-					ConnectInit();
+					if (ExtensionNumber != 0)
+					{
+						// set to connected and wait for direct dial command
+						ConnectionState = ConnectionStates.TcpConnected;
+					}
+					else
+					{
+						// no direct dial command neccessary
+						ConnectInit();
+					}
 					_incoming = true;
+					StartReceive();
 
 					IPAddress remoteAddr = ((IPEndPoint)_client.Client.RemoteEndPoint).Address;
-					Message?.Invoke($"INCOMING CONNECTION FROM {remoteAddr}");
+					Message?.Invoke($"{Constants.MSG_INCOMING_CONNECTION} {remoteAddr}");
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"incoming connection from {remoteAddr}");
+					Update?.Invoke();
 
 					while (true)
 					{
@@ -219,7 +265,7 @@ namespace WinTlx
 			}
 		}
 
-		public async Task<bool> ConnectOut(string host, int port, bool asciiMode=false)
+		public async Task<bool> ConnectOut(string host, int port, int extensionNumber, bool asciiMode=false)
 		{
 			bool status = false;
 			await Task.Run(() =>
@@ -239,10 +285,17 @@ namespace WinTlx
 					return false;
 				}
 
-				if (!ConnectInit())
+
+				SendVersionCodeCmd();
+				ConnectionState = ConnectionStates.TcpConnected;
+				Update?.Invoke();
+				if (extensionNumber != 0)
 				{
-					return false;
+					//Message?.Invoke($"send direct dial cmd {extensionNumber}");
+					SendDirectDialCmd(extensionNumber);
 				}
+				ConnectInit();
+				StartReceive();
 
 				Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"outgoing connection {host}:{port}");
 
@@ -254,8 +307,8 @@ namespace WinTlx
 				else
 				{
 					SendBaudotCode(CodeConversion.BAU_FIG, ref _shiftState);
-					Update?.Invoke();
 				}
+				Update?.Invoke();
 
 				_outgoing = true;
 				status = true;
@@ -265,7 +318,7 @@ namespace WinTlx
 			return status;
 		}
 
-		private bool ConnectInit()
+		private void ConnectInit()
 		{
 			_n_recv = 0;
 			_n_trans = 0;
@@ -284,21 +337,19 @@ namespace WinTlx
 
 			EyeballCharActive = false;
 
-			ConnectionState = ConnectionStates.Connected;
 			_shiftState = CodeConversion.ShiftStates.Unknown;
 			_echoShiftState = CodeConversion.ShiftStates.Unknown;
 			_lastInactivityTimer = 0;
-			StartReceive();
 
 			Local = false;
 			SetLastSendRecv();
 
 			_connStartTime = DateTime.Now;
 
+			ConnectionState = ConnectionStates.Connected;
+
 			Update?.Invoke();
 			Connected?.Invoke();
-
-			return true;
 		}
 
 		/*
@@ -310,7 +361,7 @@ namespace WinTlx
 
 		public void Disconnect()
 		{
-			if (!IsConnected)
+			if (ConnectionState == ConnectionStates.Disconnected)
 			{
 				return;
 			}
@@ -326,14 +377,18 @@ namespace WinTlx
 			Logging.Instance.Log(LogTypes.Info, TAG, nameof(Disconnect), $"connection dropped");
 
 			Dropped?.Invoke();
+			Update?.Invoke();
 		}
 
 		private void SendTimer_Elapsed(object sender, ElapsedEventArgs e)
 		{
-			if (!IsConnected || _ackTimerActive)
+			if (!IsConnected || _ackTimerActive || _sendTimerActive)
 			{
+				Debug.WriteLine("!connected");
 				return;
 			}
+
+			_sendTimerActive = true;
 
 			InactivityTimer = (int)(InactivityTimeout -
 										DateTime.Now.Subtract(_lastSendRecvTime).Ticks / 10000000);
@@ -347,25 +402,32 @@ namespace WinTlx
 
 			if (InactivityTimer == 0)
 			{
-				Message?.Invoke("INACTIVITY TIMEOUT");
+				Message?.Invoke(Constants.MSG_ACTIVITY_TIMEOUT);
 				SendEndCmd();
 				Disconnect();
+				_sendTimerActive = false;
+				return;
 			}
 
 			if (_sendBuffer.Count == 0)
 			{   // nothing to send
+				_sendTimerActive = false;
 				return;
 			}
 
 			if (Helper.GetTicksMs() - _lastSentMs < Constants.WAIT_BEFORE_SEND_MSEC)
 			{
 				// wait xxx sec before sending
+				_sendTimerActive = false;
 				return;
 			}
 
-			_sendTimerActive = true;
+			//if (CharsAckCount >= Constants.WAIT_BEFORE_SEND_ACK)
+			//{
+			//	Debug.WriteLine($"CharsAckCount={CharsAckCount}");
+			//}
 
-			if (CharsAckCount < Constants.WAIT_BEFORE_SEND_ACK && _sendBuffer.Count > 0)
+			if (CharsAckCount <= Constants.WAIT_BEFORE_SEND_ACK && _sendBuffer.Count > 0)
 			{
 				// all characters processed at receiver side
 				int cnt = _sendBuffer.Count;
@@ -380,7 +442,7 @@ namespace WinTlx
 				Update?.Invoke();
 			}
 
-			_sendTimerActive = true;
+			_sendTimerActive = false;
 		}
 
 		private void AckTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -401,7 +463,7 @@ namespace WinTlx
 
 		private void StartReceive()
 		{
-			if (!IsConnected)
+			if (ConnectionState == ConnectionStates.Disconnected)
 			{
 				return;
 			}
@@ -440,29 +502,18 @@ namespace WinTlx
 			else
 			{
 				byte[] baudotData = CodeConversion.AsciiStringToBaudot(asciiStr, ref _shiftState);
-				//if (IsConnected)
+				for (int i = 0; i < baudotData.Length; i++)
 				{
-					for (int i = 0; i < baudotData.Length; i++)
-					{
-						byte chr = baudotData[i];
-						SendBaudotCode(baudotData[i], ref _shiftState);
-					}
+					byte chr = baudotData[i];
+					SendBaudotCode(baudotData[i], ref _shiftState);
 				}
 				Update?.Invoke();
 			}
 		}
 
-		/*
-		public void SendBaudotChar(byte baudotChr)
-		{
-			SendBaudotCode(baudotChr, ref _shiftState);
-			Update?.Invoke();
-		}
-		*/
-
 		public void SendDirectDialCmd(int code)
 		{
-			if (IsConnected)
+			if (ConnectionState != ConnectionStates.Disconnected)
 			{
 				Logging.Instance.Log(LogTypes.Info, TAG, nameof(SendDirectDialCmd), $"code={code}");
 				byte[] data = new byte[] { (byte)code };
@@ -472,7 +523,7 @@ namespace WinTlx
 
 		public void SendVersionCodeCmd()
 		{
-			if (IsConnected)
+			if (ConnectionState != ConnectionStates.Disconnected)
 			{
 				byte[] data = new byte[] { 0x01 }; // version = 1
 				SendCmd(ItelexCommands.ProtocolVersion, data);
@@ -481,7 +532,7 @@ namespace WinTlx
 
 		public void SendEndCmd()
 		{
-			if (IsConnected)
+			if (ConnectionState != ConnectionStates.Disconnected)
 			{
 				SendCmd(ItelexCommands.End);
 			}
@@ -528,15 +579,17 @@ namespace WinTlx
 
 		public void SendCmd(ItelexCommands cmd, byte[] data = null)
 		{
-			if (!IsConnected)
+			if (ConnectionState == ConnectionStates.Disconnected)
+			{
 				return;
+			}
 
 			SendCmd((int)cmd, data);
 		}
 
 		public void SendCmd(int cmdCode, byte[] data = null)
 		{
-			if (!IsConnected)
+			if (ConnectionState == ConnectionStates.Disconnected)
 			{
 				return;
 			}
@@ -586,7 +639,7 @@ namespace WinTlx
 
 		private void EndSend(IAsyncResult ar)
 		{
-			if (!IsConnected)
+			if (ConnectionState == ConnectionStates.Disconnected)
 			{
 				return;
 			}
@@ -602,7 +655,7 @@ namespace WinTlx
 
 		private void DataReceived(IAsyncResult ar)
 		{
-			if (!IsConnected)
+			if (ConnectionState == ConnectionStates.Disconnected)
 			{
 				return;
 			}
@@ -632,7 +685,7 @@ namespace WinTlx
 			{
 				if (newData[0] <= 0x09 || newData[0] >= 0x10 && newData[0] < 0x1F)
 				{
-					ConnectionState = ConnectionStates.BaudotTexting;
+					ConnectionState = ConnectionStates.ItelexTexting;
 				}
 				else
 				{
@@ -710,6 +763,19 @@ namespace WinTlx
 					break;
 				case ItelexCommands.DirectDial:
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(DecodePacket), $"direct dial command, number={packet.Data[0]}");
+					int directDial = packet.Data[0];
+					Message?.Invoke($"received direct dial cmd {directDial}");
+					if (directDial == ExtensionNumber)
+					{
+						ConnectInit();
+					}
+					else
+					{   // not connected
+						byte[] data = Encoding.ASCII.GetBytes("nc");
+						SendCmd(ItelexCommands.Reject, data);
+						Message?.Invoke($"send reject ncc");
+						Disconnect();
+					}
 					break;
 				case ItelexCommands.BaudotData:
 					if (packet.Len > 0)
@@ -729,12 +795,12 @@ namespace WinTlx
 				case ItelexCommands.Reject:
 					string reason = Encoding.ASCII.GetString(packet.Data, 0, packet.Data.Length);
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(DecodePacket), $"reject command, reason={reason}");
-					Message?.Invoke($"REJECT {reason.ToUpper()} ({ReasonToString(reason).ToUpper()})");
+					Message?.Invoke($"{Constants.MSG_REJECT} {reason.ToUpper()} ({ReasonToString(reason).ToUpper()})");
 					Disconnect();
 					break;
 				case ItelexCommands.Ack:
 					_n_ack = packet.Data[0];
-					Debug.WriteLine($"Ack {_n_ack} received");
+					//Debug.WriteLine($"Ack {_n_ack} received");
 					Update?.Invoke();
 					break;
 				case ItelexCommands.ProtocolVersion:
@@ -769,17 +835,6 @@ namespace WinTlx
 		{
 			_lastSendRecvTime = DateTime.Now;
 		}
-
-
-		/*
-		private int TransAckDiff()
-		{
-			int trans = _n_trans;
-			if (_n_ack > trans)
-				trans += 256;
-			return _n_trans - _n_ack;
-		}
-		*/
 
 		private string ReasonToString(string reason)
 		{

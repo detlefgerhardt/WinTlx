@@ -89,6 +89,7 @@ namespace WinTlx
 			_itelex.Update += UpdatedHandler;
 			_itelex.Message += MessageHandler;
 			_itelex.InactivityTimeout = _configData.InactivityTimeout;
+			_itelex.ExtensionNumber = _configData.IncomingExtensionNumber;
 
 			_subscriberServer = new SubscriberServer();
 			_subscriberServer.Message += SubcribeServerMessageHandler;
@@ -124,7 +125,7 @@ namespace WinTlx
 				$"{Helper.GetVersion()}\r\r" +
 				"by *dg* Detlef Gerhardt\r\r" +
 				"Please note that this is a test and diagnostic tool for the i-Telex network. " +
-				"The participants have real teletype machines connected to there i-Telex ports. " +
+				"The participants have real telex machines connected to there i-Telex ports. " +
 				"Please do not send longer text files or spam to i-Telex numbers!";
 			MessageBox.Show(
 				text,
@@ -455,13 +456,13 @@ namespace WinTlx
 
 		private void ConnectedHandler()
 		{
-			ShowLocalMessage("CONNECTED");
+			ShowLocalMessage(Constants.MSG_CONNECTED);
 			SetConnectState();
 		}
 
 		private void DroppedHandler()
 		{
-			ShowLocalMessage("DISCONNECTED");
+			ShowLocalMessage(Constants.MSG_DISCONNECTED);
 			SetConnectState();
 		}
 
@@ -497,11 +498,12 @@ namespace WinTlx
 				}
 			});
 
+			/*
 			bool itelex;
 			bool ascii;
 			if (_itelex.IsConnected)
 			{
-				itelex = _itelex.ConnectionState == ItelexProtocol.ConnectionStates.BaudotTexting;
+				itelex = _itelex.ConnectionState == ItelexProtocol.ConnectionStates.ItelexTexting;
 				ascii = _itelex.ConnectionState == ItelexProtocol.ConnectionStates.AsciiTexting;
 			}
 			else
@@ -509,13 +511,18 @@ namespace WinTlx
 				itelex = false;
 				ascii = false;
 			}
-
 			Helper.ControlInvokeRequired(ProtocolItelexRb, () =>
 				ProtocolItelexRb.Checked = itelex
 			);
 			Helper.ControlInvokeRequired(ProtocolAsciiRb, () =>
 				ProtocolAsciiRb.Checked = ascii
 			);
+			*/
+
+			Helper.ControlInvokeRequired(ConnectionStateTb, () =>
+				ConnectionStateTb.Text = _itelex.ConnectionStateStr
+			);
+
 
 			Helper.ControlInvokeRequired(RecvOnCb, () =>
 			{
@@ -543,7 +550,7 @@ namespace WinTlx
 			AddressTb.Text = AddressTb.Text.Trim();
 			if (string.IsNullOrWhiteSpace(AddressTb.Text))
 			{
-				ShowLocalMessage("NO ADDRESS");
+				ShowLocalMessage(Constants.MSG_NO_ADDRESS);
 				return false;
 			}
 
@@ -551,7 +558,7 @@ namespace WinTlx
 			int? port = Helper.ToInt(PortTb.Text);
 			if (port == null)
 			{
-				ShowLocalMessage("INVALID PORT");
+				ShowLocalMessage(Constants.MSG_INVALID_PORT);
 				return false;
 			}
 
@@ -562,23 +569,27 @@ namespace WinTlx
 				extension = Helper.ToInt(ExtensionTb.Text);
 				if (extension == null)
 				{
-					ShowLocalMessage("INVALID EXTENSION NUMBER");
+					ShowLocalMessage(Constants.MSG_INVALID_EXTENSION_NUMBER);
 					return false;
 				}
 			}
+			else
+			{
+				extension = 0;
+			}
 
-			bool success = await _itelex.ConnectOut(AddressTb.Text, port.Value, false);
+			bool success = await _itelex.ConnectOut(AddressTb.Text, port.Value, extension.Value, false);
 			if (!success)
 			{
-				ShowLocalMessage("CONNECTION ERROR");
+				ShowLocalMessage(Constants.MSG_CONNECTION_ERROR);
 				return false;
 			}
 
-			_itelex.SendVersionCodeCmd();
-			if (extension != null)
-			{
-				_itelex.SendDirectDialCmd(extension.Value);
-			}
+			//_itelex.SendVersionCodeCmd();
+			//if (extension != null)
+			//{
+			//	_itelex.SendDirectDialCmd(extension.Value);
+			//}
 
 			//_itelex.StartAck();
 
@@ -671,7 +682,8 @@ namespace WinTlx
 
 			if (string.IsNullOrWhiteSpace(_configData.SubscribeServerAddress) || _configData.SubscribeServerPort == 0)
 			{
-				SubcribeServerMessageHandler("invalid subscribe server address or port");
+				SubcribeServerMessageHandler(Constants.MSG_INVALID_SUBSCRIBE_SERVER_DATA);
+				Logging.Instance.Error(TAG, "QueryBtn_Click", $"{Constants.MSG_INVALID_SUBSCRIBE_SERVER_DATA} address={_configData.SubscribeServerAddress} port={_configData.SubscribeServerPort}");
 				return;
 			}
 
@@ -720,7 +732,7 @@ namespace WinTlx
 				}
 			});
 
-			SubcribeServerMessageHandler($"{list?.Length} member(s) found");
+			SubcribeServerMessageHandler($"{list?.Length} {Constants.MSG_QUERY_RESULT}");
 
 			MemberCb.DataSource = list;
 			MemberCb.DisplayMember = "Display";
@@ -933,6 +945,7 @@ namespace WinTlx
 				MessageBoxDefaultButton.Button1);
 		}
 
+		/*
 		private bool Expired()
 		{
 			if (!Helper.IsExpired())
@@ -953,6 +966,7 @@ namespace WinTlx
 
 			return true;
 		}
+		*/
 
 		private ContextMenuStrip CreateContextMenu()
 		{
@@ -1024,7 +1038,7 @@ namespace WinTlx
 
 		private void MainForm_Resize(object sender, EventArgs e)
 		{
-			Debug.WriteLine(this.Height);
+			//Debug.WriteLine(this.Height);
 
 			// prevent width change
 			this.Width = _fixedWidth;
@@ -1130,6 +1144,7 @@ namespace WinTlx
 				_configData = configForm.GetData();
 				ConfigManager.Instance.SaveConfig(_configData);
 				_itelex.InactivityTimeout = _configData.InactivityTimeout;
+				_itelex.ExtensionNumber = _configData.IncomingExtensionNumber;
 				SetOutputTimer(_configData.OutputSpeed);
 				UpdatedHandler();
 			}
@@ -1139,7 +1154,7 @@ namespace WinTlx
 		{
 			if (EyeballCharCb.Checked)
 			{
-				_itelex.SendAsciiText("\r\neyeball char mode active - start tape punch\r\n");
+				_itelex.SendAsciiText($"\r\n{Constants.MSG_EYEBALL_CHAR_ACTIVE}\r\n");
 			}
 			_itelex.EyeballCharActive = EyeballCharCb.Checked;
 		}
@@ -1175,7 +1190,7 @@ namespace WinTlx
 			//g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 			g.Clear(Color.White);
 
-			Debug.WriteLine($"{_screen.Count} {_screenShowPos0} {_screenEditPos0} {_screenX} {_screenY}");
+			//Debug.WriteLine($"{_screen.Count} {_screenShowPos0} {_screenEditPos0} {_screenX} {_screenY}");
 
 			for (int y = 0; y < _screenHeight; y++)
 			{

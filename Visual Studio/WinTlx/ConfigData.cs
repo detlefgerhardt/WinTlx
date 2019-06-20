@@ -24,6 +24,9 @@ namespace WinTlx
 		public int OwnNumber { get; set; }
 
 		[DataMember]
+		public int IncomingExtensionNumber { get; set; }
+
+		[DataMember]
 		public int IncomingLocalPort { get; set; }
 
 		[DataMember]

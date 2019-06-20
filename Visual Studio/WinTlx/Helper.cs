@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using System.Configuration;
 
 namespace WinTlx
 {
@@ -37,6 +35,7 @@ namespace WinTlx
 			//return $"{Constants.PROGRAM_NAME}  V{Application.ProductVersion}  (Build={buildTime}) - Special Carsten Version";
 		}
 
+		/*
 		public static bool IsExpired()
 		{
 			int? expireDays = ExpireDays();
@@ -72,6 +71,7 @@ namespace WinTlx
 			}
 			return buildTime.Value.AddDays(Constants.EXPIRE_DAYS);
 		}
+		*/
 
 		public static DateTime? BuildTime()
 		{
