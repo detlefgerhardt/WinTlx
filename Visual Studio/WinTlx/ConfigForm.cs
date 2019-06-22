@@ -38,7 +38,8 @@ namespace WinTlx
 					ConfigData.CodeStandardToString(CodeStandards.UsTTy)
 				};
 
-			LanguageCb.DataSource = LanguageManager.Instance.GetLanguageKeys();
+			LanguageCb.DataSource = LanguageManager.Instance.LanguageList;
+			LanguageCb.DisplayMember = "Key";
 
 			SetData();
 		}
@@ -108,7 +109,8 @@ namespace WinTlx
 			_config.SetDefaults();
 
 			string oldLnd = _config.Language;
-			_config.Language = LanguageCb.Text.Trim();
+			Language newLng = (Language)LanguageCb.SelectedItem;
+			_config.Language = newLng.Key;
 			if (_config.Language!=oldLnd)
 			{
 				LanguageManager.Instance.ChangeLanguage(_config.Language);

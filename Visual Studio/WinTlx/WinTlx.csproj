@@ -137,6 +137,12 @@
     <EmbeddedResource Include="TapePunchForm.resx">
       <DependentUpon>TapePunchForm.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="Languages\de_deutsch.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Languages\en_english.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
