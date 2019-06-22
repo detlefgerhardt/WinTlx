@@ -41,7 +41,7 @@
 			// 
 			this.PunchedTapePb.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.PunchedTapePb.Location = new System.Drawing.Point(12, 41);
+			this.PunchedTapePb.Location = new System.Drawing.Point(12, 42);
 			this.PunchedTapePb.Name = "PunchedTapePb";
 			this.PunchedTapePb.Size = new System.Drawing.Size(479, 111);
 			this.PunchedTapePb.TabIndex = 0;
@@ -50,9 +50,9 @@
 			// 
 			// ClearBtn
 			// 
-			this.ClearBtn.Location = new System.Drawing.Point(106, 13);
+			this.ClearBtn.Location = new System.Drawing.Point(144, 13);
 			this.ClearBtn.Name = "ClearBtn";
-			this.ClearBtn.Size = new System.Drawing.Size(41, 23);
+			this.ClearBtn.Size = new System.Drawing.Size(60, 23);
 			this.ClearBtn.TabIndex = 3;
 			this.ClearBtn.Text = "Clear";
 			this.ClearBtn.UseVisualStyleBackColor = true;
@@ -63,7 +63,7 @@
 			this.OnCb.Appearance = System.Windows.Forms.Appearance.Button;
 			this.OnCb.Location = new System.Drawing.Point(12, 12);
 			this.OnCb.Name = "OnCb";
-			this.OnCb.Size = new System.Drawing.Size(41, 24);
+			this.OnCb.Size = new System.Drawing.Size(60, 24);
 			this.OnCb.TabIndex = 4;
 			this.OnCb.Text = "On";
 			this.OnCb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -74,9 +74,9 @@
 			// OffCb
 			// 
 			this.OffCb.Appearance = System.Windows.Forms.Appearance.Button;
-			this.OffCb.Location = new System.Drawing.Point(59, 12);
+			this.OffCb.Location = new System.Drawing.Point(78, 12);
 			this.OffCb.Name = "OffCb";
-			this.OffCb.Size = new System.Drawing.Size(41, 24);
+			this.OffCb.Size = new System.Drawing.Size(60, 24);
 			this.OffCb.TabIndex = 5;
 			this.OffCb.Text = "Off";
 			this.OffCb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -87,9 +87,9 @@
 			// CloseBtn
 			// 
 			this.CloseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.CloseBtn.Location = new System.Drawing.Point(450, 12);
+			this.CloseBtn.Location = new System.Drawing.Point(411, 13);
 			this.CloseBtn.Name = "CloseBtn";
-			this.CloseBtn.Size = new System.Drawing.Size(41, 23);
+			this.CloseBtn.Size = new System.Drawing.Size(80, 23);
 			this.CloseBtn.TabIndex = 6;
 			this.CloseBtn.Text = "Close";
 			this.CloseBtn.UseVisualStyleBackColor = true;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
+using WinTlx.Languages;
 
 namespace WinTlx
 {
@@ -257,7 +258,7 @@ namespace WinTlx
 			}
 			catch(Exception ex)
 			{
-				Message?.Invoke(Constants.MSG_SUBSCRIBE_SERVER_ERROR);
+				Message?.Invoke(LngText(LngKeys.Message_SubscribeServerError));
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error sending data to subscribe server", ex);
 				reply.Valid = false;
 				reply.Error = "reply server error";
@@ -430,6 +431,10 @@ namespace WinTlx
 			return reply;
 		}
 
+		private string LngText(LngKeys key)
+		{
+			return LanguageManager.Instance.GetText(key);
+		}
 	}
 
 	/*

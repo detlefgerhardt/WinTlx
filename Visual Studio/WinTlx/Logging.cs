@@ -89,7 +89,7 @@ namespace WinTlx
 			{
 				try
 				{
-					string fullName = Constants.DEBUG_LOG;
+					string fullName = Path.Combine(Helper.GetExePath(), Constants.DEBUG_LOG);
 					File.AppendAllText(fullName, $"{DateTime.Now:dd.MM.yyyy HH:mm:ss} {logType.ToString().PadRight(5)} [{section}] [{method}] {text}\r\n");
 				}
 				catch

@@ -63,20 +63,23 @@
     <Compile Include="CodeStandardItem.cs" />
     <Compile Include="EyeballChar.cs" />
     <Compile Include="CodeConversion.cs" />
-    <Compile Include="ConfigData.cs" />
+    <Compile Include="Config\ConfigData.cs" />
     <Compile Include="ConfigForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ConfigForm.Designer.cs">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ConfigManager.cs" />
+    <Compile Include="Config\ConfigManager.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="ItelexPacket.cs" />
     <Compile Include="ItelexProtocol.cs" />
     <Compile Include="KeyDownConverter.cs" />
-    <Compile Include="LngManager.cs" />
+    <Compile Include="Languages\Language.cs" />
+    <Compile Include="Languages\LanguageDeutsch.cs" />
+    <Compile Include="Languages\LanguageEnglish.cs" />
+    <Compile Include="Languages\LanguageManager.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>

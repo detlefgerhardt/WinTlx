@@ -29,8 +29,8 @@
 		private void InitializeComponent()
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigForm));
-			this.KennungLbl = new System.Windows.Forms.Label();
-			this.KennungTb = new System.Windows.Forms.TextBox();
+			this.AnswerbackLbl = new System.Windows.Forms.Label();
+			this.AnswerbackTb = new System.Windows.Forms.TextBox();
 			this.IncommingLocalPortTb = new System.Windows.Forms.TextBox();
 			this.SubscribeServerAddressTb = new System.Windows.Forms.TextBox();
 			this.SubscribeServerPortTb = new System.Windows.Forms.TextBox();
@@ -56,26 +56,28 @@
 			this.CodeStandardCb = new System.Windows.Forms.ComboBox();
 			this.CodeStandardLbl = new System.Windows.Forms.Label();
 			this.SubscribeServerGb = new System.Windows.Forms.GroupBox();
+			this.LanguageCb = new System.Windows.Forms.ComboBox();
+			this.LanguageLbl = new System.Windows.Forms.Label();
 			this.IncomingGb.SuspendLayout();
 			this.GeneralGb.SuspendLayout();
 			this.SubscribeServerGb.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// KennungLbl
+			// AnswerbackLbl
 			// 
-			this.KennungLbl.AutoSize = true;
-			this.KennungLbl.Location = new System.Drawing.Point(9, 20);
-			this.KennungLbl.Name = "KennungLbl";
-			this.KennungLbl.Size = new System.Drawing.Size(50, 13);
-			this.KennungLbl.TabIndex = 0;
-			this.KennungLbl.Text = "Kennung";
+			this.AnswerbackLbl.AutoSize = true;
+			this.AnswerbackLbl.Location = new System.Drawing.Point(9, 50);
+			this.AnswerbackLbl.Name = "AnswerbackLbl";
+			this.AnswerbackLbl.Size = new System.Drawing.Size(82, 13);
+			this.AnswerbackLbl.TabIndex = 0;
+			this.AnswerbackLbl.Text = "Kennungsgeber";
 			// 
-			// KennungTb
+			// AnswerbackTb
 			// 
-			this.KennungTb.Location = new System.Drawing.Point(141, 17);
-			this.KennungTb.Name = "KennungTb";
-			this.KennungTb.Size = new System.Drawing.Size(136, 20);
-			this.KennungTb.TabIndex = 1;
+			this.AnswerbackTb.Location = new System.Drawing.Point(141, 47);
+			this.AnswerbackTb.Name = "AnswerbackTb";
+			this.AnswerbackTb.Size = new System.Drawing.Size(136, 20);
+			this.AnswerbackTb.TabIndex = 1;
 			// 
 			// IncommingLocalPortTb
 			// 
@@ -127,7 +129,7 @@
 			// 
 			// SaveBtn
 			// 
-			this.SaveBtn.Location = new System.Drawing.Point(19, 386);
+			this.SaveBtn.Location = new System.Drawing.Point(17, 422);
 			this.SaveBtn.Name = "SaveBtn";
 			this.SaveBtn.Size = new System.Drawing.Size(75, 23);
 			this.SaveBtn.TabIndex = 12;
@@ -137,7 +139,7 @@
 			// 
 			// CancelBtn
 			// 
-			this.CancelBtn.Location = new System.Drawing.Point(205, 386);
+			this.CancelBtn.Location = new System.Drawing.Point(203, 422);
 			this.CancelBtn.Name = "CancelBtn";
 			this.CancelBtn.Size = new System.Drawing.Size(75, 23);
 			this.CancelBtn.TabIndex = 13;
@@ -195,7 +197,7 @@
 			// 
 			// InactivityTimeoutTb
 			// 
-			this.InactivityTimeoutTb.Location = new System.Drawing.Point(141, 43);
+			this.InactivityTimeoutTb.Location = new System.Drawing.Point(141, 73);
 			this.InactivityTimeoutTb.Name = "InactivityTimeoutTb";
 			this.InactivityTimeoutTb.Size = new System.Drawing.Size(54, 20);
 			this.InactivityTimeoutTb.TabIndex = 2;
@@ -203,7 +205,7 @@
 			// InactivityTimeoutLbl
 			// 
 			this.InactivityTimeoutLbl.AutoSize = true;
-			this.InactivityTimeoutLbl.Location = new System.Drawing.Point(9, 46);
+			this.InactivityTimeoutLbl.Location = new System.Drawing.Point(9, 76);
 			this.InactivityTimeoutLbl.Name = "InactivityTimeoutLbl";
 			this.InactivityTimeoutLbl.Size = new System.Drawing.Size(112, 13);
 			this.InactivityTimeoutLbl.TabIndex = 17;
@@ -212,7 +214,7 @@
 			// OutputSpeedLbl
 			// 
 			this.OutputSpeedLbl.AutoSize = true;
-			this.OutputSpeedLbl.Location = new System.Drawing.Point(9, 72);
+			this.OutputSpeedLbl.Location = new System.Drawing.Point(9, 102);
 			this.OutputSpeedLbl.Name = "OutputSpeedLbl";
 			this.OutputSpeedLbl.Size = new System.Drawing.Size(105, 13);
 			this.OutputSpeedLbl.TabIndex = 18;
@@ -220,7 +222,7 @@
 			// 
 			// OutputSpeedTb
 			// 
-			this.OutputSpeedTb.Location = new System.Drawing.Point(141, 69);
+			this.OutputSpeedTb.Location = new System.Drawing.Point(141, 99);
 			this.OutputSpeedTb.Name = "OutputSpeedTb";
 			this.OutputSpeedTb.Size = new System.Drawing.Size(54, 20);
 			this.OutputSpeedTb.TabIndex = 3;
@@ -237,7 +239,7 @@
 			this.IncomingGb.Controls.Add(this.IncomingPublicPortLbl);
 			this.IncomingGb.Controls.Add(this.SubscribeServerUpdatePinTb);
 			this.IncomingGb.Controls.Add(this.IncomingPublicPortTb);
-			this.IncomingGb.Location = new System.Drawing.Point(12, 228);
+			this.IncomingGb.Location = new System.Drawing.Point(12, 264);
 			this.IncomingGb.Name = "IncomingGb";
 			this.IncomingGb.Size = new System.Drawing.Size(283, 152);
 			this.IncomingGb.TabIndex = 20;
@@ -262,17 +264,19 @@
 			// 
 			// GeneralGb
 			// 
+			this.GeneralGb.Controls.Add(this.LanguageLbl);
+			this.GeneralGb.Controls.Add(this.LanguageCb);
 			this.GeneralGb.Controls.Add(this.CodeStandardCb);
 			this.GeneralGb.Controls.Add(this.CodeStandardLbl);
 			this.GeneralGb.Controls.Add(this.OutputSpeedTb);
 			this.GeneralGb.Controls.Add(this.InactivityTimeoutLbl);
 			this.GeneralGb.Controls.Add(this.InactivityTimeoutTb);
 			this.GeneralGb.Controls.Add(this.OutputSpeedLbl);
-			this.GeneralGb.Controls.Add(this.KennungTb);
-			this.GeneralGb.Controls.Add(this.KennungLbl);
+			this.GeneralGb.Controls.Add(this.AnswerbackTb);
+			this.GeneralGb.Controls.Add(this.AnswerbackLbl);
 			this.GeneralGb.Location = new System.Drawing.Point(12, 12);
 			this.GeneralGb.Name = "GeneralGb";
-			this.GeneralGb.Size = new System.Drawing.Size(283, 129);
+			this.GeneralGb.Size = new System.Drawing.Size(283, 165);
 			this.GeneralGb.TabIndex = 21;
 			this.GeneralGb.TabStop = false;
 			this.GeneralGb.Text = "General";
@@ -284,7 +288,7 @@
 			this.CodeStandardCb.Items.AddRange(new object[] {
             "ITA-2",
             "US-TTY"});
-			this.CodeStandardCb.Location = new System.Drawing.Point(141, 98);
+			this.CodeStandardCb.Location = new System.Drawing.Point(141, 128);
 			this.CodeStandardCb.Name = "CodeStandardCb";
 			this.CodeStandardCb.Size = new System.Drawing.Size(73, 21);
 			this.CodeStandardCb.TabIndex = 21;
@@ -292,7 +296,7 @@
 			// CodeStandardLbl
 			// 
 			this.CodeStandardLbl.AutoSize = true;
-			this.CodeStandardLbl.Location = new System.Drawing.Point(9, 98);
+			this.CodeStandardLbl.Location = new System.Drawing.Point(9, 128);
 			this.CodeStandardLbl.Name = "CodeStandardLbl";
 			this.CodeStandardLbl.Size = new System.Drawing.Size(76, 13);
 			this.CodeStandardLbl.TabIndex = 20;
@@ -304,18 +308,39 @@
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortLbl);
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerAddressLbl);
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortTb);
-			this.SubscribeServerGb.Location = new System.Drawing.Point(12, 147);
+			this.SubscribeServerGb.Location = new System.Drawing.Point(12, 183);
 			this.SubscribeServerGb.Name = "SubscribeServerGb";
 			this.SubscribeServerGb.Size = new System.Drawing.Size(283, 75);
 			this.SubscribeServerGb.TabIndex = 22;
 			this.SubscribeServerGb.TabStop = false;
 			this.SubscribeServerGb.Text = "Subscribe server";
 			// 
+			// LanguageCb
+			// 
+			this.LanguageCb.FormattingEnabled = true;
+			this.LanguageCb.ItemHeight = 13;
+			this.LanguageCb.Items.AddRange(new object[] {
+            "ITA-2",
+            "US-TTY"});
+			this.LanguageCb.Location = new System.Drawing.Point(141, 20);
+			this.LanguageCb.Name = "LanguageCb";
+			this.LanguageCb.Size = new System.Drawing.Size(136, 21);
+			this.LanguageCb.TabIndex = 22;
+			// 
+			// LanguageLbl
+			// 
+			this.LanguageLbl.AutoSize = true;
+			this.LanguageLbl.Location = new System.Drawing.Point(10, 23);
+			this.LanguageLbl.Name = "LanguageLbl";
+			this.LanguageLbl.Size = new System.Drawing.Size(106, 13);
+			this.LanguageLbl.TabIndex = 23;
+			this.LanguageLbl.Text = "Language / Sprache";
+			// 
 			// ConfigForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(319, 421);
+			this.ClientSize = new System.Drawing.Size(319, 460);
 			this.Controls.Add(this.SubscribeServerGb);
 			this.Controls.Add(this.GeneralGb);
 			this.Controls.Add(this.IncomingGb);
@@ -338,8 +363,8 @@
 
 		#endregion
 
-		private System.Windows.Forms.Label KennungLbl;
-		private System.Windows.Forms.TextBox KennungTb;
+		private System.Windows.Forms.Label AnswerbackLbl;
+		private System.Windows.Forms.TextBox AnswerbackTb;
 		private System.Windows.Forms.TextBox IncommingLocalPortTb;
 		private System.Windows.Forms.TextBox SubscribeServerAddressTb;
 		private System.Windows.Forms.TextBox SubscribeServerPortTb;
@@ -365,5 +390,7 @@
 		private System.Windows.Forms.GroupBox SubscribeServerGb;
 		private System.Windows.Forms.Label CodeStandardLbl;
 		private System.Windows.Forms.ComboBox CodeStandardCb;
+		private System.Windows.Forms.ComboBox LanguageCb;
+		private System.Windows.Forms.Label LanguageLbl;
 	}
 }

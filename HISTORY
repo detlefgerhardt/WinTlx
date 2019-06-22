@@ -44,3 +44,5 @@ Version history
         - Fix: Complete rework of internal keyboard routines
         - New: Experimental support for TTY-US code
         - New: Ctrl-I (here is) and Ctrl-W (WRU) short cuts
+1.0.1.6 - Fix: Another rework of the internal keyboard routines, should now work with all keyboard layouts
+	- New: Multi-language support (English/German)

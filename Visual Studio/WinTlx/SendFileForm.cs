@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WinTlx.Languages;
 
 namespace WinTlx
 {
@@ -24,6 +25,9 @@ namespace WinTlx
 		public SendFileForm()
 		{
 			InitializeComponent();
+
+			LanguageManager.Instance.LanguageChanged += LanguageChanged;
+			LanguageChanged();
 
 			string line = "";
 			for (int i = 0; i < 68; i++)
@@ -45,6 +49,25 @@ namespace WinTlx
 			CropRightRb.Checked = true;
 			_textLines = File.ReadAllLines("test.txt");
 			ShowCroppedText();
+		}
+
+		private void LanguageChanged()
+		{
+			this.Text = $"{Constants.PROGRAM_NAME} {LngText(LngKeys.SendFile_SendFile)}";
+			LoadBtn.Text = LngText(LngKeys.SendFile_LoadFile);
+			LineLengthLbl.Text = LngText(LngKeys.SendFile_LineLength);
+			CroppingGb.Text = LngText(LngKeys.SendFile_Cropping);
+			CropRightRb.Text = LngText(LngKeys.SendFile_CroppingRight);
+			CropCenterRb.Text = LngText(LngKeys.SendFile_CroppingCenter);
+			CropLeftRb.Text = LngText(LngKeys.SendFile_CroppingLeft);
+			ConvertCb.Text = LngText(LngKeys.SendFile_Convert);
+			SendBtn.Text = LngText(LngKeys.SendFile_SendButton);
+			CancelBtn.Text = LngText(LngKeys.SendFile_CancelButton);
+		}
+
+		private string LngText(LngKeys key)
+		{
+			return LanguageManager.Instance.GetText(key);
 		}
 
 		private void Crop_Changed(object sender, EventArgs e)

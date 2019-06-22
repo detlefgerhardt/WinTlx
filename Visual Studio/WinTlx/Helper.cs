@@ -42,6 +42,11 @@ namespace WinTlx
 			//return $"{version[0]}{version[1]}{version[2]}{version[3]}";
 		}
 
+		public static string GetExePath()
+		{
+			return Application.StartupPath;
+		}
+
 		/*
 		public static bool IsExpired()
 		{

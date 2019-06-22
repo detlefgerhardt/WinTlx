@@ -60,7 +60,7 @@
 			this.LoadBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.LoadBtn.Location = new System.Drawing.Point(516, 12);
 			this.LoadBtn.Name = "LoadBtn";
-			this.LoadBtn.Size = new System.Drawing.Size(71, 23);
+			this.LoadBtn.Size = new System.Drawing.Size(80, 23);
 			this.LoadBtn.TabIndex = 1;
 			this.LoadBtn.Text = "Load file";
 			this.LoadBtn.UseVisualStyleBackColor = true;
@@ -70,7 +70,7 @@
 			// 
 			this.LineLengthLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.LineLengthLbl.AutoSize = true;
-			this.LineLengthLbl.Location = new System.Drawing.Point(525, 52);
+			this.LineLengthLbl.Location = new System.Drawing.Point(518, 51);
 			this.LineLengthLbl.Name = "LineLengthLbl";
 			this.LineLengthLbl.Size = new System.Drawing.Size(59, 13);
 			this.LineLengthLbl.TabIndex = 2;
@@ -79,7 +79,7 @@
 			// LineLengthTb
 			// 
 			this.LineLengthTb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.LineLengthTb.Location = new System.Drawing.Point(528, 69);
+			this.LineLengthTb.Location = new System.Drawing.Point(547, 69);
 			this.LineLengthTb.Name = "LineLengthTb";
 			this.LineLengthTb.Size = new System.Drawing.Size(46, 20);
 			this.LineLengthTb.TabIndex = 3;
@@ -88,10 +88,9 @@
 			// CropRightRb
 			// 
 			this.CropRightRb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.CropRightRb.AutoSize = true;
 			this.CropRightRb.Location = new System.Drawing.Point(6, 19);
 			this.CropRightRb.Name = "CropRightRb";
-			this.CropRightRb.Size = new System.Drawing.Size(50, 17);
+			this.CropRightRb.Size = new System.Drawing.Size(68, 17);
 			this.CropRightRb.TabIndex = 4;
 			this.CropRightRb.TabStop = true;
 			this.CropRightRb.Text = "Right";
@@ -100,10 +99,9 @@
 			// CropCenterRb
 			// 
 			this.CropCenterRb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.CropCenterRb.AutoSize = true;
 			this.CropCenterRb.Location = new System.Drawing.Point(6, 42);
 			this.CropCenterRb.Name = "CropCenterRb";
-			this.CropCenterRb.Size = new System.Drawing.Size(56, 17);
+			this.CropCenterRb.Size = new System.Drawing.Size(68, 17);
 			this.CropCenterRb.TabIndex = 6;
 			this.CropCenterRb.TabStop = true;
 			this.CropCenterRb.Text = "Center";
@@ -112,10 +110,9 @@
 			// CropLeftRb
 			// 
 			this.CropLeftRb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.CropLeftRb.AutoSize = true;
 			this.CropLeftRb.Location = new System.Drawing.Point(6, 65);
 			this.CropLeftRb.Name = "CropLeftRb";
-			this.CropLeftRb.Size = new System.Drawing.Size(43, 17);
+			this.CropLeftRb.Size = new System.Drawing.Size(68, 18);
 			this.CropLeftRb.TabIndex = 7;
 			this.CropLeftRb.TabStop = true;
 			this.CropLeftRb.Text = "Left";
@@ -138,9 +135,9 @@
 			// 
 			this.ConvertCb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.ConvertCb.Appearance = System.Windows.Forms.Appearance.Button;
-			this.ConvertCb.Location = new System.Drawing.Point(525, 207);
+			this.ConvertCb.Location = new System.Drawing.Point(516, 207);
 			this.ConvertCb.Name = "ConvertCb";
-			this.ConvertCb.Size = new System.Drawing.Size(71, 24);
+			this.ConvertCb.Size = new System.Drawing.Size(80, 24);
 			this.ConvertCb.TabIndex = 9;
 			this.ConvertCb.Text = "Convert";
 			this.ConvertCb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -150,9 +147,9 @@
 			// SendBtn
 			// 
 			this.SendBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.SendBtn.Location = new System.Drawing.Point(525, 254);
+			this.SendBtn.Location = new System.Drawing.Point(516, 254);
 			this.SendBtn.Name = "SendBtn";
-			this.SendBtn.Size = new System.Drawing.Size(71, 23);
+			this.SendBtn.Size = new System.Drawing.Size(80, 23);
 			this.SendBtn.TabIndex = 10;
 			this.SendBtn.Text = "Send";
 			this.SendBtn.UseVisualStyleBackColor = true;
@@ -161,9 +158,9 @@
 			// CancelBtn
 			// 
 			this.CancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.CancelBtn.Location = new System.Drawing.Point(525, 283);
+			this.CancelBtn.Location = new System.Drawing.Point(516, 283);
 			this.CancelBtn.Name = "CancelBtn";
-			this.CancelBtn.Size = new System.Drawing.Size(71, 23);
+			this.CancelBtn.Size = new System.Drawing.Size(80, 23);
 			this.CancelBtn.TabIndex = 11;
 			this.CancelBtn.Text = "Cancel";
 			this.CancelBtn.UseVisualStyleBackColor = true;
@@ -196,7 +193,6 @@
 			this.Name = "SendFileForm";
 			this.Text = "Send text file";
 			this.CroppingGb.ResumeLayout(false);
-			this.CroppingGb.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

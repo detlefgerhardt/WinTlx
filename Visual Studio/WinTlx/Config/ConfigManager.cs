@@ -5,8 +5,9 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using WinTlx.Languages;
 
-namespace WinTlx
+namespace WinTlx.Config
 {
 	class ConfigManager
 	{
@@ -21,13 +22,17 @@ namespace WinTlx
 
 		public static ConfigManager Instance => instance ?? (instance = new ConfigManager());
 
+		private ConfigManager()
+		{
+		}
+
 		public ConfigData Config { get; set; }
 
 		public ConfigData GetDefaultConfig()
 		{
 			return new ConfigData()
 			{
-				Kennung = Constants.DEFAULT_KENNUNG,
+				Answerback = Constants.DEFAULT_ANSWERBACK,
 				InactivityTimeout = Constants.DEFAULT_INACTIVITY_TIMEOUT,
 				OutputSpeed = 0,
 				CodeStandard = CodeStandards.Ita2,
@@ -43,11 +48,12 @@ namespace WinTlx
 			{
 				string configXml = File.ReadAllText(CONFIG_NAME);
 				Config = Deserialize<ConfigData>(configXml);
+				Config.SetDefaults();
 				return true;
 			}
 			catch(Exception ex)
 			{
-				Logging.Instance.Error(TAG, nameof(SaveConfig), "", ex);
+				Logging.Instance.Error(TAG, nameof(SaveConfig), "Error read config file", ex);
 				Config = GetDefaultConfig();
 				return false;
 			}

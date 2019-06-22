@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using WinTlx.Config;
 
 namespace WinTlx
 {
@@ -219,7 +220,7 @@ namespace WinTlx
 
 		private static byte? FindBaudot(int shift, char telexChar)
 		{
-			// search ascii char to find baudot code
+			// search ascii chars to find baudot code
 			char[,] _codeTab = _config.CodeStandard == CodeStandards.Ita2 ? _codeTabEu : _codeTabUs;
 			for (int c = 0; c < 32; c++)
 			{
@@ -232,14 +233,14 @@ namespace WinTlx
 		}
 
 		private const char ASC_INV = '#'; // replace invalid baudot character
-		public const char ASC_WRU = '\x05'; // Ctrl-E, Kennungsgeber-Abfrage (wer da?)
-		public const char ASC_BEL = '\x07'; // Ctrl-G, Bell
-		public const char ASC_HEREIS = '\x09'; // own Kennungsgeber
+		public const char ASC_NUL = '\x00';
+		public const char ASC_WRU = '\x05'; // enquire (WRU)
+		public const char ASC_BEL = '\x07'; // bel
+		public const char ASC_HEREIS = '\x09'; // own answerback
 		public const char ASC_LF = '\x0A';
 		public const char ASC_CR = '\x0D';
 		public const char ASC_LTRS = '\x1E';
 		public const char ASC_FIGS = '\x1F';
-		public const char ASC_NUL = '\x00';
 
 		public const byte BAU_NUL = 0x00;
 		public const byte BAU_LTR = 0x1F;
@@ -646,10 +647,10 @@ namespace WinTlx
 
 		#endregion
 
-		#region Baudot / ITA 2 -> ASCII
-
 		private const int LTRS = 0;
 		private const int FIGS = 1;
+
+		#region ITA 2 <-> ASCII
 
 		// bitorder is: 54.321
 
@@ -727,6 +728,10 @@ namespace WinTlx
 			}
 		};
 
+		#endregion
+
+		#region US-TTY <-> ASCII
+
 		private static char[,] _codeTabUs =
 		{
 			{
@@ -802,9 +807,9 @@ namespace WinTlx
 
 		};
 
-#endregion
+		#endregion
 
-#region Baudot / ITA 2 -> Puncher
+		#region ITA-2 <-> ASCII for tape punch labeling
 
 		// bitorder is: 54.321
 
@@ -882,6 +887,11 @@ namespace WinTlx
 				"LTR"       // 1F letters
 			}
 		};
+
+		#endregion
+
+		#region US-TTY <-> ASCII for tape punch labeling
+
 		private static string[,] _codeTabPuncherUs =
 		{
 			{
@@ -956,6 +966,72 @@ namespace WinTlx
 			}
 
 		};
+
+		#endregion
+
+		#region Keyboard handling
+
+		/// <summary>
+		/// all characters that are to be recognized as input in the terminal windows must be explicitly defined here.
+		/// </summary>
+		/// <param name="keyChar"></param>
+		/// <returns></returns>
+		public static char? KeyboardCharacters(char keyChar)
+		{
+			int code = (int)keyChar;
+			char? newChar = null;
+
+
+			switch (char.ToLower(keyChar))
+			{
+				default:
+					// lowercase letters and numbers
+					if (code >= 0x30 && code <= 0x39 || code >= 0x61 && code <= 0x7A)
+					{
+						newChar = keyChar;
+					}
+					break;
+				case ' ':
+				case '+':
+				case '-':
+				case ',':
+				case '.':
+				case ':':
+				case '\'':
+				case '/':
+				case '(':
+				case ')':
+				case '=':
+				case '?':
+				// tty-us characters
+				case '@':
+				case '!':
+				case '$':
+				case '%':
+				case '&':
+				case '#':
+				case ';':
+				// characters that will be replaced
+				case 'ä':
+				case 'ö':
+				case 'ü':
+				case 'ß':
+				case '[':
+				case ']':
+				case '{':
+				case '}':
+				case '´':
+				case '`':
+				// control characters
+				case CodeConversion.ASC_HEREIS:
+				case CodeConversion.ASC_WRU:
+				case CodeConversion.ASC_BEL:
+					newChar = keyChar;
+					break;
+			}
+
+			return newChar;
+		}
 
 		#endregion
 	}

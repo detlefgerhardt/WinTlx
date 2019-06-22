@@ -60,10 +60,10 @@
 			this.SendLineBtn = new System.Windows.Forms.Button();
 			this.ClearBtn = new System.Windows.Forms.Button();
 			this.panel1 = new System.Windows.Forms.Panel();
-			this.Code32Btn = new System.Windows.Forms.Button();
+			this.SendNullBtn = new System.Windows.Forms.Button();
 			this.panel2 = new System.Windows.Forms.Panel();
-			this.KennungLbl = new System.Windows.Forms.Label();
-			this.KennungTb = new System.Windows.Forms.TextBox();
+			this.AnswerbackLbl = new System.Windows.Forms.Label();
+			this.AnswerbackTb = new System.Windows.Forms.TextBox();
 			this.panel3 = new System.Windows.Forms.Panel();
 			this.ConnectionStateTb = new System.Windows.Forms.TextBox();
 			this.ConnTimeTb = new System.Windows.Forms.TextBox();
@@ -220,7 +220,7 @@
 			this.ExitBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ExitBtn.Location = new System.Drawing.Point(652, 569);
 			this.ExitBtn.Name = "ExitBtn";
-			this.ExitBtn.Size = new System.Drawing.Size(75, 23);
+			this.ExitBtn.Size = new System.Drawing.Size(80, 23);
 			this.ExitBtn.TabIndex = 32;
 			this.ExitBtn.Text = "Exit";
 			this.ExitBtn.UseVisualStyleBackColor = true;
@@ -313,9 +313,9 @@
 			// 
 			// SendFileBtn
 			// 
-			this.SendFileBtn.Location = new System.Drawing.Point(345, 40);
+			this.SendFileBtn.Location = new System.Drawing.Point(652, 257);
 			this.SendFileBtn.Name = "SendFileBtn";
-			this.SendFileBtn.Size = new System.Drawing.Size(69, 23);
+			this.SendFileBtn.Size = new System.Drawing.Size(80, 23);
 			this.SendFileBtn.TabIndex = 25;
 			this.SendFileBtn.Text = "Send file";
 			this.SendFileBtn.UseVisualStyleBackColor = true;
@@ -386,7 +386,7 @@
 			// panel1
 			// 
 			this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.panel1.Controls.Add(this.Code32Btn);
+			this.panel1.Controls.Add(this.SendNullBtn);
 			this.panel1.Controls.Add(this.ClearBtn);
 			this.panel1.Controls.Add(this.SendHereIsBtn);
 			this.panel1.Controls.Add(this.SendWruBtn);
@@ -397,7 +397,6 @@
 			this.panel1.Controls.Add(this.SendCarriageReturnBtn);
 			this.panel1.Controls.Add(this.SendLineFeedBtn);
 			this.panel1.Controls.Add(this.SendTimeBtn);
-			this.panel1.Controls.Add(this.SendFileBtn);
 			this.panel1.Controls.Add(this.SendRyBtn);
 			this.panel1.Controls.Add(this.SendFoxBtn);
 			this.panel1.Location = new System.Drawing.Point(12, 117);
@@ -405,21 +404,21 @@
 			this.panel1.Size = new System.Drawing.Size(426, 76);
 			this.panel1.TabIndex = 0;
 			// 
-			// Code32Btn
+			// SendNullBtn
 			// 
-			this.Code32Btn.Location = new System.Drawing.Point(177, 39);
-			this.Code32Btn.Name = "Code32Btn";
-			this.Code32Btn.Size = new System.Drawing.Size(50, 23);
-			this.Code32Btn.TabIndex = 19;
-			this.Code32Btn.Text = ".....";
-			this.Code32Btn.UseVisualStyleBackColor = true;
-			this.Code32Btn.Click += new System.EventHandler(this.Code32Btn_Click);
+			this.SendNullBtn.Location = new System.Drawing.Point(177, 39);
+			this.SendNullBtn.Name = "SendNullBtn";
+			this.SendNullBtn.Size = new System.Drawing.Size(50, 23);
+			this.SendNullBtn.TabIndex = 19;
+			this.SendNullBtn.Text = ".....";
+			this.SendNullBtn.UseVisualStyleBackColor = true;
+			this.SendNullBtn.Click += new System.EventHandler(this.SendNullBtn_Click);
 			// 
 			// panel2
 			// 
 			this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.panel2.Controls.Add(this.KennungLbl);
-			this.panel2.Controls.Add(this.KennungTb);
+			this.panel2.Controls.Add(this.AnswerbackLbl);
+			this.panel2.Controls.Add(this.AnswerbackTb);
 			this.panel2.Controls.Add(this.ProtocolAsciiRb);
 			this.panel2.Controls.Add(this.MemberCb);
 			this.panel2.Controls.Add(this.PortTb);
@@ -438,24 +437,23 @@
 			this.panel2.Size = new System.Drawing.Size(540, 100);
 			this.panel2.TabIndex = 0;
 			// 
-			// KennungLbl
+			// AnswerbackLbl
 			// 
-			this.KennungLbl.AutoSize = true;
-			this.KennungLbl.Location = new System.Drawing.Point(8, 48);
-			this.KennungLbl.Name = "KennungLbl";
-			this.KennungLbl.Size = new System.Drawing.Size(82, 13);
-			this.KennungLbl.TabIndex = 0;
-			this.KennungLbl.Text = "Kennungsgeber";
+			this.AnswerbackLbl.AutoSize = true;
+			this.AnswerbackLbl.Location = new System.Drawing.Point(8, 48);
+			this.AnswerbackLbl.Name = "AnswerbackLbl";
+			this.AnswerbackLbl.Size = new System.Drawing.Size(82, 13);
+			this.AnswerbackLbl.TabIndex = 0;
+			this.AnswerbackLbl.Text = "Kennungsgeber";
 			// 
-			// KennungTb
+			// AnswerbackTb
 			// 
-			this.KennungTb.Location = new System.Drawing.Point(8, 65);
-			this.KennungTb.Name = "KennungTb";
-			this.KennungTb.ReadOnly = true;
-			this.KennungTb.Size = new System.Drawing.Size(131, 20);
-			this.KennungTb.TabIndex = 0;
-			this.KennungTb.TabStop = false;
-			this.KennungTb.Leave += new System.EventHandler(this.KennungTb_Leave);
+			this.AnswerbackTb.Location = new System.Drawing.Point(8, 65);
+			this.AnswerbackTb.Name = "AnswerbackTb";
+			this.AnswerbackTb.ReadOnly = true;
+			this.AnswerbackTb.Size = new System.Drawing.Size(131, 20);
+			this.AnswerbackTb.TabIndex = 0;
+			this.AnswerbackTb.TabStop = false;
 			// 
 			// panel3
 			// 
@@ -533,13 +531,13 @@
 			this.panel5.Controls.Add(this.TimeTb);
 			this.panel5.Location = new System.Drawing.Point(653, 12);
 			this.panel5.Name = "panel5";
-			this.panel5.Size = new System.Drawing.Size(74, 99);
+			this.panel5.Size = new System.Drawing.Size(79, 99);
 			this.panel5.TabIndex = 0;
 			// 
 			// DateTb
 			// 
 			this.DateTb.Font = new System.Drawing.Font("Arial Narrow", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.DateTb.Location = new System.Drawing.Point(3, 32);
+			this.DateTb.Location = new System.Drawing.Point(5, 32);
 			this.DateTb.Name = "DateTb";
 			this.DateTb.ReadOnly = true;
 			this.DateTb.Size = new System.Drawing.Size(67, 22);
@@ -551,7 +549,7 @@
 			// TimeTb
 			// 
 			this.TimeTb.Font = new System.Drawing.Font("Arial Narrow", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.TimeTb.Location = new System.Drawing.Point(3, 6);
+			this.TimeTb.Location = new System.Drawing.Point(5, 6);
 			this.TimeTb.Name = "TimeTb";
 			this.TimeTb.ReadOnly = true;
 			this.TimeTb.Size = new System.Drawing.Size(67, 22);
@@ -565,7 +563,7 @@
 			this.AboutBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.AboutBtn.Location = new System.Drawing.Point(652, 540);
 			this.AboutBtn.Name = "AboutBtn";
-			this.AboutBtn.Size = new System.Drawing.Size(75, 23);
+			this.AboutBtn.Size = new System.Drawing.Size(80, 23);
 			this.AboutBtn.TabIndex = 31;
 			this.AboutBtn.Text = "About";
 			this.AboutBtn.UseVisualStyleBackColor = true;
@@ -575,7 +573,7 @@
 			// 
 			this.UpdateIpAddressBtn.Location = new System.Drawing.Point(652, 146);
 			this.UpdateIpAddressBtn.Name = "UpdateIpAddressBtn";
-			this.UpdateIpAddressBtn.Size = new System.Drawing.Size(75, 23);
+			this.UpdateIpAddressBtn.Size = new System.Drawing.Size(80, 23);
 			this.UpdateIpAddressBtn.TabIndex = 27;
 			this.UpdateIpAddressBtn.Text = "Update";
 			this.UpdateIpAddressBtn.UseVisualStyleBackColor = true;
@@ -586,7 +584,7 @@
 			this.ConfigBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ConfigBtn.Location = new System.Drawing.Point(652, 511);
 			this.ConfigBtn.Name = "ConfigBtn";
-			this.ConfigBtn.Size = new System.Drawing.Size(75, 23);
+			this.ConfigBtn.Size = new System.Drawing.Size(80, 23);
 			this.ConfigBtn.TabIndex = 30;
 			this.ConfigBtn.Text = "Config";
 			this.ConfigBtn.UseVisualStyleBackColor = true;
@@ -596,7 +594,7 @@
 			// 
 			this.TapePunchBtn.Location = new System.Drawing.Point(652, 188);
 			this.TapePunchBtn.Name = "TapePunchBtn";
-			this.TapePunchBtn.Size = new System.Drawing.Size(75, 23);
+			this.TapePunchBtn.Size = new System.Drawing.Size(80, 23);
 			this.TapePunchBtn.TabIndex = 28;
 			this.TapePunchBtn.Text = "Tape Punch";
 			this.TapePunchBtn.UseVisualStyleBackColor = true;
@@ -607,9 +605,10 @@
 			this.EyeballCharCb.Appearance = System.Windows.Forms.Appearance.Button;
 			this.EyeballCharCb.Location = new System.Drawing.Point(652, 217);
 			this.EyeballCharCb.Name = "EyeballCharCb";
-			this.EyeballCharCb.Size = new System.Drawing.Size(75, 23);
+			this.EyeballCharCb.Size = new System.Drawing.Size(80, 23);
 			this.EyeballCharCb.TabIndex = 29;
 			this.EyeballCharCb.Text = "Eyeball Char";
+			this.EyeballCharCb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			this.EyeballCharCb.UseVisualStyleBackColor = true;
 			this.EyeballCharCb.CheckedChanged += new System.EventHandler(this.EyeballCharCb_CheckedChanged);
 			// 
@@ -618,7 +617,7 @@
 			this.RecvOnCb.Appearance = System.Windows.Forms.Appearance.Button;
 			this.RecvOnCb.Location = new System.Drawing.Point(652, 117);
 			this.RecvOnCb.Name = "RecvOnCb";
-			this.RecvOnCb.Size = new System.Drawing.Size(75, 23);
+			this.RecvOnCb.Size = new System.Drawing.Size(80, 23);
 			this.RecvOnCb.TabIndex = 26;
 			this.RecvOnCb.Text = "Recv On";
 			this.RecvOnCb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -643,13 +642,13 @@
 			this.TerminalPb.TabStop = false;
 			this.TerminalPb.Paint += new System.Windows.Forms.PaintEventHandler(this.TerminalPb_Paint);
 			this.TerminalPb.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TerminalPb_MouseClick);
-			this.TerminalPb.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TerminalPb_MouseUp);
+			this.TerminalPb.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TerminalPb_MouseDown);
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(734, 604);
+			this.ClientSize = new System.Drawing.Size(741, 604);
 			this.Controls.Add(this.TerminalPb);
 			this.Controls.Add(this.LinealPnl);
 			this.Controls.Add(this.RecvOnCb);
@@ -661,6 +660,7 @@
 			this.Controls.Add(this.panel5);
 			this.Controls.Add(this.panel4);
 			this.Controls.Add(this.panel3);
+			this.Controls.Add(this.SendFileBtn);
 			this.Controls.Add(this.panel2);
 			this.Controls.Add(this.panel1);
 			this.Controls.Add(this.ExitBtn);
@@ -673,6 +673,7 @@
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.LocationChanged += new System.EventHandler(this.MainForm_LocationChanged);
+			this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.MainForm_KeyPress);
 			this.Resize += new System.EventHandler(this.MainForm_Resize);
 			this.panel1.ResumeLayout(false);
 			this.panel2.ResumeLayout(false);
@@ -725,8 +726,8 @@
 		private System.Windows.Forms.Panel panel4;
 		private System.Windows.Forms.Panel panel5;
 		private System.Windows.Forms.Button AboutBtn;
-		private System.Windows.Forms.TextBox KennungTb;
-		private System.Windows.Forms.Label KennungLbl;
+		private System.Windows.Forms.TextBox AnswerbackTb;
+		private System.Windows.Forms.Label AnswerbackLbl;
 		private System.Windows.Forms.TextBox SendAckTb;
 		private System.Windows.Forms.TextBox InactivityTimoutTb;
 		private System.Windows.Forms.TextBox LnColTb;
@@ -736,7 +737,7 @@
 		private System.Windows.Forms.Button UpdateIpAddressBtn;
 		private System.Windows.Forms.Button ConfigBtn;
 		private System.Windows.Forms.Button TapePunchBtn;
-		private System.Windows.Forms.Button Code32Btn;
+		private System.Windows.Forms.Button SendNullBtn;
 		private System.Windows.Forms.CheckBox EyeballCharCb;
 		private System.Windows.Forms.CheckBox RecvOnCb;
 		private System.Windows.Forms.Panel LinealPnl;

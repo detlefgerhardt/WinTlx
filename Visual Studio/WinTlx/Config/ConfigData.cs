@@ -1,12 +1,15 @@
 ﻿using System.Runtime.Serialization;
 
-namespace WinTlx
+namespace WinTlx.Config
 {
 	public enum CodeStandards { Ita2, UsTTy }
 
-	[DataContract]
+	[DataContract(Namespace = "")]
 	public class ConfigData
 	{
+		[DataMember]
+		public string Language { get; set; }
+
 		[DataMember]
 		public string SubscribeServerAddress { get; set; }
 
@@ -17,7 +20,7 @@ namespace WinTlx
 		public int SubscribeServerUpdatePin { get; set; }
 
 		[DataMember]
-		public string Kennung { get; set; }
+		public string Answerback { get; set; }
 
 		[DataMember]
 		public int OutputSpeed { get; set; }
@@ -40,12 +43,20 @@ namespace WinTlx
 		[DataMember]
 		public int IncomingPublicPort { get; set; }
 
+		/// <summary>
+		/// Set default values for empty fields
+		/// </summary>
 		public void SetDefaults()
 		{
-			if (string.IsNullOrWhiteSpace(Kennung))
+			if (string.IsNullOrWhiteSpace(Language))
 			{
-				Kennung = Constants.DEFAULT_KENNUNG;
+				Language = Constants.DEFAULT_LANGUAGE;
 			}
+			if (string.IsNullOrWhiteSpace(Answerback))
+			{
+				Answerback = Constants.DEFAULT_ANSWERBACK;
+			}
+			/*
 			if (InactivityTimeout == 0)
 			{
 				InactivityTimeout = Constants.DEFAULT_INACTIVITY_TIMEOUT;
@@ -54,6 +65,7 @@ namespace WinTlx
 			{
 				IncomingLocalPort = Constants.DEFAULT_INCOMING_PORT;
 			}
+			*/
 		}
 
 		public static CodeStandards StringToCodeStandard(string stdStr)

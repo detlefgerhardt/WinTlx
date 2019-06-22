@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WinTlx.Languages;
 
 namespace WinTlx
 {
@@ -23,13 +24,26 @@ namespace WinTlx
 
 			_parentWindowsPosition = position;
 
+			LanguageManager.Instance.LanguageChanged += LanguageChanged;
+			LanguageChanged();
+
 			_tapePunch = new TapePunch();
 			_tapePunch.Init();
 			_tapePunch.SetPuncherLinesHorizontal(PunchedTapePb.Width);
 		}
 
-		private void BuildForm_Vertical()
+		private void LanguageChanged()
 		{
+			this.Text = $"{Constants.PROGRAM_NAME} {LngText(LngKeys.TapePunch_TapePunch)}";
+			OnCb.Text = LngText(LngKeys.TapePunch_OnButton);
+			OffCb.Text = LngText(LngKeys.TapePunch_OffButton);
+			ClearBtn.Text = LngText(LngKeys.TapePunch_ClearButton);
+			CloseBtn.Text = LngText(LngKeys.TapePunch_CloseButton);
+		}
+
+		private string LngText(LngKeys key)
+		{
+			return LanguageManager.Instance.GetText(key);
 		}
 
 		private void PunchTapeForm_Load(object sender, EventArgs e)
@@ -115,7 +129,6 @@ namespace WinTlx
 				OffCb.Checked = true;
 			}
 		}
-
 	}
 
 }

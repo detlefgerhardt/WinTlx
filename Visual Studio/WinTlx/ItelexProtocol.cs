@@ -7,6 +7,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using WinTlx.Config;
+using WinTlx.Languages;
 
 namespace WinTlx
 {
@@ -242,7 +244,7 @@ namespace WinTlx
 					StartReceive();
 
 					IPAddress remoteAddr = ((IPEndPoint)_client.Client.RemoteEndPoint).Address;
-					Message?.Invoke($"{Constants.MSG_INCOMING_CONNECTION} {remoteAddr}");
+					Message?.Invoke($"{LngText(LngKeys.Message_IncomingConnection)} {remoteAddr}");
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"incoming connection from {remoteAddr}");
 					Update?.Invoke();
 
@@ -406,7 +408,7 @@ namespace WinTlx
 
 			if (InactivityTimer == 0)
 			{
-				Message?.Invoke(Constants.MSG_ACTIVITY_TIMEOUT);
+				Message?.Invoke(LngText(LngKeys.Message_InactivityTimeout));
 				SendEndCmd();
 				Disconnect();
 				_sendTimerActive = false;
@@ -825,7 +827,7 @@ namespace WinTlx
 				case ItelexCommands.Reject:
 					string reason = Encoding.ASCII.GetString(packet.Data, 0, packet.Data.Length);
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(DecodePacket), $"reject command, reason={reason}");
-					Message?.Invoke($"{Constants.MSG_REJECT} {reason.ToUpper()} ({ReasonToString(reason).ToUpper()})");
+					Message?.Invoke($"{LngText(LngKeys.Message_Reject)} {reason.ToUpper()} ({ReasonToString(reason).ToUpper()})");
 					Disconnect();
 					break;
 				case ItelexCommands.Ack:
@@ -884,6 +886,11 @@ namespace WinTlx
 				default:
 					return reason;
 			}
+		}
+
+		private string LngText(LngKeys key)
+		{
+			return LanguageManager.Instance.GetText(key);
 		}
 
 		public void Dispose()

@@ -7,6 +7,8 @@ using System.Media;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
+using WinTlx.Config;
+using WinTlx.Languages;
 
 namespace WinTlx
 {
@@ -68,6 +70,9 @@ namespace WinTlx
 
 			ConfigManager.Instance.LoadConfig();
 
+			LanguageManager.Instance.LanguageChanged += LanguageChanged;
+			LanguageManager.Instance.ChangeLanguage(_config.Language);
+
 			_itelex = new ItelexProtocol();
 			_itelex.Received += ReceivedHandler;
 			_itelex.Send += SendHandler;
@@ -100,6 +105,49 @@ namespace WinTlx
 			SearchTb.Focus();
 		}
 
+		private void LanguageChanged()
+		{
+			SearchLbl.Text = LngText(LngKeys.MainForm_SearchText);
+			MemberLbl.Text = LngText(LngKeys.MainForm_SearchResult);
+			QueryBtn.Text = LngText(LngKeys.MainForm_SearchButton);
+			AnswerbackLbl.Text = LngText(LngKeys.MainForm_Answerback);
+			AddressLbl.Text = LngText(LngKeys.MainForm_Address);
+			PortLbl.Text = LngText(LngKeys.MainForm_Port);
+			ExtensionLbl.Text = LngText(LngKeys.MainForm_Extension);
+			ProtocolItelexRb.Text = LngText(LngKeys.MainForm_Itelex);
+			ProtocolAsciiRb.Text = LngText(LngKeys.MainForm_ASCII);
+			ConnectBtn.Text = LngText(LngKeys.MainForm_ConnectButton);
+			DisconnectBtn.Text = LngText(LngKeys.MainForm_DisconnectButton);
+			LocalBtn.Text = LngText(LngKeys.MainForm_LocalButton);
+			SendWruBtn.Text = LngText(LngKeys.MainForm_SendWruButton);
+			SendHereIsBtn.Text = LngText(LngKeys.MainForm_SendHereisButton);
+			SendLettersBtn.Text = LngText(LngKeys.MainForm_SendLettersButton);
+			SendFiguresBtn.Text = LngText(LngKeys.MainForm_SendFiguresButton);
+			SendCarriageReturnBtn.Text = LngText(LngKeys.MainForm_SendReturnButton);
+			SendLineFeedBtn.Text = LngText(LngKeys.MainForm_SendLinefeedButton);
+			SendBellBtn.Text = LngText(LngKeys.MainForm_SendBellButton);
+			SendNullBtn.Text = LngText(LngKeys.MainForm_SendNullButton);
+			SendTimeBtn.Text = LngText(LngKeys.MainForm_SendTimeButton);
+			SendRyBtn.Text = LngText(LngKeys.MainForm_SendRyButton);
+			SendFoxBtn.Text = LngText(LngKeys.MainForm_SendFoxButton);
+			ClearBtn.Text = LngText(LngKeys.MainForm_ClearButton);
+			SendFileBtn.Text = LngText(LngKeys.MainForm_SendfileButton);
+			RecvOnCb.Text = LngText(LngKeys.MainForm_RecvOnButton);
+			UpdateIpAddressBtn.Text = LngText(LngKeys.MainForm_UpdateIpAddressButton);
+			TapePunchBtn.Text = LngText(LngKeys.MainForm_TapePunchButton);
+			EyeballCharCb.Text = LngText(LngKeys.MainForm_EyeBallCharsButton);
+			ConfigBtn.Text = LngText(LngKeys.MainForm_ConfigButton);
+			AboutBtn.Text = LngText(LngKeys.MainForm_AboutButton);
+			ExitBtn.Text = LngText(LngKeys.MainForm_ExitButton);
+		}
+
+		private string LngText(LngKeys key)
+		{
+			return LanguageManager.Instance.GetText(key);
+		}
+
+		#region form events
+
 		private void MainForm_Load(object sender, EventArgs e)
 		{
 			MainForm_Resize(null, null);
@@ -107,12 +155,7 @@ namespace WinTlx
 			SearchTb.Focus();
 
 #if !DEBUG
-			string text =
-				$"{Helper.GetVersion()}\r\r" +
-				"by *dg* Detlef Gerhardt\r\r" +
-				"Please note that this is a test and diagnostic tool for the i-Telex network. " +
-				"The members of the network have real telex machines connected to there i-Telex ports. " +
-				"Please do not send longer text files or spam to i-Telex numbers!";
+			string text = $"{Helper.GetVersion()}\r\r" + "by *dg* Detlef Gerhardt\r\r" + LngText(LngKeys.Start_Text);
 			MessageBox.Show(
 				text,
 				$"{Constants.PROGRAM_NAME}",
@@ -121,13 +164,43 @@ namespace WinTlx
 				MessageBoxDefaultButton.Button1);
 
 #endif
-			//Expired();
+		}
+
+		private void MainForm_Resize(object sender, EventArgs e)
+		{
+			//Debug.WriteLine(this.Height);
+
+			// prevent width change
+			this.Width = _fixedWidth;
+
+			TerminalPb.Height = this.Height - 310 + 50;
+			_screenHeight = TerminalPb.Height / CHAR_HEIGHT;
+
+
+			_screenEditPos0 = _screen.Count - _screenHeight;
+			if (_screenEditPos0 < 0)
+				_screenEditPos0 = 0;
+			_screenShowPos0 = _screenEditPos0;
+
+			_screenY = _screen.Count - _screenEditPos0 - 1;
+
+#warning TODO why is _screenY < 0 sometimes?
+			if (_screenY < 0)
+				_screenY = 0;
+
+			ShowScreen();
+
+			_tapePunchForm?.SetPosition(this.Bounds);
 		}
 
 		private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
 			Disconnect();
 		}
+
+		#endregion
+
+		#region keyboard handling
 
 		/// <summary>
 		/// Catch cursor up/cursor down/return
@@ -137,8 +210,8 @@ namespace WinTlx
 		/// <returns></returns>
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
-			if (SearchTb.Focused || MemberCb.Focused || AddressTb.Focused || PortTb.Focused ||
-				ExtensionTb.Focused)
+			// check for controls without special input handling
+			if (SearchTb.Focused || MemberCb.Focused || AddressTb.Focused || PortTb.Focused || ExtensionTb.Focused)
 			{
 				return base.ProcessCmdKey(ref msg, keyData);
 			}
@@ -197,27 +270,58 @@ namespace WinTlx
 				return true;
 			}
 
-			string chrs = KeyDownConverter.ToStr2(keyData);
-			if (!string.IsNullOrEmpty(chrs))
+			// all other inputs are handled by the KeyPress event
+			return base.ProcessCmdKey(ref msg, keyData);
+		}
+
+		private void MainForm_KeyPress(object sender, KeyPressEventArgs e)
+		{
+			// check for controls without special input handling
+			if (SearchTb.Focused || MemberCb.Focused || AddressTb.Focused || PortTb.Focused || ExtensionTb.Focused)
 			{
-				// check for short cuts
-				if (chrs == CodeConversion.ASC_HEREIS.ToString())
-				{   // ctrl-i: send here is
-					SendHereIs();
-				}
-				else if (chrs == CodeConversion.ASC_WRU.ToString())
-				{   // ctrl-w: send WRU
-					SendWerDa();
-				}
-				else
-				{   // all other keys
-					SendAsciiText(chrs);
+				return;
+			}
+
+			char key = e.KeyChar;
+			/*
+			int code = (int)key;
+			if (code < 32)
+			{
+				Debug.WriteLine($"{code:X2}");
+			}
+			else
+			{
+				Debug.WriteLine($"{code:X2} {key}");
+			}
+			*/
+
+			char? chr = KeyDownConverter.AsciiKeyToChar(key);
+			if (chr != null)
+			{
+				switch(chr)
+				{
+					case '\x07': // ctrl-g: send BEL
+						SendBel();
+						break;
+					case '\x09': // ctrl-i: send HERE IS
+						SendHereIs();
+						break;
+					case '\x05': // ctrl-e: send WRU
+					case '\x17': // ctrl-w: send WRU
+						SendWhoAreYou();
+						break;
+					default: // all other keys
+						SendAsciiText(chr.ToString());
+						break;
 				}
 			}
-			return true;
 
-			//return base.ProcessCmdKey(ref msg, keyData);
+			e.Handled = true;
 		}
+
+		#endregion
+
+		#region timer events
 
 		private void ClockTimer_Elapsed(object sender, ElapsedEventArgs e)
 		{
@@ -226,9 +330,29 @@ namespace WinTlx
 			Helper.ControlInvokeRequired(TimeTb, () => TimeTb.Text = $"{dt:HH:mm:ss}");
 		}
 
-		private void ExitBtn_Click(object sender, EventArgs e)
+		#endregion
+
+		private void TerminalPb_MouseClick(object sender, MouseEventArgs e)
 		{
-			Close();
+			SetFocus();
+		}
+
+		private void TerminalPb_MouseDown(object sender, MouseEventArgs e)
+		{
+			if (e.Button == MouseButtons.Right)
+			{   //click event
+				ContextMenu contextMenu = new ContextMenu();
+				MenuItem menuItem = new MenuItem("Clear");
+				menuItem.Click += new EventHandler(ClearAction);
+				contextMenu.MenuItems.Add(menuItem);
+				menuItem = new MenuItem("Copy");
+				menuItem.Click += new EventHandler(CopyAction);
+				contextMenu.MenuItems.Add(menuItem);
+				menuItem = new MenuItem("Paste");
+				menuItem.Click += new EventHandler(PasteAction);
+				contextMenu.MenuItems.Add(menuItem);
+				TerminalPb.ContextMenu = contextMenu;
+			}
 		}
 
 		private void PhoneEntryCb_SelectedIndexChanged(object sender, EventArgs e)
@@ -237,61 +361,6 @@ namespace WinTlx
 			AddressTb.Text = entry.Address;
 			PortTb.Text = entry.PortNumber != 0 ? entry.PortNumber.ToString() : "";
 			ExtensionTb.Text = entry.ExtensionNumber != 0 ? entry.ExtensionNumber.ToString() : "";
-		}
-
-		private async void ConnectBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			if (_itelex.IsConnected || string.IsNullOrEmpty(PortTb.Text))
-			{
-				return;
-			}
-
-			ConnectBtn.Enabled = false;
-			await ConnectOut();
-			ConnectBtn.Enabled = true;
-			SetConnectState();
-		}
-
-		private void DisconnectBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			_outputBuffer.Clear();
-			Disconnect();
-		}
-
-		private void LocalBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			LocalBtn_DoClick();
-		}
-
-		private void LocalBtn_DoClick()
-		{
-			SetFocus();
-			if (!_itelex.IsConnected)
-			{
-				return;
-			}
-
-			if (_itelex.Local)
-			{
-				_itelex.Local = false;
-			}
-			else
-			{
-				_itelex.Local = true;
-			}
-			SetConnectState();
-		}
-
-
-		private void KennungTb_Leave(object sender, EventArgs e)
-		{
-			if (string.IsNullOrWhiteSpace(KennungTb.Text))
-			{
-				KennungTb.Text = Constants.DEFAULT_KENNUNG;
-			}
 		}
 
 		private void AddressTb_Leave(object sender, EventArgs e)
@@ -304,373 +373,6 @@ namespace WinTlx
 			SetConnectState();
 		}
 
-		private void SendWruBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			SendWerDa();
-		}
-
-		private void SendHereIsBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			SendHereIs();
-		}
-
-		private void SendBellBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			_itelex.SendAsciiChar(CodeConversion.ASC_BEL);
-		}
-
-		private void SendLettersBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			_itelex.SendAsciiChar(CodeConversion.ASC_LTRS);
-		}
-
-		private void SendFiguresBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			_itelex.SendAsciiChar(CodeConversion.ASC_FIGS);
-		}
-
-		private void SendCarriageReturnBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			_itelex.SendAsciiText("\r");
-		}
-
-		private void SendLineFeedBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			_itelex.SendAsciiText("\n");
-		}
-
-		private void SendTimeBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			SendAsciiText($"{DateTime.Now:dd.MM.yyyy  HH:mm}\r\n");
-		}
-
-		private void Code32Btn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			SendAsciiText("\x00");
-		}
-
-		private void SendLineBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			SendAsciiText("\r\n");
-			SendAsciiText(new string('-', 68));
-			SendAsciiText("\r\n");
-		}
-
-		private void SendRyBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			for (int l = 0; l < 10; l++)
-			{
-				for (int i = 0; i < 33; i++)
-				{
-					SendAsciiText("ry");
-				}
-				SendAsciiText("\r\n");
-			}
-		}
-
-		private void SendFoxBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			SendAsciiText("the quick brown fox jumps over the lazy dog 1234567890/:,-=()");
-			//SendAsciiText("\r\n");
-		}
-
-		private void TerminalPb_MouseClick(object sender, MouseEventArgs e)
-		{
-			SetFocus();
-		}
-
-		private void ReceivedHandler(string asciiText)
-		{
-			string str = "";
-			for (int i = 0; i < asciiText.Length; i++)
-			{
-				switch (asciiText[i])
-				{
-					case CodeConversion.ASC_BEL:
-						SystemSounds.Beep.Play();
-						AddText(asciiText, CharAttributes.Recv);
-						return;
-					case CodeConversion.ASC_WRU:
-						SendHereIs();
-						AddText(asciiText, CharAttributes.Recv);
-						return;
-				}
-			}
-			AddText(asciiText, CharAttributes.Recv);
-		}
-
-		private void SendHandler(string asciiText)
-		{
-			string dispText = "";
-			for (int i = 0; i < asciiText.Length; i++)
-			{
-				char c = asciiText[i];
-				switch (c)
-				{
-					case CodeConversion.ASC_NUL:
-						continue;
-					case CodeConversion.ASC_BEL:
-						SystemSounds.Beep.Play();
-						break;
-					//case CodeConversion.ASC_WRU:
-					//	break;
-					case CodeConversion.ASC_LTRS:
-					case CodeConversion.ASC_FIGS:
-						continue;
-				}
-				dispText += c;
-			}
-			AddText(dispText, CharAttributes.Send);
-		}
-
-		private void BaudotSendRecvHandler(byte[] code)
-		{
-			if (_tapePunchForm == null)
-			{
-				return;
-			}
-
-			for (int i = 0; i < code.Length; i++)
-			{
-				_tapePunchForm.PunchCode(code[i], _itelex.ShiftState);
-			}
-		}
-
-		private void SubcribeServerMessageHandler(string message)
-		{
-			ShowLocalMessage(message);
-		}
-
-		private void ConnectedHandler()
-		{
-			ShowLocalMessage(Constants.MSG_CONNECTED);
-			SetConnectState();
-		}
-
-		private void DroppedHandler()
-		{
-			ShowLocalMessage(Constants.MSG_DISCONNECTED);
-			SetConnectState();
-		}
-
-		private void UpdatedHandler()
-		{
-			Helper.ControlInvokeRequired(SendAckTb, () => SendAckTb.Text = $"Snd {_itelex.CharsToSendCount}  Ack {_itelex.CharsAckCount}");
-			Helper.ControlInvokeRequired(InactivityTimoutTb, () => InactivityTimoutTb.Text = $"Timeout {_itelex.InactivityTimer} sec");
-			Helper.ControlInvokeRequired(ConnTimeTb, () => ConnTimeTb.Text = $"Conn {_itelex.ConnTimeMin} min");
-
-			Helper.ControlInvokeRequired(KennungTb, () => KennungTb.Text = _config.Kennung);
-
-			Helper.ControlInvokeRequired(SendLettersBtn, () =>
-			{
-				if (_itelex.ShiftState == CodeConversion.ShiftStates.Unknown || _itelex.ShiftState == CodeConversion.ShiftStates.Figs)
-				{
-					SendLettersBtn.ForeColor = Color.Black;
-				}
-				else
-				{
-					SendLettersBtn.ForeColor = Color.Green;
-				}
-			});
-
-			Helper.ControlInvokeRequired(SendFiguresBtn, () =>
-			{
-				if (_itelex.ShiftState == CodeConversion.ShiftStates.Unknown || _itelex.ShiftState == CodeConversion.ShiftStates.Ltr)
-				{
-					SendFiguresBtn.ForeColor = Color.Black;
-				}
-				else
-				{
-					SendFiguresBtn.ForeColor = Color.Green;
-				}
-			});
-
-			/*
-			bool itelex;
-			bool ascii;
-			if (_itelex.IsConnected)
-			{
-				itelex = _itelex.ConnectionState == ItelexProtocol.ConnectionStates.ItelexTexting;
-				ascii = _itelex.ConnectionState == ItelexProtocol.ConnectionStates.AsciiTexting;
-			}
-			else
-			{
-				itelex = false;
-				ascii = false;
-			}
-			Helper.ControlInvokeRequired(ProtocolItelexRb, () =>
-				ProtocolItelexRb.Checked = itelex
-			);
-			Helper.ControlInvokeRequired(ProtocolAsciiRb, () =>
-				ProtocolAsciiRb.Checked = ascii
-			);
-			*/
-
-			Helper.ControlInvokeRequired(ConnectionStateTb, () =>
-				ConnectionStateTb.Text = _itelex.ConnectionStateStr
-			);
-
-
-			Helper.ControlInvokeRequired(RecvOnCb, () =>
-			{
-				RecvOnCb.Checked = _itelex.RecvOn;
-
-				/*
-				if (_itelex.RecvOn)
-				{
-					RecvOnOffBtn.ForeColor = Color.Green;
-					RecvOnOffBtn.Text = "Recv Off";
-					//UpdateIpAddressBtn.Enabled = true;
-				}
-				else
-				{
-					RecvOnOffBtn.ForeColor = Color.Black;
-					RecvOnOffBtn.Text = "Recv On";
-					//UpdateIpAddressBtn.Enabled = false;
-				}
-				*/
-			});
-		}
-
-		private async Task<bool> ConnectOut()
-		{
-			AddressTb.Text = AddressTb.Text.Trim();
-			if (string.IsNullOrWhiteSpace(AddressTb.Text))
-			{
-				ShowLocalMessage(Constants.MSG_NO_ADDRESS);
-				return false;
-			}
-
-			PortTb.Text = PortTb.Text.Trim();
-			int? port = Helper.ToInt(PortTb.Text);
-			if (port == null)
-			{
-				ShowLocalMessage(Constants.MSG_INVALID_PORT);
-				return false;
-			}
-
-			ExtensionTb.Text = ExtensionTb.Text.Trim();
-			int? extension = null;
-			if (!string.IsNullOrWhiteSpace(ExtensionTb.Text))
-			{
-				extension = Helper.ToInt(ExtensionTb.Text);
-				if (extension == null)
-				{
-					ShowLocalMessage(Constants.MSG_INVALID_EXTENSION_NUMBER);
-					return false;
-				}
-			}
-			else
-			{
-				extension = 0;
-			}
-
-			bool success = await _itelex.ConnectOut(AddressTb.Text, port.Value, extension.Value, false);
-			if (!success)
-			{
-				ShowLocalMessage(Constants.MSG_CONNECTION_ERROR);
-				return false;
-			}
-
-			//_itelex.SendVersionCodeCmd();
-			//if (extension != null)
-			//{
-			//	_itelex.SendDirectDialCmd(extension.Value);
-			//}
-
-			//_itelex.StartAck();
-
-			return true;
-		}
-
-		private void Disconnect()
-		{
-			if (_itelex != null)
-			{
-				_itelex.SendEndCmd();
-				_itelex.Disconnect();
-				SetConnectState();
-			}
-		}
-
-		private void SendWerDa()
-		{
-			SendAsciiText(CodeConversion.ASC_WRU.ToString());
-		}
-
-		private void SendHereIs()
-		{
-#if DEBUG
-			SendAsciiText($"\r\n{KennungTb.Text}");
-#else
-			SendAsciiText($"\r\n{KennungTb.Text} (wintlx)");
-#endif
-		}
-
-		private void SetConnectState()
-		{
-			if (!_itelex.IsConnected)
-			{
-				LocalBtn.ForeColor = Color.Green;
-				ConnectBtn.ForeColor = Color.Black;
-				DisconnectBtn.ForeColor = Color.Gray;
-				if (string.IsNullOrEmpty(AddressTb.Text) || string.IsNullOrEmpty(PortTb.Text))
-				{
-					ConnectBtn.ForeColor = Color.Gray;
-				}
-				else
-				{
-					ConnectBtn.ForeColor = Color.Black;
-				}
-			}
-			else
-			{
-				if (_itelex.Local)
-				{
-					LocalBtn.ForeColor = Color.Green;
-					ConnectBtn.ForeColor = Color.Green;
-					DisconnectBtn.ForeColor = Color.Black;
-				}
-				else
-				{
-					LocalBtn.ForeColor = Color.Black;
-					ConnectBtn.ForeColor = Color.Green;
-					DisconnectBtn.ForeColor = Color.Black;
-				}
-			}
-		}
-
-		private void ClearBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			ClearScreen();
-		}
-
-		private void SendFileBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			SendFileForm sendFileForm = new SendFileForm();
-			sendFileForm.ShowDialog();
-
-			if (sendFileForm.AsciiText != null)
-			{
-				SendAsciiText(sendFileForm.AsciiText);
-			}
-			return;
-		}
-
 		private async void QueryBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
@@ -681,9 +383,9 @@ namespace WinTlx
 
 			if (string.IsNullOrWhiteSpace(_config.SubscribeServerAddress) || _config.SubscribeServerPort == 0)
 			{
-				SubcribeServerMessageHandler(Constants.MSG_INVALID_SUBSCRIBE_SERVER_DATA);
+				SubcribeServerMessageHandler(LngText(LngKeys.Message_InvalidSubscribeServerData));
 				Logging.Instance.Error(TAG, "QueryBtn_Click",
-					$"{Constants.MSG_INVALID_SUBSCRIBE_SERVER_DATA} address={_config.SubscribeServerAddress} port={_config.SubscribeServerPort}");
+					$"invalid subscribe server data, address={_config.SubscribeServerAddress} port={_config.SubscribeServerPort}");
 				return;
 			}
 
@@ -732,7 +434,7 @@ namespace WinTlx
 				}
 			});
 
-			SubcribeServerMessageHandler($"{list?.Length} {Constants.MSG_QUERY_RESULT}");
+			SubcribeServerMessageHandler($"{list?.Length} {LngText(LngKeys.Message_QueryResult)}");
 
 			MemberCb.DataSource = list;
 			MemberCb.DisplayMember = "Display";
@@ -752,6 +454,450 @@ namespace WinTlx
 			}
 
 			SetConnectState();
+		}
+
+		private async void ConnectBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			if (_itelex.IsConnected || string.IsNullOrEmpty(PortTb.Text))
+			{
+				return;
+			}
+
+			ConnectBtn.Enabled = false;
+			await ConnectOut();
+			ConnectBtn.Enabled = true;
+			SetConnectState();
+		}
+
+		private void DisconnectBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			_outputBuffer.Clear();
+			Disconnect();
+		}
+
+		private void LocalBtn_Click(object sender, EventArgs e)
+		{
+			//Debug.WriteLine("LocalBtn_Click");
+			SetFocus();
+			if (!_itelex.IsConnected)
+			{
+				return;
+			}
+
+			if (_itelex.Local)
+			{
+				_itelex.Local = false;
+			}
+			else
+			{
+				_itelex.Local = true;
+			}
+			SetConnectState();
+		}
+
+		private void ExitBtn_Click(object sender, EventArgs e)
+		{
+			Close();
+		}
+
+		private void SendWruBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			SendWhoAreYou();
+		}
+
+		private void SendHereIsBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			SendHereIs();
+		}
+
+		private void SendBellBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			_itelex.SendAsciiChar(CodeConversion.ASC_BEL);
+		}
+
+		private void SendLettersBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			_itelex.SendAsciiChar(CodeConversion.ASC_LTRS);
+		}
+
+		private void SendFiguresBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			_itelex.SendAsciiChar(CodeConversion.ASC_FIGS);
+		}
+
+		private void SendCarriageReturnBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			_itelex.SendAsciiText("\r");
+		}
+
+		private void SendLineFeedBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			_itelex.SendAsciiText("\n");
+		}
+
+		private void SendTimeBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			SendAsciiText($"{DateTime.Now:dd.MM.yyyy  HH:mm}\r\n");
+		}
+
+		private void SendNullBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			SendAsciiText(CodeConversion.ASC_NUL.ToString());
+		}
+
+		private void SendLineBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			SendAsciiText("\r\n");
+			SendAsciiText(new string('-', 68));
+			SendAsciiText("\r\n");
+		}
+
+		private void SendRyBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			for (int l = 0; l < 10; l++)
+			{
+				for (int i = 0; i < 33; i++)
+				{
+					SendAsciiText("ry");
+				}
+				SendAsciiText("\r\n");
+			}
+		}
+
+		private void SendFoxBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			SendAsciiText("the quick brown fox jumps over the lazy dog 1234567890/:,-=()");
+			//SendAsciiText("\r\n");
+		}
+
+		private void ClearBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			ClearScreen();
+		}
+
+		private void SendFileBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			SendFileForm sendFileForm = new SendFileForm();
+			sendFileForm.ShowDialog();
+
+			if (sendFileForm.AsciiText != null)
+			{
+				SendAsciiText(sendFileForm.AsciiText);
+			}
+			return;
+		}
+
+		private void RecvOnCb_Click(object sender, EventArgs e)
+		{
+			if (!_itelex.RecvOn)
+			{
+				_itelex.SetRecvOn(_config.IncomingLocalPort);
+				UpdateIpAddress();
+			}
+			else
+			{
+				_itelex.SetRecvOff();
+			}
+		}
+
+		private void TapePunchBtn_Click(object sender, EventArgs e)
+		{
+			if (_tapePunchForm == null)
+			{
+				_tapePunchForm = new TapePunchHorizontalForm(this.Bounds);
+				_tapePunchForm.Show();
+			}
+			else
+			{
+				_tapePunchForm.Close();
+				_tapePunchForm = null;
+			}
+			SetFocus();
+		}
+
+		private void EyeballCharCb_CheckedChanged(object sender, EventArgs e)
+		{
+			if (EyeballCharCb.Checked)
+			{
+				_itelex.SendAsciiText($"\r\n{LngText(LngKeys.Message_EyeballCharActive)}\r\n");
+			}
+			_itelex.EyeballCharActive = EyeballCharCb.Checked;
+		}
+
+
+		private void ConfigBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			ConfigForm configForm = new ConfigForm(this.Bounds);
+			//configForm.SetData(_configData);
+			configForm.ShowDialog();
+			if (!configForm.Canceled)
+			{
+				//_configData = configForm.GetData();
+				ConfigManager.Instance.SaveConfig();
+				//_itelex.InactivityTimeout = _configData.InactivityTimeout;
+				//_itelex.ExtensionNumber = _configData.IncomingExtensionNumber;
+				//_itelex.CodeStandard = _configData.CodeStandard;
+				SetOutputTimer(_config.OutputSpeed);
+				UpdatedHandler();
+			}
+		}
+
+		private void AboutBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			string text =
+				$"{Helper.GetVersion()}\r\r" +
+				"by *dg* Detlef Gerhardt\r\r" +
+				"Send feedback to\r" +
+				"feedback@dgerhardt.de";
+			MessageBox.Show(
+				text,
+				$"About {Constants.PROGRAM_NAME}",
+				MessageBoxButtons.OK,
+				MessageBoxIcon.Information,
+				MessageBoxDefaultButton.Button1);
+		}
+		private void ReceivedHandler(string asciiText)
+		{
+			string str = "";
+			for (int i = 0; i < asciiText.Length; i++)
+			{
+				switch (asciiText[i])
+				{
+					case CodeConversion.ASC_BEL:
+						SystemSounds.Beep.Play();
+						AddText(asciiText, CharAttributes.Recv);
+						return;
+					case CodeConversion.ASC_WRU:
+						SendHereIs();
+						AddText(asciiText, CharAttributes.Recv);
+						return;
+				}
+			}
+			AddText(asciiText, CharAttributes.Recv);
+		}
+
+		private void SendHandler(string asciiText)
+		{
+			string dispText = "";
+			for (int i = 0; i < asciiText.Length; i++)
+			{
+				char c = asciiText[i];
+				switch (c)
+				{
+					case CodeConversion.ASC_NUL:
+						continue;
+					case CodeConversion.ASC_BEL:
+						SystemSounds.Beep.Play();
+						break;
+					case CodeConversion.ASC_LTRS:
+					case CodeConversion.ASC_FIGS:
+						continue;
+				}
+				dispText += c;
+			}
+			AddText(dispText, CharAttributes.Send);
+		}
+
+		private void BaudotSendRecvHandler(byte[] code)
+		{
+			if (_tapePunchForm == null)
+			{
+				return;
+			}
+
+			for (int i = 0; i < code.Length; i++)
+			{
+				_tapePunchForm.PunchCode(code[i], _itelex.ShiftState);
+			}
+		}
+
+		private void SubcribeServerMessageHandler(string message)
+		{
+			ShowLocalMessage(message);
+		}
+
+		private void ConnectedHandler()
+		{
+			ShowLocalMessage(LngText(LngKeys.Message_Connected));
+			SetConnectState();
+		}
+
+		private void DroppedHandler()
+		{
+			ShowLocalMessage(LngText(LngKeys.Message_Disconnected));
+			SetConnectState();
+		}
+
+		private void UpdatedHandler()
+		{
+			Helper.ControlInvokeRequired(SendAckTb, () => SendAckTb.Text = $"Snd {_itelex.CharsToSendCount}  Ack {_itelex.CharsAckCount}");
+			Helper.ControlInvokeRequired(InactivityTimoutTb, () => InactivityTimoutTb.Text = $"Timeout {_itelex.InactivityTimer} sec");
+			Helper.ControlInvokeRequired(ConnTimeTb, () => ConnTimeTb.Text = $"Conn {_itelex.ConnTimeMin} min");
+
+			Helper.ControlInvokeRequired(AnswerbackTb, () => AnswerbackTb.Text = _config.Answerback);
+
+			Helper.ControlInvokeRequired(SendLettersBtn, () =>
+			{
+				if (_itelex.ShiftState == CodeConversion.ShiftStates.Unknown || _itelex.ShiftState == CodeConversion.ShiftStates.Figs)
+				{
+					SendLettersBtn.ForeColor = Color.Black;
+				}
+				else
+				{
+					SendLettersBtn.ForeColor = Color.Green;
+				}
+			});
+
+			Helper.ControlInvokeRequired(SendFiguresBtn, () =>
+			{
+				if (_itelex.ShiftState == CodeConversion.ShiftStates.Unknown || _itelex.ShiftState == CodeConversion.ShiftStates.Ltr)
+				{
+					SendFiguresBtn.ForeColor = Color.Black;
+				}
+				else
+				{
+					SendFiguresBtn.ForeColor = Color.Green;
+				}
+			});
+
+			Helper.ControlInvokeRequired(ConnectionStateTb, () =>
+				ConnectionStateTb.Text = _itelex.ConnectionStateStr
+			);
+
+
+			Helper.ControlInvokeRequired(RecvOnCb, () =>
+			{
+				RecvOnCb.Checked = _itelex.RecvOn;
+			});
+		}
+
+		private async Task<bool> ConnectOut()
+		{
+			AddressTb.Text = AddressTb.Text.Trim();
+			if (string.IsNullOrWhiteSpace(AddressTb.Text))
+			{
+				ShowLocalMessage(LngText(LngKeys.Message_ConnectNoAddress));
+				return false;
+			}
+
+			PortTb.Text = PortTb.Text.Trim();
+			int? port = Helper.ToInt(PortTb.Text);
+			if (port == null)
+			{
+				ShowLocalMessage(LngText(LngKeys.Message_ConnectInvalidPort));
+				return false;
+			}
+
+			ExtensionTb.Text = ExtensionTb.Text.Trim();
+			int? extension = null;
+			if (!string.IsNullOrWhiteSpace(ExtensionTb.Text))
+			{
+				extension = Helper.ToInt(ExtensionTb.Text);
+				if (extension == null)
+				{
+					ShowLocalMessage(LngText(LngKeys.Message_ConnectInvalidExtension));
+					return false;
+				}
+			}
+			else
+			{
+				extension = 0;
+			}
+
+			bool success = await _itelex.ConnectOut(AddressTb.Text, port.Value, extension.Value, false);
+			if (!success)
+			{
+				ShowLocalMessage(LngText(LngKeys.Message_ConnectionError));
+				return false;
+			}
+
+			return true;
+		}
+
+		private void Disconnect()
+		{
+			if (_itelex != null)
+			{
+				_itelex.SendEndCmd();
+				_itelex.Disconnect();
+				SetConnectState();
+			}
+		}
+
+		private void SendBel()
+		{
+			SendAsciiText(CodeConversion.ASC_BEL.ToString());
+		}
+
+		private void SendWhoAreYou()
+		{
+			SendAsciiText(CodeConversion.ASC_WRU.ToString());
+		}
+
+		private void SendHereIs()
+		{
+#if DEBUG
+			SendAsciiText($"\r\n{AnswerbackTb.Text}");
+#else
+			SendAsciiText($"\r\n{AnswerbackTb.Text} (wintlx)");
+#endif
+		}
+
+		private void SendAsciiText(string text)
+		{
+			_itelex?.SendAsciiText(text);
+		}
+
+
+		private void SetConnectState()
+		{
+			if (!_itelex.IsConnected)
+			{
+				LocalBtn.ForeColor = Color.Green;
+				ConnectBtn.ForeColor = Color.Black;
+				DisconnectBtn.ForeColor = Color.Gray;
+				if (string.IsNullOrEmpty(AddressTb.Text) || string.IsNullOrEmpty(PortTb.Text))
+				{
+					ConnectBtn.ForeColor = Color.Gray;
+				}
+				else
+				{
+					ConnectBtn.ForeColor = Color.Black;
+				}
+			}
+			else
+			{
+				if (_itelex.Local)
+				{
+					LocalBtn.ForeColor = Color.Green;
+					ConnectBtn.ForeColor = Color.Green;
+					DisconnectBtn.ForeColor = Color.Black;
+				}
+				else
+				{
+					LocalBtn.ForeColor = Color.Black;
+					ConnectBtn.ForeColor = Color.Green;
+					DisconnectBtn.ForeColor = Color.Black;
+				}
+			}
 		}
 
 		private void ClearScreen()
@@ -892,19 +1038,6 @@ namespace WinTlx
 			});
 		}
 
-		private void SendBufferTb_TextChanged(object sender, EventArgs e)
-		{
-		}
-
-		private void AckLbl_Click(object sender, EventArgs e)
-		{
-		}
-
-		private void SendAsciiText(string text)
-		{
-			_itelex?.SendAsciiText(text);
-		}
-
 		private void SetFocus()
 		{
 			TerminalPb.Focus();
@@ -927,45 +1060,6 @@ namespace WinTlx
 			}
 		}
 
-		private void AboutBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			string text =
-				$"{Helper.GetVersion()}\r\r" +
-				"by *dg* Detlef Gerhardt\r\r" +
-				"Send feedback to\r" +
-				"feedback@dgerhardt.de";
-			MessageBox.Show(
-				text,
-				$"About {Constants.PROGRAM_NAME}",
-				MessageBoxButtons.OK,
-				MessageBoxIcon.Information,
-				MessageBoxDefaultButton.Button1);
-		}
-
-		/*
-		private bool Expired()
-		{
-			if (!Helper.IsExpired())
-			{
-				return false;
-			}
-
-			string text =
-				$"{Helper.GetVersion()}\r\r" +
-				"This test version expired\r\r" +
-				"Please get a new version at\rhttps://github.com/detlefgerhardt/WinTlx/tree/master/Binaries";
-			MessageBox.Show(
-				text,
-				$"Expired",
-				MessageBoxButtons.OK,
-				MessageBoxIcon.Information,
-				MessageBoxDefaultButton.Button1);
-
-			return true;
-		}
-		*/
-
 		private ContextMenuStrip CreateContextMenu()
 		{
 			ContextMenuStrip contextMenu = new ContextMenuStrip();
@@ -986,24 +1080,6 @@ namespace WinTlx
 
 			// get menu item
 			ToolStripItem tsi = e.ClickedItem;
-		}
-
-		private void TerminalPb_MouseUp(object sender, MouseEventArgs e)
-		{
-			if (e.Button == MouseButtons.Right)
-			{   //click event
-				ContextMenu contextMenu = new ContextMenu();
-				MenuItem menuItem = new MenuItem("Clear");
-				menuItem.Click += new EventHandler(ClearAction);
-				contextMenu.MenuItems.Add(menuItem);
-				menuItem = new MenuItem("Copy");
-				menuItem.Click += new EventHandler(CopyAction);
-				contextMenu.MenuItems.Add(menuItem);
-				menuItem = new MenuItem("Paste");
-				menuItem.Click += new EventHandler(PasteAction);
-				contextMenu.MenuItems.Add(menuItem);
-				TerminalPb.ContextMenu = contextMenu;
-			}
 		}
 
 		private void ClearAction(object sender, EventArgs e)
@@ -1034,33 +1110,6 @@ namespace WinTlx
 			ShowLocalMessage(asciiText);
 		}
 
-		private void MainForm_Resize(object sender, EventArgs e)
-		{
-			//Debug.WriteLine(this.Height);
-
-			// prevent width change
-			this.Width = _fixedWidth;
-
-			TerminalPb.Height = this.Height - 310 + 50;
-			_screenHeight = TerminalPb.Height / CHAR_HEIGHT;
-
-
-			_screenEditPos0 = _screen.Count - _screenHeight;
-			if (_screenEditPos0 < 0)
-				_screenEditPos0 = 0;
-			_screenShowPos0 = _screenEditPos0;
-
-			_screenY = _screen.Count - _screenEditPos0 - 1;
-
-#warning TODO why is _screenY < 0 sometimes?
-			if (_screenY < 0)
-				_screenY = 0;
-
-			ShowScreen();
-
-			_tapePunchForm?.SetPosition(this.Bounds);
-		}
-
 		private void MainForm_LocationChanged(object sender, EventArgs e)
 		{
 			_tapePunchForm?.SetPosition(this.Bounds);
@@ -1084,19 +1133,6 @@ namespace WinTlx
 			}
 		}
 
-		private void RecvOnCb_Click(object sender, EventArgs e)
-		{
-			if (!_itelex.RecvOn)
-			{
-				_itelex.SetRecvOn(_config.IncomingLocalPort);
-				UpdateIpAddress();
-			}
-			else
-			{
-				_itelex.SetRecvOff();
-			}
-		}
-
 		private void UpdateIpAddressBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
@@ -1113,48 +1149,6 @@ namespace WinTlx
 			_subscriberServer.Connect(_config.SubscribeServerAddress, _config.SubscribeServerPort);
 			SendClientUpdate(_config.OwnNumber, _config.SubscribeServerUpdatePin, _config.IncomingPublicPort);
 			_subscriberServer.Disconnect();
-		}
-
-		private void TapePunchBtn_Click(object sender, EventArgs e)
-		{
-			if (_tapePunchForm == null)
-			{
-				_tapePunchForm = new TapePunchHorizontalForm(this.Bounds);
-				_tapePunchForm.Show();
-			}
-			else
-			{
-				_tapePunchForm.Close();
-				_tapePunchForm = null;
-			}
-			SetFocus();
-		}
-
-		private void ConfigBtn_Click(object sender, EventArgs e)
-		{
-			SetFocus();
-			ConfigForm configForm = new ConfigForm(this.Bounds);
-			//configForm.SetData(_configData);
-			configForm.ShowDialog();
-			if (!configForm.Canceled)
-			{
-				//_configData = configForm.GetData();
-				ConfigManager.Instance.SaveConfig();
-				//_itelex.InactivityTimeout = _configData.InactivityTimeout;
-				//_itelex.ExtensionNumber = _configData.IncomingExtensionNumber;
-				//_itelex.CodeStandard = _configData.CodeStandard;
-				SetOutputTimer(_config.OutputSpeed);
-				UpdatedHandler();
-			}
-		}
-
-		private void EyeballCharCb_CheckedChanged(object sender, EventArgs e)
-		{
-			if (EyeballCharCb.Checked)
-			{
-				_itelex.SendAsciiText($"\r\n{Constants.MSG_EYEBALL_CHAR_ACTIVE}\r\n");
-			}
-			_itelex.EyeballCharActive = EyeballCharCb.Checked;
 		}
 
 		private void LinealPnl_Paint(object sender, PaintEventArgs e)
@@ -1174,8 +1168,6 @@ namespace WinTlx
 			//g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 			g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
 			g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-
-			//g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 			g.Clear(Color.White);
 
 			//Debug.WriteLine($"{_screen.Count} {_screenShowPos0} {_screenEditPos0} {_screenX} {_screenY}");
@@ -1216,5 +1208,6 @@ namespace WinTlx
 				}
 			}
 		}
+
 	}
 }

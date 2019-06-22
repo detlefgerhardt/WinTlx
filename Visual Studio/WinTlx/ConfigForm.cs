@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WinTlx.Config;
+using WinTlx.Languages;
 
 namespace WinTlx
 {
@@ -27,13 +29,45 @@ namespace WinTlx
 			_parentWindowsPosition = position;
 			Canceled = false;
 
+			LanguageManager.Instance.LanguageChanged += LanguageChanged;
+			LanguageChanged();
+
 			CodeStandardCb.DataSource = new string[]
 				{
 					ConfigData.CodeStandardToString(CodeStandards.Ita2),
 					ConfigData.CodeStandardToString(CodeStandards.UsTTy)
 				};
 
+			LanguageCb.DataSource = LanguageManager.Instance.GetLanguageKeys();
+
 			SetData();
+		}
+
+		private void LanguageChanged()
+		{
+			this.Text = $"{Constants.PROGRAM_NAME} {LngText(LngKeys.Setup_Setup)}";
+			GeneralGb.Text = LngText(LngKeys.Setup_General);
+			LanguageCb.Text = LngText(LngKeys.Setup_Language);
+			AnswerbackLbl.Text = LngText(LngKeys.Setup_Answerback);
+			InactivityTimeoutLbl.Text = LngText(LngKeys.Setup_InactivityTimeout);
+			OutputSpeedLbl.Text = LngText(LngKeys.Setup_OutputSpeed);
+			CodeStandardCb.Text = LngText(LngKeys.Setup_CodeStandard);
+			SubscribeServerGb.Text = LngText(LngKeys.Setup_SubscribeServer);
+			SubscribeServerAddressLbl.Text = LngText(LngKeys.Setup_SubscribeServerAddress);
+			SubscribeServerPortLbl.Text = LngText(LngKeys.Setup_SubscribeServerPort);
+			IncomingGb.Text = LngText(LngKeys.Setup_IncomingConnection);
+			SubscribeServerUpdatePinLbl.Text = LngText(LngKeys.Setup_SubscribeServerPin);
+			OwnNumberLbl.Text = LngText(LngKeys.Setup_OwnTelexNumber);
+			ExtensionNumberLbl.Text = LngText(LngKeys.Setup_ExtensionNumber);
+			IncomingLocalPortLbl.Text = LngText(LngKeys.Setup_IncomingLocalPort);
+			IncomingPublicPortLbl.Text = LngText(LngKeys.Setup_IncomingPublicPort);
+			CancelBtn.Text = LngText(LngKeys.Setup_CancelButton);
+			SaveBtn.Text = LngText(LngKeys.Setup_SaveButton);
+		}
+
+		private string LngText(LngKeys key)
+		{
+			return LanguageManager.Instance.GetText(key);
 		}
 
 		private void ConfigForm_Load(object sender, EventArgs e)
@@ -44,7 +78,8 @@ namespace WinTlx
 
 		public void SetData()
 		{
-			KennungTb.Text = _config.Kennung;
+			LanguageCb.SelectedItem = _config.Language;
+			AnswerbackTb.Text = _config.Answerback;
 			InactivityTimeoutTb.Text = IntToStr(_config.InactivityTimeout);
 			CodeStandardCb.SelectedItem = ConfigData.CodeStandardToString(_config.CodeStandard);
 			OutputSpeedTb.Text = IntToStr(_config.OutputSpeed);
@@ -59,7 +94,7 @@ namespace WinTlx
 
 		public void GetData()
 		{
-			_config.Kennung = KennungTb.Text.Trim();
+			_config.Answerback = AnswerbackTb.Text.Trim();
 			_config.InactivityTimeout = StrToInt(InactivityTimeoutTb.Text);
 			_config.CodeStandard = ConfigData.StringToCodeStandard((string)CodeStandardCb.SelectedItem);
 			_config.OutputSpeed = StrToInt(OutputSpeedTb.Text);
@@ -71,6 +106,14 @@ namespace WinTlx
 			_config.IncomingLocalPort = StrToInt(IncommingLocalPortTb.Text);
 			_config.IncomingPublicPort = StrToInt(IncomingPublicPortTb.Text);
 			_config.SetDefaults();
+
+			string oldLnd = _config.Language;
+			_config.Language = LanguageCb.Text.Trim();
+			if (_config.Language!=oldLnd)
+			{
+				LanguageManager.Instance.ChangeLanguage(_config.Language);
+			}
+
 		}
 
 		private string IntToStr(int intValue)
