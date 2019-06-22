@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Text;
 using System.Windows.Forms;
 
@@ -33,6 +34,12 @@ namespace WinTlx
 #endif
 			return $"{Constants.PROGRAM_NAME}  V{Application.ProductVersion}  (Build={buildTime}) {expireStr}";
 			//return $"{Constants.PROGRAM_NAME}  V{Application.ProductVersion}  (Build={buildTime}) - Special Carsten Version";
+		}
+
+		public static string GetVersionCode()
+		{
+			return Application.ProductVersion;
+			//return $"{version[0]}{version[1]}{version[2]}{version[3]}";
 		}
 
 		/*
@@ -218,7 +225,9 @@ namespace WinTlx
 			for (int i = 0; i < screenWidth + 3; i++)
 			{
 				float x = (float)(2 + i * scale);
-				Pen pen = (i == screenWidth) ? new Pen(Color.Red, 1) : new Pen(Color.Black, 1);
+				Pen pen = (i == screenWidth) ? new Pen(Color.Red, 2) : new Pen(Color.Black, 1);
+				pen.StartCap = LineCap.Square;
+				pen.EndCap = LineCap.Square;
 				if (i % 10 == 0)
 				{
 					g.DrawLine(pen, x, 0, x, 10);

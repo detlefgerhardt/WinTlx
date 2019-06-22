@@ -12,11 +12,13 @@ namespace WinTlx
 {
 	public partial class ConfigForm : Form
 	{
-		private ConfigData _config;
+		//private ConfigData _config;
 
 		private Rectangle _parentWindowsPosition;
 
 		public bool Canceled { get; set; }
+
+		private ConfigData _config => ConfigManager.Instance.Config;
 
 		public ConfigForm(Rectangle position)
 		{
@@ -24,6 +26,14 @@ namespace WinTlx
 
 			_parentWindowsPosition = position;
 			Canceled = false;
+
+			CodeStandardCb.DataSource = new string[]
+				{
+					ConfigData.CodeStandardToString(CodeStandards.Ita2),
+					ConfigData.CodeStandardToString(CodeStandards.UsTTy)
+				};
+
+			SetData();
 		}
 
 		private void ConfigForm_Load(object sender, EventArgs e)
@@ -32,11 +42,11 @@ namespace WinTlx
 			SetBounds(pos.X, pos.Y, Bounds.Width, Bounds.Height);
 		}
 
-		public void SetData(ConfigData configData)
+		public void SetData()
 		{
-			_config = configData;
 			KennungTb.Text = _config.Kennung;
 			InactivityTimeoutTb.Text = IntToStr(_config.InactivityTimeout);
+			CodeStandardCb.SelectedItem = ConfigData.CodeStandardToString(_config.CodeStandard);
 			OutputSpeedTb.Text = IntToStr(_config.OutputSpeed);
 			SubscribeServerAddressTb.Text = _config.SubscribeServerAddress;
 			SubscribeServerPortTb.Text = IntToStr(_config.SubscribeServerPort);
@@ -47,10 +57,11 @@ namespace WinTlx
 			IncomingPublicPortTb.Text = IntToStr(_config.IncomingPublicPort);
 		}
 
-		public ConfigData GetData()
+		public void GetData()
 		{
 			_config.Kennung = KennungTb.Text.Trim();
 			_config.InactivityTimeout = StrToInt(InactivityTimeoutTb.Text);
+			_config.CodeStandard = ConfigData.StringToCodeStandard((string)CodeStandardCb.SelectedItem);
 			_config.OutputSpeed = StrToInt(OutputSpeedTb.Text);
 			_config.SubscribeServerAddress = SubscribeServerAddressTb.Text.Trim();
 			_config.SubscribeServerPort = StrToInt(SubscribeServerPortTb.Text);
@@ -60,7 +71,6 @@ namespace WinTlx
 			_config.IncomingLocalPort = StrToInt(IncommingLocalPortTb.Text);
 			_config.IncomingPublicPort = StrToInt(IncomingPublicPortTb.Text);
 			_config.SetDefaults();
-			return _config;
 		}
 
 		private string IntToStr(int intValue)
@@ -93,5 +103,9 @@ namespace WinTlx
 			Canceled = true;
 		}
 
+		private void ConfigForm_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			GetData();
+		}
 	}
 }

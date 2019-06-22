@@ -21,37 +21,43 @@ namespace WinTlx
 
 		public static ConfigManager Instance => instance ?? (instance = new ConfigManager());
 
+		public ConfigData Config { get; set; }
+
 		public ConfigData GetDefaultConfig()
 		{
 			return new ConfigData()
 			{
-				InactivityTimeout = Constants.DEFAULT_INACTIVITY_TIMEOUT,
 				Kennung = Constants.DEFAULT_KENNUNG,
-				IncomingLocalPort = Constants.DEFAULT_INCOMING_PORT
+				InactivityTimeout = Constants.DEFAULT_INACTIVITY_TIMEOUT,
+				OutputSpeed = 0,
+				CodeStandard = CodeStandards.Ita2,
+				IncomingLocalPort = Constants.DEFAULT_INCOMING_PORT,
+				IncomingPublicPort = Constants.DEFAULT_INCOMING_PORT,
+				IncomingExtensionNumber = 0,
 			};
 		}
 
-		public ConfigData LoadConfig()
+		public bool LoadConfig()
 		{
 			try
 			{
 				string configXml = File.ReadAllText(CONFIG_NAME);
-				ConfigData configData = Deserialize<ConfigData>(configXml);
-				configData.SetDefaults();
-				return configData;
+				Config = Deserialize<ConfigData>(configXml);
+				return true;
 			}
 			catch(Exception ex)
 			{
 				Logging.Instance.Error(TAG, nameof(SaveConfig), "", ex);
-				return null;
+				Config = GetDefaultConfig();
+				return false;
 			}
 		}
 
-		public bool SaveConfig(ConfigData configData)
+		public bool SaveConfig()
 		{
 			try
 			{
-				string configXml = SerializeObject<ConfigData>(configData);
+				string configXml = SerializeObject<ConfigData>(Config);
 				File.WriteAllText(CONFIG_NAME, configXml);
 				return true;
 			}

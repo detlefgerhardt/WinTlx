@@ -5,6 +5,8 @@ namespace WinTlx
 {
 	public static class CodeConversion
 	{
+		private static ConfigData _config => ConfigManager.Instance.Config;
+
 		public enum ShiftStates
 		{
 			Unknown,
@@ -12,7 +14,6 @@ namespace WinTlx
 			Figs,
 			Both
 		}
-
 
 		public static string BaudotStringToAscii(byte[] baudotData, ref ShiftStates shiftState)
 		{
@@ -44,20 +45,24 @@ namespace WinTlx
 				return (char)ASC_INV;
 			}
 
+			char[,] codeTab = _config.CodeStandard == CodeStandards.Ita2 ? _codeTabEu : _codeTabUs;
+
 			switch (shiftState)
 			{
 				case ShiftStates.Unknown:
 				default:
 					return ASC_INV;
 				case ShiftStates.Ltr:
-					return _codeTabEu[LTRS, baudotCode];
+					return codeTab[LTRS, baudotCode];
 				case ShiftStates.Figs:
-					return _codeTabEu[FIGS, baudotCode];
+					return codeTab[FIGS, baudotCode];
 			}
 		}
 
 		public static string BaudotCodeToPuncherText(byte baudotCode, ShiftStates shiftState)
 		{
+			string[,] codeTab = _config.CodeStandard == CodeStandards.Ita2 ? _codeTabPuncherEu : _codeTabPuncherUs;
+
 			switch (shiftState)
 			{
 				case ShiftStates.Ltr:
@@ -103,12 +108,19 @@ namespace WinTlx
 		/// <returns></returns>
 		private static string AsciiCharToTelex(char asciiChr)
 		{
+			Dictionary<byte, string> asciiToTelexTab =
+				_config.CodeStandard == CodeStandards.Ita2 ? _asciiToTelexTabEu : _asciiToTelexTabUs;
+
 			string asciiData = _codePage437ToAsciiTab(asciiChr);
 			string telexData = "";
 			for (int i = 0; i < asciiData.Length; i++)
 			{
 				//telexData += _asciiToTelexTab[(int)asciiData[i]];
-				telexData += _asciiToTelexTabEu[(byte)asciiData[i]];
+				byte data = (byte)asciiData[i];
+				if (asciiToTelexTab.ContainsKey(data))
+				{ 
+					telexData += asciiToTelexTab[data];
+				}
 			}
 			return telexData;
 		}
@@ -140,10 +152,14 @@ namespace WinTlx
 				baudCode = ltrCode.Value;
 				newShiftState = ShiftStates.Ltr;
 			}
-			else
+			else if (figCode != null)
 			{
 				baudCode = figCode.Value;
 				newShiftState = ShiftStates.Figs;
+			}
+			else
+			{
+				return new byte[0];
 			}
 
 			return BaudotCodeToBaudotWithShift(baudCode, newShiftState, ref shiftState);
@@ -204,9 +220,10 @@ namespace WinTlx
 		private static byte? FindBaudot(int shift, char telexChar)
 		{
 			// search ascii char to find baudot code
+			char[,] _codeTab = _config.CodeStandard == CodeStandards.Ita2 ? _codeTabEu : _codeTabUs;
 			for (int c = 0; c < 32; c++)
 			{
-				if (_codeTabEu[shift, c] == telexChar)
+				if (_codeTab[shift, c] == telexChar)
 				{
 					return (byte)c;
 				}
@@ -214,19 +231,17 @@ namespace WinTlx
 			return null;
 		}
 
-		private const int LTRS = 0;
-		private const int FIGS = 1;
-
 		private const char ASC_INV = '#'; // replace invalid baudot character
 		public const char ASC_WRU = '\x05'; // Ctrl-E, Kennungsgeber-Abfrage (wer da?)
 		public const char ASC_BEL = '\x07'; // Ctrl-G, Bell
+		public const char ASC_HEREIS = '\x09'; // own Kennungsgeber
 		public const char ASC_LF = '\x0A';
 		public const char ASC_CR = '\x0D';
 		public const char ASC_LTRS = '\x1E';
 		public const char ASC_FIGS = '\x1F';
-		public const char ASC_CODE32 = '\x00';
+		public const char ASC_NUL = '\x00';
 
-		public const byte BAU_CODE32 = 0x00;
+		public const byte BAU_NUL = 0x00;
 		public const byte BAU_LTR = 0x1F;
 		public const byte BAU_FIG = 0x1B;
 		public const byte BAU_WRU = 0x12;
@@ -295,9 +310,9 @@ namespace WinTlx
 		// ASCII -> ASCII conversion Europe
 		private static Dictionary<byte, string> _asciiToTelexTabEu = new Dictionary<byte, string>
 		{
-			{ 0x00, ASC_CODE32.ToString() },
-			{ 0x05, ASC_WRU.ToString() },
-			{ 0x07, ASC_BEL.ToString() }, // bell
+			{ 0x00, ASC_NUL.ToString() }, // NUL
+			{ 0x05, ASC_WRU.ToString() }, // WRU
+			{ 0x07, ASC_BEL.ToString() }, // BEL
 			{ 0x0A, ASC_LF.ToString() }, // LF
 			{ 0x0D, ASC_CR.ToString() }, // CR
 			{ 0x1E, ASC_LTRS.ToString() }, // ITA2 letters
@@ -395,19 +410,19 @@ namespace WinTlx
 		// ASCII -> ASCII conversion US
 		private static Dictionary<byte, string> _asciiToTelexTabUs = new Dictionary<byte, string>
 		{
-			{ 0x00, ASC_CODE32.ToString() },
-			//{ 0x05, ASC_WRU.ToString() }, no WRU
-			{ 0x07, ASC_BEL.ToString() }, // bell
+			{ 0x00, ASC_NUL.ToString() }, // NUL
+			{ 0x05, ASC_WRU.ToString() }, // WRU
+			{ 0x07, ASC_BEL.ToString() }, // BEL
 			{ 0x0A, ASC_LF.ToString() }, // LF
 			{ 0x0D, ASC_CR.ToString() }, // CR
 			{ 0x1E, ASC_LTRS.ToString() }, // ITA2 letters
 			{ 0x1F, ASC_FIGS.ToString() }, // ITA2 figurs
 			{ 0x20, " " },  // space
-			{ 0x21, "!" },  // !
+			{ 0x21, "!" },  // ! -> ! (%)
 			{ 0x22, "\"" }, // " -> "
-			{ 0x23, "#" },	// # -> #
+			{ 0x23, "#" },	// # -> # ($)
 			{ 0x24, "$" },  // $ -> $
-			{ 0x26, "&" },  // & -> &
+			{ 0x26, "&" },  // & -> & (@)
 			{ 0x27, "'" },	// ' -> '
 			{ 0x28, "(" },	// ( -> (
 			{ 0x29, ")" },	// ) -> )
@@ -633,12 +648,15 @@ namespace WinTlx
 
 		#region Baudot / ITA 2 -> ASCII
 
+		private const int LTRS = 0;
+		private const int FIGS = 1;
+
 		// bitorder is: 54.321
 
 		private static char[,] _codeTabEu =
 		{
 			{
-				ASC_CODE32,	// 00 C32
+				ASC_NUL,	// 00 NUL
 				't',		// 01 t
 				'\r',		// 02 CR
 				'o',		// 03 o
@@ -674,33 +692,33 @@ namespace WinTlx
 
 			// figures
 			{
-				ASC_CODE32,	// 00 C32
+				ASC_NUL,	// 00 NUL
 				'5',		// 01 5
 				'\r',		// 02 CR
 				'9',		// 03 9
-				' ',		// 04 BL
-				ASC_INV,	// 05      #
+				' ',		// 04 SP
+				ASC_INV,	// 05      
 				',',		// 06 ,
 				'.',		// 07 .
 				'\n',		// 08 LF
 				')',		// 09 )
 				'4',		// 0A 4
-				ASC_INV,	// 0B      &
+				ASC_INV,	// 0B      
 				'8',		// 0C 8
 				'0',		// 0D 0
 				':',		// 0E :
-				'=',		// 0F =    ;
+				'=',		// 0F =    
 				'3',		// 10 3
-				'+',		// 11 +    "
-				ASC_WRU,	// 12 WRU  $
-				'?',		// 13 ?    ?
-				'\'',		// 14 '    BEL
+				'+',		// 11 +    
+				ASC_WRU,	// 12 WRU  
+				'?',		// 13 ?    
+				'\'',		// 14 '   
 				'6',		// 15 6
-				ASC_INV,	// 16      !
+				ASC_INV,	// 16      
 				'/',		// 17 /
 				'-',		// 18 -
 				'2',		// 19 2
-				ASC_BEL,	// 1A BEL  '
+				ASC_BEL,	// 1A BEL  
 				ASC_FIGS,	// 1B FIG
 				'7',		// 1C 7
 				'1',		// 1D 1
@@ -712,7 +730,7 @@ namespace WinTlx
 		private static char[,] _codeTabUs =
 		{
 			{
-				ASC_CODE32,	// 00 C32
+				ASC_NUL,	// 00 NUL
 				't',		// 01 t
 				'\r',		// 02 CR
 				'o',		// 03 o
@@ -748,7 +766,7 @@ namespace WinTlx
 
 			// figures
 			{
-				ASC_CODE32,	// 00 C32
+				ASC_NUL,	// 00 NUL
 				'5',		// 01 5
 				'\r',		// 02 CR
 				'9',		// 03 9
@@ -756,25 +774,25 @@ namespace WinTlx
 				'#',		// 05 #
 				',',		// 06 ,
 				'.',		// 07 .
-				'\n',		// 08 NL
+				'\n',		// 08 LF
 				')',		// 09 )
 				'4',		// 0A 4
-				'&',		// 0B &
+				'&',		// 0B & (@)
 				'8',		// 0C 8
 				'0',		// 0D 0
 				':',		// 0E :
-				';',		// 0F ;    =
+				';',		// 0F ;
 				'3',		// 10 3
-				'"',		// 11 "    +
-				'$',		// 12 $    WRU
-				'?',		// 13 ?    ?
-				ASC_BEL,	// 14 BEL  '
+				'"',		// 11 "
+				'$',		// 12 $ (Pound)
+				'?',		// 13 ?
+				ASC_BEL,	// 14 BEL  
 				'6',		// 15 6
-				'!',		// 16 !
+				'!',		// 16 ! (%)
 				'/',		// 17 /
 				'-',		// 18 -
 				'2',		// 19 2
-				'\'',		// 1A '     BEL
+				'\'',		// 1A '     
 				ASC_FIGS,	// 1B FIG
 				'7',		// 1C 7
 				'1',		// 1D 1
@@ -835,13 +853,13 @@ namespace WinTlx
 				"CR",		// 02 carriage return
 				"9",		// 03
 				"SP",		// 04 space
-				"",			// 05 $ / pound
+				"",			// 05 
 				",",		// 06
 				".",		// 07
 				"LF",		// 08 new line
 				")",		// 09
 				"4",		// 0A
-				"",			// 0B @
+				"",			// 0B
 				"8",		// 0C
 				"0",		// 0D
 				":",		// 0E
@@ -850,9 +868,9 @@ namespace WinTlx
 				"+",		// 11
 				"WRU",		// 12 who are you
 				"?",		// 13
-				"",			// 14 or $
+				"",			// 14 
 				"6",		// 15
-				"",			// 16 ! / %
+				"",			// 16 
 				"/",		// 17
 				"-",		// 18
 				"2",		// 19
@@ -867,7 +885,7 @@ namespace WinTlx
 		private static string[,] _codeTabPuncherUs =
 		{
 			{
-				"",			// 00 C32
+				"",			// 00 NUL
 				"t",		// 01 t
 				"CR",		// 02 CR
 				"o",		// 03 o
@@ -903,7 +921,7 @@ namespace WinTlx
 
 			// figures
 			{
-				"",			// 00 C32
+				"",			// 00 NUL
 				"5",		// 01 5
 				"CR",		// 02 CR
 				"9",		// 03 9
@@ -911,25 +929,25 @@ namespace WinTlx
 				"#",		// 05 #
 				",",		// 06 ,
 				".",		// 07 .
-				"LF",		// 08 NL
+				"LF",		// 08 LF
 				")",		// 09 )
 				"4",		// 0A 4
-				"&",		// 0B &
+				"&",		// 0B & (@)
 				"8",		// 0C 8
 				"0",		// 0D 0
 				":",		// 0E :
-				";",		// 0F ;    =
+				";",		// 0F ;
 				"3",		// 10 3
-				"\"",		// 11 "    +
-				"$",		// 12 $    WRU
-				"?",		// 13 ?    ?
-				"BEL",		// 14 BEL  '
+				"\"",		// 11 "
+				"$",		// 12 $ (Pound)
+				"?",		// 13 ?   
+				"BEL",		// 14 BEL  
 				"6",		// 15 6
-				"!",		// 16 !
+				"!",		// 16 ! (%)
 				"/",		// 17 /
 				"-",		// 18 -
 				"2",		// 19 2
-				"\'",		// 1A '     BEL
+				"\'",		// 1A '    
 				"FIG",		// 1B FIG
 				"7",		// 1C 7
 				"1",		// 1D 1

@@ -60,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeStandardItem.cs" />
     <Compile Include="EyeballChar.cs" />
     <Compile Include="CodeConversion.cs" />
     <Compile Include="ConfigData.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="SendFileForm.Designer.cs">
       <DependentUpon>SendFileForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="SpecialCharacters.cs" />
     <Compile Include="TapePunch.cs" />
     <Compile Include="TapePunchHorizontalForm.cs">
       <SubType>Form</SubType>

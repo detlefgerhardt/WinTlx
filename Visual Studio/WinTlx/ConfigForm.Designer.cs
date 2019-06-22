@@ -53,8 +53,12 @@
 			this.ExtensionNumberLbl = new System.Windows.Forms.Label();
 			this.ExtensionNumberTb = new System.Windows.Forms.TextBox();
 			this.GeneralGb = new System.Windows.Forms.GroupBox();
+			this.CodeStandardCb = new System.Windows.Forms.ComboBox();
+			this.CodeStandardLbl = new System.Windows.Forms.Label();
+			this.SubscribeServerGb = new System.Windows.Forms.GroupBox();
 			this.IncomingGb.SuspendLayout();
 			this.GeneralGb.SuspendLayout();
+			this.SubscribeServerGb.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// KennungLbl
@@ -78,21 +82,21 @@
 			this.IncommingLocalPortTb.Location = new System.Drawing.Point(141, 97);
 			this.IncommingLocalPortTb.Name = "IncommingLocalPortTb";
 			this.IncommingLocalPortTb.Size = new System.Drawing.Size(54, 20);
-			this.IncommingLocalPortTb.TabIndex = 3;
+			this.IncommingLocalPortTb.TabIndex = 10;
 			// 
 			// SubscribeServerAddressTb
 			// 
-			this.SubscribeServerAddressTb.Location = new System.Drawing.Point(141, 95);
+			this.SubscribeServerAddressTb.Location = new System.Drawing.Point(141, 21);
 			this.SubscribeServerAddressTb.Name = "SubscribeServerAddressTb";
 			this.SubscribeServerAddressTb.Size = new System.Drawing.Size(136, 20);
 			this.SubscribeServerAddressTb.TabIndex = 5;
 			// 
 			// SubscribeServerPortTb
 			// 
-			this.SubscribeServerPortTb.Location = new System.Drawing.Point(141, 121);
+			this.SubscribeServerPortTb.Location = new System.Drawing.Point(141, 47);
 			this.SubscribeServerPortTb.Name = "SubscribeServerPortTb";
 			this.SubscribeServerPortTb.Size = new System.Drawing.Size(54, 20);
-			this.SubscribeServerPortTb.TabIndex = 7;
+			this.SubscribeServerPortTb.TabIndex = 6;
 			// 
 			// IncomingLocalPortLbl
 			// 
@@ -106,7 +110,7 @@
 			// SubscribeServerAddressLbl
 			// 
 			this.SubscribeServerAddressLbl.AutoSize = true;
-			this.SubscribeServerAddressLbl.Location = new System.Drawing.Point(9, 98);
+			this.SubscribeServerAddressLbl.Location = new System.Drawing.Point(9, 24);
 			this.SubscribeServerAddressLbl.Name = "SubscribeServerAddressLbl";
 			this.SubscribeServerAddressLbl.Size = new System.Drawing.Size(126, 13);
 			this.SubscribeServerAddressLbl.TabIndex = 4;
@@ -115,7 +119,7 @@
 			// SubscribeServerPortLbl
 			// 
 			this.SubscribeServerPortLbl.AutoSize = true;
-			this.SubscribeServerPortLbl.Location = new System.Drawing.Point(9, 124);
+			this.SubscribeServerPortLbl.Location = new System.Drawing.Point(9, 50);
 			this.SubscribeServerPortLbl.Name = "SubscribeServerPortLbl";
 			this.SubscribeServerPortLbl.Size = new System.Drawing.Size(107, 13);
 			this.SubscribeServerPortLbl.TabIndex = 6;
@@ -123,20 +127,20 @@
 			// 
 			// SaveBtn
 			// 
-			this.SaveBtn.Location = new System.Drawing.Point(19, 342);
+			this.SaveBtn.Location = new System.Drawing.Point(19, 386);
 			this.SaveBtn.Name = "SaveBtn";
 			this.SaveBtn.Size = new System.Drawing.Size(75, 23);
-			this.SaveBtn.TabIndex = 8;
+			this.SaveBtn.TabIndex = 12;
 			this.SaveBtn.Text = "Save";
 			this.SaveBtn.UseVisualStyleBackColor = true;
 			this.SaveBtn.Click += new System.EventHandler(this.SaveBtn_Click);
 			// 
 			// CancelBtn
 			// 
-			this.CancelBtn.Location = new System.Drawing.Point(205, 342);
+			this.CancelBtn.Location = new System.Drawing.Point(205, 386);
 			this.CancelBtn.Name = "CancelBtn";
 			this.CancelBtn.Size = new System.Drawing.Size(75, 23);
-			this.CancelBtn.TabIndex = 9;
+			this.CancelBtn.TabIndex = 13;
 			this.CancelBtn.Text = "Cancel";
 			this.CancelBtn.UseVisualStyleBackColor = true;
 			this.CancelBtn.Click += new System.EventHandler(this.CancelBtn_Click);
@@ -146,7 +150,7 @@
 			this.OwnNumberTb.Location = new System.Drawing.Point(141, 45);
 			this.OwnNumberTb.Name = "OwnNumberTb";
 			this.OwnNumberTb.Size = new System.Drawing.Size(136, 20);
-			this.OwnNumberTb.TabIndex = 10;
+			this.OwnNumberTb.TabIndex = 8;
 			// 
 			// OwnNumberLbl
 			// 
@@ -162,7 +166,7 @@
 			this.SubscribeServerUpdatePinTb.Location = new System.Drawing.Point(141, 19);
 			this.SubscribeServerUpdatePinTb.Name = "SubscribeServerUpdatePinTb";
 			this.SubscribeServerUpdatePinTb.Size = new System.Drawing.Size(54, 20);
-			this.SubscribeServerUpdatePinTb.TabIndex = 12;
+			this.SubscribeServerUpdatePinTb.TabIndex = 7;
 			// 
 			// SubscribeServerUpdatePinLbl
 			// 
@@ -178,7 +182,7 @@
 			this.IncomingPublicPortTb.Location = new System.Drawing.Point(141, 123);
 			this.IncomingPublicPortTb.Name = "IncomingPublicPortTb";
 			this.IncomingPublicPortTb.Size = new System.Drawing.Size(54, 20);
-			this.IncomingPublicPortTb.TabIndex = 14;
+			this.IncomingPublicPortTb.TabIndex = 11;
 			// 
 			// IncomingPublicPortLbl
 			// 
@@ -194,7 +198,7 @@
 			this.InactivityTimeoutTb.Location = new System.Drawing.Point(141, 43);
 			this.InactivityTimeoutTb.Name = "InactivityTimeoutTb";
 			this.InactivityTimeoutTb.Size = new System.Drawing.Size(54, 20);
-			this.InactivityTimeoutTb.TabIndex = 16;
+			this.InactivityTimeoutTb.TabIndex = 2;
 			// 
 			// InactivityTimeoutLbl
 			// 
@@ -219,7 +223,7 @@
 			this.OutputSpeedTb.Location = new System.Drawing.Point(141, 69);
 			this.OutputSpeedTb.Name = "OutputSpeedTb";
 			this.OutputSpeedTb.Size = new System.Drawing.Size(54, 20);
-			this.OutputSpeedTb.TabIndex = 19;
+			this.OutputSpeedTb.TabIndex = 3;
 			// 
 			// IncomingGb
 			// 
@@ -233,7 +237,7 @@
 			this.IncomingGb.Controls.Add(this.IncomingPublicPortLbl);
 			this.IncomingGb.Controls.Add(this.SubscribeServerUpdatePinTb);
 			this.IncomingGb.Controls.Add(this.IncomingPublicPortTb);
-			this.IncomingGb.Location = new System.Drawing.Point(12, 172);
+			this.IncomingGb.Location = new System.Drawing.Point(12, 228);
 			this.IncomingGb.Name = "IncomingGb";
 			this.IncomingGb.Size = new System.Drawing.Size(283, 152);
 			this.IncomingGb.TabIndex = 20;
@@ -254,32 +258,65 @@
 			this.ExtensionNumberTb.Location = new System.Drawing.Point(141, 71);
 			this.ExtensionNumberTb.Name = "ExtensionNumberTb";
 			this.ExtensionNumberTb.Size = new System.Drawing.Size(54, 20);
-			this.ExtensionNumberTb.TabIndex = 16;
+			this.ExtensionNumberTb.TabIndex = 9;
 			// 
 			// GeneralGb
 			// 
+			this.GeneralGb.Controls.Add(this.CodeStandardCb);
+			this.GeneralGb.Controls.Add(this.CodeStandardLbl);
 			this.GeneralGb.Controls.Add(this.OutputSpeedTb);
-			this.GeneralGb.Controls.Add(this.SubscribeServerAddressTb);
 			this.GeneralGb.Controls.Add(this.InactivityTimeoutLbl);
-			this.GeneralGb.Controls.Add(this.SubscribeServerPortTb);
 			this.GeneralGb.Controls.Add(this.InactivityTimeoutTb);
 			this.GeneralGb.Controls.Add(this.OutputSpeedLbl);
-			this.GeneralGb.Controls.Add(this.SubscribeServerAddressLbl);
-			this.GeneralGb.Controls.Add(this.SubscribeServerPortLbl);
 			this.GeneralGb.Controls.Add(this.KennungTb);
 			this.GeneralGb.Controls.Add(this.KennungLbl);
 			this.GeneralGb.Location = new System.Drawing.Point(12, 12);
 			this.GeneralGb.Name = "GeneralGb";
-			this.GeneralGb.Size = new System.Drawing.Size(283, 154);
+			this.GeneralGb.Size = new System.Drawing.Size(283, 129);
 			this.GeneralGb.TabIndex = 21;
 			this.GeneralGb.TabStop = false;
 			this.GeneralGb.Text = "General";
+			// 
+			// CodeStandardCb
+			// 
+			this.CodeStandardCb.FormattingEnabled = true;
+			this.CodeStandardCb.ItemHeight = 13;
+			this.CodeStandardCb.Items.AddRange(new object[] {
+            "ITA-2",
+            "US-TTY"});
+			this.CodeStandardCb.Location = new System.Drawing.Point(141, 98);
+			this.CodeStandardCb.Name = "CodeStandardCb";
+			this.CodeStandardCb.Size = new System.Drawing.Size(73, 21);
+			this.CodeStandardCb.TabIndex = 21;
+			// 
+			// CodeStandardLbl
+			// 
+			this.CodeStandardLbl.AutoSize = true;
+			this.CodeStandardLbl.Location = new System.Drawing.Point(9, 98);
+			this.CodeStandardLbl.Name = "CodeStandardLbl";
+			this.CodeStandardLbl.Size = new System.Drawing.Size(76, 13);
+			this.CodeStandardLbl.TabIndex = 20;
+			this.CodeStandardLbl.Text = "Code standard";
+			// 
+			// SubscribeServerGb
+			// 
+			this.SubscribeServerGb.Controls.Add(this.SubscribeServerAddressTb);
+			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortLbl);
+			this.SubscribeServerGb.Controls.Add(this.SubscribeServerAddressLbl);
+			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortTb);
+			this.SubscribeServerGb.Location = new System.Drawing.Point(12, 147);
+			this.SubscribeServerGb.Name = "SubscribeServerGb";
+			this.SubscribeServerGb.Size = new System.Drawing.Size(283, 75);
+			this.SubscribeServerGb.TabIndex = 22;
+			this.SubscribeServerGb.TabStop = false;
+			this.SubscribeServerGb.Text = "Subscribe server";
 			// 
 			// ConfigForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(307, 384);
+			this.ClientSize = new System.Drawing.Size(319, 421);
+			this.Controls.Add(this.SubscribeServerGb);
 			this.Controls.Add(this.GeneralGb);
 			this.Controls.Add(this.IncomingGb);
 			this.Controls.Add(this.CancelBtn);
@@ -287,11 +324,14 @@
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "ConfigForm";
 			this.Text = "WinTlx Configuration";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ConfigForm_FormClosing);
 			this.Load += new System.EventHandler(this.ConfigForm_Load);
 			this.IncomingGb.ResumeLayout(false);
 			this.IncomingGb.PerformLayout();
 			this.GeneralGb.ResumeLayout(false);
 			this.GeneralGb.PerformLayout();
+			this.SubscribeServerGb.ResumeLayout(false);
+			this.SubscribeServerGb.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -322,5 +362,8 @@
 		private System.Windows.Forms.GroupBox GeneralGb;
 		private System.Windows.Forms.TextBox ExtensionNumberTb;
 		private System.Windows.Forms.Label ExtensionNumberLbl;
+		private System.Windows.Forms.GroupBox SubscribeServerGb;
+		private System.Windows.Forms.Label CodeStandardLbl;
+		private System.Windows.Forms.ComboBox CodeStandardCb;
 	}
 }

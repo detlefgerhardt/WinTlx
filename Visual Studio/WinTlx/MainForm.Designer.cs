@@ -673,7 +673,6 @@
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.LocationChanged += new System.EventHandler(this.MainForm_LocationChanged);
-			this.Paint += new System.Windows.Forms.PaintEventHandler(this.MainForm_Paint);
 			this.Resize += new System.EventHandler(this.MainForm_Resize);
 			this.panel1.ResumeLayout(false);
 			this.panel2.ResumeLayout(false);

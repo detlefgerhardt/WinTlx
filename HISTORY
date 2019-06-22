@@ -40,3 +40,7 @@ Version history
         - New: Complete rework of the terminal output (now with color and without flickerung)
         - Fix: Some minor bugfixes
 1.0.1.4 - Fix: Handling of extension numbers on incoming connections
+1.0.1.5 - Fix: Crash when an invalid character was typed
+        - Fix: Complete rework of internal keyboard routines
+        - New: Experimental support for TTY-US code
+        - New: Ctrl-I (here is) and Ctrl-W (WRU) short cuts

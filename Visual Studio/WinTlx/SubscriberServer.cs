@@ -281,7 +281,7 @@ namespace WinTlx
 					reply.Error = "reply server error";
 					return reply;
 				}
-				Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendPeerSearch), $"recvLen={recvLen}");
+				//Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendPeerSearch), $"recvLen={recvLen}");
 
 				if (recvLen == 0)
 				{

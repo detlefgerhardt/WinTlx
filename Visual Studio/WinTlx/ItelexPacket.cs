@@ -52,6 +52,11 @@ namespace WinTlx
 			return debStr.Trim();
 		}
 
+		public string GetDebugPacket()
+		{
+			return $"{Command:X02} {Len:X02} " + GetDebugData();
+		}
+
 		public override string ToString()
 		{
 			return $"{CommandType} {Len}: {GetDebugData()}";
