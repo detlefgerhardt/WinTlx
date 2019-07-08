@@ -14,6 +14,8 @@ namespace WinTlx
 {
 	public partial class SendFileForm : Form
 	{
+		private const string TAG = "SendFileForm";
+
 		private enum Cropping { Right, Center, Left };
 
 		private string[] _textLines;
@@ -53,6 +55,8 @@ namespace WinTlx
 
 		private void LanguageChanged()
 		{
+			Logging.Instance.Log(LogTypes.Info, TAG, nameof(LanguageChanged), $"switch language to {LanguageManager.Instance.CurrentLanguage.Key}");
+
 			this.Text = $"{Constants.PROGRAM_NAME} {LngText(LngKeys.SendFile_SendFile)}";
 			LoadBtn.Text = LngText(LngKeys.SendFile_LoadFile);
 			LineLengthLbl.Text = LngText(LngKeys.SendFile_LineLength);
@@ -116,7 +120,7 @@ namespace WinTlx
 				}
 				*/
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 			}
 		}

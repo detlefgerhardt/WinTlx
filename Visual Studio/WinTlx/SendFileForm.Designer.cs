@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SendFileForm));
 			this.TextTb = new System.Windows.Forms.TextBox();
 			this.LoadBtn = new System.Windows.Forms.Button();
 			this.LineLengthLbl = new System.Windows.Forms.Label();
@@ -190,6 +191,7 @@
 			this.Controls.Add(this.LineLengthLbl);
 			this.Controls.Add(this.LoadBtn);
 			this.Controls.Add(this.TextTb);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "SendFileForm";
 			this.Text = "Send text file";
 			this.CroppingGb.ResumeLayout(false);

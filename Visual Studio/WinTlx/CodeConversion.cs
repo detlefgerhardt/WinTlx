@@ -6,7 +6,7 @@ namespace WinTlx
 {
 	public static class CodeConversion
 	{
-		private static ConfigData _config => ConfigManager.Instance.Config;
+		//private static ConfigData _config => ConfigManager.Instance.Config;
 
 		public enum ShiftStates
 		{
@@ -16,7 +16,7 @@ namespace WinTlx
 			Both
 		}
 
-		public static string BaudotStringToAscii(byte[] baudotData, ref ShiftStates shiftState)
+		public static string BaudotStringToAscii(byte[] baudotData, ref ShiftStates shiftState, CodeStandards codeStd)
 		{
 			string asciiStr = "";
 			for (int i = 0; i < baudotData.Length; i++)
@@ -32,21 +32,21 @@ namespace WinTlx
 				}
 				else
 				{
-					char asciiChr = BaudotCharToAscii(baudotData[i], shiftState);
+					char asciiChr = BaudotCharToAscii(baudotData[i], shiftState, codeStd);
 					asciiStr += asciiChr;
 				}
 			}
 			return asciiStr;
 		}
 
-		public static char BaudotCharToAscii(byte baudotCode, ShiftStates shiftState)
+		public static char BaudotCharToAscii(byte baudotCode, ShiftStates shiftState, CodeStandards codeStd)
 		{
 			if (baudotCode > 0x1F)
 			{
 				return (char)ASC_INV;
 			}
 
-			char[,] codeTab = _config.CodeStandard == CodeStandards.Ita2 ? _codeTabEu : _codeTabUs;
+			char[,] codeTab = codeStd == CodeStandards.Ita2 ? _codeTabEu : _codeTabUs;
 
 			switch (shiftState)
 			{
@@ -60,28 +60,28 @@ namespace WinTlx
 			}
 		}
 
-		public static string BaudotCodeToPuncherText(byte baudotCode, ShiftStates shiftState)
+		public static string BaudotCodeToPuncherText(byte baudotCode, ShiftStates shiftState, CodeStandards codeStd)
 		{
-			string[,] codeTab = _config.CodeStandard == CodeStandards.Ita2 ? _codeTabPuncherEu : _codeTabPuncherUs;
+			string[,] codeTab = codeStd == CodeStandards.Ita2 ? _codeTabPuncherEu : _codeTabPuncherUs;
 
 			switch (shiftState)
 			{
 				case ShiftStates.Ltr:
-					return _codeTabPuncherEu[LTRS, baudotCode];
+					return codeTab[LTRS, baudotCode];
 				case ShiftStates.Figs:
-					return _codeTabPuncherEu[FIGS, baudotCode];
+					return codeTab[FIGS, baudotCode];
 				default:
 					return "";
 			}
 		}
 
-		public static byte[] AsciiStringToBaudot(string asciiStr, ref ShiftStates shiftState)
+		public static byte[] AsciiStringToBaudot(string asciiStr, ref ShiftStates shiftState, CodeStandards codeStd)
 		{
 			byte[] baudotData = new byte[0];
 			for (int i = 0; i < asciiStr.Length; i++)
 			{
-				string telexData = AsciiCharToTelex(asciiStr[i]);
-				byte[] data = TelexStringToBaudot(telexData, ref shiftState);
+				string telexData = AsciiCharToTelex(asciiStr[i], codeStd);
+				byte[] data = TelexStringToBaudot(telexData, ref shiftState, codeStd);
 				baudotData = baudotData.Concat(data).ToArray();
 			}
 			return baudotData;
@@ -92,12 +92,12 @@ namespace WinTlx
 		/// </summary>
 		/// <param name="asciiStr"></param>
 		/// <returns></returns>
-		public static string AsciiStringToTelex(string asciiStr)
+		public static string AsciiStringToTelex(string asciiStr, CodeStandards codeStd)
 		{
 			string telexStr = "";
 			for (int i = 0; i < asciiStr.Length; i++)
 			{
-				telexStr += AsciiCharToTelex(asciiStr[i]);
+				telexStr += AsciiCharToTelex(asciiStr[i], codeStd);
 			}
 			return telexStr;
 		}
@@ -107,10 +107,10 @@ namespace WinTlx
 		/// </summary>
 		/// <param name="asciiChr"></param>
 		/// <returns></returns>
-		private static string AsciiCharToTelex(char asciiChr)
+		private static string AsciiCharToTelex(char asciiChr, CodeStandards codeStd)
 		{
 			Dictionary<byte, string> asciiToTelexTab =
-				_config.CodeStandard == CodeStandards.Ita2 ? _asciiToTelexTabEu : _asciiToTelexTabUs;
+				codeStd == CodeStandards.Ita2 ? _asciiToTelexTabEu : _asciiToTelexTabUs;
 
 			string asciiData = _codePage437ToAsciiTab(asciiChr);
 			string telexData = "";
@@ -126,21 +126,21 @@ namespace WinTlx
 			return telexData;
 		}
 
-		public static byte[] TelexStringToBaudot(string telexStr, ref ShiftStates shiftState)
+		public static byte[] TelexStringToBaudot(string telexStr, ref ShiftStates shiftState, CodeStandards codeStd)
 		{
 			byte[] buffer = new byte[0];
 			for (int i = 0; i < telexStr.Length; i++)
 			{
-				byte[] baudotData = TelexCharToBaudotWithShift(telexStr[i], ref shiftState);
+				byte[] baudotData = TelexCharToBaudotWithShift(telexStr[i], ref shiftState, codeStd);
 				buffer = buffer.Concat(baudotData).ToArray();
 			}
 			return buffer;
 		}
 
-		public static byte[] TelexCharToBaudotWithShift(char telexChr, ref ShiftStates shiftState)
+		public static byte[] TelexCharToBaudotWithShift(char telexChr, ref ShiftStates shiftState, CodeStandards codeStd)
 		{
-			byte? ltrCode = FindBaudot(LTRS, telexChr);
-			byte? figCode = FindBaudot(FIGS, telexChr);
+			byte? ltrCode = FindBaudot(LTRS, telexChr, codeStd);
+			byte? figCode = FindBaudot(FIGS, telexChr, codeStd);
 			byte baudCode;
 			ShiftStates newShiftState;
 			if (ltrCode != null && figCode != null)
@@ -218,10 +218,10 @@ namespace WinTlx
 			return new byte[0];
 		}
 
-		private static byte? FindBaudot(int shift, char telexChar)
+		private static byte? FindBaudot(int shift, char telexChar, CodeStandards codeStd)
 		{
 			// search ascii chars to find baudot code
-			char[,] _codeTab = _config.CodeStandard == CodeStandards.Ita2 ? _codeTabEu : _codeTabUs;
+			char[,] _codeTab = codeStd == CodeStandards.Ita2 ? _codeTabEu : _codeTabUs;
 			for (int c = 0; c < 32; c++)
 			{
 				if (_codeTab[shift, c] == telexChar)
@@ -232,7 +232,7 @@ namespace WinTlx
 			return null;
 		}
 
-		private const char ASC_INV = '#'; // replace invalid baudot character
+		private const char ASC_INV = '~'; // replace invalid baudot character
 		public const char ASC_NUL = '\x00';
 		public const char ASC_WRU = '\x05'; // enquire (WRU)
 		public const char ASC_BEL = '\x07'; // bel
@@ -343,7 +343,6 @@ namespace WinTlx
 			{ 0x3D, "=" },	// = -> =
 			{ 0x3E, ".)" },	// > -> .)
 			{ 0x3F, "?" },	// ? -> ?
-			{ 0x40, "(at)" }, // @ -> (at)
 			{ 0x41, "a" },	// A -> a
 			{ 0x42, "b" },	// B -> b
 			{ 0x43, "c" },	// C -> c
@@ -446,7 +445,7 @@ namespace WinTlx
 			{ 0x3C, "(." },	// < -> (.
 			{ 0x3E, ".)" },	// > -> .)
 			{ 0x3F, "?" },	// ? -> ?
-			{ 0x40, "(at)" }, // @ -> (at)
+			{ 0x40, "@" },  // @ -> @
 			{ 0x41, "a" },	// A -> a
 			{ 0x42, "b" },	// B -> b
 			{ 0x43, "c" },	// C -> c
@@ -511,140 +510,6 @@ namespace WinTlx
 			{ 0x7E, "-" },	// ~ -> -
 		};
 
-#if false
-		private static string[] _asciiToTelexTab =
-		{
-			"\x00",	// 00 Code32
-			"",		// 01 invalid skip
-			"",		// 02 invalid skip
-			"",		// 03 invalid skip
-			"",		// 04 invalid skip
-			"\x05",	// 05 invalid skip
-			"",		// 06 invalid skip
-			"\x07",	// 07 ITA2 bel
-			"",		// 08 invalid skip
-			"\x09",	// 09 ITA2 wru
-			"\n",	// 0A line feed
-			"",		// 0B invalid skip
-			"",		// 0C invalid skip
-			"\r",	// 0D carrige return
-			"",		// 0E invalid skip
-			"",		// 0F invalid skip
-			"",		// 10 invalid skip
-			"",		// 11 invalid skip
-			"",		// 12 invalid skip
-			"",		// 13 invalid skip
-			"",		// 14 invalid skip
-			"",		// 15 invalid skip
-			"",		// 16 invalid skip
-			"",		// 17 invalid skip
-			"",		// 18 invalid skip
-			"",		// 19 invalid skip
-			"",		// 1A invalid skip
-			"",		// 1B invalid skip
-			"",		// 1C invalid skip
-			"",		// 1D invalid skip
-			ASC_LTRS.ToString(), // 1E ITA2 letters
-			ASC_FIGS.ToString(), // 1F ITA2 figures
-			" ",	// 20 space
-			"",		// 21 ! -> .
-			"''",	// 22 " -> ''
-			"",		// 23 #
-			"",		// 24 $
-			"",		// 25 %
-			"+",	// 26 & -> +
-			"'",	// 27 '
-			"(",	// 28 (
-			")",	// 29 )
-			"",		// 2A *
-			"+",	// 2B +
-			",",	// 2C ,
-			"-",	// 2D - 
-			".",	// 2E .
-			"/",	// 2F /
-			"0",	// 30 0
-			"1",	// 31 1
-			"2",	// 32 2
-			"3",	// 33 3
-			"4",	// 34 4
-			"5",	// 35 5
-			"6",	// 36 6
-			"7",	// 37 7
-			"8",	// 38 8
-			"9",	// 39 9
-			":",	// 3A :
-			",.",	// 3B ; -> ,
-			"(.",	// 3C < -> (.
-			"=",	// 3D =
-			".)",	// 3E > -> .)
-			"?",	// 3F ?
-			"(at)",	// 40 @ -> (at)
-			"a",	// 41 A
-			"b",	// 42 B
-			"c",	// 43 C
-			"d",	// 44 D
-			"e",	// 45 E
-			"f",	// 46 F
-			"g",	// 47 G
-			"h",	// 48 H
-			"i",	// 49 I
-			"j",	// 4A J
-			"k",	// 4B K
-			"l",	// 4C L
-			"m",	// 4D M
-			"n",	// 4E N
-			"o",	// 4F O
-			"p",	// 50 P
-			"q",	// 51 Q
-			"r",	// 52 R
-			"s",	// 53 S
-			"t",	// 54 T
-			"u",	// 55 U
-			"v",	// 56 V
-			"w",	// 57 W
-			"x",	// 58 X
-			"y",	// 59 Y
-			"z",	// 5A Z
-			"(:",	// 5B [ -> (:
-			"/",	// 5C \ -> /
-			":)",	// 5D ] -> :)
-			"?",	// 5E ^ -> ?
-			"-",	// 5F _ -> -
-			"'",	// 60 ` -> '
-			"a",	// 61 a
-			"b",	// 62 b
-			"c",	// 63 c
-			"d",	// 64 d
-			"e",	// 65 e
-			"f",	// 66 f
-			"g",	// 67 g
-			"h",	// 68 h
-			"i",	// 69 i
-			"j",	// 6A j
-			"k",	// 6B k
-			"l",	// 6C l
-			"m",	// 6D m
-			"n",	// 6E n
-			"o",	// 6F o
-			"p",	// 70 p
-			"q",	// 71 q
-			"r",	// 72 r
-			"s",	// 73 s
-			"t",	// 74 t
-			"u",	// 75 u
-			"v",	// 76 v
-			"w",	// 77 w
-			"x",	// 78 x
-			"y",	// 79 y
-			"z",	// 7A z
-			"(,",	// 7B { -> (,
-			"/",	// 7C | -> /
-			",)",	// 7D } -> ,)
-			"-",	// 7E ~ -> -
-			"",		// 7F invalid skip
-		};
-#endif
-
 		#endregion
 
 		private const int LTRS = 0;
@@ -652,79 +517,77 @@ namespace WinTlx
 
 		#region ITA 2 <-> ASCII
 
-		// bitorder is: 54.321
-
 		private static char[,] _codeTabEu =
 		{
 			{
-				ASC_NUL,	// 00 NUL
-				't',		// 01 t
-				'\r',		// 02 CR
-				'o',		// 03 o
-				' ',		// 04 SP
-				'h',		// 05 h
-				'n',		// 06 n
-				'm',		// 07 m
-				'\n',		// 08 LF
-				'l',		// 09 l
-				'r',		// 0A r
-				'g',		// 0B g
-				'i',		// 0C i
-				'p',		// 0D p
-				'c',		// 0E c
-				'v',		// 0F v
-				'e',		// 10 e
-				'z',		// 11 z
-				'd',		// 12 d
-				'b',		// 13 b
-				's',		// 14 s
-				'y',		// 15 y
-				'f',		// 16 f
-				'x',		// 17 x
-				'a',		// 18 a
-				'w',		// 19 w
-				'j',		// 1A j
-				ASC_FIGS,	// 1B FIG
-				'u',		// 1C u
-				'q',		// 1D q
-				'k',		// 1E k
-				ASC_LTRS    // 1F LTR
+				ASC_NUL,	// 00 00000 NUL
+				't',		// 01 00001 t
+				'\r',		// 02 00010 CR
+				'o',		// 03 00011 o
+				' ',		// 04 00100 SP
+				'h',		// 05 00101 h
+				'n',		// 06 00110 n
+				'm',		// 07 00111 m
+				'\n',		// 08 01000 LF
+				'l',		// 09 01001 l
+				'r',		// 0A 01010 r
+				'g',		// 0B 01011 g
+				'i',		// 0C 01100 i
+				'p',		// 0D 01101 p
+				'c',		// 0E 01110 c
+				'v',		// 0F 01111 v
+				'e',		// 10 10000 e
+				'z',		// 11 10001 z
+				'd',		// 12 10010 d
+				'b',		// 13 10011 b
+				's',		// 14 10100 s
+				'y',		// 15 10101 y
+				'f',		// 16 10110 f
+				'x',		// 17 10111 x
+				'a',		// 18 11000 a
+				'w',		// 19 11001 w
+				'j',		// 1A 11010 j
+				ASC_FIGS,	// 1B 11011 FIG
+				'u',		// 1C 11100 u
+				'q',		// 1D 11101 q
+				'k',		// 1E 11110 k
+				ASC_LTRS    // 1F 11111 LTR
 			},
 
 			// figures
 			{
-				ASC_NUL,	// 00 NUL
-				'5',		// 01 5
-				'\r',		// 02 CR
-				'9',		// 03 9
-				' ',		// 04 SP
-				ASC_INV,	// 05      
-				',',		// 06 ,
-				'.',		// 07 .
-				'\n',		// 08 LF
-				')',		// 09 )
-				'4',		// 0A 4
-				ASC_INV,	// 0B      
-				'8',		// 0C 8
-				'0',		// 0D 0
-				':',		// 0E :
-				'=',		// 0F =    
-				'3',		// 10 3
-				'+',		// 11 +    
-				ASC_WRU,	// 12 WRU  
-				'?',		// 13 ?    
-				'\'',		// 14 '   
-				'6',		// 15 6
-				ASC_INV,	// 16      
-				'/',		// 17 /
-				'-',		// 18 -
-				'2',		// 19 2
-				ASC_BEL,	// 1A BEL  
-				ASC_FIGS,	// 1B FIG
-				'7',		// 1C 7
-				'1',		// 1D 1
-				'(',		// 1E (
-				ASC_LTRS	// 1F LTR
+				ASC_NUL,	// 00 00000 NUL
+				'5',		// 01 00001 5
+				'\r',		// 02 00010 CR
+				'9',		// 03 00011 9
+				' ',		// 04 00100 SP
+				ASC_INV,	// 05 00101
+				',',		// 06 00110 ,
+				'.',		// 07 00111 .
+				'\n',		// 08 01000 LF
+				')',		// 09 01001 )
+				'4',		// 0A 01010 4
+				ASC_INV,	// 0B 01011
+				'8',		// 0C 01100 8
+				'0',		// 0D 01101 0
+				':',		// 0E 01110 :
+				'=',		// 0F 01111 =
+				'3',		// 10 10000 3
+				'+',		// 11 10001 +
+				ASC_WRU,	// 12 10010 WRU
+				'?',		// 13 10011 ?
+				'\'',		// 14 10100 '
+				'6',		// 15 10101 6
+				ASC_INV,	// 16 10110
+				'/',		// 17 10111 /
+				'-',		// 18 11000 -
+				'2',		// 19 11001 2
+				ASC_BEL,	// 1A 11010 BEL
+				ASC_FIGS,	// 1B 11011 FIG
+				'7',		// 1C 11100 7
+				'1',		// 1D 11101 1
+				'(',		// 1E 11110 (
+				ASC_LTRS	// 1F 11111 LTR
 			}
 		};
 
@@ -735,76 +598,75 @@ namespace WinTlx
 		private static char[,] _codeTabUs =
 		{
 			{
-				ASC_NUL,	// 00 NUL
-				't',		// 01 t
-				'\r',		// 02 CR
-				'o',		// 03 o
-				' ',		// 04 SP
-				'h',		// 05 h
-				'n',		// 06 n
-				'm',		// 07 m
-				'\n',		// 08 LF
-				'l',		// 09 l
-				'r',		// 0A r
-				'g',		// 0B g
-				'i',		// 0C i
-				'p',		// 0D p
-				'c',		// 0E c
-				'v',		// 0F v
-				'e',		// 10 e
-				'z',		// 11 z
-				'd',		// 12 d
-				'b',		// 13 b
-				's',		// 14 s
-				'y',		// 15 y
-				'f',		// 16 f
-				'x',		// 17 x
-				'a',		// 18 a
-				'w',		// 19 w
-				'j',		// 1A j
-				ASC_FIGS,	// 1B FIG
-				'u',		// 1C u
-				'q',		// 1D q
-				'k',		// 1E k
-				ASC_LTRS    // 1F LTR
+				ASC_NUL,	// 00 00000 NUL
+				't',		// 01 00001 t
+				'\r',		// 02 00010 CR
+				'o',		// 03 00011 o
+				' ',		// 04 00100 SP
+				'h',		// 05 00101h
+				'n',		// 06 00110 n
+				'm',		// 07 00111 m
+				'\n',		// 08 01000 LF
+				'l',		// 09 01001 l
+				'r',		// 0A 01010 r
+				'g',		// 0B 01011g
+				'i',		// 0C 01100 i
+				'p',		// 0D 01101 p
+				'c',		// 0E 01110 c
+				'v',		// 0F 01111 v
+				'e',		// 10 10000 e
+				'z',		// 11 10001 z
+				'd',		// 12 10010 d
+				'b',		// 13 10011 b
+				's',		// 14 10100 s
+				'y',		// 15 10101 y
+				'f',		// 16 10110f
+				'x',		// 17 10111 x
+				'a',		// 18 11000 a
+				'w',		// 19 11001 w
+				'j',		// 1A 11010 j
+				ASC_FIGS,	// 1B 11011 FIG
+				'u',		// 1C 11100 u
+				'q',		// 1D 11101 q
+				'k',		// 1E 11110 k
+				ASC_LTRS    // 1F 11111 LTR
 			},
 
 			// figures
 			{
-				ASC_NUL,	// 00 NUL
-				'5',		// 01 5
-				'\r',		// 02 CR
-				'9',		// 03 9
-				' ',		// 04 SP
-				'#',		// 05 #
-				',',		// 06 ,
-				'.',		// 07 .
-				'\n',		// 08 LF
-				')',		// 09 )
-				'4',		// 0A 4
-				'&',		// 0B & (@)
-				'8',		// 0C 8
-				'0',		// 0D 0
-				':',		// 0E :
-				';',		// 0F ;
-				'3',		// 10 3
-				'"',		// 11 "
-				'$',		// 12 $ (Pound)
-				'?',		// 13 ?
-				ASC_BEL,	// 14 BEL  
-				'6',		// 15 6
-				'!',		// 16 ! (%)
-				'/',		// 17 /
-				'-',		// 18 -
-				'2',		// 19 2
-				'\'',		// 1A '     
-				ASC_FIGS,	// 1B FIG
-				'7',		// 1C 7
-				'1',		// 1D 1
-				'(',		// 1E (
-				ASC_LTRS	// 1F LTR
+				ASC_NUL,	// 00 00000 NUL
+				'5',		// 01 00001 5
+				'\r',		// 02 00010 CR
+				'9',		// 03 00011 9
+				' ',		// 04 00100 SP
+				'#',		// 05 00101#
+				',',		// 06 00110 ,
+				'.',		// 07 00111 .
+				'\n',		// 08 01000 LF
+				')',		// 09 01001 )
+				'4',		// 0A 01010 4
+				'&',		// 0B 01011& (@)
+				'8',		// 0C 01100 8
+				'0',		// 0D 01101 0
+				':',		// 0E 01110 :
+				';',		// 0F 01111 ;
+				'3',		// 10 10000 3
+				'"',		// 11 10001 "
+				'$',		// 12 10010 $ (Pound)
+				'?',		// 13 10011 ?
+				ASC_BEL,	// 14 10100 BEL
+				'6',		// 15 10101 6
+				'!',		// 16 10110 ! (%)
+				'/',		// 17 10111 /
+				'-',		// 18 11000 -
+				'2',		// 19 11001 2
+				'\'',       // 1A 11010 '
+				ASC_FIGS,	// 1B 11011 FIG
+				'7',		// 1C 11100 7
+				'1',		// 1D 11101 1
+				'(',		// 1E 11110 (
+				ASC_LTRS	// 1F 11111 LTR
 			}
-
 		};
 
 		#endregion
@@ -819,13 +681,13 @@ namespace WinTlx
 			{
 				"",			// 00
 				"t",		// 01
-				"CR",		// 02
+				"CR",		// 02 carriage return
 				"o",		// 03
 				"SP",		// 04 space
 				"h",		// 05
 				"n",		// 06
 				"m",		// 07
-				"LF",		// 08
+				"LF",		// 08 line feed
 				"l",		// 09
 				"r",		// 0A
 				"g",		// 0B
@@ -981,7 +843,7 @@ namespace WinTlx
 			int code = (int)keyChar;
 			char? newChar = null;
 
-
+			// all characters that are to be recognized as input in the terminal windows must be explicitly defined here.
 			switch (char.ToLower(keyChar))
 			{
 				default:
@@ -1023,13 +885,13 @@ namespace WinTlx
 				case '´':
 				case '`':
 				// control characters
-				case CodeConversion.ASC_HEREIS:
-				case CodeConversion.ASC_WRU:
-				case CodeConversion.ASC_BEL:
+				case '\x05': // ctrl-g ENQ (WRU)
+				case '\x07': // ctrl-g BEL
+				case '\x09': // ctrl-i here is
+				case '\x17': // ctrl-w WRU
 					newChar = keyChar;
 					break;
 			}
-
 			return newChar;
 		}
 

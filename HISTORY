@@ -1,37 +1,39 @@
 
 Version history
 
-1.0.0.1 - Logging, improved error handling, inactivity timer
-1.0.0.2 - Direct entry of peer address, port and extension is now possible
-        - Fixed error on incoming connection (there still seems to be a problem)
-        - Last line was not shown in terminal window
-        - Terminal window is now scrollable
-1.0.0.3 - Copy/paste implemented (context menu and ctrl-c/ctrl-v)
-1.0.0.4 - Removed expire date
-        - The size of the terminal window can now be changed dynamically.
+1.0.0.1 - Add: Logging
+        - Add: Inactivity timer
+	- Fix: Improved error handling
+1.0.0.2 - Add: Direct entry of peer address, port and extension is now possible
+        - Add: Terminal window is now scrollable
+        - Fix: Error on incoming connection (there still seems to be a problem)
+        - Fix: Last line was not shown in terminal window
+1.0.0.3 - Add: Copy/paste implemented (context menu and ctrl-c/ctrl-v)
+1.0.0.4 - Fix: Removed expire date
+        - Add: The size of the terminal window can now be changed dynamically.
         - First GitHub release
-1.0.0.5 - Show messages when connecting to subscribe server
-1.0.0.6 - Send always "wintelex" after WRU
-        - Fixed a bug that occurred if the query did not find a number
-        - Locking for logfiles access
-        - New config menu
-1.0.0.7 - Inactivity timeout config did not work (was always 120 sec)
-        - New program icon
-        - Added update function to update own ip number on subscribe server
-        - Added pin and own i-telex number to config
-        - Added local and public code to config
-        - Added virtual tape punch
+1.0.0.5 - Add: Show messages when connecting to subscribe server
+1.0.0.6 - Fix: Send always "wintelex" after WRU
+        - Fix: Fixed a bug that occurred if the query did not find a number
+        - Fix: Locking for logfiles access
+        - Add: New config menu
+1.0.0.7 - Fix: Inactivity timeout config did not work (was always 120 sec)
+        - Add: New program icon
+        - Add: Added update function to update own ip number on subscribe server
+        - Add: Added pin and own i-telex number to config
+        - Add: Added local and public port to config
+        - Add: Virtual tape punch
 1.0.0.8 - Project renamed to WinTlx
-1.0.0.9 - Code cleanup and some improvements
-        - Note at program start
-1.0.1.0 - Eyeball characters on tape punch (use with care on real machines!)
-        - Improvements and cleanup
+1.0.0.9 - Fix: Code cleanup and some improvements
+        - Add: Note at program start
+1.0.1.0 - Add: Eyeball characters on tape punch (use with care on real machines!)
+        - Fix; Improvements and cleanup
         - Fix: Inactivity timeout was missing in the config dialog
 1.0.1.1 - Virtual tape punch changed to horizontal view
-        - Improvements and cleanup
-1.0.1.2 - Connection was not closed correctly on exit
+        - Fix: Improvements and cleanup
+1.0.1.2 - Fix: Connection was not closed correctly on exit
         - Fix: If a CCITT-2 code 0 (Code 32) was received, the output in the terminal window was stopped.
-        - Display of the Recv On button changed
+        - Fix: Display of the Recv On button changed
         - error.log renamed to debug.log
 1.0.1.3 - New: configurable delay for terminal output
         - New: Automatically update ip address on subscribe server when setting RecvOn
@@ -46,3 +48,6 @@ Version history
         - New: Ctrl-I (here is) and Ctrl-W (WRU) short cuts
 1.0.1.6 - Fix: Another rework of the internal keyboard routines, should now work with all keyboard layouts
 	- New: Multi-language support (English/German)
+1.0.1.7 - Fix: Error when idle timer was set to 0 (or empty)
+	- Fix: A lot of bugfixes
+        - New: Experimental scheduler for automatic sending of text files.

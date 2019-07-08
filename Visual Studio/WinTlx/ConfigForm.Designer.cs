@@ -45,8 +45,8 @@
 			this.SubscribeServerUpdatePinLbl = new System.Windows.Forms.Label();
 			this.IncomingPublicPortTb = new System.Windows.Forms.TextBox();
 			this.IncomingPublicPortLbl = new System.Windows.Forms.Label();
-			this.InactivityTimeoutTb = new System.Windows.Forms.TextBox();
-			this.InactivityTimeoutLbl = new System.Windows.Forms.Label();
+			this.IdleTimeoutTb = new System.Windows.Forms.TextBox();
+			this.IdleTimeoutLbl = new System.Windows.Forms.Label();
 			this.OutputSpeedLbl = new System.Windows.Forms.Label();
 			this.OutputSpeedTb = new System.Windows.Forms.TextBox();
 			this.IncomingGb = new System.Windows.Forms.GroupBox();
@@ -195,21 +195,21 @@
 			this.IncomingPublicPortLbl.TabIndex = 15;
 			this.IncomingPublicPortLbl.Text = "Incoming public port";
 			// 
-			// InactivityTimeoutTb
+			// IdleTimeoutTb
 			// 
-			this.InactivityTimeoutTb.Location = new System.Drawing.Point(141, 73);
-			this.InactivityTimeoutTb.Name = "InactivityTimeoutTb";
-			this.InactivityTimeoutTb.Size = new System.Drawing.Size(54, 20);
-			this.InactivityTimeoutTb.TabIndex = 2;
+			this.IdleTimeoutTb.Location = new System.Drawing.Point(141, 73);
+			this.IdleTimeoutTb.Name = "IdleTimeoutTb";
+			this.IdleTimeoutTb.Size = new System.Drawing.Size(54, 20);
+			this.IdleTimeoutTb.TabIndex = 2;
 			// 
-			// InactivityTimeoutLbl
+			// IdleTimeoutLbl
 			// 
-			this.InactivityTimeoutLbl.AutoSize = true;
-			this.InactivityTimeoutLbl.Location = new System.Drawing.Point(9, 76);
-			this.InactivityTimeoutLbl.Name = "InactivityTimeoutLbl";
-			this.InactivityTimeoutLbl.Size = new System.Drawing.Size(112, 13);
-			this.InactivityTimeoutLbl.TabIndex = 17;
-			this.InactivityTimeoutLbl.Text = "Inactivity timeout (sec)";
+			this.IdleTimeoutLbl.AutoSize = true;
+			this.IdleTimeoutLbl.Location = new System.Drawing.Point(9, 76);
+			this.IdleTimeoutLbl.Name = "IdleTimeoutLbl";
+			this.IdleTimeoutLbl.Size = new System.Drawing.Size(112, 13);
+			this.IdleTimeoutLbl.TabIndex = 17;
+			this.IdleTimeoutLbl.Text = "Idle timeout (sec)";
 			// 
 			// OutputSpeedLbl
 			// 
@@ -269,8 +269,8 @@
 			this.GeneralGb.Controls.Add(this.CodeStandardCb);
 			this.GeneralGb.Controls.Add(this.CodeStandardLbl);
 			this.GeneralGb.Controls.Add(this.OutputSpeedTb);
-			this.GeneralGb.Controls.Add(this.InactivityTimeoutLbl);
-			this.GeneralGb.Controls.Add(this.InactivityTimeoutTb);
+			this.GeneralGb.Controls.Add(this.IdleTimeoutLbl);
+			this.GeneralGb.Controls.Add(this.IdleTimeoutTb);
 			this.GeneralGb.Controls.Add(this.OutputSpeedLbl);
 			this.GeneralGb.Controls.Add(this.AnswerbackTb);
 			this.GeneralGb.Controls.Add(this.AnswerbackLbl);
@@ -379,8 +379,8 @@
 		private System.Windows.Forms.Label SubscribeServerUpdatePinLbl;
 		private System.Windows.Forms.TextBox IncomingPublicPortTb;
 		private System.Windows.Forms.Label IncomingPublicPortLbl;
-		private System.Windows.Forms.TextBox InactivityTimeoutTb;
-		private System.Windows.Forms.Label InactivityTimeoutLbl;
+		private System.Windows.Forms.TextBox IdleTimeoutTb;
+		private System.Windows.Forms.Label IdleTimeoutLbl;
 		private System.Windows.Forms.Label OutputSpeedLbl;
 		private System.Windows.Forms.TextBox OutputSpeedTb;
 		private System.Windows.Forms.GroupBox IncomingGb;

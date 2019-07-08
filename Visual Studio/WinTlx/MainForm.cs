@@ -4,11 +4,13 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Media;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
 using WinTlx.Config;
 using WinTlx.Languages;
+using WinTlx.Scheduler;
 
 namespace WinTlx
 {
@@ -23,7 +25,6 @@ namespace WinTlx
 		private SubscriberServer _subscriberServer;
 		private ItelexProtocol _itelex;
 		TapePunchHorizontalForm _tapePunchForm;
-		EyeballChar _eyeballChar;
 		SpecialCharacters _specialCharacters = SpecialCharacters.Instance;
 
 		public const int SCREEN_WIDTH = 68;
@@ -42,6 +43,8 @@ namespace WinTlx
 
 		private ConfigData _config => ConfigManager.Instance.Config;
 
+		private SchedulerManager _schedulerManager;
+
 		public MainForm()
 		{
 			InitializeComponent();
@@ -59,7 +62,7 @@ namespace WinTlx
 
 			SendLineFeedBtn.Text = "\u2261";
 
-			InactivityTimoutTb.Text = "";
+			IdleTimoutTb.Text = "";
 			ConnTimeTb.Text = "";
 			LnColTb.Text = "";
 			SendAckTb.Text = "";
@@ -85,8 +88,6 @@ namespace WinTlx
 			_subscriberServer = new SubscriberServer();
 			_subscriberServer.Message += SubcribeServerMessageHandler;
 
-			_eyeballChar = EyeballChar.Instance;
-
 			_clockTimer = new System.Timers.Timer(500);
 			_clockTimer.Elapsed += ClockTimer_Elapsed;
 			_clockTimer.Start();
@@ -96,6 +97,10 @@ namespace WinTlx
 			_outputTimer.Elapsed += _outputTimer_Elapsed;
 			SetOutputTimer(_config.OutputSpeed);
 
+			_schedulerManager = SchedulerManager.Instance;
+			_schedulerManager.Schedule += SchedulerManager_Schedule;
+			_schedulerManager.LoadScheduler();
+
 			ClearScreen();
 
 			SetConnectState();
@@ -103,10 +108,13 @@ namespace WinTlx
 
 			SetFocus();
 			SearchTb.Focus();
+
 		}
 
 		private void LanguageChanged()
 		{
+			Logging.Instance.Log(LogTypes.Info, TAG, nameof(LanguageChanged), $"switch language to {LanguageManager.Instance.CurrentLanguage.Key}");
+
 			SearchLbl.Text = LngText(LngKeys.MainForm_SearchText);
 			MemberLbl.Text = LngText(LngKeys.MainForm_SearchResult);
 			QueryBtn.Text = LngText(LngKeys.MainForm_SearchButton);
@@ -129,7 +137,7 @@ namespace WinTlx
 			SendNullBtn.Text = LngText(LngKeys.MainForm_SendNullButton);
 			SendTimeBtn.Text = LngText(LngKeys.MainForm_SendTimeButton);
 			SendRyBtn.Text = LngText(LngKeys.MainForm_SendRyButton);
-			SendFoxBtn.Text = LngText(LngKeys.MainForm_SendFoxButton);
+			SendFoxBtn.Text = LngText(LngKeys.MainForm_SendPanButton);
 			ClearBtn.Text = LngText(LngKeys.MainForm_ClearButton);
 			SendFileBtn.Text = LngText(LngKeys.MainForm_SendfileButton);
 			RecvOnCb.Text = LngText(LngKeys.MainForm_RecvOnButton);
@@ -139,6 +147,7 @@ namespace WinTlx
 			ConfigBtn.Text = LngText(LngKeys.MainForm_ConfigButton);
 			AboutBtn.Text = LngText(LngKeys.MainForm_AboutButton);
 			ExitBtn.Text = LngText(LngKeys.MainForm_ExitButton);
+			SchedulerBtn.Text = LngText(LngKeys.Scheduler_Scheduler);
 		}
 
 		private string LngText(LngKeys key)
@@ -184,7 +193,6 @@ namespace WinTlx
 
 			_screenY = _screen.Count - _screenEditPos0 - 1;
 
-#warning TODO why is _screenY < 0 sometimes?
 			if (_screenY < 0)
 				_screenY = 0;
 
@@ -282,20 +290,7 @@ namespace WinTlx
 				return;
 			}
 
-			char key = e.KeyChar;
-			/*
-			int code = (int)key;
-			if (code < 32)
-			{
-				Debug.WriteLine($"{code:X2}");
-			}
-			else
-			{
-				Debug.WriteLine($"{code:X2} {key}");
-			}
-			*/
-
-			char? chr = KeyDownConverter.AsciiKeyToChar(key);
+			char? chr = CodeConversion.KeyboardCharacters(e.KeyChar);
 			if (chr != null)
 			{
 				switch(chr)
@@ -456,6 +451,15 @@ namespace WinTlx
 			SetConnectState();
 		}
 
+		/*
+		private async Task<bool> DoQuery(string searchStr)
+		{
+			searchStr = searchStr.Trim();
+
+			return true;
+		}
+		*/
+
 		private async void ConnectBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
@@ -580,7 +584,8 @@ namespace WinTlx
 		private void SendFoxBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			SendAsciiText("the quick brown fox jumps over the lazy dog 1234567890/:,-=()");
+			//SendAsciiText("the quick brown fox jumps over the lazy dog 1234567890/:,-=()");
+			SendAsciiText(LngText(LngKeys.Message_Pangram));
 			//SendAsciiText("\r\n");
 		}
 
@@ -600,6 +605,15 @@ namespace WinTlx
 			{
 				SendAsciiText(sendFileForm.AsciiText);
 			}
+			return;
+		}
+
+		private void SchedulerBtn_Click(object sender, EventArgs e)
+		{
+			SetFocus();
+			SchedulerForm schedulerForm = new SchedulerForm();
+			schedulerForm.ShowDialog();
+
 			return;
 		}
 
@@ -638,22 +652,17 @@ namespace WinTlx
 				_itelex.SendAsciiText($"\r\n{LngText(LngKeys.Message_EyeballCharActive)}\r\n");
 			}
 			_itelex.EyeballCharActive = EyeballCharCb.Checked;
+			SetFocus();
 		}
-
 
 		private void ConfigBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
 			ConfigForm configForm = new ConfigForm(this.Bounds);
-			//configForm.SetData(_configData);
 			configForm.ShowDialog();
 			if (!configForm.Canceled)
 			{
-				//_configData = configForm.GetData();
 				ConfigManager.Instance.SaveConfig();
-				//_itelex.InactivityTimeout = _configData.InactivityTimeout;
-				//_itelex.ExtensionNumber = _configData.IncomingExtensionNumber;
-				//_itelex.CodeStandard = _configData.CodeStandard;
 				SetOutputTimer(_config.OutputSpeed);
 				UpdatedHandler();
 			}
@@ -674,9 +683,9 @@ namespace WinTlx
 				MessageBoxIcon.Information,
 				MessageBoxDefaultButton.Button1);
 		}
+
 		private void ReceivedHandler(string asciiText)
 		{
-			string str = "";
 			for (int i = 0; i < asciiText.Length; i++)
 			{
 				switch (asciiText[i])
@@ -749,7 +758,7 @@ namespace WinTlx
 		private void UpdatedHandler()
 		{
 			Helper.ControlInvokeRequired(SendAckTb, () => SendAckTb.Text = $"Snd {_itelex.CharsToSendCount}  Ack {_itelex.CharsAckCount}");
-			Helper.ControlInvokeRequired(InactivityTimoutTb, () => InactivityTimoutTb.Text = $"Timeout {_itelex.InactivityTimer} sec");
+			Helper.ControlInvokeRequired(IdleTimoutTb, () => IdleTimoutTb.Text = $"Timeout {_itelex.IdleTimer} sec");
 			Helper.ControlInvokeRequired(ConnTimeTb, () => ConnTimeTb.Text = $"Conn {_itelex.ConnTimeMin} min");
 
 			Helper.ControlInvokeRequired(AnswerbackTb, () => AnswerbackTb.Text = _config.Answerback);
@@ -781,7 +790,6 @@ namespace WinTlx
 			Helper.ControlInvokeRequired(ConnectionStateTb, () =>
 				ConnectionStateTb.Text = _itelex.ConnectionStateStr
 			);
-
 
 			Helper.ControlInvokeRequired(RecvOnCb, () =>
 			{
@@ -865,8 +873,7 @@ namespace WinTlx
 		{
 			_itelex?.SendAsciiText(text);
 		}
-
-
+		
 		private void SetConnectState()
 		{
 			if (!_itelex.IsConnected)
@@ -934,14 +941,10 @@ namespace WinTlx
 			_outputTimer.Stop();
 			if (charSec != 0)
 			{
-				_outputTimer.Interval = 1000 / charSec * 5 + 1;
+				// 5 data bits + 1 start bit + 1.5 stop bits = 7.5
+				_outputTimer.Interval = 1000D / charSec * 7.5D;
 				_outputTimer.Start();
 			}
-		}
-
-		private void ClearOutputBuffer()
-		{
-			_outputBuffer.Clear();
 		}
 
 		private void _outputTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -1063,7 +1066,7 @@ namespace WinTlx
 		private ContextMenuStrip CreateContextMenu()
 		{
 			ContextMenuStrip contextMenu = new ContextMenuStrip();
-			bool needSep = false;
+			//bool needSep = false;
 			List<ToolStripMenuItem> endItems = new List<ToolStripMenuItem>();
 			endItems.Add(new ToolStripMenuItem("Clear"));
 			endItems.Add(new ToolStripMenuItem("Copy"));
@@ -1079,7 +1082,7 @@ namespace WinTlx
 			cms.Hide();
 
 			// get menu item
-			ToolStripItem tsi = e.ClickedItem;
+			//ToolStripItem tsi = e.ClickedItem;
 		}
 
 		private void ClearAction(object sender, EventArgs e)
@@ -1185,7 +1188,7 @@ namespace WinTlx
 					{
 						//scrChr = new ScreenChar('_', CharAttributes.Send);
 						// draw cursor
-						Pen pen = new Pen(Color.Blue, 2);
+						Pen pen = new Pen(Color.Red, 2);
 						g.DrawLine(pen, x * CHAR_WIDTH+4, y * CHAR_HEIGHT + CHAR_HEIGHT - 2,
 							x * CHAR_WIDTH + CHAR_WIDTH+2, y * CHAR_HEIGHT + CHAR_HEIGHT - 2);
 					}
@@ -1207,7 +1210,230 @@ namespace WinTlx
 					}
 				}
 			}
+
 		}
 
+		private void SchedulerManager_Schedule(ScheduleEventArgs args)
+		{
+			SchedulerItem scheduleItem = args.Item;
+			ShowLocalMessage($"schedule {scheduleItem.Destination}");
+			Logging.Instance.Warn(TAG, nameof(SchedulerManager_Schedule), $"Schedule {scheduleItem}");
+			bool success = DoSchedule(scheduleItem);
+			if (!success)
+			{
+				Logging.Instance.Warn(TAG, nameof(SchedulerManager_Schedule), $"Schedule failed {scheduleItem}");
+				ShowLocalMessage($"schedule failed {scheduleItem.Destination}");
+			}
+		}
+
+		private bool DoSchedule(SchedulerItem scheduleItem)
+		{
+			if (_itelex.IsConnected)
+			{
+				return true;
+			}
+
+			// get destination address
+
+			if (scheduleItem.DestAddress == null)
+			{
+				// query number
+				if (string.IsNullOrWhiteSpace(scheduleItem.Destination))
+				{
+					// invalid distination
+					Logging.Instance.Warn(TAG, nameof(DoSchedule), $"Invalid destination {scheduleItem.Destination}");
+					scheduleItem.Error = true;
+					return false;
+				}
+
+				uint num;
+				string dest = scheduleItem.Destination.Replace(" ", "");
+				if (!uint.TryParse(dest, out num))
+				{
+					Logging.Instance.Warn(TAG, nameof(DoSchedule), $"Invalid destination number {dest}");
+					scheduleItem.Error = true;
+					return false;
+				}
+
+				_subscriberServer.Connect(_config.SubscribeServerAddress, _config.SubscribeServerPort);
+				PeerQueryReply queryReply = _subscriberServer.SendPeerQuery(dest);
+				_subscriberServer.Disconnect();
+				if (!queryReply.Valid || queryReply.Data == null)
+				{
+					Logging.Instance.Warn(TAG, nameof(DoSchedule), $"Subscribe server query failed");
+					SubcribeServerMessageHandler(queryReply.Error);
+					return false;
+				}
+				if (string.IsNullOrEmpty(queryReply.Data?.Address))
+				{
+					// not host or ip-address
+					Logging.Instance.Warn(TAG, nameof(DoSchedule), $"No host or ip-address");
+					return false;
+				}
+
+				scheduleItem.DestAddress = queryReply.Data.Address;
+				scheduleItem.DestPort = queryReply.Data.PortNumber;
+				scheduleItem.DestExtension = queryReply.Data.ExtensionNumber;
+			}
+
+			// load text file
+
+			string[] fileData;
+			try
+			{
+				fileData = File.ReadAllLines(scheduleItem.Filename);
+			}
+			catch(Exception ex)
+			{
+				Logging.Instance.Error(TAG, nameof(DoSchedule), $"Read file '{scheduleItem.Filename}' failed", ex);
+				scheduleItem.Error = true;
+				return false;
+			}
+
+			// connect to destination
+
+			ShowLocalMessage($"schedule send to {scheduleItem.DestAddress}:{scheduleItem.DestPort} {scheduleItem.DestExtension}");
+			Logging.Instance.Info(TAG, nameof(DoSchedule), $"Schedule send to {scheduleItem.DestAddress}:{scheduleItem.DestPort} {scheduleItem.DestExtension}");
+
+			Task<bool> task = _itelex.ConnectOut(scheduleItem.DestAddress, scheduleItem.DestPort, scheduleItem.DestExtension);
+			task.Wait();
+			if (!task.Result)
+			{
+				Logging.Instance.Info(TAG, nameof(DoSchedule), $"Connect failed");
+				return false;
+			}
+
+			if (!_itelex.IsConnected)
+			{
+				Logging.Instance.Info(TAG, nameof(DoSchedule), $"No connection");
+				return false;
+			}
+
+			// send text
+
+			try
+			{
+				// wait 30 seconds for greeting message to finish
+				WaitRecv(5000);
+				//ShowLocalMessage("wait greeting ok");
+
+				_itelex.SendAsciiText("\r\n");
+				WaitSend(5000);
+
+				ScheduleWru();
+
+				_itelex.SendAsciiText("\r\n");
+				WaitSend(5000);
+
+				foreach (string line in fileData)
+				{
+					int col = 0;
+					for (int i=0; i<line.Length; i++)
+					{
+						if (line[i]==CodeConversion.ASC_CR)
+						{
+							col = 0;
+						}
+						if (col>68)
+						{
+							_itelex.SendAsciiText("\r\n");
+							col = 0;
+						}
+						_itelex.SendAsciiChar(line[i]);
+						col++;
+					}
+					WaitSend(5000);
+				}
+
+				_itelex.SendAsciiText("\r\n");
+				WaitSend(5000);
+
+				//ShowLocalMessage("wait text ok");
+
+				ScheduleWru();
+
+				_itelex.SendAsciiText("\r\n\r\n\r\n\r\n");
+				WaitSend(5000);
+
+				Logging.Instance.Debug(TAG, nameof(DoSchedule), $"Success");
+				scheduleItem.Success = true;
+			}
+			catch (Exception ex)
+			{
+				Logging.Instance.Error(TAG, nameof(DoSchedule), $"Error sending text", ex);
+				ShowLocalMessage("recv timeout");
+				return false;
+			}
+			finally
+			{
+				if (_itelex.IsConnected)
+				{
+					Disconnect();
+				}
+			}
+
+			return true;
+		}
+
+		private void ScheduleWru()
+		{
+			_itelex.SendAsciiChar(CodeConversion.ASC_WRU);
+			WaitSend(5000);
+			WaitRecv(5000);
+			//ShowLocalMessage("wait WRU ok");
+
+			SendAsciiText($"\r\n{AnswerbackTb.Text}\r\n");
+			WaitSend(5000);
+			//ShowLocalMessage("wait here is ok");
+		}
+
+		private void WaitSend(int millis)
+		{
+			WaitSendRecv(millis, () => { return _itelex.CharsToSendCount == 0 && _outputBuffer.Count == 0; });
+		}
+
+		private void WaitRecv(int millis)
+		{
+			WaitSendRecv(millis, () => { return _itelex.CharsAckCount == 0 && _outputBuffer.Count == 0; });
+		}
+
+		private void WaitSendRecv(int millis, Func<bool> chr0)
+		{
+			Thread.Sleep(2000);
+			int lastSendCnt = -1;
+			int lastSend0Cnt = 0;
+
+			long ticks = Helper.MilliTicks();
+			while (true)
+			{
+				Thread.Sleep(100);
+
+				bool lastSend0 = chr0();
+				if (lastSend0)
+				{
+					lastSend0Cnt++;
+					if (lastSend0Cnt > 10)
+					{
+						return;
+					};
+					continue;
+				}
+
+				if (_itelex.CharsToSendCount == lastSendCnt)
+				{
+					// no change
+					if (Helper.MilliTicks() - ticks > millis)
+					{
+						// timeout
+						throw new Exception("recv timeout");
+					}
+				}
+				else
+				{
+					lastSendCnt = _itelex.CharsAckCount;
+					ticks = Helper.MilliTicks();
+				}
+			}
+		}
 	}
 }

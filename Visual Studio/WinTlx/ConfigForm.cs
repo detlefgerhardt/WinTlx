@@ -14,6 +14,7 @@ namespace WinTlx
 {
 	public partial class ConfigForm : Form
 	{
+		private const string TAG = "ConfigForm";
 		//private ConfigData _config;
 
 		private Rectangle _parentWindowsPosition;
@@ -40,17 +41,20 @@ namespace WinTlx
 
 			LanguageCb.DataSource = LanguageManager.Instance.LanguageList;
 			LanguageCb.DisplayMember = "Key";
+			LanguageCb.SelectedItem = LanguageManager.Instance.CurrentLanguage;
 
 			SetData();
 		}
 
 		private void LanguageChanged()
 		{
+			Logging.Instance.Log(LogTypes.Info, TAG, nameof(LanguageChanged), $"switch language to {LanguageManager.Instance.CurrentLanguage.Key}");
+
 			this.Text = $"{Constants.PROGRAM_NAME} {LngText(LngKeys.Setup_Setup)}";
 			GeneralGb.Text = LngText(LngKeys.Setup_General);
 			LanguageCb.Text = LngText(LngKeys.Setup_Language);
 			AnswerbackLbl.Text = LngText(LngKeys.Setup_Answerback);
-			InactivityTimeoutLbl.Text = LngText(LngKeys.Setup_InactivityTimeout);
+			IdleTimeoutLbl.Text = LngText(LngKeys.Setup_IdleTimeout);
 			OutputSpeedLbl.Text = LngText(LngKeys.Setup_OutputSpeed);
 			CodeStandardCb.Text = LngText(LngKeys.Setup_CodeStandard);
 			SubscribeServerGb.Text = LngText(LngKeys.Setup_SubscribeServer);
@@ -81,7 +85,7 @@ namespace WinTlx
 		{
 			LanguageCb.SelectedItem = _config.Language;
 			AnswerbackTb.Text = _config.Answerback;
-			InactivityTimeoutTb.Text = IntToStr(_config.InactivityTimeout);
+			IdleTimeoutTb.Text = IntToStr(_config.IdleTimeout);
 			CodeStandardCb.SelectedItem = ConfigData.CodeStandardToString(_config.CodeStandard);
 			OutputSpeedTb.Text = IntToStr(_config.OutputSpeed);
 			SubscribeServerAddressTb.Text = _config.SubscribeServerAddress;
@@ -96,7 +100,7 @@ namespace WinTlx
 		public void GetData()
 		{
 			_config.Answerback = AnswerbackTb.Text.Trim();
-			_config.InactivityTimeout = StrToInt(InactivityTimeoutTb.Text);
+			_config.IdleTimeout = StrToInt(IdleTimeoutTb.Text);
 			_config.CodeStandard = ConfigData.StringToCodeStandard((string)CodeStandardCb.SelectedItem);
 			_config.OutputSpeed = StrToInt(OutputSpeedTb.Text);
 			_config.SubscribeServerAddress = SubscribeServerAddressTb.Text.Trim();

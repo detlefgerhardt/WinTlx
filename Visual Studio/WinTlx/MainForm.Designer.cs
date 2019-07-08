@@ -68,7 +68,7 @@
 			this.ConnectionStateTb = new System.Windows.Forms.TextBox();
 			this.ConnTimeTb = new System.Windows.Forms.TextBox();
 			this.LnColTb = new System.Windows.Forms.TextBox();
-			this.InactivityTimoutTb = new System.Windows.Forms.TextBox();
+			this.IdleTimoutTb = new System.Windows.Forms.TextBox();
 			this.SendAckTb = new System.Windows.Forms.TextBox();
 			this.panel4 = new System.Windows.Forms.Panel();
 			this.panel5 = new System.Windows.Forms.Panel();
@@ -82,6 +82,7 @@
 			this.RecvOnCb = new System.Windows.Forms.CheckBox();
 			this.LinealPnl = new System.Windows.Forms.Panel();
 			this.TerminalPb = new System.Windows.Forms.PictureBox();
+			this.SchedulerBtn = new System.Windows.Forms.Button();
 			this.panel1.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.panel3.SuspendLayout();
@@ -461,7 +462,7 @@
 			this.panel3.Controls.Add(this.ConnectionStateTb);
 			this.panel3.Controls.Add(this.ConnTimeTb);
 			this.panel3.Controls.Add(this.LnColTb);
-			this.panel3.Controls.Add(this.InactivityTimoutTb);
+			this.panel3.Controls.Add(this.IdleTimoutTb);
 			this.panel3.Controls.Add(this.SendAckTb);
 			this.panel3.Location = new System.Drawing.Point(444, 117);
 			this.panel3.Name = "panel3";
@@ -495,14 +496,14 @@
 			this.LnColTb.TabIndex = 0;
 			this.LnColTb.TabStop = false;
 			// 
-			// InactivityTimoutTb
+			// IdleTimoutTb
 			// 
-			this.InactivityTimoutTb.Location = new System.Drawing.Point(103, 5);
-			this.InactivityTimoutTb.Name = "InactivityTimoutTb";
-			this.InactivityTimoutTb.ReadOnly = true;
-			this.InactivityTimoutTb.Size = new System.Drawing.Size(90, 20);
-			this.InactivityTimoutTb.TabIndex = 0;
-			this.InactivityTimoutTb.TabStop = false;
+			this.IdleTimoutTb.Location = new System.Drawing.Point(103, 5);
+			this.IdleTimoutTb.Name = "IdleTimoutTb";
+			this.IdleTimoutTb.ReadOnly = true;
+			this.IdleTimoutTb.Size = new System.Drawing.Size(90, 20);
+			this.IdleTimoutTb.TabIndex = 0;
+			this.IdleTimoutTb.TabStop = false;
 			// 
 			// SendAckTb
 			// 
@@ -644,11 +645,23 @@
 			this.TerminalPb.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TerminalPb_MouseClick);
 			this.TerminalPb.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TerminalPb_MouseDown);
 			// 
+			// SchedulerBtn
+			// 
+			this.SchedulerBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.SchedulerBtn.Location = new System.Drawing.Point(652, 482);
+			this.SchedulerBtn.Name = "SchedulerBtn";
+			this.SchedulerBtn.Size = new System.Drawing.Size(80, 23);
+			this.SchedulerBtn.TabIndex = 56;
+			this.SchedulerBtn.Text = "Scheduler";
+			this.SchedulerBtn.UseVisualStyleBackColor = true;
+			this.SchedulerBtn.Click += new System.EventHandler(this.SchedulerBtn_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(741, 604);
+			this.Controls.Add(this.SchedulerBtn);
 			this.Controls.Add(this.TerminalPb);
 			this.Controls.Add(this.LinealPnl);
 			this.Controls.Add(this.RecvOnCb);
@@ -666,7 +679,7 @@
 			this.Controls.Add(this.ExitBtn);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
-			this.MinimumSize = new System.Drawing.Size(750, 380);
+			this.MinimumSize = new System.Drawing.Size(750, 480);
 			this.Name = "MainForm";
 			this.Text = "WinTlx";
 			this.Activated += new System.EventHandler(this.MainForm_Activated);
@@ -729,7 +742,7 @@
 		private System.Windows.Forms.TextBox AnswerbackTb;
 		private System.Windows.Forms.Label AnswerbackLbl;
 		private System.Windows.Forms.TextBox SendAckTb;
-		private System.Windows.Forms.TextBox InactivityTimoutTb;
+		private System.Windows.Forms.TextBox IdleTimoutTb;
 		private System.Windows.Forms.TextBox LnColTb;
 		private System.Windows.Forms.TextBox ConnTimeTb;
 		private System.Windows.Forms.TextBox TimeTb;
@@ -743,6 +756,7 @@
 		private System.Windows.Forms.Panel LinealPnl;
 		private System.Windows.Forms.PictureBox TerminalPb;
 		private System.Windows.Forms.TextBox ConnectionStateTb;
+		private System.Windows.Forms.Button SchedulerBtn;
 	}
 }
 

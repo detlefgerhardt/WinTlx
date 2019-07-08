@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CodeStandardItem.cs" />
+    <Compile Include="Scheduler\ScheduleData.cs" />
     <Compile Include="EyeballChar.cs" />
     <Compile Include="CodeConversion.cs" />
     <Compile Include="Config\ConfigData.cs" />
@@ -75,7 +76,6 @@
     <Compile Include="Helper.cs" />
     <Compile Include="ItelexPacket.cs" />
     <Compile Include="ItelexProtocol.cs" />
-    <Compile Include="KeyDownConverter.cs" />
     <Compile Include="Languages\Language.cs" />
     <Compile Include="Languages\LanguageDeutsch.cs" />
     <Compile Include="Languages\LanguageEnglish.cs" />
@@ -89,6 +89,18 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scheduler\ScheduleEventArgs.cs" />
+    <Compile Include="Scheduler\SchedulerItemComparer.cs" />
+    <Compile Include="Scheduler\SchedulerManager.cs" />
+    <Compile Include="Scheduler\SchedulerItem.cs" />
+    <Compile Include="Scheduler\TimeClasses.cs" />
+    <Compile Include="Scheduler\CalendarClasses.cs" />
+    <Compile Include="Scheduler\SchedulerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Scheduler\SchedulerForm.Designer.cs">
+      <DependentUpon>SchedulerForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ScreenChar.cs" />
     <Compile Include="ScreenLine.cs" />
     <Compile Include="SendFileForm.cs">
@@ -128,6 +140,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Scheduler\SchedulerForm.resx">
+      <DependentUpon>SchedulerForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SendFileForm.resx">
       <DependentUpon>SendFileForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -137,12 +152,6 @@
     <EmbeddedResource Include="TapePunchForm.resx">
       <DependentUpon>TapePunchForm.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="Languages\de_deutsch.lng">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Languages\en_english.lng">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

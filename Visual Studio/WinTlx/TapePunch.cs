@@ -4,6 +4,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WinTlx.Config;
+using WinTlx.Languages;
 
 namespace WinTlx
 {
@@ -36,6 +38,7 @@ namespace WinTlx
 		private int _puncherLines;
 
 		private bool _puncherOn;
+		private ConfigData _config => ConfigManager.Instance.Config;
 
 		public void Init()
 		{
@@ -61,13 +64,35 @@ namespace WinTlx
 				return;
 			}
 
-			string text = CodeConversion.BaudotCodeToPuncherText(baudotCode, shiftState);
+			string text = CodeConversion.BaudotCodeToPuncherText(baudotCode, shiftState, _config.CodeStandard);
+			switch(text)
+			{
+				case "CR":
+					text = LngText(LngKeys.TapePunch_CodeCarriageReturn);
+					break;
+				case "LF":
+					text = LngText(LngKeys.TapePunch_CodeLinefeed);
+					break;
+				case "LTR":
+					text = LngText(LngKeys.TapePunch_CodeLetters);
+					break;
+				case "FIG":
+					text = LngText(LngKeys.TapePunch_CodeFigures);
+					break;
+			}
+
 			_buffer[_bufferPos++] = new PunchLine(baudotCode, text);
 			if (_bufferPos >= _buffer.Length)
 			{
 				_bufferPos = 0;
 			}
 		}
+
+		private string LngText(LngKeys key)
+		{
+			return LanguageManager.Instance.GetText(key);
+		}
+
 
 		/// <summary>
 		/// Draw current buffer to puncher graphic
@@ -91,18 +116,18 @@ namespace WinTlx
 				{
 					break;
 				}
-				int yp = line * HOLE_DIST;
+				int yp = (int)(line * HOLE_DIST);
 				int bit = 16;
 				PunchLine punchLine = _buffer[pos--];
 				for (int col = 0; col < 6; col++)
 				{
 					if (col == 2)
 					{
+						// trasport hole
 						int d = (HOLE_SIZE - TRANSPORT_HOLE_SIZE) / 2;
 						g.FillEllipse(holeBrush, BORDER + HOLE_DIST * col + d, yp + d + 6, TRANSPORT_HOLE_SIZE, TRANSPORT_HOLE_SIZE);
 						continue;
 					}
-
 					if ((punchLine.Code & bit) != 0)
 					{
 						g.FillEllipse(holeBrush, BORDER + HOLE_DIST * col, yp + 6, HOLE_SIZE, HOLE_SIZE);
@@ -130,7 +155,7 @@ namespace WinTlx
 			Brush backBrush = new SolidBrush(backColor);
 
 			g.Clear(backColor);
-			int th = HOLE_DIST * 6 + BORDER * 2 - 2;
+			int th = (int)(HOLE_DIST * 6 + BORDER * 2 - 2);
 			int y0 = height - th;
 			g.FillRectangle(tapeBrush, 0, y0, width, th);
 
@@ -142,7 +167,7 @@ namespace WinTlx
 					break;
 				}
 				//int xp = line * HOLE_DIST;
-				int xp = width - line * HOLE_DIST - HOLE_DIST;
+				int xp = (int)(width - line * HOLE_DIST - HOLE_DIST);
 				int bit = 16;
 				PunchLine punchLine = _buffer[pos--];
 				for (int col = 0; col < 6; col++)
@@ -168,7 +193,7 @@ namespace WinTlx
 					string text = punchLine.Text;
 					for (int i = 0; i < text.Length; i++)
 					{
-						Point p = new Point(xp - 0, y0 - 5 - 10 * (text.Length - i));
+						Point p = new Point(xp - 2, y0 - 5 - 10 * (text.Length - i));
 						g.DrawString(text.Substring(i, 1), font, Brushes.Black, p);
 					}
 				}
@@ -192,12 +217,12 @@ namespace WinTlx
 
 		public void SetPuncherLinesVertical(int height)
 		{
-			_puncherLines = height / HOLE_DIST;
+			_puncherLines = (int)(height / HOLE_DIST);
 		}
 
 		public void SetPuncherLinesHorizontal(int width)
 		{
-			_puncherLines = width / HOLE_DIST;
+			_puncherLines = (int)(width / HOLE_DIST);
 		}
 
 		public void SetOnOff(bool on)

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Windows.Forms;
 
@@ -241,6 +243,43 @@ namespace WinTlx
 				{
 					g.DrawLine(pen, x, 5, x, 10);
 				}
+			}
+		}
+
+		public static long MilliTicks()
+		{
+			return DateTime.Now.Ticks / 10000;
+		}
+
+		public static long MilliDiff(DateTime dt)
+		{
+			return (DateTime.Now - dt).Ticks / 10000;
+		}
+
+		public static string SerializeObject<T>(T objectToSerialize)
+		{
+			using (var memoryStream = new MemoryStream())
+			{
+				using (var reader = new StreamReader(memoryStream))
+				{
+					DataContractSerializer serializer = new DataContractSerializer(typeof(T));
+					serializer.WriteObject(memoryStream, objectToSerialize);
+					memoryStream.Position = 0;
+					var readToEnd = reader.ReadToEnd();
+					return readToEnd;
+				}
+			}
+		}
+
+		public static T Deserialize<T>(string xml)
+		{
+			using (Stream stream = new MemoryStream())
+			{
+				byte[] data = System.Text.Encoding.UTF8.GetBytes(xml);
+				stream.Write(data, 0, data.Length);
+				stream.Position = 0;
+				DataContractSerializer deserializer = new DataContractSerializer(typeof(T));
+				return (T)deserializer.ReadObject(stream);
 			}
 		}
 	}

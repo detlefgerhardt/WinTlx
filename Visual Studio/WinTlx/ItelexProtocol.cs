@@ -65,12 +65,10 @@ namespace WinTlx
 		private TcpListener _tcpListener;
 
 		private TcpClient _client;
-		private byte[] _incomingData = new byte[0];
+		//private byte[] _incomingData = new byte[0];
 
 		private Timer _sendTimer;
 		private bool _sendTimerActive;
-		//private Timer _outputTimer;
-		//private bool _outputTimerActive;
 		private Timer _ackTimer;
 		private bool _ackTimerActive;
 		private long _lastSentMs;
@@ -94,11 +92,8 @@ namespace WinTlx
 		}
 
 		private DateTime _lastSendRecvTime;
-		private int _lastInactivityTimer;
-		public int InactivityTimer { get; set; }
-		//public int InactivityTimeout { get; set; }
-
-		//public int ExtensionNumber { get; set; }
+		private int _lastActivityTimer;
+		public int IdleTimer { get; set; }
 
 		private EyeballChar _eyeballChar;
 		public bool EyeballCharActive { get; set; }
@@ -110,7 +105,7 @@ namespace WinTlx
 			set { _shiftState = value; }
 		}
 
-		private CodeConversion.ShiftStates _echoShiftState;
+		//private CodeConversion.ShiftStates _echoShiftState;
 
 		//private bool _startAck;
 		private int _n_recv;
@@ -145,7 +140,7 @@ namespace WinTlx
 
 		public ConnectionStates ConnectionState { get; set; }
 		private bool _incoming = false;
-		private bool _outgoing = false;
+		//private bool _outgoing = false;
 
 		public string ConnectionStateStr
 		{
@@ -316,7 +311,7 @@ namespace WinTlx
 				}
 				Update?.Invoke();
 
-				_outgoing = true;
+				//_outgoing = true;
 				status = true;
 				return true;
 			});
@@ -331,7 +326,7 @@ namespace WinTlx
 			_n_ack = 0;
 			//_startAck = false;
 			_sendBuffer = new Queue<byte>();
-			_ackTimerActive = false;
+			//_ackTimerActive = false;
 			_ackTimer = new Timer(2000);
 			_ackTimer.Elapsed += AckTimer_Elapsed;
 			_ackTimer.Start();
@@ -344,8 +339,8 @@ namespace WinTlx
 			EyeballCharActive = false;
 
 			_shiftState = CodeConversion.ShiftStates.Unknown;
-			_echoShiftState = CodeConversion.ShiftStates.Unknown;
-			_lastInactivityTimer = 0;
+			//_echoShiftState = CodeConversion.ShiftStates.Unknown;
+			_lastActivityTimer = 0;
 
 			Local = false;
 			SetLastSendRecv();
@@ -390,29 +385,31 @@ namespace WinTlx
 		{
 			if (!IsConnected || _ackTimerActive || _sendTimerActive)
 			{
-				Debug.WriteLine("!connected");
+				//Debug.WriteLine("!connected");
 				return;
 			}
 
 			_sendTimerActive = true;
 
-			InactivityTimer = (int)(_config.InactivityTimeout -
-										DateTime.Now.Subtract(_lastSendRecvTime).Ticks / 10000000);
-			if (InactivityTimer < 0)
-				InactivityTimer = 0;
-			if (InactivityTimer != _lastInactivityTimer)
+			if (_config.IdleTimeout > 0)
 			{
-				Update?.Invoke();
-			}
-			_lastInactivityTimer = InactivityTimer;
+				IdleTimer = (int)(_config.IdleTimeout - DateTime.Now.Subtract(_lastSendRecvTime).Ticks / 10000000);
+				if (IdleTimer < 0)
+					IdleTimer = 0;
+				if (IdleTimer != _lastActivityTimer)
+				{
+					Update?.Invoke();
+				}
+				_lastActivityTimer = IdleTimer;
 
-			if (InactivityTimer == 0)
-			{
-				Message?.Invoke(LngText(LngKeys.Message_InactivityTimeout));
-				SendEndCmd();
-				Disconnect();
-				_sendTimerActive = false;
-				return;
+				if (IdleTimer == 0)
+				{
+					Message?.Invoke(LngText(LngKeys.Message_IdleTimeout));
+					SendEndCmd();
+					Disconnect();
+					_sendTimerActive = false;
+					return;
+				}
 			}
 
 			if (_sendBuffer.Count == 0)
@@ -502,7 +499,7 @@ namespace WinTlx
 
 			SetLastSendRecv();
 
-			string telexData = CodeConversion.AsciiStringToTelex(asciiStr);
+			string telexData = CodeConversion.AsciiStringToTelex(asciiStr, _config.CodeStandard);
 			Send?.Invoke(telexData);
 
 			if (ConnectionState == ConnectionStates.AsciiTexting)
@@ -512,7 +509,7 @@ namespace WinTlx
 			}
 			else
 			{
-				byte[] baudotData = CodeConversion.AsciiStringToBaudot(asciiStr, ref _shiftState);
+				byte[] baudotData = CodeConversion.AsciiStringToBaudot(asciiStr, ref _shiftState, _config.CodeStandard);
 				for (int i = 0; i < baudotData.Length; i++)
 				{
 					byte chr = baudotData[i];
@@ -747,7 +744,7 @@ namespace WinTlx
 				}
 			}
 
-			_incomingData = new byte[0];
+			//_incomingData = new byte[0];
 			StartReceive();
 
 #if false
@@ -812,7 +809,7 @@ namespace WinTlx
 				case ItelexCommands.BaudotData:
 					if (packet.Len > 0)
 					{
-						string asciiStr = CodeConversion.BaudotStringToAscii(packet.Data, ref _shiftState);
+						string asciiStr = CodeConversion.BaudotStringToAscii(packet.Data, ref _shiftState, _config.CodeStandard);
 						AddReceivedCharCount(packet.Data.Length);
 						Received?.Invoke(asciiStr);
 						BaudotSendRecv?.Invoke(packet.Data);

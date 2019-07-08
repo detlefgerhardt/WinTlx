@@ -13,16 +13,6 @@ namespace WinTlx.Languages
 	/// The languages "en" and "de" are hardcoded and do not need a language file, but the hardcoded definition
 	/// can be overwritten by a language file.
 	/// </summary>
-	/*
-	class LngItem
-	{
-		public string Section { get; set; }
-
-		public string Key { get; set; }
-
-		public string Text { get; set; }
-	}
-	*/
 
 	class LanguageManager
 	{
@@ -63,10 +53,10 @@ namespace WinTlx.Languages
 		/// Get a list of all language keys
 		/// </summary>
 		/// <returns></returns>
-		public List<string> GetLanguageKeys()
-		{
-			return (from l in LanguageList orderby l.Key select $"{l.Key} {l.DisplayName}").ToList();
-		}
+		//public List<string> GetLanguageKeys()
+		//{
+		//	return (from l in LanguageList orderby l.Key select $"{l.Key} {l.DisplayName}").ToList();
+		//}
 
 		public string GetText(LngKeys textKey)
 		{
@@ -246,10 +236,6 @@ namespace WinTlx.Languages
 				Logging.Instance.Error(TAG, "LoadLanguage", $"language file {filename} not found", ex);
 				return null;
 			}
-
-
-
-			return null;
 		}
 
 		/// <summary>
@@ -311,7 +297,7 @@ namespace WinTlx.Languages
 				File.WriteAllLines($"{lng.Key}_{lng.DisplayName}.lng", lines);
 				return true;
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				return false;
 			}

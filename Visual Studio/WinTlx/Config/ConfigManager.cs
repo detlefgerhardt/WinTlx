@@ -11,9 +11,9 @@ namespace WinTlx.Config
 {
 	class ConfigManager
 	{
-		private const string CONFIG_NAME = Constants.PROGRAM_NAME + ".cfg";
-
 		private const string TAG = nameof(ConfigManager);
+
+		private const string CONFIG_NAME = Constants.PROGRAM_NAME + ".cfg";
 
 		/// <summary>
 		/// singleton pattern
@@ -33,7 +33,7 @@ namespace WinTlx.Config
 			return new ConfigData()
 			{
 				Answerback = Constants.DEFAULT_ANSWERBACK,
-				InactivityTimeout = Constants.DEFAULT_INACTIVITY_TIMEOUT,
+				IdleTimeout = Constants.DEFAULT_IDLE_TIMEOUT,
 				OutputSpeed = 0,
 				CodeStandard = CodeStandards.Ita2,
 				IncomingLocalPort = Constants.DEFAULT_INCOMING_PORT,
@@ -47,13 +47,13 @@ namespace WinTlx.Config
 			try
 			{
 				string configXml = File.ReadAllText(CONFIG_NAME);
-				Config = Deserialize<ConfigData>(configXml);
+				Config = Helper.Deserialize<ConfigData>(configXml);
 				Config.SetDefaults();
 				return true;
 			}
 			catch(Exception ex)
 			{
-				Logging.Instance.Error(TAG, nameof(SaveConfig), "Error read config file", ex);
+				Logging.Instance.Error(TAG, nameof(LoadConfig), "Error read config file", ex);
 				Config = GetDefaultConfig();
 				return false;
 			}
@@ -63,42 +63,16 @@ namespace WinTlx.Config
 		{
 			try
 			{
-				string configXml = SerializeObject<ConfigData>(Config);
+				string configXml = Helper.SerializeObject<ConfigData>(Config);
 				File.WriteAllText(CONFIG_NAME, configXml);
 				return true;
 			}
 			catch(Exception ex)
 			{
-				Logging.Instance.Error(TAG, nameof(SaveConfig), "", ex);
+				Logging.Instance.Error(TAG, nameof(SaveConfig), "Error writing scheduler file", ex);
 				return false;
 			}
 		}
 
-		public static string SerializeObject<T>(T objectToSerialize)
-		{
-			using (var memoryStream = new MemoryStream())
-			{
-				using (var reader = new StreamReader(memoryStream))
-				{
-					DataContractSerializer serializer = new DataContractSerializer(typeof(T));
-					serializer.WriteObject(memoryStream, objectToSerialize);
-					memoryStream.Position = 0;
-					var readToEnd = reader.ReadToEnd();
-					return readToEnd;
-				}
-			}
-		}
-
-		public static T Deserialize<T>(string xml)
-		{
-			using (Stream stream = new MemoryStream())
-			{
-				byte[] data = System.Text.Encoding.UTF8.GetBytes(xml);
-				stream.Write(data, 0, data.Length);
-				stream.Position = 0;
-				DataContractSerializer deserializer = new DataContractSerializer(typeof(T));
-				return (T)deserializer.ReadObject(stream);
-			}
-		}
 	}
 }

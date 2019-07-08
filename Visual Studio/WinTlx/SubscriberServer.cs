@@ -28,7 +28,7 @@ namespace WinTlx
 			catch(Exception ex)
 			{
 				string errStr = $"error connecting to subscribe server {address}:{port}";
-				Logging.Instance.Log(LogTypes.Error, TAG, nameof(Connect), errStr);
+				Logging.Instance.Error(TAG, nameof(Connect), errStr, ex);
 				Message?.Invoke(errStr);
 				stream?.Close();
 				client?.Close();

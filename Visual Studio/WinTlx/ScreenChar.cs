@@ -23,11 +23,11 @@ namespace WinTlx
 				{
 					default:
 					case CharAttributes.Message:
-						return Color.Black;
-					case CharAttributes.Send:
 						return Color.Blue;
-					case CharAttributes.Recv:
+					case CharAttributes.Send:
 						return Color.Red;
+					case CharAttributes.Recv:
+						return Color.Black;
 				}
 			}
 		}

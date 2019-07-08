@@ -29,7 +29,7 @@ namespace WinTlx.Config
 		public CodeStandards CodeStandard { get; set; }
 
 		[DataMember]
-		public int InactivityTimeout { get; set; }
+		public int IdleTimeout { get; set; }
 
 		[DataMember]
 		public int OwnNumber { get; set; }
@@ -56,16 +56,6 @@ namespace WinTlx.Config
 			{
 				Answerback = Constants.DEFAULT_ANSWERBACK;
 			}
-			/*
-			if (InactivityTimeout == 0)
-			{
-				InactivityTimeout = Constants.DEFAULT_INACTIVITY_TIMEOUT;
-			}
-			if (IncomingLocalPort == 0)
-			{
-				IncomingLocalPort = Constants.DEFAULT_INCOMING_PORT;
-			}
-			*/
 		}
 
 		public static CodeStandards StringToCodeStandard(string stdStr)

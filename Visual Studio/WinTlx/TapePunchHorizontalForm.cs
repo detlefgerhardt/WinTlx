@@ -14,6 +14,8 @@ namespace WinTlx
 {
 	public partial class TapePunchHorizontalForm : Form
 	{
+		private const string TAG = "TapePunchHorizontalForm";
+
 		private Rectangle _parentWindowsPosition;
 
 		private TapePunch _tapePunch;
@@ -34,6 +36,8 @@ namespace WinTlx
 
 		private void LanguageChanged()
 		{
+			Logging.Instance.Log(LogTypes.Info, TAG, nameof(LanguageChanged), $"switch language to {LanguageManager.Instance.CurrentLanguage.Key}");
+
 			this.Text = $"{Constants.PROGRAM_NAME} {LngText(LngKeys.TapePunch_TapePunch)}";
 			OnCb.Text = LngText(LngKeys.TapePunch_OnButton);
 			OffCb.Text = LngText(LngKeys.TapePunch_OffButton);
