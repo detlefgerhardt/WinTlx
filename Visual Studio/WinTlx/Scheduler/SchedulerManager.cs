@@ -34,8 +34,11 @@ namespace WinTlx.Scheduler
 
 		public static SchedulerManager Instance => instance ?? (instance = new SchedulerManager());
 
+		public int SchedulerActive { get; private set; }
+
 		private SchedulerManager()
 		{
+			SchedulerActive = -1;
 			_scheduleTimer = new System.Timers.Timer(500);
 			_scheduleTimer.Elapsed += ScheduleTimer_Elapsed;
 			_scheduleTimer.Start();
@@ -54,8 +57,9 @@ namespace WinTlx.Scheduler
 
 			DateTime now = DateTime.Now;
 			bool changed = false;
-			foreach(SchedulerItem item in ScheduleData.SchedulerList)
+			for(int i=0; i< ScheduleData.SchedulerList.Count; i++)
 			{
+				SchedulerItem item = ScheduleData.SchedulerList[i];
 				if (!item.Active || item.Success || item.Error)
 				{
 					continue;
@@ -77,12 +81,16 @@ namespace WinTlx.Scheduler
 							break;
 					}
 
+					SchedulerActive = i;
+					Changed?.Invoke();
+
 					DoSchedule(item);
 					if (item.Success)
 					{
 						item.Success = true;
 						item.Active = false;
-						changed = true;
+						SaveScheduler();
+						Changed?.Invoke();
 					}
 					else
 					{
@@ -92,16 +100,21 @@ namespace WinTlx.Scheduler
 						{
 							item.Error = true;
 							item.Active = false;
-							changed = true;
+							SaveScheduler();
+							Changed?.Invoke();
 						}
 					}
+
+					SchedulerActive = -1;
 				}
 			}
+			/*
 			if (changed)
 			{
 				SaveScheduler();
 				Changed?.Invoke();
 			}
+			*/
 			_schedulerActive = false;
 		}
 

@@ -145,7 +145,8 @@ namespace WinTlx
 			UInt32 num;
 			if (!UInt32.TryParse(number, out num))
 			{
-				return null;
+				reply.Error = "invalid number";
+				return reply;
 			}
 
 			byte[] sendData = new byte[2 + 5];
@@ -167,7 +168,7 @@ namespace WinTlx
 			}
 
 			byte[] recvData = new byte[102];
-			int recvLen = 0;
+			int recvLen;
 			try
 			{
 				recvLen = stream.Read(recvData, 0, recvData.Length);
@@ -189,6 +190,7 @@ namespace WinTlx
 			{
 				// peer not found
 				Logging.Instance.Log(LogTypes.Info, TAG, nameof(SendPeerSearch), $"peer not found");
+				reply.Error = $"peer not found {number}";
 				reply.Valid = true;
 				return reply;
 			}

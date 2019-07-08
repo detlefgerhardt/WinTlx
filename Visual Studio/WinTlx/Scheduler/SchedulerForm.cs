@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -42,7 +43,7 @@ namespace WinTlx.Scheduler
 
 			_manager = SchedulerManager.Instance;
 			_manager.Changed += SchedulerManager_Changed;
-			_manager.LoadScheduler();
+			//_manager.LoadScheduler();
 
 			ShowSchedules();
 		}
@@ -208,7 +209,11 @@ namespace WinTlx.Scheduler
 				for (int i = 0; i < SCHEDULE_COL_COUNT; i++)
 				{
 					Color color = Color.Black;
-					if (!item.Active || item.Success)
+					if (i==_manager.SchedulerActive)
+					{
+						color = Color.Green;
+					}
+					else if (!item.Active || item.Success)
 					{
 						color = Color.Gray;
 					}
@@ -290,6 +295,7 @@ namespace WinTlx.Scheduler
 
 		private void CloseBtn_Click(object sender, EventArgs e)
 		{
+			/*
 			_manager.ScheduleData.SchedulerList = new List<SchedulerItem>();
 			foreach (DataGridViewRow row in SchedularView.Rows)
 			{
@@ -306,6 +312,7 @@ namespace WinTlx.Scheduler
 			}
 
 			_manager.SaveScheduler();
+			*/
 			Close();
 		}
 
@@ -317,27 +324,35 @@ namespace WinTlx.Scheduler
 				return;
 			}
 
-			bool changed = false;
+			SchedulerItem item = _manager.ScheduleData.SchedulerList[rowIndex];
+			DataGridViewRow row = SchedularView.Rows[rowIndex];
+
 			switch(e.ColumnIndex)
 			{
 				case SCHEDULE_COL_ACTIVE:
-					_manager.ScheduleData.SchedulerList[rowIndex].Active = (bool)SchedularView.Rows[rowIndex].Cells[SCHEDULE_COL_ACTIVE].Value;
-					changed = true;
+					item.Active = (bool)row.Cells[SCHEDULE_COL_ACTIVE].Value;
 					break;
 				case SCHEDULE_COL_SUCCESS:
-					_manager.ScheduleData.SchedulerList[rowIndex].Success = (bool)SchedularView.Rows[rowIndex].Cells[SCHEDULE_COL_SUCCESS].Value;
-					changed = true;
+					item.Success = (bool)row.Cells[SCHEDULE_COL_SUCCESS].Value;
 					break;
 				case SCHEDULE_COL_ERROR:
-					_manager.ScheduleData.SchedulerList[rowIndex].Error = (bool)SchedularView.Rows[rowIndex].Cells[SCHEDULE_COL_ERROR].Value;
-					changed = true;
+					item.Error = (bool)row.Cells[SCHEDULE_COL_ERROR].Value;
+					break;
+				case SCHEDULE_COL_DATE:
+				case SCHEDULE_COL_TIME:
+					DateTime date = (DateTime)row.Cells[SCHEDULE_COL_DATE].Value;
+					DateTime time = (DateTime)row.Cells[SCHEDULE_COL_TIME].Value;
+					item.Timestamp = new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second);
+					break;
+				case SCHEDULE_COL_DEST:
+					item.Destination = (string)row.Cells[SCHEDULE_COL_DEST].Value;
+					break;
+				case SCHEDULE_COL_FILE:
+					item.Filename = (string)row.Cells[SCHEDULE_COL_FILE].Tag;
 					break;
 			}
 
-			if (changed)
-			{
-				ShowSchedules();
-			}
+			ShowSchedules();
 		}
 
 		private void SchedularView_CellMouseUp(object sender, DataGridViewCellMouseEventArgs e)
@@ -355,6 +370,12 @@ namespace WinTlx.Scheduler
 					SchedularView.EndEdit();
 					break;
 			}
+		}
+
+		private void SchedularView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+		{
+			Debug.WriteLine("end edit");
+			_manager.SaveScheduler();
 		}
 	}
 }

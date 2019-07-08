@@ -51,6 +51,8 @@ namespace WinTlx
 			_fixedWidth = this.Width;
 			TerminalPb.ContextMenuStrip = CreateContextMenu();
 
+			string x = "✠";
+
 			Logging.Instance.Log(LogTypes.Info, TAG, "Start", $"{Helper.GetVersion()}");
 
 			this.Text = Helper.GetVersion();
@@ -1198,9 +1200,11 @@ namespace WinTlx
 						switch(scrChr.Char)
 						{
 							case CodeConversion.ASC_BEL:
+								//g.DrawString("⍾", font, new SolidBrush(scrChr.AttrColor), p);
 								g.DrawImage(_specialCharacters.GetBell(scrChr.AttrColor), x * CHAR_WIDTH+3, y * CHAR_HEIGHT+3, CHAR_WIDTH, CHAR_HEIGHT);
 								break;
 							case CodeConversion.ASC_WRU:
+								//g.DrawString("✠", font, new SolidBrush(scrChr.AttrColor), p);
 								g.DrawImage(_specialCharacters.GetWru(scrChr.AttrColor), x * CHAR_WIDTH+3, y * CHAR_HEIGHT+3, CHAR_WIDTH, CHAR_HEIGHT);
 								break;
 							default:
@@ -1342,6 +1346,7 @@ namespace WinTlx
 						_itelex.SendAsciiChar(line[i]);
 						col++;
 					}
+					_itelex.SendAsciiText("\r\n");
 					WaitSend(5000);
 				}
 

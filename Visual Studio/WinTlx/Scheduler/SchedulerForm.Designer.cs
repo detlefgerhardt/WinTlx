@@ -46,6 +46,7 @@
 			this.SchedularView.Size = new System.Drawing.Size(719, 257);
 			this.SchedularView.TabIndex = 0;
 			this.SchedularView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SchedularView_CellClick);
+			this.SchedularView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.SchedularView_CellEndEdit);
 			this.SchedularView.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.SchedularView_CellMouseEnter);
 			this.SchedularView.CellMouseUp += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.SchedularView_CellMouseUp);
 			this.SchedularView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.SchedularView_CellValueChanged);
