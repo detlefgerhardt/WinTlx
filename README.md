@@ -15,7 +15,7 @@ A Windows test und diagnostic tool for the i-Telex network
 - Virtual tape punch with eyeball characters (Bildlocher)
 - New: ITA-2 and US-TTY suport
 - New: Multi-language support
-- New: Scheduler for automatic sendnig of text file (experimental)
+- New: Scheduler for automatic sending of text file (experimental)
 
 
 ![Screenshot](https://github.com/detlefgerhardt/WinTlx/blob/master/WinTlxScreen.png)
