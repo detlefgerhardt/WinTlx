@@ -1,4 +1,4 @@
-﻿namespace WinTlx
+﻿namespace WinTlx.Config
 {
 	partial class ConfigForm
 	{
@@ -53,11 +53,13 @@
 			this.ExtensionNumberLbl = new System.Windows.Forms.Label();
 			this.ExtensionNumberTb = new System.Windows.Forms.TextBox();
 			this.GeneralGb = new System.Windows.Forms.GroupBox();
+			this.LanguageLbl = new System.Windows.Forms.Label();
+			this.LanguageCb = new System.Windows.Forms.ComboBox();
 			this.CodeStandardCb = new System.Windows.Forms.ComboBox();
 			this.CodeStandardLbl = new System.Windows.Forms.Label();
 			this.SubscribeServerGb = new System.Windows.Forms.GroupBox();
-			this.LanguageCb = new System.Windows.Forms.ComboBox();
-			this.LanguageLbl = new System.Windows.Forms.Label();
+			this.LogfilePathLbl = new System.Windows.Forms.Label();
+			this.LogFilePathTb = new System.Windows.Forms.TextBox();
 			this.IncomingGb.SuspendLayout();
 			this.GeneralGb.SuspendLayout();
 			this.SubscribeServerGb.SuspendLayout();
@@ -129,7 +131,7 @@
 			// 
 			// SaveBtn
 			// 
-			this.SaveBtn.Location = new System.Drawing.Point(17, 422);
+			this.SaveBtn.Location = new System.Drawing.Point(17, 440);
 			this.SaveBtn.Name = "SaveBtn";
 			this.SaveBtn.Size = new System.Drawing.Size(75, 23);
 			this.SaveBtn.TabIndex = 12;
@@ -139,7 +141,7 @@
 			// 
 			// CancelBtn
 			// 
-			this.CancelBtn.Location = new System.Drawing.Point(203, 422);
+			this.CancelBtn.Location = new System.Drawing.Point(220, 440);
 			this.CancelBtn.Name = "CancelBtn";
 			this.CancelBtn.Size = new System.Drawing.Size(75, 23);
 			this.CancelBtn.TabIndex = 13;
@@ -207,7 +209,7 @@
 			this.IdleTimeoutLbl.AutoSize = true;
 			this.IdleTimeoutLbl.Location = new System.Drawing.Point(9, 76);
 			this.IdleTimeoutLbl.Name = "IdleTimeoutLbl";
-			this.IdleTimeoutLbl.Size = new System.Drawing.Size(112, 13);
+			this.IdleTimeoutLbl.Size = new System.Drawing.Size(87, 13);
 			this.IdleTimeoutLbl.TabIndex = 17;
 			this.IdleTimeoutLbl.Text = "Idle timeout (sec)";
 			// 
@@ -239,7 +241,7 @@
 			this.IncomingGb.Controls.Add(this.IncomingPublicPortLbl);
 			this.IncomingGb.Controls.Add(this.SubscribeServerUpdatePinTb);
 			this.IncomingGb.Controls.Add(this.IncomingPublicPortTb);
-			this.IncomingGb.Location = new System.Drawing.Point(12, 264);
+			this.IncomingGb.Location = new System.Drawing.Point(12, 282);
 			this.IncomingGb.Name = "IncomingGb";
 			this.IncomingGb.Size = new System.Drawing.Size(283, 152);
 			this.IncomingGb.TabIndex = 20;
@@ -264,6 +266,8 @@
 			// 
 			// GeneralGb
 			// 
+			this.GeneralGb.Controls.Add(this.LogFilePathTb);
+			this.GeneralGb.Controls.Add(this.LogfilePathLbl);
 			this.GeneralGb.Controls.Add(this.LanguageLbl);
 			this.GeneralGb.Controls.Add(this.LanguageCb);
 			this.GeneralGb.Controls.Add(this.CodeStandardCb);
@@ -276,10 +280,31 @@
 			this.GeneralGb.Controls.Add(this.AnswerbackLbl);
 			this.GeneralGb.Location = new System.Drawing.Point(12, 12);
 			this.GeneralGb.Name = "GeneralGb";
-			this.GeneralGb.Size = new System.Drawing.Size(283, 165);
+			this.GeneralGb.Size = new System.Drawing.Size(283, 183);
 			this.GeneralGb.TabIndex = 21;
 			this.GeneralGb.TabStop = false;
 			this.GeneralGb.Text = "General";
+			// 
+			// LanguageLbl
+			// 
+			this.LanguageLbl.AutoSize = true;
+			this.LanguageLbl.Location = new System.Drawing.Point(10, 23);
+			this.LanguageLbl.Name = "LanguageLbl";
+			this.LanguageLbl.Size = new System.Drawing.Size(106, 13);
+			this.LanguageLbl.TabIndex = 23;
+			this.LanguageLbl.Text = "Language / Sprache";
+			// 
+			// LanguageCb
+			// 
+			this.LanguageCb.FormattingEnabled = true;
+			this.LanguageCb.ItemHeight = 13;
+			this.LanguageCb.Items.AddRange(new object[] {
+            "ITA-2",
+            "US-TTY"});
+			this.LanguageCb.Location = new System.Drawing.Point(141, 20);
+			this.LanguageCb.Name = "LanguageCb";
+			this.LanguageCb.Size = new System.Drawing.Size(136, 21);
+			this.LanguageCb.TabIndex = 22;
 			// 
 			// CodeStandardCb
 			// 
@@ -308,39 +333,34 @@
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortLbl);
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerAddressLbl);
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortTb);
-			this.SubscribeServerGb.Location = new System.Drawing.Point(12, 183);
+			this.SubscribeServerGb.Location = new System.Drawing.Point(12, 201);
 			this.SubscribeServerGb.Name = "SubscribeServerGb";
 			this.SubscribeServerGb.Size = new System.Drawing.Size(283, 75);
 			this.SubscribeServerGb.TabIndex = 22;
 			this.SubscribeServerGb.TabStop = false;
 			this.SubscribeServerGb.Text = "Subscribe server";
 			// 
-			// LanguageCb
+			// LogfileLbl
 			// 
-			this.LanguageCb.FormattingEnabled = true;
-			this.LanguageCb.ItemHeight = 13;
-			this.LanguageCb.Items.AddRange(new object[] {
-            "ITA-2",
-            "US-TTY"});
-			this.LanguageCb.Location = new System.Drawing.Point(141, 20);
-			this.LanguageCb.Name = "LanguageCb";
-			this.LanguageCb.Size = new System.Drawing.Size(136, 21);
-			this.LanguageCb.TabIndex = 22;
+			this.LogfilePathLbl.AutoSize = true;
+			this.LogfilePathLbl.Location = new System.Drawing.Point(10, 158);
+			this.LogfilePathLbl.Name = "LogfileLbl";
+			this.LogfilePathLbl.Size = new System.Drawing.Size(67, 13);
+			this.LogfilePathLbl.TabIndex = 24;
+			this.LogfilePathLbl.Text = "Logfile path";
 			// 
-			// LanguageLbl
+			// LogFileTb
 			// 
-			this.LanguageLbl.AutoSize = true;
-			this.LanguageLbl.Location = new System.Drawing.Point(10, 23);
-			this.LanguageLbl.Name = "LanguageLbl";
-			this.LanguageLbl.Size = new System.Drawing.Size(106, 13);
-			this.LanguageLbl.TabIndex = 23;
-			this.LanguageLbl.Text = "Language / Sprache";
+			this.LogFilePathTb.Location = new System.Drawing.Point(83, 155);
+			this.LogFilePathTb.Name = "LogfilePathTb";
+			this.LogFilePathTb.Size = new System.Drawing.Size(194, 20);
+			this.LogFilePathTb.TabIndex = 25;
 			// 
 			// ConfigForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(319, 460);
+			this.ClientSize = new System.Drawing.Size(315, 480);
 			this.Controls.Add(this.SubscribeServerGb);
 			this.Controls.Add(this.GeneralGb);
 			this.Controls.Add(this.IncomingGb);
@@ -392,5 +412,7 @@
 		private System.Windows.Forms.ComboBox CodeStandardCb;
 		private System.Windows.Forms.ComboBox LanguageCb;
 		private System.Windows.Forms.Label LanguageLbl;
+		private System.Windows.Forms.Label LogfilePathLbl;
+		private System.Windows.Forms.TextBox LogFilePathTb;
 	}
 }

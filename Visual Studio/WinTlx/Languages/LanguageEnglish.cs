@@ -52,6 +52,7 @@ namespace WinTlx.Languages
 
 				{ LngKeys.Setup_Setup, "Setup" },
 				{ LngKeys.Setup_General, "General" },
+				{ LngKeys.Setup_LogfilePath, "Logfile path" },
 				{ LngKeys.Setup_Language, "Language / Sprache" },
 				{ LngKeys.Setup_Answerback, "Answerback" },
 				{ LngKeys.Setup_IdleTimeout, "Idle timeout" },
@@ -110,7 +111,7 @@ namespace WinTlx.Languages
 				{ LngKeys.Message_IncomingConnection, "incoming connection from" },
 				{ LngKeys.Message_SubscribeServerError, "subscribe server error" },
 				{ LngKeys.Message_InvalidSubscribeServerData, "invalid subscribe server address or port" },
-				{ LngKeys.Message_QueryResult, "member(s) found" },
+				{ LngKeys.Message_QueryResult, "entries found" },
 				{ LngKeys.Message_ConnectNoAddress, "no address" },
 				{ LngKeys.Message_ConnectInvalidPort, "invalid port" },
 				{ LngKeys.Message_ConnectInvalidExtension, "invalid extension" },

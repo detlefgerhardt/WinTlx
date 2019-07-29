@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using WinTlx.Config;
 using WinTlx.Languages;
 
-namespace WinTlx
+namespace WinTlx.Config
 {
 	public partial class ConfigForm : Form
 	{
@@ -52,11 +52,13 @@ namespace WinTlx
 
 			this.Text = $"{Constants.PROGRAM_NAME} {LngText(LngKeys.Setup_Setup)}";
 			GeneralGb.Text = LngText(LngKeys.Setup_General);
+			LogfilePathLbl.Text = LngText(LngKeys.Setup_LogfilePath);
 			LanguageCb.Text = LngText(LngKeys.Setup_Language);
 			AnswerbackLbl.Text = LngText(LngKeys.Setup_Answerback);
 			IdleTimeoutLbl.Text = LngText(LngKeys.Setup_IdleTimeout);
 			OutputSpeedLbl.Text = LngText(LngKeys.Setup_OutputSpeed);
 			CodeStandardCb.Text = LngText(LngKeys.Setup_CodeStandard);
+
 			SubscribeServerGb.Text = LngText(LngKeys.Setup_SubscribeServer);
 			SubscribeServerAddressLbl.Text = LngText(LngKeys.Setup_SubscribeServerAddress);
 			SubscribeServerPortLbl.Text = LngText(LngKeys.Setup_SubscribeServerPort);
@@ -84,6 +86,7 @@ namespace WinTlx
 		public void SetData()
 		{
 			LanguageCb.SelectedItem = _config.Language;
+			LogFilePathTb.Text = _config.LogfilePath;
 			AnswerbackTb.Text = _config.Answerback;
 			IdleTimeoutTb.Text = IntToStr(_config.IdleTimeout);
 			CodeStandardCb.SelectedItem = ConfigData.CodeStandardToString(_config.CodeStandard);
@@ -99,6 +102,7 @@ namespace WinTlx
 
 		public void GetData()
 		{
+			_config.LogfilePath = ConfigData.FormatLogPath(LogFilePathTb.Text.Trim());
 			_config.Answerback = AnswerbackTb.Text.Trim();
 			_config.IdleTimeout = StrToInt(IdleTimeoutTb.Text);
 			_config.CodeStandard = ConfigData.StringToCodeStandard((string)CodeStandardCb.SelectedItem);

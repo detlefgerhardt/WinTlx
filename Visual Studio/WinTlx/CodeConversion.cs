@@ -847,8 +847,8 @@ namespace WinTlx
 			switch (char.ToLower(keyChar))
 			{
 				default:
-					// lowercase letters and numbers
-					if (code >= 0x30 && code <= 0x39 || code >= 0x61 && code <= 0x7A)
+					// letters and numbers
+					if (code >= 0x30 && code <= 0x39 || code >= 0x41 && code <= 0x5A || code >= 0x61 && code <= 0x7A)
 					{
 						newChar = keyChar;
 					}

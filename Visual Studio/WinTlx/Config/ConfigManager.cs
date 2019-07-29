@@ -53,7 +53,7 @@ namespace WinTlx.Config
 			}
 			catch(Exception ex)
 			{
-				Logging.Instance.Error(TAG, nameof(LoadConfig), "Error read config file", ex);
+				Logging.Instance.Error(TAG, nameof(LoadConfig), "Error reading config file", ex);
 				Config = GetDefaultConfig();
 				return false;
 			}
@@ -65,6 +65,7 @@ namespace WinTlx.Config
 			{
 				string configXml = Helper.SerializeObject<ConfigData>(Config);
 				File.WriteAllText(CONFIG_NAME, configXml);
+				Logging.Instance.Info(TAG, nameof(SaveConfig), $"Config saved to {CONFIG_NAME}");
 				return true;
 			}
 			catch(Exception ex)

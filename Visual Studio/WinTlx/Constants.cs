@@ -4,7 +4,8 @@
 	{
 		public const string PROGRAM_NAME = "WinTlx";
 
-		public const string DEBUG_LOG = "debug.log";
+		public const string CONSOLE_LOG = "wintlx_console.log";
+		public const string DEBUG_LOG = "wintlx_debug.log";
 
 		public const string DEFAULT_LANGUAGE = "EN";
 

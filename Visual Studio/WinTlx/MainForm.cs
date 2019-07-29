@@ -41,7 +41,9 @@ namespace WinTlx
 		private System.Timers.Timer _outputTimer;
 		private Queue<ScreenChar> _outputBuffer;
 
-		private ConfigData _config => ConfigManager.Instance.Config;
+		private ConfigManager _configManager;
+
+		private ConfigData _configData;
 
 		private SchedulerManager _schedulerManager;
 
@@ -52,6 +54,12 @@ namespace WinTlx
 			TerminalPb.ContextMenuStrip = CreateContextMenu();
 
 			string x = "✠";
+
+			// order is import, logging needs Logfile path from config !!!
+			_configManager = ConfigManager.Instance;
+			_configManager.LoadConfig();
+			_configData = _configManager.Config;
+			Logging.Instance.LogfilePath = _configData.LogfilePath;
 
 			Logging.Instance.Log(LogTypes.Info, TAG, "Start", $"{Helper.GetVersion()}");
 
@@ -73,10 +81,8 @@ namespace WinTlx
 
 			this.KeyPreview = true;
 
-			ConfigManager.Instance.LoadConfig();
-
 			LanguageManager.Instance.LanguageChanged += LanguageChanged;
-			LanguageManager.Instance.ChangeLanguage(_config.Language);
+			LanguageManager.Instance.ChangeLanguage(_configData.Language);
 
 			_itelex = new ItelexProtocol();
 			_itelex.Received += ReceivedHandler;
@@ -97,7 +103,7 @@ namespace WinTlx
 			_outputBuffer = new Queue<ScreenChar>();
 			_outputTimer = new System.Timers.Timer();
 			_outputTimer.Elapsed += _outputTimer_Elapsed;
-			SetOutputTimer(_config.OutputSpeed);
+			SetOutputTimer(_configData.OutputSpeed);
 
 			_schedulerManager = SchedulerManager.Instance;
 			_schedulerManager.Schedule += SchedulerManager_Schedule;
@@ -378,11 +384,11 @@ namespace WinTlx
 
 			Logging.Instance.Log(LogTypes.Info, TAG, nameof(QueryBtn_Click), $"SearchText='{SearchTb.Text}'");
 
-			if (string.IsNullOrWhiteSpace(_config.SubscribeServerAddress) || _config.SubscribeServerPort == 0)
+			if (string.IsNullOrWhiteSpace(_configData.SubscribeServerAddress) || _configData.SubscribeServerPort == 0)
 			{
 				SubcribeServerMessageHandler(LngText(LngKeys.Message_InvalidSubscribeServerData));
 				Logging.Instance.Error(TAG, "QueryBtn_Click",
-					$"invalid subscribe server data, address={_config.SubscribeServerAddress} port={_config.SubscribeServerPort}");
+					$"invalid subscribe server data, address={_configData.SubscribeServerAddress} port={_configData.SubscribeServerPort}");
 				return;
 			}
 
@@ -394,7 +400,7 @@ namespace WinTlx
 
 			await Task.Run(() =>
 			{
-				if (!_subscriberServer.Connect(_config.SubscribeServerAddress, _config.SubscribeServerPort))
+				if (!_subscriberServer.Connect(_configData.SubscribeServerAddress, _configData.SubscribeServerPort))
 				{
 					return;
 				}
@@ -623,7 +629,7 @@ namespace WinTlx
 		{
 			if (!_itelex.RecvOn)
 			{
-				_itelex.SetRecvOn(_config.IncomingLocalPort);
+				_itelex.SetRecvOn(_configData.IncomingLocalPort);
 				UpdateIpAddress();
 			}
 			else
@@ -665,7 +671,8 @@ namespace WinTlx
 			if (!configForm.Canceled)
 			{
 				ConfigManager.Instance.SaveConfig();
-				SetOutputTimer(_config.OutputSpeed);
+				SetOutputTimer(_configData.OutputSpeed);
+				Logging.Instance.LogfilePath = _configData.LogfilePath;
 				UpdatedHandler();
 			}
 		}
@@ -763,7 +770,7 @@ namespace WinTlx
 			Helper.ControlInvokeRequired(IdleTimoutTb, () => IdleTimoutTb.Text = $"Timeout {_itelex.IdleTimer} sec");
 			Helper.ControlInvokeRequired(ConnTimeTb, () => ConnTimeTb.Text = $"Conn {_itelex.ConnTimeMin} min");
 
-			Helper.ControlInvokeRequired(AnswerbackTb, () => AnswerbackTb.Text = _config.Answerback);
+			Helper.ControlInvokeRequired(AnswerbackTb, () => AnswerbackTb.Text = _configData.Answerback);
 
 			Helper.ControlInvokeRequired(SendLettersBtn, () =>
 			{
@@ -923,7 +930,7 @@ namespace WinTlx
 
 		private void AddText(string asciiText, CharAttributes attr, bool fast = false)
 		{
-			if (fast || _config.OutputSpeed==0)
+			if (fast || _configData.OutputSpeed==0)
 			{
 				// output immediatly
 				OutputText(asciiText, attr);
@@ -1054,13 +1061,18 @@ namespace WinTlx
 		{
 			lock (_commLogLock)
 			{
+				string fullName = "";
 				try
 				{
-					File.AppendAllText($"{Constants.PROGRAM_NAME}.log", text);
+					string path = string.IsNullOrWhiteSpace(_configData.LogfilePath) ? Helper.GetExePath() : _configData.LogfilePath;
+					fullName = Path.Combine(path, Constants.CONSOLE_LOG);
+					File.AppendAllText(fullName, text);
 				}
 				catch (Exception ex)
 				{
-					Logging.Instance.Error(TAG, nameof(CommLog), "", ex);
+					string newName = Path.Combine(Helper.GetExePath(), Constants.CONSOLE_LOG);
+					File.AppendAllText(newName, text);
+					Logging.Instance.Error(TAG, nameof(CommLog), $"Error writing console log to {fullName}", ex);
 				}
 			}
 		}
@@ -1146,13 +1158,13 @@ namespace WinTlx
 
 		private void UpdateIpAddress()
 		{
-			if (_config.SubscribeServerUpdatePin == 0 || _config.OwnNumber == 0 || _config.IncomingLocalPort == 0)
+			if (_configData.SubscribeServerUpdatePin == 0 || _configData.OwnNumber == 0 || _configData.IncomingLocalPort == 0)
 			{
 				return;
 			}
 
-			_subscriberServer.Connect(_config.SubscribeServerAddress, _config.SubscribeServerPort);
-			SendClientUpdate(_config.OwnNumber, _config.SubscribeServerUpdatePin, _config.IncomingPublicPort);
+			_subscriberServer.Connect(_configData.SubscribeServerAddress, _configData.SubscribeServerPort);
+			SendClientUpdate(_configData.OwnNumber, _configData.SubscribeServerUpdatePin, _configData.IncomingPublicPort);
 			_subscriberServer.Disconnect();
 		}
 
@@ -1259,7 +1271,7 @@ namespace WinTlx
 					return false;
 				}
 
-				_subscriberServer.Connect(_config.SubscribeServerAddress, _config.SubscribeServerPort);
+				_subscriberServer.Connect(_configData.SubscribeServerAddress, _configData.SubscribeServerPort);
 				PeerQueryReply queryReply = _subscriberServer.SendPeerQuery(dest);
 				_subscriberServer.Disconnect();
 				if (!queryReply.Valid || queryReply.Data == null)

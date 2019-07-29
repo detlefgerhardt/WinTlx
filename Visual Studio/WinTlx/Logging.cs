@@ -14,6 +14,8 @@ namespace WinTlx
 
 		public LogTypes LogLevel { get; set; }
 
+		public string LogfilePath { get; set; }
+
 		private static Logging instance;
 
 		private object _lock = new object();
@@ -87,13 +89,21 @@ namespace WinTlx
 		{
 			lock(_lock)
 			{
+				string fullName = "";
+				string prefix = $"{DateTime.Now:dd.MM.yyyy HH:mm:ss} {logType.ToString().PadRight(5)} [{section}]";
+				string logStr = $"{prefix} [{method}] {text}\r\n";
 				try
 				{
-					string fullName = Path.Combine(Helper.GetExePath(), Constants.DEBUG_LOG);
-					File.AppendAllText(fullName, $"{DateTime.Now:dd.MM.yyyy HH:mm:ss} {logType.ToString().PadRight(5)} [{section}] [{method}] {text}\r\n");
+					string path = string.IsNullOrWhiteSpace(LogfilePath) ? Helper.GetExePath() : LogfilePath;
+					fullName = Path.Combine(path, Constants.DEBUG_LOG);
+					File.AppendAllText(fullName, logStr);
 				}
 				catch
 				{
+					// try to log in program directory
+					string newName = Path.Combine(Helper.GetExePath(), Constants.DEBUG_LOG);
+					File.AppendAllText(newName, $"{prefix} [AppendLog] Error writing logfile to {fullName}\r\n");
+					File.AppendAllText(newName, logStr);
 				}
 			}
 		}

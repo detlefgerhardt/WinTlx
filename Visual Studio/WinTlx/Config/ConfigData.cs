@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.IO;
+using System.Runtime.Serialization;
 
 namespace WinTlx.Config
 {
@@ -9,6 +10,9 @@ namespace WinTlx.Config
 	{
 		[DataMember]
 		public string Language { get; set; }
+
+		[DataMember]
+		public string LogfilePath { get; set; }
 
 		[DataMember]
 		public string SubscribeServerAddress { get; set; }
@@ -82,5 +86,17 @@ namespace WinTlx.Config
 			}
 		}
 
+		public static string FormatLogPath(string path)
+		{
+			if (string.IsNullOrWhiteSpace(path))
+			{
+				return "";
+			}
+			if (!path.EndsWith("\\"))
+			{
+				path += "\\";
+			};
+			return path;
+		}
 	}
 }

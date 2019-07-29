@@ -12,10 +12,14 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <SccProjectName>Svn</SccProjectName>
-    <SccLocalPath>Svn</SccLocalPath>
-    <SccAuxPath>Svn</SccAuxPath>
-    <SccProvider>SubversionScc</SccProvider>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
@@ -65,10 +69,10 @@
     <Compile Include="EyeballChar.cs" />
     <Compile Include="CodeConversion.cs" />
     <Compile Include="Config\ConfigData.cs" />
-    <Compile Include="ConfigForm.cs">
+    <Compile Include="Config\ConfigForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ConfigForm.Designer.cs">
+    <Compile Include="Config\ConfigForm.Designer.cs">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Config\ConfigManager.cs" />
@@ -124,7 +128,7 @@
       <DependentUpon>TapePunchForm.cs</DependentUpon>
     </Compile>
     <Compile Include="SubscriberServer.cs" />
-    <EmbeddedResource Include="ConfigForm.resx">
+    <EmbeddedResource Include="Config\ConfigForm.resx">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
