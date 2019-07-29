@@ -51,7 +51,7 @@ Version history
 1.0.1.7 - Fix: Error when idle timer was set to 0 (or empty)
 	- Fix: A lot of bugfixes
         - New: Experimental scheduler for automatic sending of text files.
-1.0.1.8 - Fix: Problem with uppercase charachters
+1.0.1.8 - Fix: Problem with uppercase characters
         - New: The log file path is now configurable. If no log file path is set, the program path is used by default.
         - Chg: Changed debug.log to wintlx_debug.log and WinTlx.log to wintlx_console.log
 
