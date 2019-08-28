@@ -173,11 +173,17 @@ namespace WinTlx
 			}
 		}
 
+		/// <summary>
+		/// singleton pattern
+		/// </summary>
+		private static ItelexProtocol instance;
+
+		public static ItelexProtocol Instance => instance ?? (instance = new ItelexProtocol());
 
 		/// <summary>
 		/// Contructor
 		/// </summary>
-		public ItelexProtocol()
+		private ItelexProtocol()
 		{
 			_eyeballChar = EyeballChar.Instance;
 		}
@@ -291,7 +297,7 @@ namespace WinTlx
 
 				SendVersionCodeCmd();
 				Update?.Invoke();
-				if (extensionNumber != 0)
+				//if (extensionNumber != 0)
 				{
 					//Message?.Invoke($"send direct dial cmd {extensionNumber}");
 					SendDirectDialCmd(extensionNumber);
@@ -307,7 +313,7 @@ namespace WinTlx
 				}
 				else
 				{
-					SendBaudotCode(CodeConversion.BAU_FIG, ref _shiftState);
+					SendCode(CodeConversion.BAU_FIG, ref _shiftState);
 				}
 				Update?.Invoke();
 
@@ -359,6 +365,7 @@ namespace WinTlx
 			_startAck = true;
 		}
 		*/
+#warning TODO Warum Disconnect immer noch mal aufgerufen, obwohl die Verbindung schon beendet ist? Aber ConnectionState steht noch nicht auf Disonnected :-(
 
 		public void Disconnect()
 		{
@@ -367,11 +374,11 @@ namespace WinTlx
 				return;
 			}
 
-			_ackTimer.Stop();
-			_sendTimer.Stop();
+			_ackTimer?.Stop();
+			_sendTimer?.Stop();
 
 			ConnectionState = ConnectionStates.Disconnected;
-			_client.Close();
+			_client?.Close();
 
 			Local = true;
 
@@ -513,7 +520,7 @@ namespace WinTlx
 				for (int i = 0; i < baudotData.Length; i++)
 				{
 					byte chr = baudotData[i];
-					SendBaudotCode(baudotData[i], ref _shiftState);
+					SendCode(baudotData[i], ref _shiftState);
 				}
 				Update?.Invoke();
 			}
@@ -550,7 +557,7 @@ namespace WinTlx
 			}
 		}
 
-		private void SendBaudotCode(byte baudotCode, ref CodeConversion.ShiftStates shiftState)
+		private void SendCode(byte baudotCode, ref CodeConversion.ShiftStates shiftState)
 		{
 			byte[] codes = CodeConversion.BaudotCodeToBaudotWithShift(baudotCode, shiftState, ref shiftState);
 
@@ -580,11 +587,22 @@ namespace WinTlx
 
 			for (int i = 0; i < codes.Length; i++)
 			{
-				if (IsConnected)
-				{
-					_sendBuffer.Enqueue(codes[i]);
-				}
+				_sendBuffer.Enqueue(codes[i]);
 			}
+			Update?.Invoke();
+			_lastSentMs = Helper.GetTicksMs();
+		}
+
+		public void SendBaudotCode(byte code)
+		{
+			string asciiStr = CodeConversion.BaudotStringToAscii(new byte[] { code }, ref _shiftState, _config.CodeStandard);
+			Send?.Invoke(asciiStr);
+
+			if (IsConnected && !Local)
+			{
+				_sendBuffer.Enqueue(code);
+			}
+
 			Update?.Invoke();
 			_lastSentMs = Helper.GetTicksMs();
 		}

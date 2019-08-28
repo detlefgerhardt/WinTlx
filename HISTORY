@@ -54,4 +54,8 @@ Version history
 1.0.1.8 - Fix: Problem with uppercase characters
         - New: The log file path is now configurable. If no log file path is set, the program path is used by default.
         - Chg: Changed debug.log to wintlx_debug.log and WinTlx.log to wintlx_console.log
-
+1.0.1.9 - Fix: Problem with extenion number on incoming connection (nc)
+	- Fix: Crash when closing incoming connection (temporary fix)
+	- New: Load/Save/Send/Scroll tape punch
+	- New: Real overtyping in terminal windows
+	- New: Show gray background if terminal window does not have the focus

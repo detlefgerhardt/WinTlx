@@ -19,6 +19,7 @@ namespace WinTlx
 		private const string TAG = nameof(MainForm);
 
 		private System.Timers.Timer _clockTimer;
+		private System.Timers.Timer _focusTimer;
 
 		private int _fixedWidth;
 
@@ -47,13 +48,18 @@ namespace WinTlx
 
 		private SchedulerManager _schedulerManager;
 
+		private TapePunch _tapePunch;
+
 		public MainForm()
 		{
 			InitializeComponent();
+
 			_fixedWidth = this.Width;
 			TerminalPb.ContextMenuStrip = CreateContextMenu();
+			TerminalPb.Enter += TerminalPb_Enter;
+			TerminalPb.Leave += TerminalPb_Leave;
 
-			string x = "✠";
+			//string x = "✠";
 
 			// order is import, logging needs Logfile path from config !!!
 			_configManager = ConfigManager.Instance;
@@ -64,8 +70,9 @@ namespace WinTlx
 			Logging.Instance.Log(LogTypes.Info, TAG, "Start", $"{Helper.GetVersion()}");
 
 			this.Text = Helper.GetVersion();
-
 			this.KeyPreview = true;
+			this.Enter += MainForm_Enter;
+			this.Deactivate += MainForm_Deactivate;
 
 			MemberCb.DataSource = null;
 			MemberCb.DisplayMember = "DisplayName";
@@ -79,15 +86,13 @@ namespace WinTlx
 
 			RecvOnCb.Enabled = true;
 
-			this.KeyPreview = true;
-
 			LanguageManager.Instance.LanguageChanged += LanguageChanged;
 			LanguageManager.Instance.ChangeLanguage(_configData.Language);
 
-			_itelex = new ItelexProtocol();
+			_itelex = ItelexProtocol.Instance;
 			_itelex.Received += ReceivedHandler;
 			_itelex.Send += SendHandler;
-			_itelex.BaudotSendRecv += BaudotSendRecvHandler;
+			//_itelex.BaudotSendRecv += BaudotSendRecvHandler;
 			_itelex.Connected += ConnectedHandler;
 			_itelex.Dropped += DroppedHandler;
 			_itelex.Update += UpdatedHandler;
@@ -100,10 +105,16 @@ namespace WinTlx
 			_clockTimer.Elapsed += ClockTimer_Elapsed;
 			_clockTimer.Start();
 
+			_focusTimer = new System.Timers.Timer(100);
+			_focusTimer.Elapsed += FocusTimer_Elapsed;
+			_focusTimer.Start();
+
 			_outputBuffer = new Queue<ScreenChar>();
 			_outputTimer = new System.Timers.Timer();
 			_outputTimer.Elapsed += _outputTimer_Elapsed;
 			SetOutputTimer(_configData.OutputSpeed);
+
+			_tapePunch = TapePunch.Instance;
 
 			_schedulerManager = SchedulerManager.Instance;
 			_schedulerManager.Schedule += SchedulerManager_Schedule;
@@ -114,9 +125,8 @@ namespace WinTlx
 			SetConnectState();
 			UpdatedHandler();
 
-			SetFocus();
-			SearchTb.Focus();
-
+			//SetFocus();
+			//SearchTb.Focus();
 		}
 
 		private void LanguageChanged()
@@ -168,8 +178,6 @@ namespace WinTlx
 		private void MainForm_Load(object sender, EventArgs e)
 		{
 			MainForm_Resize(null, null);
-			SetFocus();
-			SearchTb.Focus();
 
 #if !DEBUG
 			string text = $"{Helper.GetVersion()}\r\r" + "by *dg* Detlef Gerhardt\r\r" + LngText(LngKeys.Start_Text);
@@ -179,8 +187,31 @@ namespace WinTlx
 				MessageBoxButtons.OK,
 				MessageBoxIcon.Information,
 				MessageBoxDefaultButton.Button1);
-
 #endif
+		}
+
+		private void MainForm_Deactivate(object sender, EventArgs e)
+		{
+			Debug.WriteLine(nameof(MainForm_Deactivate));
+			TimeTb.Focus();
+			TerminalPb.Refresh();
+		}
+
+		private void MainForm_Shown(object sender, EventArgs e)
+		{
+			SetFocus();
+			//SearchTb.Focus();
+		}
+
+		private void MainForm_Enter(object sender, EventArgs e)
+		{
+			Debug.WriteLine(nameof(MainForm_Enter));
+		}
+
+		private void MainForm_Leave(object sender, EventArgs e)
+		{
+			Debug.WriteLine(nameof(MainForm_Leave));
+			TerminalPb.Refresh();
 		}
 
 		private void MainForm_Resize(object sender, EventArgs e)
@@ -227,7 +258,8 @@ namespace WinTlx
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
 			// check for controls without special input handling
-			if (SearchTb.Focused || MemberCb.Focused || AddressTb.Focused || PortTb.Focused || ExtensionTb.Focused)
+			//if (SearchTb.Focused || MemberCb.Focused || AddressTb.Focused || PortTb.Focused || ExtensionTb.Focused)
+			if (!TerminalPb.Focused)
 			{
 				return base.ProcessCmdKey(ref msg, keyData);
 			}
@@ -333,7 +365,24 @@ namespace WinTlx
 			Helper.ControlInvokeRequired(TimeTb, () => TimeTb.Text = $"{dt:HH:mm:ss}");
 		}
 
+		private void FocusTimer_Elapsed(object sender, ElapsedEventArgs e)
+		{
+			//bool focus = !SearchTb.Focused && !MemberCb.Focused && !AddressTb.Focused && !PortTb.Focused && ExtensionTb.Focused;
+		}
+
 		#endregion
+
+		#region TerminalPb-Events
+
+		private void TerminalPb_Enter()
+		{
+			Debug.WriteLine("Enter");
+		}
+
+		private void TerminalPb_Leave()
+		{
+			Debug.WriteLine("Leave");
+		}
 
 		private void TerminalPb_MouseClick(object sender, MouseEventArgs e)
 		{
@@ -357,6 +406,8 @@ namespace WinTlx
 				TerminalPb.ContextMenu = contextMenu;
 			}
 		}
+
+		#endregion
 
 		private void PhoneEntryCb_SelectedIndexChanged(object sender, EventArgs e)
 		{
@@ -643,14 +694,20 @@ namespace WinTlx
 			if (_tapePunchForm == null)
 			{
 				_tapePunchForm = new TapePunchHorizontalForm(this.Bounds);
+				_tapePunchForm.Closed += TapePunchForm_Closed;
 				_tapePunchForm.Show();
 			}
 			else
 			{
 				_tapePunchForm.Close();
-				_tapePunchForm = null;
 			}
 			SetFocus();
+		}
+
+		private void TapePunchForm_Closed()
+		{
+			_tapePunchForm.Closed -= TapePunchForm_Closed;
+			_tapePunchForm = null;
 		}
 
 		private void EyeballCharCb_CheckedChanged(object sender, EventArgs e)
@@ -734,18 +791,16 @@ namespace WinTlx
 			AddText(dispText, CharAttributes.Send);
 		}
 
+		/*
 		private void BaudotSendRecvHandler(byte[] code)
 		{
-			if (_tapePunchForm == null)
-			{
-				return;
-			}
-
 			for (int i = 0; i < code.Length; i++)
 			{
-				_tapePunchForm.PunchCode(code[i], _itelex.ShiftState);
+				//_tapePunch.PunchCode(code[i], _itelex.ShiftState);
+				//_tapePunchForm.PunchCode(code[i], _itelex.ShiftState);
 			}
 		}
+		*/
 
 		private void SubcribeServerMessageHandler(string message)
 		{
@@ -998,7 +1053,9 @@ namespace WinTlx
 						{
 							_screen.Add(new ScreenLine());
 						}
-						_screen[_screenEditPos0 + _screenY].Line[_screenX] = new ScreenChar(asciiText[i], attr);
+						//_screen[_screenEditPos0 + _screenY].Line[_screenX] = new ScreenChar(asciiText[i], attr);
+						_screen[_screenEditPos0 + _screenY].Line[_screenX].Char = asciiText[i];
+						_screen[_screenEditPos0 + _screenY].Line[_screenX].Attr = attr;
 						IncScreenX();
 						break;
 				}
@@ -1053,6 +1110,7 @@ namespace WinTlx
 		private void SetFocus()
 		{
 			TerminalPb.Focus();
+			TerminalPb.Refresh();
 		}
 
 		private object _commLogLock = new object();
@@ -1176,18 +1234,25 @@ namespace WinTlx
 		private void TerminalPb_Paint(object sender, PaintEventArgs e)
 		{
 			Graphics g = e.Graphics;
-			TerminalRefresh(g);
+			TerminalRefresh(g, TerminalPb.Focused);
 		}
 
-		private void TerminalRefresh(Graphics g)
+		private void TerminalRefresh(Graphics g, bool focus)
 		{
 			Font font = new Font("Consolas", 12);
 			//g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 			g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
 			g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-			g.Clear(Color.White);
+			if (focus)
+			{
+				g.Clear(Color.White);
+			}
+			else
+			{
+				g.Clear(Color.LightGray);
+			}
 
-			//Debug.WriteLine($"{_screen.Count} {_screenShowPos0} {_screenEditPos0} {_screenX} {_screenY}");
+			// Debug.WriteLine($"{_screen.Count} {_screenShowPos0} {_screenEditPos0} {_screenX} {_screenY}");
 
 			for (int y = 0; y < _screenHeight; y++)
 			{
@@ -1200,33 +1265,43 @@ namespace WinTlx
 					}
 					if (x == _screenX && y == _screenY && _screenShowPos0 == _screenEditPos0)
 					{
-						//scrChr = new ScreenChar('_', CharAttributes.Send);
 						// draw cursor
 						Pen pen = new Pen(Color.Red, 2);
-						g.DrawLine(pen, x * CHAR_WIDTH+4, y * CHAR_HEIGHT + CHAR_HEIGHT - 2,
-							x * CHAR_WIDTH + CHAR_WIDTH+2, y * CHAR_HEIGHT + CHAR_HEIGHT - 2);
+						g.DrawLine(pen, x * CHAR_WIDTH + 4, y * CHAR_HEIGHT + CHAR_HEIGHT - 2,
+									x * CHAR_WIDTH + CHAR_WIDTH + 2, y * CHAR_HEIGHT + CHAR_HEIGHT - 2);
 					}
-					if (scrChr != null && scrChr.Char != ' ' && scrChr.Char != 0x00)
+					if (scrChr != null)
 					{
-						Point p = new Point(x * CHAR_WIDTH, y * CHAR_HEIGHT);
-						switch(scrChr.Char)
-						{
-							case CodeConversion.ASC_BEL:
-								//g.DrawString("⍾", font, new SolidBrush(scrChr.AttrColor), p);
-								g.DrawImage(_specialCharacters.GetBell(scrChr.AttrColor), x * CHAR_WIDTH+3, y * CHAR_HEIGHT+3, CHAR_WIDTH, CHAR_HEIGHT);
-								break;
-							case CodeConversion.ASC_WRU:
-								//g.DrawString("✠", font, new SolidBrush(scrChr.AttrColor), p);
-								g.DrawImage(_specialCharacters.GetWru(scrChr.AttrColor), x * CHAR_WIDTH+3, y * CHAR_HEIGHT+3, CHAR_WIDTH, CHAR_HEIGHT);
-								break;
-							default:
-								g.DrawString(scrChr.Char.ToString(), font, new SolidBrush(scrChr.AttrColor), p);
-								break;
-						}
+						TerminalDrawChar(g, font, x, y, scrChr);
 					}
 				}
 			}
+		}
 
+		private void TerminalDrawChar(Graphics g, Font font, int x, int y, ScreenChar scrChr)
+		{
+			for (int c = 0; c < scrChr.Chars.Count; c++)
+			{
+				char chr = scrChr.Chars[c];
+				if (chr != ' ' && chr != 0x00)
+				{
+					Point p = new Point(x * CHAR_WIDTH, y * CHAR_HEIGHT);
+					switch (chr)
+					{
+						case CodeConversion.ASC_BEL:
+							//g.DrawString("⍾", font, new SolidBrush(scrChr.AttrColor), p);
+							g.DrawImage(_specialCharacters.GetBell(scrChr.AttrColor), x * CHAR_WIDTH + 3, y * CHAR_HEIGHT + 3, CHAR_WIDTH, CHAR_HEIGHT);
+							break;
+						case CodeConversion.ASC_WRU:
+							//g.DrawString("✠", font, new SolidBrush(scrChr.AttrColor), p);
+							g.DrawImage(_specialCharacters.GetWru(scrChr.AttrColor), x * CHAR_WIDTH + 3, y * CHAR_HEIGHT + 3, CHAR_WIDTH, CHAR_HEIGHT);
+							break;
+						default:
+							g.DrawString(chr.ToString(), font, new SolidBrush(scrChr.AttrColor), p);
+							break;
+					}
+				}
+			}
 		}
 
 		private void SchedulerManager_Schedule(ScheduleEventArgs args)
@@ -1452,5 +1527,6 @@ namespace WinTlx
 				}
 			}
 		}
+
 	}
 }

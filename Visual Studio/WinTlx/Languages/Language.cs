@@ -77,9 +77,11 @@ namespace WinTlx.Languages
 		SendFile_CancelButton,
 
 		TapePunch_TapePunch,
-		TapePunch_OnButton,
-		TapePunch_OffButton,
+		TapePunch_RecvButton,
+		TapePunch_SendButton,
 		TapePunch_ClearButton,
+		TapePunch_LoadButton,
+		TapePunch_SaveButton,
 		TapePunch_CloseButton,
 		TapePunch_CodeLetters,
 		TapePunch_CodeFigures,

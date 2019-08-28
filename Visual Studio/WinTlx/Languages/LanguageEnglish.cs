@@ -82,9 +82,11 @@ namespace WinTlx.Languages
 				{ LngKeys.SendFile_CancelButton, "Cancel" },
 
 				{ LngKeys.TapePunch_TapePunch, "Tape punch" },
-				{ LngKeys.TapePunch_OnButton, "On" },
-				{ LngKeys.TapePunch_OffButton, "Off" },
+				{ LngKeys.TapePunch_RecvButton, "Recv" },
+				{ LngKeys.TapePunch_SendButton, "Send" },
 				{ LngKeys.TapePunch_ClearButton, "Clear" },
+				{ LngKeys.TapePunch_LoadButton, "Load" },
+				{ LngKeys.TapePunch_SaveButton, "Save" },
 				{ LngKeys.TapePunch_CloseButton, "Close" },
 				{ LngKeys.TapePunch_CodeLetters, "LTR" },
 				{ LngKeys.TapePunch_CodeFigures, "FIG" },

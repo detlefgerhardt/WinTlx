@@ -6,23 +6,6 @@ using System.Threading.Tasks;
 
 namespace WinTlx.Scheduler
 {
-
-	class GFG : IComparer<string>
-	{
-		public int Compare(string x, string y)
-		{
-
-			if (x == null || y == null)
-			{
-				return 0;
-			}
-
-			// "CompareTo()" method 
-			return x.CompareTo(y);
-
-		}
-	}
-
 	class SchedulerItemComparer : IComparer<SchedulerItem>
 	{
 		public int Compare(SchedulerItem item1, SchedulerItem item2)

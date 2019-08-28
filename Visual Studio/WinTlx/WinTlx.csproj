@@ -107,6 +107,9 @@
     </Compile>
     <Compile Include="ScreenChar.cs" />
     <Compile Include="ScreenLine.cs" />
+    <Compile Include="SelectablePictureBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="SendFileForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -120,12 +123,6 @@
     </Compile>
     <Compile Include="TapePunchHorizontalForm.Designer.cs">
       <DependentUpon>TapePunchHorizontalForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TapePunchForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TapePunchForm.Designer.cs">
-      <DependentUpon>TapePunchForm.cs</DependentUpon>
     </Compile>
     <Compile Include="SubscriberServer.cs" />
     <EmbeddedResource Include="Config\ConfigForm.resx">
@@ -152,9 +149,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TapePunchHorizontalForm.resx">
       <DependentUpon>TapePunchHorizontalForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TapePunchForm.resx">
-      <DependentUpon>TapePunchForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

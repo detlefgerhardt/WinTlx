@@ -104,7 +104,7 @@ namespace WinTlx
 
 		private void SetOnOff(bool on)
 		{
-			_tapePunch.SetOnOff(on);
+			_tapePunch.PuncherOn = on;
 			if (on)
 			{
 				OnCb.Checked = true;

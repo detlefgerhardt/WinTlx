@@ -81,8 +81,8 @@
 			this.EyeballCharCb = new System.Windows.Forms.CheckBox();
 			this.RecvOnCb = new System.Windows.Forms.CheckBox();
 			this.LinealPnl = new System.Windows.Forms.Panel();
-			this.TerminalPb = new System.Windows.Forms.PictureBox();
 			this.SchedulerBtn = new System.Windows.Forms.Button();
+			this.TerminalPb = new SelectablePictureBox();
 			this.panel1.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.panel3.SuspendLayout();
@@ -633,18 +633,6 @@
 			this.LinealPnl.TabIndex = 0;
 			this.LinealPnl.Paint += new System.Windows.Forms.PaintEventHandler(this.LinealPnl_Paint);
 			// 
-			// TerminalPb
-			// 
-			this.TerminalPb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.TerminalPb.Location = new System.Drawing.Point(12, 217);
-			this.TerminalPb.Name = "TerminalPb";
-			this.TerminalPb.Size = new System.Drawing.Size(634, 375);
-			this.TerminalPb.TabIndex = 55;
-			this.TerminalPb.TabStop = false;
-			this.TerminalPb.Paint += new System.Windows.Forms.PaintEventHandler(this.TerminalPb_Paint);
-			this.TerminalPb.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TerminalPb_MouseClick);
-			this.TerminalPb.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TerminalPb_MouseDown);
-			// 
 			// SchedulerBtn
 			// 
 			this.SchedulerBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -656,13 +644,23 @@
 			this.SchedulerBtn.UseVisualStyleBackColor = true;
 			this.SchedulerBtn.Click += new System.EventHandler(this.SchedulerBtn_Click);
 			// 
+			// TerminalPb
+			// 
+			this.TerminalPb.Location = new System.Drawing.Point(12, 217);
+			this.TerminalPb.Name = "TerminalPb";
+			this.TerminalPb.Size = new System.Drawing.Size(634, 375);
+			this.TerminalPb.TabIndex = 57;
+			this.TerminalPb.Paint += new System.Windows.Forms.PaintEventHandler(this.TerminalPb_Paint);
+			this.TerminalPb.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TerminalPb_MouseClick);
+			this.TerminalPb.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TerminalPb_MouseDown);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(741, 604);
-			this.Controls.Add(this.SchedulerBtn);
 			this.Controls.Add(this.TerminalPb);
+			this.Controls.Add(this.SchedulerBtn);
 			this.Controls.Add(this.LinealPnl);
 			this.Controls.Add(this.RecvOnCb);
 			this.Controls.Add(this.EyeballCharCb);
@@ -685,8 +683,10 @@
 			this.Activated += new System.EventHandler(this.MainForm_Activated);
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.Load += new System.EventHandler(this.MainForm_Load);
+			this.Shown += new System.EventHandler(this.MainForm_Shown);
 			this.LocationChanged += new System.EventHandler(this.MainForm_LocationChanged);
 			this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.MainForm_KeyPress);
+			this.Leave += new System.EventHandler(this.MainForm_Leave);
 			this.Resize += new System.EventHandler(this.MainForm_Resize);
 			this.panel1.ResumeLayout(false);
 			this.panel2.ResumeLayout(false);
@@ -754,9 +754,9 @@
 		private System.Windows.Forms.CheckBox EyeballCharCb;
 		private System.Windows.Forms.CheckBox RecvOnCb;
 		private System.Windows.Forms.Panel LinealPnl;
-		private System.Windows.Forms.PictureBox TerminalPb;
 		private System.Windows.Forms.TextBox ConnectionStateTb;
 		private System.Windows.Forms.Button SchedulerBtn;
+		private SelectablePictureBox TerminalPb;
 	}
 }
 
