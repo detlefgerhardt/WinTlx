@@ -13,9 +13,10 @@ A Windows test und diagnostic tool for the i-Telex network
 - Logging all communication to a text file
 - Runs on any Windows version with .NET Framework 4.5 and above
 - Virtual tape punch with eyeball characters (Bildlocher)
-- New: ITA-2 and US-TTY suport
-- New: Multi-language support
-- New: Scheduler for automatic sending of text file (experimental)
+- Send and receive of binary ITA-2 files (via tape punch function)
+- ITA-2 and US-TTY suport
+- Multi-language support
+- Scheduler for automatic sending of text file (experimental)
 
 
 ![Screenshot](https://github.com/detlefgerhardt/WinTlx/blob/master/WinTlxScreen.png)
