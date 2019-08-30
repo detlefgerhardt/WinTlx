@@ -1,6 +1,6 @@
-﻿namespace WinTlx
+﻿namespace WinTlx.TapePunch
 {
-	partial class TapePunchHorizontalForm
+	partial class TapePunchForm
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -28,7 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TapePunchHorizontalForm));
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TapePunchForm));
 			this.PunchedTapePb = new System.Windows.Forms.PictureBox();
 			this.ClearBtn = new System.Windows.Forms.Button();
 			this.RecvCb = new System.Windows.Forms.CheckBox();

@@ -5,25 +5,13 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WinTlx.Codes;
 using WinTlx.Config;
 using WinTlx.Languages;
 
-namespace WinTlx
+namespace WinTlx.TapePunch
 {
-	class PunchLine
-	{
-		public byte Code { get; set; }
-
-		public string Text { get; set; }
-
-		public PunchLine(byte code, string text)
-		{
-			Code = code;
-			Text = text;
-		}
-	}
-
-	class TapePunch
+	class TapePunchManager
 	{
 		public const int BUFFER_SIZE = 50000;
 
@@ -51,11 +39,11 @@ namespace WinTlx
 		/// <summary>
 		/// singleton pattern
 		/// </summary>
-		private static TapePunch instance;
+		private static TapePunchManager instance;
 
-		public static TapePunch Instance => instance ?? (instance = new TapePunch());
+		public static TapePunchManager Instance => instance ?? (instance = new TapePunchManager());
 
-		private TapePunch()
+		private TapePunchManager()
 		{
 			_itelex = ItelexProtocol.Instance;
 			_itelex.BaudotSendRecv += BaudotSendRecvHandler;
@@ -89,18 +77,18 @@ namespace WinTlx
 
 		public void SetBuffer(byte[] buffer)
 		{
-			CodeConversion.ShiftStates shiftState = CodeConversion.ShiftStates.Ltr;
+			ShiftStates shiftState = ShiftStates.Ltr;
 			Clear();
 			for (int i = 0; i < buffer.Length; i++)
 			{
 				PunchCode(buffer[i], shiftState);
 				switch (buffer[i])
 				{
-					case CodeConversion.BAU_LTR:
-						shiftState = CodeConversion.ShiftStates.Ltr;
+					case CodeManager.BAU_LTR:
+						shiftState = ShiftStates.Ltr;
 						break;
-					case CodeConversion.BAU_FIG:
-						shiftState = CodeConversion.ShiftStates.Figs;
+					case CodeManager.BAU_FIG:
+						shiftState = ShiftStates.Figs;
 						break;
 				}
 			}
@@ -122,20 +110,20 @@ namespace WinTlx
 		/// </summary>
 		/// <param name="baudotCode"></param>
 		/// <param name="shiftState"></param>
-		public void PunchCode(byte baudotCode, CodeConversion.ShiftStates shiftState)
+		public void PunchCode(byte baudotCode, ShiftStates shiftState)
 		{
 			if (!PuncherOn)
 			{
 				return;
 			}
 
-			string text = CodeConversion.BaudotCodeToPuncherText(baudotCode, shiftState, _config.CodeStandard);
+			string text = CodeManager.BaudotCodeToPuncherText(baudotCode, shiftState, _config.CodeSet);
 			switch (text)
 			{
 				case "CR":
 					text = LngText(LngKeys.TapePunch_CodeCarriageReturn);
 					break;
-				case "LF":
+				case "NL":
 					text = LngText(LngKeys.TapePunch_CodeLinefeed);
 					break;
 				case "LTR":
@@ -162,56 +150,6 @@ namespace WinTlx
 			return LanguageManager.Instance.GetText(key);
 		}
 
-#if false
-		/// <summary>
-		/// Draw current buffer to puncher graphic
-		/// </summary>
-		/// <param name="g"></param>
-		public void DrawTapeVertical(Graphics g, int height)
-		{
-			g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-			//Color tapeColor = Color.FromArgb(0xFF, 0xFF, 0xA0);
-			Brush tapeBrush = new SolidBrush(Color.FromArgb(0xFF, 0xFF, 0xA0));
-			Brush holeBrush = new SolidBrush(Color.FromArgb(0x40, 0x40, 0x40));
-			Color backColor = Color.FromArgb(240, 240, 240);
-			g.Clear(backColor);
-			g.FillRectangle(tapeBrush, 0, 0, HOLE_DIST * 6 + BORDER * 2 - 2, height);
-
-
-			//int pos = _bufferPos - 1;
-			int pos = DisplayPos - 1;
-			for (int line = 0; line < PunchLines; line++)
-			{
-				if (pos < 0)
-				{
-					break;
-				}
-				int yp = (int)(line * HOLE_DIST);
-				int bit = 16;
-				PunchLine punchLine = _buffer[pos--];
-				for (int col = 0; col < 6; col++)
-				{
-					if (col == 2)
-					{
-						// trasport hole
-						int d = (HOLE_SIZE - TRANSPORT_HOLE_SIZE) / 2;
-						g.FillEllipse(holeBrush, BORDER + HOLE_DIST * col + d, yp + d + 6, TRANSPORT_HOLE_SIZE, TRANSPORT_HOLE_SIZE);
-						continue;
-					}
-					if ((punchLine.Code & bit) != 0)
-					{
-						g.FillEllipse(holeBrush, BORDER + HOLE_DIST * col, yp + 6, HOLE_SIZE, HOLE_SIZE);
-					}
-					bit >>= 1;
-				}
-
-				// show char
-				Point p = new Point(BORDER + HOLE_DIST * 6 + 9, yp + 3);
-				g.DrawString(punchLine.Text, new Font("Arial", 8), new SolidBrush(Color.Black), p);
-			}
-		}
-#endif
-
 		/// <summary>
 		/// Draw current buffer to puncher graphic
 		/// </summary>
@@ -231,7 +169,8 @@ namespace WinTlx
 
 			//int pos = BufferPos - 1;
 			int pos = DisplayPos - 1;
-			Debug.WriteLine($"pos={pos}");
+
+			//Debug.WriteLine($"pos={pos}");
 
 			// draw from left to tight
 			for (int line = 0; line < PunchLines; line++)

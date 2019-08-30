@@ -416,6 +416,7 @@ namespace WinTlx
 			if (recvLen != 6)
 			{
 				Logging.Instance.Log(LogTypes.Info, TAG, nameof(SendPeerSearch), $"wrong reply packet size ({recvLen})");
+				reply.Error = "error";
 				return reply;
 			}
 
@@ -423,6 +424,7 @@ namespace WinTlx
 			{
 				// peer not found
 				Logging.Instance.Log(LogTypes.Info, TAG, nameof(SendPeerSearch), $"wrong reply packet, type={recvData[0]:X2}");
+				reply.Error = "error";
 				return reply;
 			}
 

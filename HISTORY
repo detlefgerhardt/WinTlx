@@ -11,7 +11,7 @@ Version history
 1.0.0.3 - Add: Copy/paste implemented (context menu and ctrl-c/ctrl-v)
 1.0.0.4 - Fix: Removed expire date
         - Add: The size of the terminal window can now be changed dynamically.
-        - First GitHub release
+        - New First GitHub release
 1.0.0.5 - Add: Show messages when connecting to subscribe server
 1.0.0.6 - Fix: Send always "wintelex" after WRU
         - Fix: Fixed a bug that occurred if the query did not find a number
@@ -59,3 +59,6 @@ Version history
 	- New: Load/Save/Send/Scroll tape punch
 	- New: Real overtyping in terminal windows
 	- New: Show gray background if terminal window does not have the focus
+1.0.2.0 - Fix: Some internal rework, many minor bug fixes
+          New: ITA2-EXT character set (ITA2 with additional characters)
+          Chg: Rearranged setup Window

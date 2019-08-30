@@ -64,10 +64,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CodeStandardItem.cs" />
+    <Compile Include="Codes\AsciiConvItem.cs" />
+    <Compile Include="Codes\CodeItem.cs" />
     <Compile Include="Scheduler\ScheduleData.cs" />
-    <Compile Include="EyeballChar.cs" />
-    <Compile Include="CodeConversion.cs" />
+    <Compile Include="Codes\EyeballChar.cs" />
+    <Compile Include="Codes\CodeManager.cs" />
     <Compile Include="Config\ConfigData.cs" />
     <Compile Include="Config\ConfigForm.cs">
       <SubType>Form</SubType>
@@ -117,12 +118,13 @@
       <DependentUpon>SendFileForm.cs</DependentUpon>
     </Compile>
     <Compile Include="SpecialCharacters.cs" />
-    <Compile Include="TapePunch.cs" />
-    <Compile Include="TapePunchHorizontalForm.cs">
+    <Compile Include="TapePunch\PunchLine.cs" />
+    <Compile Include="TapePunch\TapePunchManager.cs" />
+    <Compile Include="TapePunch\TapePunchForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TapePunchHorizontalForm.Designer.cs">
-      <DependentUpon>TapePunchHorizontalForm.cs</DependentUpon>
+    <Compile Include="TapePunch\TapePunchForm.Designer.cs">
+      <DependentUpon>TapePunchForm.cs</DependentUpon>
     </Compile>
     <Compile Include="SubscriberServer.cs" />
     <EmbeddedResource Include="Config\ConfigForm.resx">
@@ -147,8 +149,8 @@
     <EmbeddedResource Include="SendFileForm.resx">
       <DependentUpon>SendFileForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TapePunchHorizontalForm.resx">
-      <DependentUpon>TapePunchHorizontalForm.cs</DependentUpon>
+    <EmbeddedResource Include="TapePunch\TapePunchForm.resx">
+      <DependentUpon>TapePunchForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

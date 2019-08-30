@@ -1,21 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using WinTlx.Languages;
 
-namespace WinTlx
+namespace WinTlx.TapePunch
 {
-	public partial class TapePunchHorizontalForm : Form
+	public partial class TapePunchForm : Form
 	{
-		private const string TAG = "TapePunchHorizontalForm";
+		private const string TAG = nameof(TapePunchForm);
 
 		public delegate void ClosedEventHandler();
 		public event ClosedEventHandler Closed;
@@ -24,9 +17,9 @@ namespace WinTlx
 
 		private ItelexProtocol _itelex;
 
-		private TapePunch _tapePunch;
+		private TapePunchManager _tapePunch;
 
-		public TapePunchHorizontalForm(Rectangle position)
+		public TapePunchForm(Rectangle position)
 		{
 			InitializeComponent();
 
@@ -37,7 +30,7 @@ namespace WinTlx
 
 			_itelex = ItelexProtocol.Instance;
 
-			_tapePunch = TapePunch.Instance;
+			_tapePunch = TapePunchManager.Instance;
 			_tapePunch.Punched += TapePunch_Punched;
 			_tapePunch.Changed += TapePunch_Changed;
 			_tapePunch.SetPuncherLinesHorizontal(PunchedTapePb.Width);
@@ -51,9 +44,13 @@ namespace WinTlx
 
 		private void TapePunch_Changed()
 		{
-			Debug.WriteLine(nameof(TapePunch_Changed));
-			Helper.ControlInvokeRequired(PunchedTapePb, () => PunchedTapePb.Refresh());
-			BufferLbl.Text = $"{_tapePunch.BufferPos} / {TapePunch.BUFFER_SIZE} / {_tapePunch.DisplayPos}";
+			//Debug.WriteLine(nameof(TapePunch_Changed));
+			Helper.ControlInvokeRequired(PunchedTapePb,
+				() => PunchedTapePb.Refresh()
+			);
+			Helper.ControlInvokeRequired(BufferLbl,
+				() => BufferLbl.Text = $"{_tapePunch.BufferPos} / {TapePunchManager.BUFFER_SIZE} / {_tapePunch.DisplayPos}"
+			);
 		}
 
 		private void LanguageChanged()

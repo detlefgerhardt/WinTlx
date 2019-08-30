@@ -1,10 +1,9 @@
 ﻿using System.IO;
 using System.Runtime.Serialization;
+using WinTlx.Codes;
 
 namespace WinTlx.Config
 {
-	public enum CodeStandards { Ita2, UsTTy }
-
 	[DataContract(Namespace = "")]
 	public class ConfigData
 	{
@@ -30,7 +29,7 @@ namespace WinTlx.Config
 		public int OutputSpeed { get; set; }
 
 		[DataMember]
-		public CodeStandards CodeStandard { get; set; }
+		public CodeSets CodeSet { get; set; }
 
 		[DataMember]
 		public int IdleTimeout { get; set; }
@@ -60,28 +59,36 @@ namespace WinTlx.Config
 			{
 				Answerback = Constants.DEFAULT_ANSWERBACK;
 			}
+			if (string.IsNullOrEmpty(Language))
+			{
+				Language = "en";
+			}
 		}
 
-		public static CodeStandards StringToCodeStandard(string stdStr)
+		public static CodeSets StringToCodeSet(string stdStr)
 		{
 			switch(stdStr.ToUpper())
 			{
 				default:
 				case "ITA-2":
-					return CodeStandards.Ita2;
+					return CodeSets.ITA2;
+				case "ITA-2 EXT":
+					return CodeSets.ITA2EXT;
 				case "US-TTY":
-					return CodeStandards.UsTTy;
+					return CodeSets.USTTY;
 			}
 		}
 
-		public static string CodeStandardToString(CodeStandards std)
+		public static string CodeSetToString(CodeSets std)
 		{
 			switch (std)
 			{
 				default:
-				case CodeStandards.Ita2:
+				case CodeSets.ITA2:
 					return "ITA-2";
-				case CodeStandards.UsTTy:
+				case CodeSets.ITA2EXT:
+					return "ITA-2 EXT";
+				case CodeSets.USTTY:
 					return "US-TTY";
 			}
 		}

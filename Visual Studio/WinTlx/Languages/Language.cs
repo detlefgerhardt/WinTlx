@@ -52,7 +52,7 @@ namespace WinTlx.Languages
 		Setup_Answerback,
 		Setup_IdleTimeout,
 		Setup_OutputSpeed,
-		Setup_CodeStandard,
+		Setup_CodeSet,
 		Setup_SubscribeServer,
 		Setup_SubscribeServerAddress,
 		Setup_SubscribeServerPort,
@@ -62,6 +62,7 @@ namespace WinTlx.Languages
 		Setup_ExtensionNumber,
 		Setup_IncomingLocalPort,
 		Setup_IncomingPublicPort,
+		Setup_ServerDataHint,
 		Setup_CancelButton,
 		Setup_SaveButton,
 

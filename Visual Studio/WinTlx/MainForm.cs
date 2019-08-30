@@ -8,9 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
+using WinTlx.Codes;
 using WinTlx.Config;
 using WinTlx.Languages;
 using WinTlx.Scheduler;
+using WinTlx.TapePunch;
 
 namespace WinTlx
 {
@@ -25,7 +27,7 @@ namespace WinTlx
 
 		private SubscriberServer _subscriberServer;
 		private ItelexProtocol _itelex;
-		TapePunchHorizontalForm _tapePunchForm;
+		TapePunchForm _tapePunchForm;
 		SpecialCharacters _specialCharacters = SpecialCharacters.Instance;
 
 		public const int SCREEN_WIDTH = 68;
@@ -48,7 +50,7 @@ namespace WinTlx
 
 		private SchedulerManager _schedulerManager;
 
-		private TapePunch _tapePunch;
+		private TapePunchManager _tapePunch;
 
 		public MainForm()
 		{
@@ -56,8 +58,6 @@ namespace WinTlx
 
 			_fixedWidth = this.Width;
 			TerminalPb.ContextMenuStrip = CreateContextMenu();
-			TerminalPb.Enter += TerminalPb_Enter;
-			TerminalPb.Leave += TerminalPb_Leave;
 
 			//string x = "✠";
 
@@ -92,7 +92,6 @@ namespace WinTlx
 			_itelex = ItelexProtocol.Instance;
 			_itelex.Received += ReceivedHandler;
 			_itelex.Send += SendHandler;
-			//_itelex.BaudotSendRecv += BaudotSendRecvHandler;
 			_itelex.Connected += ConnectedHandler;
 			_itelex.Dropped += DroppedHandler;
 			_itelex.Update += UpdatedHandler;
@@ -114,7 +113,7 @@ namespace WinTlx
 			_outputTimer.Elapsed += _outputTimer_Elapsed;
 			SetOutputTimer(_configData.OutputSpeed);
 
-			_tapePunch = TapePunch.Instance;
+			_tapePunch = TapePunchManager.Instance;
 
 			_schedulerManager = SchedulerManager.Instance;
 			_schedulerManager.Schedule += SchedulerManager_Schedule;
@@ -330,7 +329,7 @@ namespace WinTlx
 				return;
 			}
 
-			char? chr = CodeConversion.KeyboardCharacters(e.KeyChar);
+			char? chr = CodeManager.KeyboardCharacters(e.KeyChar);
 			if (chr != null)
 			{
 				switch(chr)
@@ -374,19 +373,10 @@ namespace WinTlx
 
 		#region TerminalPb-Events
 
-		private void TerminalPb_Enter()
+		private void TerminalPb_Paint(object sender, PaintEventArgs e)
 		{
-			Debug.WriteLine("Enter");
-		}
-
-		private void TerminalPb_Leave()
-		{
-			Debug.WriteLine("Leave");
-		}
-
-		private void TerminalPb_MouseClick(object sender, MouseEventArgs e)
-		{
-			SetFocus();
+			Graphics g = e.Graphics;
+			TerminalRefresh(g, TerminalPb.Focused);
 		}
 
 		private void TerminalPb_MouseDown(object sender, MouseEventArgs e)
@@ -510,15 +500,6 @@ namespace WinTlx
 			SetConnectState();
 		}
 
-		/*
-		private async Task<bool> DoQuery(string searchStr)
-		{
-			searchStr = searchStr.Trim();
-
-			return true;
-		}
-		*/
-
 		private async void ConnectBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
@@ -580,19 +561,19 @@ namespace WinTlx
 		private void SendBellBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			_itelex.SendAsciiChar(CodeConversion.ASC_BEL);
+			_itelex.SendAsciiChar(CodeManager.ASC_BEL);
 		}
 
 		private void SendLettersBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			_itelex.SendAsciiChar(CodeConversion.ASC_LTRS);
+			_itelex.SendAsciiChar(CodeManager.ASC_LTRS);
 		}
 
 		private void SendFiguresBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			_itelex.SendAsciiChar(CodeConversion.ASC_FIGS);
+			_itelex.SendAsciiChar(CodeManager.ASC_FIGS);
 		}
 
 		private void SendCarriageReturnBtn_Click(object sender, EventArgs e)
@@ -616,7 +597,7 @@ namespace WinTlx
 		private void SendNullBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			SendAsciiText(CodeConversion.ASC_NUL.ToString());
+			SendAsciiText(CodeManager.ASC_NUL.ToString());
 		}
 
 		private void SendLineBtn_Click(object sender, EventArgs e)
@@ -624,28 +605,35 @@ namespace WinTlx
 			SetFocus();
 			SendAsciiText("\r\n");
 			SendAsciiText(new string('-', 68));
-			SendAsciiText("\r\n");
+			//SendAsciiText("\r\n");
 		}
 
 		private void SendRyBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			for (int l = 0; l < 10; l++)
+			SendAsciiText("\r\n");
+			for (int i = 0; i < 34; i++)
 			{
-				for (int i = 0; i < 33; i++)
+				SendAsciiText("ry");
+			}
+
+			/*
+			for (int l = 0; l < 6; l++)
+			{
+				for (int i = 0; i < 34; i++)
 				{
 					SendAsciiText("ry");
 				}
 				SendAsciiText("\r\n");
 			}
+			*/
 		}
 
 		private void SendFoxBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			//SendAsciiText("the quick brown fox jumps over the lazy dog 1234567890/:,-=()");
+			SendAsciiText("\r\n");
 			SendAsciiText(LngText(LngKeys.Message_Pangram));
-			//SendAsciiText("\r\n");
 		}
 
 		private void ClearBtn_Click(object sender, EventArgs e)
@@ -693,7 +681,7 @@ namespace WinTlx
 		{
 			if (_tapePunchForm == null)
 			{
-				_tapePunchForm = new TapePunchHorizontalForm(this.Bounds);
+				_tapePunchForm = new TapePunchForm(this.Bounds);
 				_tapePunchForm.Closed += TapePunchForm_Closed;
 				_tapePunchForm.Show();
 			}
@@ -756,11 +744,11 @@ namespace WinTlx
 			{
 				switch (asciiText[i])
 				{
-					case CodeConversion.ASC_BEL:
+					case CodeManager.ASC_BEL:
 						SystemSounds.Beep.Play();
 						AddText(asciiText, CharAttributes.Recv);
 						return;
-					case CodeConversion.ASC_WRU:
+					case CodeManager.ASC_WRU:
 						SendHereIs();
 						AddText(asciiText, CharAttributes.Recv);
 						return;
@@ -777,30 +765,19 @@ namespace WinTlx
 				char c = asciiText[i];
 				switch (c)
 				{
-					case CodeConversion.ASC_NUL:
+					case CodeManager.ASC_NUL:
 						continue;
-					case CodeConversion.ASC_BEL:
+					case CodeManager.ASC_BEL:
 						SystemSounds.Beep.Play();
 						break;
-					case CodeConversion.ASC_LTRS:
-					case CodeConversion.ASC_FIGS:
+					case CodeManager.ASC_LTRS:
+					case CodeManager.ASC_FIGS:
 						continue;
 				}
 				dispText += c;
 			}
 			AddText(dispText, CharAttributes.Send);
 		}
-
-		/*
-		private void BaudotSendRecvHandler(byte[] code)
-		{
-			for (int i = 0; i < code.Length; i++)
-			{
-				//_tapePunch.PunchCode(code[i], _itelex.ShiftState);
-				//_tapePunchForm.PunchCode(code[i], _itelex.ShiftState);
-			}
-		}
-		*/
 
 		private void SubcribeServerMessageHandler(string message)
 		{
@@ -829,7 +806,7 @@ namespace WinTlx
 
 			Helper.ControlInvokeRequired(SendLettersBtn, () =>
 			{
-				if (_itelex.ShiftState == CodeConversion.ShiftStates.Unknown || _itelex.ShiftState == CodeConversion.ShiftStates.Figs)
+				if (_itelex.ShiftState == ShiftStates.Unknown || _itelex.ShiftState == ShiftStates.Figs)
 				{
 					SendLettersBtn.ForeColor = Color.Black;
 				}
@@ -841,7 +818,7 @@ namespace WinTlx
 
 			Helper.ControlInvokeRequired(SendFiguresBtn, () =>
 			{
-				if (_itelex.ShiftState == CodeConversion.ShiftStates.Unknown || _itelex.ShiftState == CodeConversion.ShiftStates.Ltr)
+				if (_itelex.ShiftState == ShiftStates.Unknown || _itelex.ShiftState == ShiftStates.Ltr)
 				{
 					SendFiguresBtn.ForeColor = Color.Black;
 				}
@@ -916,12 +893,12 @@ namespace WinTlx
 
 		private void SendBel()
 		{
-			SendAsciiText(CodeConversion.ASC_BEL.ToString());
+			SendAsciiText(CodeManager.ASC_BEL.ToString());
 		}
 
 		private void SendWhoAreYou()
 		{
-			SendAsciiText(CodeConversion.ASC_WRU.ToString());
+			SendAsciiText(CodeManager.ASC_WRU.ToString());
 		}
 
 		private void SendHereIs()
@@ -1138,7 +1115,6 @@ namespace WinTlx
 		private ContextMenuStrip CreateContextMenu()
 		{
 			ContextMenuStrip contextMenu = new ContextMenuStrip();
-			//bool needSep = false;
 			List<ToolStripMenuItem> endItems = new List<ToolStripMenuItem>();
 			endItems.Add(new ToolStripMenuItem("Clear"));
 			endItems.Add(new ToolStripMenuItem("Copy"));
@@ -1190,17 +1166,12 @@ namespace WinTlx
 			_tapePunchForm?.SetPosition(this.Bounds);
 		}
 
-		private void MainForm_Activated(object sender, EventArgs e)
-		{
-			//_tapePunchForm?.Activate();
-		}
-
 		private void SendClientUpdate(int number, int pin, int publicPort)
 		{
 			ClientUpdateReply reply = _subscriberServer.SendClientUpdate(number, pin, publicPort);
 			if (reply.Success)
 			{
-				SubcribeServerMessageHandler($"update {number} {reply.IpAddress}:{publicPort}");
+				SubcribeServerMessageHandler($"update {number} ok / {reply.IpAddress}:{publicPort}");
 			}
 			else
 			{
@@ -1229,12 +1200,6 @@ namespace WinTlx
 		private void LinealPnl_Paint(object sender, PaintEventArgs e)
 		{
 			Helper.PaintRuler(e.Graphics, SCREEN_WIDTH, 8.98F);
-		}
-
-		private void TerminalPb_Paint(object sender, PaintEventArgs e)
-		{
-			Graphics g = e.Graphics;
-			TerminalRefresh(g, TerminalPb.Focused);
 		}
 
 		private void TerminalRefresh(Graphics g, bool focus)
@@ -1288,11 +1253,11 @@ namespace WinTlx
 					Point p = new Point(x * CHAR_WIDTH, y * CHAR_HEIGHT);
 					switch (chr)
 					{
-						case CodeConversion.ASC_BEL:
+						case CodeManager.ASC_BEL:
 							//g.DrawString("⍾", font, new SolidBrush(scrChr.AttrColor), p);
 							g.DrawImage(_specialCharacters.GetBell(scrChr.AttrColor), x * CHAR_WIDTH + 3, y * CHAR_HEIGHT + 3, CHAR_WIDTH, CHAR_HEIGHT);
 							break;
-						case CodeConversion.ASC_WRU:
+						case CodeManager.ASC_WRU:
 							//g.DrawString("✠", font, new SolidBrush(scrChr.AttrColor), p);
 							g.DrawImage(_specialCharacters.GetWru(scrChr.AttrColor), x * CHAR_WIDTH + 3, y * CHAR_HEIGHT + 3, CHAR_WIDTH, CHAR_HEIGHT);
 							break;
@@ -1303,6 +1268,8 @@ namespace WinTlx
 				}
 			}
 		}
+
+		#region Scheduler
 
 		private void SchedulerManager_Schedule(ScheduleEventArgs args)
 		{
@@ -1421,7 +1388,7 @@ namespace WinTlx
 					int col = 0;
 					for (int i=0; i<line.Length; i++)
 					{
-						if (line[i]==CodeConversion.ASC_CR)
+						if (line[i]==CodeManager.ASC_CR)
 						{
 							col = 0;
 						}
@@ -1469,7 +1436,7 @@ namespace WinTlx
 
 		private void ScheduleWru()
 		{
-			_itelex.SendAsciiChar(CodeConversion.ASC_WRU);
+			_itelex.SendAsciiChar(CodeManager.ASC_WRU);
 			WaitSend(5000);
 			WaitRecv(5000);
 			//ShowLocalMessage("wait WRU ok");
@@ -1478,6 +1445,8 @@ namespace WinTlx
 			WaitSend(5000);
 			//ShowLocalMessage("wait here is ok");
 		}
+
+		#endregion
 
 		private void WaitSend(int millis)
 		{

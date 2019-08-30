@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using WinTlx.Codes;
 using WinTlx.Config;
 using WinTlx.Languages;
 
@@ -98,8 +99,8 @@ namespace WinTlx
 		private EyeballChar _eyeballChar;
 		public bool EyeballCharActive { get; set; }
 
-		private CodeConversion.ShiftStates _shiftState;
-		public CodeConversion.ShiftStates ShiftState
+		private ShiftStates _shiftState;
+		public ShiftStates ShiftState
 		{
 			get {return _shiftState; }
 			set { _shiftState = value; }
@@ -313,7 +314,7 @@ namespace WinTlx
 				}
 				else
 				{
-					SendCode(CodeConversion.BAU_FIG, ref _shiftState);
+					SendCode(CodeManager.BAU_FIG, ref _shiftState);
 				}
 				Update?.Invoke();
 
@@ -344,7 +345,7 @@ namespace WinTlx
 
 			EyeballCharActive = false;
 
-			_shiftState = CodeConversion.ShiftStates.Unknown;
+			_shiftState = ShiftStates.Unknown;
 			//_echoShiftState = CodeConversion.ShiftStates.Unknown;
 			_lastActivityTimer = 0;
 
@@ -506,7 +507,7 @@ namespace WinTlx
 
 			SetLastSendRecv();
 
-			string telexData = CodeConversion.AsciiStringToTelex(asciiStr, _config.CodeStandard);
+			string telexData = CodeManager.AsciiStringToTelex(asciiStr, _config.CodeSet);
 			Send?.Invoke(telexData);
 
 			if (ConnectionState == ConnectionStates.AsciiTexting)
@@ -516,11 +517,14 @@ namespace WinTlx
 			}
 			else
 			{
-				byte[] baudotData = CodeConversion.AsciiStringToBaudot(asciiStr, ref _shiftState, _config.CodeStandard);
-				for (int i = 0; i < baudotData.Length; i++)
+				for (int c = 0; c < asciiStr.Length; c++)
 				{
-					byte chr = baudotData[i];
-					SendCode(baudotData[i], ref _shiftState);
+					byte[] baudotData = CodeManager.AsciiStringToBaudot(asciiStr[c].ToString(), ref _shiftState, _config.CodeSet);
+					for (int i = 0; i < baudotData.Length; i++)
+					{
+						byte chr = baudotData[i];
+						SendCode(baudotData[i], ref _shiftState);
+					}
 				}
 				Update?.Invoke();
 			}
@@ -557,16 +561,17 @@ namespace WinTlx
 			}
 		}
 
-		private void SendCode(byte baudotCode, ref CodeConversion.ShiftStates shiftState)
+		private void SendCode(byte baudotCode, ref ShiftStates shiftState)
 		{
-			byte[] codes = CodeConversion.BaudotCodeToBaudotWithShift(baudotCode, shiftState, ref shiftState);
+			byte[] codes = CodeManager.BaudotCodeToBaudotWithShift(baudotCode, shiftState, ref shiftState);
 
 			if (EyeballCharActive)
 			{
 				byte[] buffer = new byte[0];
 				for (int i=0; i<codes.Length; i++)
 				{
-					byte[] newCodes = _eyeballChar.GetPunchCodes(codes[i], shiftState == CodeConversion.ShiftStates.Ltr ? 0 : 1);
+					byte[] newCodes =
+							_eyeballChar.GetPunchCodes(codes[i], shiftState);
 					buffer = Helper.AddBytes(buffer, newCodes);
 				}
 				codes = buffer;
@@ -595,7 +600,7 @@ namespace WinTlx
 
 		public void SendBaudotCode(byte code)
 		{
-			string asciiStr = CodeConversion.BaudotStringToAscii(new byte[] { code }, ref _shiftState, _config.CodeStandard);
+			string asciiStr = CodeManager.BaudotStringToAscii(new byte[] { code }, ref _shiftState, _config.CodeSet);
 			Send?.Invoke(asciiStr);
 
 			if (IsConnected && !Local)
@@ -827,7 +832,7 @@ namespace WinTlx
 				case ItelexCommands.BaudotData:
 					if (packet.Len > 0)
 					{
-						string asciiStr = CodeConversion.BaudotStringToAscii(packet.Data, ref _shiftState, _config.CodeStandard);
+						string asciiStr = CodeManager.BaudotStringToAscii(packet.Data, ref _shiftState, _config.CodeSet);
 						AddReceivedCharCount(packet.Data.Length);
 						Received?.Invoke(asciiStr);
 						BaudotSendRecv?.Invoke(packet.Data);

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WinTlx.Codes;
 using WinTlx.Config;
 using WinTlx.Languages;
 
@@ -15,7 +16,7 @@ namespace WinTlx.Config
 	public partial class ConfigForm : Form
 	{
 		private const string TAG = "ConfigForm";
-		//private ConfigData _config;
+		//private ConfigData _config;x:
 
 		private Rectangle _parentWindowsPosition;
 
@@ -33,11 +34,13 @@ namespace WinTlx.Config
 			LanguageManager.Instance.LanguageChanged += LanguageChanged;
 			LanguageChanged();
 
-			CodeStandardCb.DataSource = new string[]
-				{
-					ConfigData.CodeStandardToString(CodeStandards.Ita2),
-					ConfigData.CodeStandardToString(CodeStandards.UsTTy)
-				};
+			var enums = Enum.GetValues(typeof(CodeSets));
+			string[] codeSets = new string[CodeItem.CODESETS_COUNT];
+			for (int i=0; i<CodeItem.CODESETS_COUNT; i++)
+			{
+				codeSets[i] = ConfigData.CodeSetToString((CodeSets)enums.GetValue(i));
+			}
+			CodeSetCb.DataSource = codeSets;
 
 			LanguageCb.DataSource = LanguageManager.Instance.LanguageList;
 			LanguageCb.DisplayMember = "Key";
@@ -57,7 +60,7 @@ namespace WinTlx.Config
 			AnswerbackLbl.Text = LngText(LngKeys.Setup_Answerback);
 			IdleTimeoutLbl.Text = LngText(LngKeys.Setup_IdleTimeout);
 			OutputSpeedLbl.Text = LngText(LngKeys.Setup_OutputSpeed);
-			CodeStandardCb.Text = LngText(LngKeys.Setup_CodeStandard);
+			CodeSetLbl.Text = LngText(LngKeys.Setup_CodeSet);
 
 			SubscribeServerGb.Text = LngText(LngKeys.Setup_SubscribeServer);
 			SubscribeServerAddressLbl.Text = LngText(LngKeys.Setup_SubscribeServerAddress);
@@ -68,6 +71,8 @@ namespace WinTlx.Config
 			ExtensionNumberLbl.Text = LngText(LngKeys.Setup_ExtensionNumber);
 			IncomingLocalPortLbl.Text = LngText(LngKeys.Setup_IncomingLocalPort);
 			IncomingPublicPortLbl.Text = LngText(LngKeys.Setup_IncomingPublicPort);
+			ServerDataHintLbl.Text = LngText(LngKeys.Setup_ServerDataHint);
+
 			CancelBtn.Text = LngText(LngKeys.Setup_CancelButton);
 			SaveBtn.Text = LngText(LngKeys.Setup_SaveButton);
 		}
@@ -89,13 +94,13 @@ namespace WinTlx.Config
 			LogFilePathTb.Text = _config.LogfilePath;
 			AnswerbackTb.Text = _config.Answerback;
 			IdleTimeoutTb.Text = IntToStr(_config.IdleTimeout);
-			CodeStandardCb.SelectedItem = ConfigData.CodeStandardToString(_config.CodeStandard);
+			CodeSetCb.SelectedItem = ConfigData.CodeSetToString(_config.CodeSet);
 			OutputSpeedTb.Text = IntToStr(_config.OutputSpeed);
 			SubscribeServerAddressTb.Text = _config.SubscribeServerAddress;
 			SubscribeServerPortTb.Text = IntToStr(_config.SubscribeServerPort);
 			SubscribeServerUpdatePinTb.Text = IntToStr(_config.SubscribeServerUpdatePin);
 			OwnNumberTb.Text = IntToStr(_config.OwnNumber);
-			ExtensionNumberTb.Text = IntToStr(_config.IncomingExtensionNumber);
+			ExtensionNumberTb.Text = _config.IncomingExtensionNumber.ToString();
 			IncommingLocalPortTb.Text = IntToStr(_config.IncomingLocalPort);
 			IncomingPublicPortTb.Text = IntToStr(_config.IncomingPublicPort);
 		}
@@ -105,7 +110,7 @@ namespace WinTlx.Config
 			_config.LogfilePath = ConfigData.FormatLogPath(LogFilePathTb.Text.Trim());
 			_config.Answerback = AnswerbackTb.Text.Trim();
 			_config.IdleTimeout = StrToInt(IdleTimeoutTb.Text);
-			_config.CodeStandard = ConfigData.StringToCodeStandard((string)CodeStandardCb.SelectedItem);
+			_config.CodeSet = ConfigData.StringToCodeSet((string)CodeSetCb.SelectedItem);
 			_config.OutputSpeed = StrToInt(OutputSpeedTb.Text);
 			_config.SubscribeServerAddress = SubscribeServerAddressTb.Text.Trim();
 			_config.SubscribeServerPort = StrToInt(SubscribeServerPortTb.Text);

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace WinTlx
+namespace WinTlx.Codes
 {
 	class EyeballChar
 	{
@@ -71,14 +71,18 @@ namespace WinTlx
 		/// <param name="baudotCode">0..31</param>
 		/// <param name="shift">0=letters, 1=figures</param>
 		/// <returns></returns>
-		public byte[] GetPunchCodes(int baudotCode, int shift)
+		public byte[] GetPunchCodes(int baudotCode, ShiftStates shift)
 		{
 			if (baudotCode == 0x00)
 			{   // code32
 				return new byte[] { 0x00 };
 			}
 
-			int code = baudotCode + 32 * shift;
+			int code = baudotCode;
+			if (shift==ShiftStates.Figs)
+			{
+				code += 32;
+			}
 			return (from p in _punchCodes where p.BaudotCode == code select p.Pattern).FirstOrDefault();
 		}
 
@@ -144,7 +148,7 @@ namespace WinTlx
 				46,			// 13 ?
 				40,			// 14 '
 				33,			// 15 6
-				-1,			// 16 ! / %
+				49,			// 16 ! / %
 				43,			// 17 /
 				39,			// 18 -
 				28,			// 19 2
@@ -156,6 +160,16 @@ namespace WinTlx
 				-1	        // 1F LTR
 			}
 		};
+
+		public enum EyeballCharEnum
+		{
+			None,
+			Space,
+			A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
+			D1, D2, D3, D4, D5, D6, D7, D8, D9,
+			Plus, Minus, Hyphen, BracketOpen, BracketClose, Slash, Colon, Equal, QuestionMark,
+			Comma, Dot, ExclamationMark
+		}
 
 		private string[,] _charLines =
 		{
@@ -558,6 +572,14 @@ namespace WinTlx
 				"",
 				"**",
 				"**"
+			},
+			// 49 !
+			{
+				"*",
+				"*",
+				"*",
+				"",
+				"*"
 			},
 		};
 	}

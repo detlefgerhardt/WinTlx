@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using WinTlx.Codes;
 using WinTlx.Languages;
 
 namespace WinTlx.Config
@@ -32,10 +33,11 @@ namespace WinTlx.Config
 		{
 			return new ConfigData()
 			{
+				Language = "en",
 				Answerback = Constants.DEFAULT_ANSWERBACK,
 				IdleTimeout = Constants.DEFAULT_IDLE_TIMEOUT,
 				OutputSpeed = 0,
-				CodeStandard = CodeStandards.Ita2,
+				CodeSet = CodeSets.ITA2,
 				IncomingLocalPort = Constants.DEFAULT_INCOMING_PORT,
 				IncomingPublicPort = Constants.DEFAULT_INCOMING_PORT,
 				IncomingExtensionNumber = 0,

@@ -651,7 +651,6 @@
 			this.TerminalPb.Size = new System.Drawing.Size(634, 375);
 			this.TerminalPb.TabIndex = 57;
 			this.TerminalPb.Paint += new System.Windows.Forms.PaintEventHandler(this.TerminalPb_Paint);
-			this.TerminalPb.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TerminalPb_MouseClick);
 			this.TerminalPb.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TerminalPb_MouseDown);
 			// 
 			// MainForm
@@ -680,7 +679,6 @@
 			this.MinimumSize = new System.Drawing.Size(750, 480);
 			this.Name = "MainForm";
 			this.Text = "WinTlx";
-			this.Activated += new System.EventHandler(this.MainForm_Activated);
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.Shown += new System.EventHandler(this.MainForm_Shown);
