@@ -59,6 +59,8 @@ namespace WinTlx.Codes
 			}
 		}
 
+		private Exception _illegalCodeExeption = new Exception("illegal code definition");
+
 		public CodeItem(byte code, char?[] charLtr, char?[] charFig, string[] nameLtr, string[] nameFig, char? charExt = null, string nameExt = null)
 		{
 			Code = code;
@@ -71,6 +73,10 @@ namespace WinTlx.Codes
 			{
 				SetCharLtr(charLtr[0]);
 			}
+			else
+			{
+				throw _illegalCodeExeption;
+			}
 
 			if (charFig.Length == CODESETS_COUNT)
 			{
@@ -79,6 +85,10 @@ namespace WinTlx.Codes
 			else if (charFig.Length==1)
 			{
 				SetCharFig(charFig[0]);
+			}
+			else
+			{
+				throw _illegalCodeExeption;
 			}
 
 			if (nameLtr.Length == CODESETS_COUNT)
@@ -89,6 +99,10 @@ namespace WinTlx.Codes
 			{
 				SetNameLtr(nameLtr[0]);
 			}
+			else
+			{
+				throw _illegalCodeExeption;
+			}
 
 			if (nameFig.Length == CODESETS_COUNT)
 			{
@@ -97,6 +111,10 @@ namespace WinTlx.Codes
 			else if (nameFig.Length == 1)
 			{
 				SetNameFig(nameFig[0]);
+			}
+			else
+			{
+				throw _illegalCodeExeption;
 			}
 
 			CharExt = charExt;

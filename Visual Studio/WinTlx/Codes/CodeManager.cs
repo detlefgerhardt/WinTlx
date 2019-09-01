@@ -484,7 +484,7 @@ namespace WinTlx.Codes
 				new char?[] { 'h' },
 				new char?[] { ASC_SHIFTH, '#' },
 				new string[] { "h" },
-				new string[] { ASC_SHIFTH.ToString(), "#", "#" },
+				new string[] { ASC_SHIFTH.ToString(), "#" },
 				'#',
 				"#"
 				),
