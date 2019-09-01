@@ -60,5 +60,10 @@ Version history
 	- New: Real overtyping in terminal windows
 	- New: Show gray background if terminal window does not have the focus
 1.0.2.0 - Fix: Some internal rework, many minor bug fixes
-          New: ITA2-EXT character set (ITA2 with additional characters)
+          New: ITA2-EXT code set (ITA2 with additional characters)
           Chg: Rearranged setup Window
+1.0.2.1 - Fix: Button states (enabled/disabled)
+          Fix: Send queue was not thread save
+          Fix: Improved code set handling
+          Fix: Tape punch manual scroll direction
+          Chg: Removed ITA2-EXT code set

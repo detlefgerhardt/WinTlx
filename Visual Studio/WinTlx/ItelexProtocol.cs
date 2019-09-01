@@ -65,6 +65,8 @@ namespace WinTlx
 
 		private TcpListener _tcpListener;
 
+		private object DisconnectLock = new object();
+
 		private TcpClient _client;
 		//private byte[] _incomingData = new byte[0];
 
@@ -113,6 +115,7 @@ namespace WinTlx
 		private int _n_trans;
 		private int _n_ack;
 		private Queue<byte> _sendBuffer;
+		private object _sendBufferLock = new object();
 
 		public int CharsToSendCount
 		{
@@ -143,7 +146,7 @@ namespace WinTlx
 		private bool _incoming = false;
 		//private bool _outgoing = false;
 
-		public string ConnectionStateStr
+		public string ConnectionStateString
 		{
 			get
 			{
@@ -314,7 +317,7 @@ namespace WinTlx
 				}
 				else
 				{
-					SendCode(CodeManager.BAU_FIG, ref _shiftState);
+					SendCode(CodeManager.BAU_FIGS, ref _shiftState);
 				}
 				Update?.Invoke();
 
@@ -328,6 +331,8 @@ namespace WinTlx
 
 		private void ConnectInit()
 		{
+			Debug.WriteLine($"Start {nameof(ConnectInit)}");
+
 			_n_recv = 0;
 			_n_trans = 0;
 			_n_ack = 0;
@@ -358,35 +363,32 @@ namespace WinTlx
 
 			Update?.Invoke();
 			Connected?.Invoke();
-		}
 
-		/*
-		public void StartAck()
-		{
-			_startAck = true;
+			Debug.WriteLine($"End {nameof(ConnectInit)}");
 		}
-		*/
-#warning TODO Warum Disconnect immer noch mal aufgerufen, obwohl die Verbindung schon beendet ist? Aber ConnectionState steht noch nicht auf Disonnected :-(
 
 		public void Disconnect()
 		{
-			if (ConnectionState == ConnectionStates.Disconnected)
+			lock (DisconnectLock)
 			{
-				return;
+				if (ConnectionState == ConnectionStates.Disconnected)
+				{
+					return;
+				}
+
+				_ackTimer.Stop();
+				_sendTimer.Stop();
+
+				ConnectionState = ConnectionStates.Disconnected;
+				_client.Close();
+
+				Local = false;
+
+				Logging.Instance.Log(LogTypes.Info, TAG, nameof(Disconnect), $"connection dropped");
+
+				Dropped?.Invoke();
+				Update?.Invoke();
 			}
-
-			_ackTimer?.Stop();
-			_sendTimer?.Stop();
-
-			ConnectionState = ConnectionStates.Disconnected;
-			_client?.Close();
-
-			Local = true;
-
-			Logging.Instance.Log(LogTypes.Info, TAG, nameof(Disconnect), $"connection dropped");
-
-			Dropped?.Invoke();
-			Update?.Invoke();
 		}
 
 		private void SendTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -445,9 +447,19 @@ namespace WinTlx
 				if (cnt > Constants.WAIT_BEFORE_SEND_ACK)
 					cnt = Constants.WAIT_BEFORE_SEND_ACK;
 				byte[] baudotData = new byte[cnt];
-				for (int i = 0; i < cnt && _sendBuffer.Count > 0; i++)
+				lock (_sendBufferLock)
 				{
-					baudotData[i] = _sendBuffer.Dequeue();
+					for (int i = 0; i < cnt && _sendBuffer.Count > 0; i++)
+					{
+						try
+						{
+							baudotData[i] = _sendBuffer.Dequeue();
+						}
+						catch (Exception ex)
+						{
+							Debug.WriteLine(ex.Message);
+						}
+					}
 				}
 				SendCmd(ItelexCommands.BaudotData, baudotData);
 				Update?.Invoke();
@@ -590,9 +602,12 @@ namespace WinTlx
 				return;
 			}
 
-			for (int i = 0; i < codes.Length; i++)
+			lock (_sendBufferLock)
 			{
-				_sendBuffer.Enqueue(codes[i]);
+				for (int i = 0; i < codes.Length; i++)
+				{
+					_sendBuffer.Enqueue(codes[i]);
+				}
 			}
 			Update?.Invoke();
 			_lastSentMs = Helper.GetTicksMs();
@@ -600,12 +615,15 @@ namespace WinTlx
 
 		public void SendBaudotCode(byte code)
 		{
-			string asciiStr = CodeManager.BaudotStringToAscii(new byte[] { code }, ref _shiftState, _config.CodeSet);
+			string asciiStr = CodeManager.BaudotStringToAscii(new byte[] { code }, ref _shiftState, _config.CodeSet, CodeManager.SendRecv.Send);
 			Send?.Invoke(asciiStr);
 
 			if (IsConnected && !Local)
 			{
-				_sendBuffer.Enqueue(code);
+				lock (_sendBufferLock)
+				{
+					_sendBuffer.Enqueue(code);
+				}
 			}
 
 			Update?.Invoke();
@@ -735,11 +753,13 @@ namespace WinTlx
 				{
 					ConnectionState = ConnectionStates.AsciiTexting;
 				}
+				Update?.Invoke();
 			}
 
 			if (ConnectionState == ConnectionStates.AsciiTexting)
 			{	// ascii
 				string asciiText = Encoding.ASCII.GetString(newData, 0, newData.Length);
+				asciiText = asciiText.Replace('@', CodeManager.ASC_WRU);
 				Received?.Invoke(asciiText);
 				SetLastSendRecv();
 			}
@@ -832,7 +852,7 @@ namespace WinTlx
 				case ItelexCommands.BaudotData:
 					if (packet.Len > 0)
 					{
-						string asciiStr = CodeManager.BaudotStringToAscii(packet.Data, ref _shiftState, _config.CodeSet);
+						string asciiStr = CodeManager.BaudotStringToAscii(packet.Data, ref _shiftState, _config.CodeSet, CodeManager.SendRecv.Recv);
 						AddReceivedCharCount(packet.Data.Length);
 						Received?.Invoke(asciiStr);
 						BaudotSendRecv?.Invoke(packet.Data);

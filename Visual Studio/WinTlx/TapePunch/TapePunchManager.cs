@@ -84,10 +84,10 @@ namespace WinTlx.TapePunch
 				PunchCode(buffer[i], shiftState);
 				switch (buffer[i])
 				{
-					case CodeManager.BAU_LTR:
+					case CodeManager.BAU_LTRS:
 						shiftState = ShiftStates.Ltr;
 						break;
-					case CodeManager.BAU_FIG:
+					case CodeManager.BAU_FIGS:
 						shiftState = ShiftStates.Figs;
 						break;
 				}

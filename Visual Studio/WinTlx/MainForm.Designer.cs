@@ -83,6 +83,10 @@
 			this.LinealPnl = new System.Windows.Forms.Panel();
 			this.SchedulerBtn = new System.Windows.Forms.Button();
 			this.TerminalPb = new SelectablePictureBox();
+			this.ScrollStartBtn = new System.Windows.Forms.Button();
+			this.ScrollUpBtn = new System.Windows.Forms.Button();
+			this.ScrollEndBtn = new System.Windows.Forms.Button();
+			this.ScrollDownBtn = new System.Windows.Forms.Button();
 			this.panel1.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.panel3.SuspendLayout();
@@ -219,7 +223,7 @@
 			// ExitBtn
 			// 
 			this.ExitBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.ExitBtn.Location = new System.Drawing.Point(652, 569);
+			this.ExitBtn.Location = new System.Drawing.Point(680, 569);
 			this.ExitBtn.Name = "ExitBtn";
 			this.ExitBtn.Size = new System.Drawing.Size(80, 23);
 			this.ExitBtn.TabIndex = 32;
@@ -314,7 +318,7 @@
 			// 
 			// SendFileBtn
 			// 
-			this.SendFileBtn.Location = new System.Drawing.Point(652, 257);
+			this.SendFileBtn.Location = new System.Drawing.Point(680, 257);
 			this.SendFileBtn.Name = "SendFileBtn";
 			this.SendFileBtn.Size = new System.Drawing.Size(80, 23);
 			this.SendFileBtn.TabIndex = 25;
@@ -337,6 +341,8 @@
 			this.SearchTb.Name = "SearchTb";
 			this.SearchTb.Size = new System.Drawing.Size(103, 20);
 			this.SearchTb.TabIndex = 1;
+			this.SearchTb.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SearchTb_KeyPress);
+			this.SearchTb.Validated += new System.EventHandler(this.SearchTb_Validated);
 			// 
 			// QueryBtn
 			// 
@@ -532,7 +538,7 @@
 			this.panel5.Controls.Add(this.TimeTb);
 			this.panel5.Location = new System.Drawing.Point(653, 12);
 			this.panel5.Name = "panel5";
-			this.panel5.Size = new System.Drawing.Size(79, 99);
+			this.panel5.Size = new System.Drawing.Size(107, 99);
 			this.panel5.TabIndex = 0;
 			// 
 			// DateTb
@@ -541,7 +547,7 @@
 			this.DateTb.Location = new System.Drawing.Point(5, 32);
 			this.DateTb.Name = "DateTb";
 			this.DateTb.ReadOnly = true;
-			this.DateTb.Size = new System.Drawing.Size(67, 22);
+			this.DateTb.Size = new System.Drawing.Size(94, 22);
 			this.DateTb.TabIndex = 47;
 			this.DateTb.TabStop = false;
 			this.DateTb.Text = "00.00.0000";
@@ -553,7 +559,7 @@
 			this.TimeTb.Location = new System.Drawing.Point(5, 6);
 			this.TimeTb.Name = "TimeTb";
 			this.TimeTb.ReadOnly = true;
-			this.TimeTb.Size = new System.Drawing.Size(67, 22);
+			this.TimeTb.Size = new System.Drawing.Size(94, 22);
 			this.TimeTb.TabIndex = 45;
 			this.TimeTb.TabStop = false;
 			this.TimeTb.Text = "00:00:00";
@@ -562,7 +568,7 @@
 			// AboutBtn
 			// 
 			this.AboutBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.AboutBtn.Location = new System.Drawing.Point(652, 540);
+			this.AboutBtn.Location = new System.Drawing.Point(680, 540);
 			this.AboutBtn.Name = "AboutBtn";
 			this.AboutBtn.Size = new System.Drawing.Size(80, 23);
 			this.AboutBtn.TabIndex = 31;
@@ -572,7 +578,7 @@
 			// 
 			// UpdateIpAddressBtn
 			// 
-			this.UpdateIpAddressBtn.Location = new System.Drawing.Point(652, 146);
+			this.UpdateIpAddressBtn.Location = new System.Drawing.Point(680, 146);
 			this.UpdateIpAddressBtn.Name = "UpdateIpAddressBtn";
 			this.UpdateIpAddressBtn.Size = new System.Drawing.Size(80, 23);
 			this.UpdateIpAddressBtn.TabIndex = 27;
@@ -583,7 +589,7 @@
 			// ConfigBtn
 			// 
 			this.ConfigBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.ConfigBtn.Location = new System.Drawing.Point(652, 511);
+			this.ConfigBtn.Location = new System.Drawing.Point(680, 511);
 			this.ConfigBtn.Name = "ConfigBtn";
 			this.ConfigBtn.Size = new System.Drawing.Size(80, 23);
 			this.ConfigBtn.TabIndex = 30;
@@ -593,7 +599,7 @@
 			// 
 			// TapePunchBtn
 			// 
-			this.TapePunchBtn.Location = new System.Drawing.Point(652, 188);
+			this.TapePunchBtn.Location = new System.Drawing.Point(680, 188);
 			this.TapePunchBtn.Name = "TapePunchBtn";
 			this.TapePunchBtn.Size = new System.Drawing.Size(80, 23);
 			this.TapePunchBtn.TabIndex = 28;
@@ -604,7 +610,7 @@
 			// EyeballCharCb
 			// 
 			this.EyeballCharCb.Appearance = System.Windows.Forms.Appearance.Button;
-			this.EyeballCharCb.Location = new System.Drawing.Point(652, 217);
+			this.EyeballCharCb.Location = new System.Drawing.Point(680, 217);
 			this.EyeballCharCb.Name = "EyeballCharCb";
 			this.EyeballCharCb.Size = new System.Drawing.Size(80, 23);
 			this.EyeballCharCb.TabIndex = 29;
@@ -616,13 +622,14 @@
 			// RecvOnCb
 			// 
 			this.RecvOnCb.Appearance = System.Windows.Forms.Appearance.Button;
-			this.RecvOnCb.Location = new System.Drawing.Point(652, 117);
+			this.RecvOnCb.Location = new System.Drawing.Point(680, 117);
 			this.RecvOnCb.Name = "RecvOnCb";
 			this.RecvOnCb.Size = new System.Drawing.Size(80, 23);
 			this.RecvOnCb.TabIndex = 26;
 			this.RecvOnCb.Text = "Recv On";
 			this.RecvOnCb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			this.RecvOnCb.UseVisualStyleBackColor = true;
+			this.RecvOnCb.CheckedChanged += new System.EventHandler(this.RecvOnCb_CheckedChanged);
 			this.RecvOnCb.Click += new System.EventHandler(this.RecvOnCb_Click);
 			// 
 			// LinealPnl
@@ -636,7 +643,7 @@
 			// SchedulerBtn
 			// 
 			this.SchedulerBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.SchedulerBtn.Location = new System.Drawing.Point(652, 482);
+			this.SchedulerBtn.Location = new System.Drawing.Point(680, 482);
 			this.SchedulerBtn.Name = "SchedulerBtn";
 			this.SchedulerBtn.Size = new System.Drawing.Size(80, 23);
 			this.SchedulerBtn.TabIndex = 56;
@@ -653,11 +660,55 @@
 			this.TerminalPb.Paint += new System.Windows.Forms.PaintEventHandler(this.TerminalPb_Paint);
 			this.TerminalPb.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TerminalPb_MouseDown);
 			// 
+			// ScrollStartBtn
+			// 
+			this.ScrollStartBtn.Location = new System.Drawing.Point(652, 217);
+			this.ScrollStartBtn.Name = "ScrollStartBtn";
+			this.ScrollStartBtn.Size = new System.Drawing.Size(22, 23);
+			this.ScrollStartBtn.TabIndex = 58;
+			this.ScrollStartBtn.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.ScrollStartBtn.UseVisualStyleBackColor = true;
+			this.ScrollStartBtn.Click += new System.EventHandler(this.ScrollStartBtn_Click);
+			// 
+			// ScrollUpBtn
+			// 
+			this.ScrollUpBtn.Location = new System.Drawing.Point(652, 246);
+			this.ScrollUpBtn.Name = "ScrollUpBtn";
+			this.ScrollUpBtn.Size = new System.Drawing.Size(22, 23);
+			this.ScrollUpBtn.TabIndex = 59;
+			this.ScrollUpBtn.Text = "^";
+			this.ScrollUpBtn.UseVisualStyleBackColor = true;
+			this.ScrollUpBtn.Click += new System.EventHandler(this.ScrollUpBtn_Click);
+			// 
+			// ScrollEndBtn
+			// 
+			this.ScrollEndBtn.Location = new System.Drawing.Point(652, 569);
+			this.ScrollEndBtn.Name = "ScrollEndBtn";
+			this.ScrollEndBtn.Size = new System.Drawing.Size(22, 23);
+			this.ScrollEndBtn.TabIndex = 60;
+			this.ScrollEndBtn.Text = "v";
+			this.ScrollEndBtn.UseVisualStyleBackColor = true;
+			this.ScrollEndBtn.Click += new System.EventHandler(this.ScrollEndBtn_Click);
+			// 
+			// ScrollDownBtn
+			// 
+			this.ScrollDownBtn.Location = new System.Drawing.Point(653, 540);
+			this.ScrollDownBtn.Name = "ScrollDownBtn";
+			this.ScrollDownBtn.Size = new System.Drawing.Size(22, 23);
+			this.ScrollDownBtn.TabIndex = 61;
+			this.ScrollDownBtn.Text = "v";
+			this.ScrollDownBtn.UseVisualStyleBackColor = true;
+			this.ScrollDownBtn.Click += new System.EventHandler(this.ScrollDownBtn_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(741, 604);
+			this.ClientSize = new System.Drawing.Size(775, 604);
+			this.Controls.Add(this.ScrollDownBtn);
+			this.Controls.Add(this.ScrollEndBtn);
+			this.Controls.Add(this.ScrollUpBtn);
+			this.Controls.Add(this.ScrollStartBtn);
 			this.Controls.Add(this.TerminalPb);
 			this.Controls.Add(this.SchedulerBtn);
 			this.Controls.Add(this.LinealPnl);
@@ -755,6 +806,10 @@
 		private System.Windows.Forms.TextBox ConnectionStateTb;
 		private System.Windows.Forms.Button SchedulerBtn;
 		private SelectablePictureBox TerminalPb;
+		private System.Windows.Forms.Button ScrollStartBtn;
+		private System.Windows.Forms.Button ScrollUpBtn;
+		private System.Windows.Forms.Button ScrollEndBtn;
+		private System.Windows.Forms.Button ScrollDownBtn;
 	}
 }
 

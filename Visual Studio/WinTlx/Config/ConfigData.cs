@@ -72,8 +72,8 @@ namespace WinTlx.Config
 				default:
 				case "ITA-2":
 					return CodeSets.ITA2;
-				case "ITA-2 EXT":
-					return CodeSets.ITA2EXT;
+				//case "ITA-2 EXT":
+				//	return CodeSets.ITA2EXT;
 				case "US-TTY":
 					return CodeSets.USTTY;
 			}
@@ -86,8 +86,8 @@ namespace WinTlx.Config
 				default:
 				case CodeSets.ITA2:
 					return "ITA-2";
-				case CodeSets.ITA2EXT:
-					return "ITA-2 EXT";
+				//case CodeSets.ITA2EXT:
+				//	return "ITA-2 EXT";
 				case CodeSets.USTTY:
 					return "US-TTY";
 			}

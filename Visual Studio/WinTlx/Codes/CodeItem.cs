@@ -14,12 +14,13 @@ namespace WinTlx.Codes
 		Both
 	}
 
-	public enum CodeSets { ITA2 = 0, ITA2EXT = 1, USTTY = 2 };
+	//public enum CodeSets { ITA2 = 0, ITA2EXT = 1, USTTY = 2 };
+	public enum CodeSets { ITA2 = 0, USTTY = 1 };
 
 	public class CodeItem
 	{
 
-		public const int CODESETS_COUNT = 3;
+		public const int CODESETS_COUNT = 2;
 
 		public byte Code { get; set; }
 

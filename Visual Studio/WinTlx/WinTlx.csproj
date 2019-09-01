@@ -117,7 +117,7 @@
     <Compile Include="SendFileForm.Designer.cs">
       <DependentUpon>SendFileForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SpecialCharacters.cs" />
+    <Compile Include="Codes\SpecialCharacters.cs" />
     <Compile Include="TapePunch\PunchLine.cs" />
     <Compile Include="TapePunch\TapePunchManager.cs" />
     <Compile Include="TapePunch\TapePunchForm.cs">

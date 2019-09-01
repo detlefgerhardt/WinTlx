@@ -189,12 +189,12 @@ namespace WinTlx.TapePunch
 
 		private void ScrollLeftBtn_Click(object sender, EventArgs e)
 		{
-			_tapePunch.ScrollLeft(5);
+			_tapePunch.ScrollRight(5);
 		}
 
 		private void ScrollRightBtn_Click(object sender, EventArgs e)
 		{
-			_tapePunch.ScrollRight(5);
+			_tapePunch.ScrollLeft(5);
 		}
 	}
 }
