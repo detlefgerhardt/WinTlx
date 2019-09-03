@@ -18,6 +18,8 @@ A Windows test und diagnostic tool for the i-Telex network
 - Multi-language support
 - Scheduler for automatic sending of text file (experimental)
 
+WinTlx is a single Windows EXE file with optinal language files. No installation required.
+Requires .NET Frame 4.5 or higher.
 
 ![Screenshot](https://github.com/detlefgerhardt/WinTlx/blob/master/WinTlxScreen.png)
 
