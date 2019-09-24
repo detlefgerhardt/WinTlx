@@ -23,8 +23,10 @@ Requires .NET Frame 4.5 or higher.
 
 ![Screenshot](https://github.com/detlefgerhardt/WinTlx/blob/master/WinTlxScreen.png)
 
-## Credits
+## Links
 
 An [i-Telex-Library](https://sourceforge.net/projects/itelex) for Arduino/Atmel by Fred Sonnenrein.
 
 The [piTelex project](https://github.com/fablab-wue/piTelex) by FabLab Würzburg.
+
+i-Telex interface for Arduino [ArduinoTW39](https://github.com/glsys/ArduinoTW39).
