@@ -61,7 +61,7 @@ namespace WinTlx
 		public delegate void MessageEventHandler(string asciiText);
 		public event MessageEventHandler Message;
 
-		private const int RECV_BUFFERSIZE = 255 + 2;
+		private const int RECV_BUFFERSIZE = 2048;
 
 		private TcpListener _tcpListener;
 
@@ -823,10 +823,13 @@ namespace WinTlx
 		{
 			if (packet.CommandType != ItelexCommands.Ack)
 			{
-				//Logging.Instance.Log(LogTypes.Debug, TAG, nameof(DecodePacket),
-				//		$"Recv packet {packet.CommandType} {packet.Command:X02} {packet.GetDebugData()}");
-				Logging.Instance.Log(LogTypes.Debug, TAG, nameof(DecodePacket),
+				if (packet.CommandType != ItelexCommands.Ack)
+				{
+					//Logging.Instance.Log(LogTypes.Debug, TAG, nameof(DecodePacket),
+					//		$"Recv packet {packet.CommandType} {packet.Command:X02} {packet.GetDebugData()}");
+					Logging.Instance.Log(LogTypes.Debug, TAG, nameof(DecodePacket),
 						$"Recv packet {packet.CommandType} {packet.GetDebugPacket()}");
+				}
 			}
 
 			switch ((ItelexCommands)packet.Command)
@@ -853,6 +856,7 @@ namespace WinTlx
 					if (packet.Len > 0)
 					{
 						string asciiStr = CodeManager.BaudotStringToAscii(packet.Data, ref _shiftState, _config.CodeSet, CodeManager.SendRecv.Recv);
+						Logging.Instance.Log(LogTypes.Debug, TAG, nameof(DecodePacket), $"Recv {packet.CommandType} {packet.Len} \"{CodeManager.AsciiToDebugStr(asciiStr)}\"");
 						AddReceivedCharCount(packet.Data.Length);
 						Received?.Invoke(asciiStr);
 						BaudotSendRecv?.Invoke(packet.Data);

@@ -243,6 +243,53 @@ namespace WinTlx.Codes
 			return new byte[0];
 		}
 
+		public static string AsciiToDebugStr(string ascStr)
+		{
+			string newStr = "";
+			for (int i = 0; i < ascStr.Length; i++)
+			{
+				char ascChr = ascStr[i];
+				int ascCode = (int)ascChr;
+				string newChr = "";
+				if (ascCode < 32)
+				{
+					switch (ascCode)
+					{
+						case ASC_NUL:
+							newChr = "[NU]";
+							break;
+						case ASC_WRU:
+							newChr = "[WRU]";
+							break;
+						case ASC_BEL:
+							newChr = "[KL]";
+							break;
+						case ASC_LF:
+							newChr = "[LF]";
+							break;
+						case ASC_CR:
+							newChr = "[CR]";
+							break;
+						case ASC_LTRS:
+							newChr = "[BU]";
+							break;
+						case ASC_FIGS:
+							newChr = "[ZI]";
+							break;
+						default:
+							newChr = $"{ascCode:X02}";
+							break;
+					}
+				}
+				else
+				{
+					newChr = ascChr.ToString();
+				}
+				newStr += newChr;
+			}
+			return newStr;
+		}
+
 		private static byte? FindBaudot(char asciiChar, ShiftStates shiftState, CodeSets codeSet)
 		{
 			for (int c = 0; c < 32; c++)

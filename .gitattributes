@@ -6,3 +6,9 @@
 *.resx text eol=crlf
 *.config text eol=crlf
 *.txt text eol=crlf
+*.c text eol=crlf
+*.cpp text eol=crlf
+*.h text eol=crlf
+*.ino text eol=crlf
+*.hex text eol=crlf
+
