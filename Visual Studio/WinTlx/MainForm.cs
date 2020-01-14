@@ -67,7 +67,7 @@ namespace WinTlx
 			_configData = _configManager.Config;
 			Logging.Instance.LogfilePath = _configData.LogfilePath;
 
-			Logging.Instance.Log(LogTypes.Info, TAG, "Start", $"{Helper.GetVersion()}");
+			Logging.Instance.Info(TAG, nameof(MainForm), $"---------- Start {Helper.GetVersion()} ----------");
 
 			this.Text = Helper.GetVersion();
 			this.KeyPreview = true;
@@ -97,13 +97,14 @@ namespace WinTlx
 			ConnTimeTb.Text = "";
 			LnColTb.Text = "";
 			SendAckTb.Text = "";
+			RecvBufTb.Text = "";
 
 			RecvOnCb.Enabled = true;
 
-#if !DEBUG
+//#if !DEBUG
 			ProtocolItelexRb.Enabled = false;
 			ProtocolAsciiRb.Enabled = false;
-#endif
+//#endif
 
 			LanguageManager.Instance.LanguageChanged += LanguageChanged;
 			LanguageManager.Instance.ChangeLanguage(_configData.Language);
@@ -355,6 +356,11 @@ namespace WinTlx
 			if (SearchTb.Focused || MemberCb.Focused || AddressTb.Focused || PortTb.Focused || ExtensionTb.Focused)
 			{
 				return;
+			}
+
+			if (!TerminalPb.Focused)
+			{
+				SetFocus();
 			}
 
 			char? chr = CodeManager.KeyboardCharacters(e.KeyChar);
@@ -1030,7 +1036,8 @@ namespace WinTlx
 				}
 			});
 
-			Helper.ControlInvokeRequired(SendAckTb, () => SendAckTb.Text = $"Snd {_itelex.CharsToSendCount}  Ack {_itelex.CharsAckCount}");
+			Helper.ControlInvokeRequired(SendAckTb, () => SendAckTb.Text = $"O Buf={_itelex.CharsToSendCount} Ack={_itelex.CharsAckCount}");
+			Helper.ControlInvokeRequired(RecvBufTb, () => RecvBufTb.Text = $"I Buf={_outputBuffer.Count}");
 			Helper.ControlInvokeRequired(IdleTimoutTb, () => IdleTimoutTb.Text = $"Timeout {_itelex.IdleTimer} sec");
 			Helper.ControlInvokeRequired(ConnTimeTb, () => ConnTimeTb.Text = $"Conn {_itelex.ConnTimeMin} min");
 

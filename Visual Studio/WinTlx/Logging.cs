@@ -10,6 +10,8 @@ namespace WinTlx
 	[Serializable]
 	class Logging
 	{
+		private const string TAG = nameof(Logging);
+
 		public event RecvLogEvent RecvLog;
 
 		public LogTypes LogLevel { get; set; }
@@ -105,6 +107,47 @@ namespace WinTlx
 					File.AppendAllText(newName, $"{prefix} [AppendLog] Error writing logfile to {fullName}\r\n");
 					File.AppendAllText(newName, logStr);
 				}
+			}
+		}
+
+		public enum BinaryModes { Recv, Send }
+
+		public void AppendBinary(byte[] data, BinaryModes mode)
+		{
+			if (mode==BinaryModes.Send)
+			{
+				// copy data and set bit 7
+				byte[] sendData = new byte[data.Length];
+				for(int i=0; i<data.Length; i++)
+				{
+					sendData[i] = (byte)(data[i] | 0x80);
+				}
+				data = sendData;
+			}
+
+			string fullName = "";
+			try
+			{
+				string path = string.IsNullOrWhiteSpace(LogfilePath) ? Helper.GetExePath() : LogfilePath;
+				fullName = Path.Combine(path, Constants.BINARY_LOG);
+				AppendBinary(fullName, data);
+			}
+			catch(Exception ex)
+			{
+				Error(TAG, nameof(AppendBinary), $"Error writing binary data to {fullName}", ex);
+
+				// try to log in program directory
+				fullName = Path.Combine(Helper.GetExePath(), Constants.BINARY_LOG);
+				AppendBinary(fullName, data);
+			}
+		}
+
+		public void AppendBinary(string fullName, byte[] data)
+		{
+			using (var fileStream = new FileStream(fullName, FileMode.Append, FileAccess.Write, FileShare.None))
+			using (var bw = new BinaryWriter(fileStream))
+			{
+				bw.Write(data);
 			}
 		}
 

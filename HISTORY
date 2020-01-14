@@ -67,3 +67,4 @@ Version history
           Fix: Improved code set handling
           Fix: Tape punch manual scroll direction
           Chg: Removed ITA2-EXT code set
+1.0.2.4 - Fix: Improved i-Telex protocol

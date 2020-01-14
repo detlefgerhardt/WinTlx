@@ -6,12 +6,16 @@
 
 		public const string CONSOLE_LOG = "wintlx_console.log";
 		public const string DEBUG_LOG = "wintlx_debug.log";
+		public const string BINARY_LOG = "wintlx_console.bin";
 
 		public const string DEFAULT_LANGUAGE = "EN";
 
 		public const string DEFAULT_ANSWERBACK = "12345 wintlx";
 		public const int DEFAULT_IDLE_TIMEOUT = 120; // disconnect after 2 minutes without communication
 		public const int DEFAULT_INCOMING_PORT = 134;
+
+		public const int ITELIX_REMOTEBUFFER_SIZE = 32; // 16 characters
+		public const int ITELIX_SENDBUFFER_SIZE = 16; // 16 characters
 
 		public const int WAIT_BEFORE_SEND_MSEC = 100; // 0.1 seconds
 		public const int WAIT_BEFORE_SEND_ACK = 16; // 16 characters

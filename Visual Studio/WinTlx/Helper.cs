@@ -21,71 +21,27 @@ namespace WinTlx
 
 		public static string GetVersion()
 		{
-			//int? expireDays = ExpireDays();
-			//string expireStr = expireDays != null ? $" expires in {expireDays} days" : "";
-			string expireStr = "";
 #if DEBUG
 			// show date and time in debug version
 			string buildTime = Properties.Resources.BuildDate.Trim(new char[] { '\n', '\r' }) + " Debug";
 			//string buildTime = ConfigurationManager.AppSettings.Get("builddate") + " Debug";
-
 #else
 			// show only date in release version
 			string buildTime = Properties.Resources.BuildDate.Trim(new char[] { '\n', '\r' });
 			buildTime = buildTime.Substring(0, 10);
 #endif
-			return $"{Constants.PROGRAM_NAME}  V{Application.ProductVersion}  (Build={buildTime}) {expireStr}";
-			//return $"{Constants.PROGRAM_NAME}  V{Application.ProductVersion}  (Build={buildTime}) - Special Carsten Version";
+			return $"{Constants.PROGRAM_NAME}  V{Application.ProductVersion}  (Build={buildTime})";
 		}
 
 		public static string GetVersionCode()
 		{
 			return Application.ProductVersion;
-			//return $"{version[0]}{version[1]}{version[2]}{version[3]}";
 		}
 
 		public static string GetExePath()
 		{
 			return Application.StartupPath;
 		}
-
-		/*
-		public static bool IsExpired()
-		{
-			int? expireDays = ExpireDays();
-			if (expireDays==null)
-			{
-				// invalid expire date
-				return false;
-			}
-			return expireDays == 0;
-		}
-
-		public static int? ExpireDays()
-		{
-			DateTime? expireDate = ExpireDate();
-			if (expireDate == null)
-			{
-				// invalid build date, no expire
-				return null;
-			}
-			int expireDays = (int)Math.Ceiling(expireDate.Value.Subtract(DateTime.Now).TotalDays);
-			if (expireDays < 0)
-				expireDays = 0;
-			return expireDays;
-		}
-
-		public static DateTime? ExpireDate()
-		{
-			DateTime? buildTime = BuildTime();
-			if (buildTime == null)
-			{
-				// invalid build date
-				return null;
-			}
-			return buildTime.Value.AddDays(Constants.EXPIRE_DAYS);
-		}
-		*/
 
 		public static DateTime? BuildTime()
 		{

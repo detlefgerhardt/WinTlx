@@ -87,6 +87,7 @@
 			this.ScrollUpBtn = new System.Windows.Forms.Button();
 			this.ScrollEndBtn = new System.Windows.Forms.Button();
 			this.ScrollDownBtn = new System.Windows.Forms.Button();
+			this.RecvBufTb = new System.Windows.Forms.TextBox();
 			this.panel1.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.panel3.SuspendLayout();
@@ -465,6 +466,7 @@
 			// panel3
 			// 
 			this.panel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.panel3.Controls.Add(this.RecvBufTb);
 			this.panel3.Controls.Add(this.ConnectionStateTb);
 			this.panel3.Controls.Add(this.ConnTimeTb);
 			this.panel3.Controls.Add(this.LnColTb);
@@ -495,7 +497,7 @@
 			// 
 			// LnColTb
 			// 
-			this.LnColTb.Location = new System.Drawing.Point(8, 28);
+			this.LnColTb.Location = new System.Drawing.Point(8, 51);
 			this.LnColTb.Name = "LnColTb";
 			this.LnColTb.ReadOnly = true;
 			this.LnColTb.Size = new System.Drawing.Size(90, 20);
@@ -700,6 +702,15 @@
 			this.ScrollDownBtn.UseVisualStyleBackColor = true;
 			this.ScrollDownBtn.Click += new System.EventHandler(this.ScrollDownBtn_Click);
 			// 
+			// RecvBufTb
+			// 
+			this.RecvBufTb.Location = new System.Drawing.Point(8, 28);
+			this.RecvBufTb.Name = "RecvBufTb";
+			this.RecvBufTb.ReadOnly = true;
+			this.RecvBufTb.Size = new System.Drawing.Size(90, 20);
+			this.RecvBufTb.TabIndex = 2;
+			this.RecvBufTb.TabStop = false;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -810,6 +821,7 @@
 		private System.Windows.Forms.Button ScrollUpBtn;
 		private System.Windows.Forms.Button ScrollEndBtn;
 		private System.Windows.Forms.Button ScrollDownBtn;
+		private System.Windows.Forms.TextBox RecvBufTb;
 	}
 }
 
