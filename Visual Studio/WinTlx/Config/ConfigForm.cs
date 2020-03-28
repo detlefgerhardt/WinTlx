@@ -63,7 +63,8 @@ namespace WinTlx.Config
 			CodeSetLbl.Text = LngText(LngKeys.Setup_CodeSet);
 
 			SubscribeServerGb.Text = LngText(LngKeys.Setup_SubscribeServer);
-			SubscribeServerAddressLbl.Text = LngText(LngKeys.Setup_SubscribeServerAddress);
+			SubscribeServerAddress1Lbl.Text = LngText(LngKeys.Setup_SubscribeServerAddress) + " 1";
+			SubscribeServerAddress2Lbl.Text = LngText(LngKeys.Setup_SubscribeServerAddress) + " 2";
 			SubscribeServerPortLbl.Text = LngText(LngKeys.Setup_SubscribeServerPort);
 			IncomingGb.Text = LngText(LngKeys.Setup_IncomingConnection);
 			SubscribeServerUpdatePinLbl.Text = LngText(LngKeys.Setup_SubscribeServerPin);
@@ -71,7 +72,8 @@ namespace WinTlx.Config
 			ExtensionNumberLbl.Text = LngText(LngKeys.Setup_ExtensionNumber);
 			IncomingLocalPortLbl.Text = LngText(LngKeys.Setup_IncomingLocalPort);
 			IncomingPublicPortLbl.Text = LngText(LngKeys.Setup_IncomingPublicPort);
-			ServerDataHintLbl.Text = LngText(LngKeys.Setup_ServerDataHint);
+			LimitedClientLbl.Text = LngText(LngKeys.Setup_LimitedClient);
+			//ServerDataHintLbl.Text = LngText(LngKeys.Setup_ServerDataHint);
 
 			CancelBtn.Text = LngText(LngKeys.Setup_CancelButton);
 			SaveBtn.Text = LngText(LngKeys.Setup_SaveButton);
@@ -96,13 +98,17 @@ namespace WinTlx.Config
 			IdleTimeoutTb.Text = IntToStr(_config.IdleTimeout);
 			CodeSetCb.SelectedItem = ConfigData.CodeSetToString(_config.CodeSet);
 			OutputSpeedTb.Text = IntToStr(_config.OutputSpeed);
-			SubscribeServerAddressTb.Text = _config.SubscribeServerAddress;
+			SubscribeServerAddress1Tb.Text = _config.SubscribeServerAddress;
+			SubscribeServerAddress2Tb.Text = _config.SubscribeServerAddress2;
 			SubscribeServerPortTb.Text = IntToStr(_config.SubscribeServerPort);
 			SubscribeServerUpdatePinTb.Text = IntToStr(_config.SubscribeServerUpdatePin);
 			OwnNumberTb.Text = IntToStr(_config.OwnNumber);
 			ExtensionNumberTb.Text = _config.IncomingExtensionNumber.ToString();
 			IncommingLocalPortTb.Text = IntToStr(_config.IncomingLocalPort);
 			IncomingPublicPortTb.Text = IntToStr(_config.IncomingPublicPort);
+			LimitedClientCb.Checked = _config.LimitedClient;
+			RemoteServerAddressTb.Text = _config.RemoteServerAddress;
+			RemoteServerPortTb.Text = IntToStr(_config.RemoteServerPort);
 		}
 
 		public void GetData()
@@ -112,13 +118,17 @@ namespace WinTlx.Config
 			_config.IdleTimeout = StrToInt(IdleTimeoutTb.Text);
 			_config.CodeSet = ConfigData.StringToCodeSet((string)CodeSetCb.SelectedItem);
 			_config.OutputSpeed = StrToInt(OutputSpeedTb.Text);
-			_config.SubscribeServerAddress = SubscribeServerAddressTb.Text.Trim();
+			_config.SubscribeServerAddress = SubscribeServerAddress1Tb.Text.Trim();
+			_config.SubscribeServerAddress2 = SubscribeServerAddress2Tb.Text.Trim();
 			_config.SubscribeServerPort = StrToInt(SubscribeServerPortTb.Text);
 			_config.SubscribeServerUpdatePin = StrToInt(SubscribeServerUpdatePinTb.Text);
 			_config.OwnNumber = StrToInt(OwnNumberTb.Text);
 			_config.IncomingExtensionNumber = StrToInt(ExtensionNumberTb.Text);
 			_config.IncomingLocalPort = StrToInt(IncommingLocalPortTb.Text);
 			_config.IncomingPublicPort = StrToInt(IncomingPublicPortTb.Text);
+			_config.LimitedClient = LimitedClientCb.Checked;
+			_config.RemoteServerAddress = RemoteServerAddressTb.Text.Trim();
+			_config.RemoteServerPort = StrToInt(RemoteServerPortTb.Text);
 			_config.SetDefaults();
 
 			string oldLnd = _config.Language;

@@ -74,8 +74,8 @@ namespace WinTlx
 			this.Enter += MainForm_Enter;
 			this.Deactivate += MainForm_Deactivate;
 
-			MemberCb.DataSource = null;
-			MemberCb.DisplayMember = "DisplayName";
+			TlnNameCb.DataSource = null;
+			TlnNameCb.DisplayMember = "DisplayName";
 
 			SendLineFeedBtn.Text = "\u2261";
 
@@ -153,12 +153,12 @@ namespace WinTlx
 			Logging.Instance.Log(LogTypes.Info, TAG, nameof(LanguageChanged), $"switch language to {LanguageManager.Instance.CurrentLanguage.Key}");
 
 			SearchLbl.Text = LngText(LngKeys.MainForm_SearchText);
-			MemberLbl.Text = LngText(LngKeys.MainForm_SearchResult);
+			TlnMemberLbl.Text = LngText(LngKeys.MainForm_SearchResult);
 			QueryBtn.Text = LngText(LngKeys.MainForm_SearchButton);
 			AnswerbackLbl.Text = LngText(LngKeys.MainForm_Answerback);
-			AddressLbl.Text = LngText(LngKeys.MainForm_Address);
-			PortLbl.Text = LngText(LngKeys.MainForm_Port);
-			ExtensionLbl.Text = LngText(LngKeys.MainForm_Extension);
+			TlnAddressLbl.Text = LngText(LngKeys.MainForm_Address);
+			TlnPortLbl.Text = LngText(LngKeys.MainForm_Port);
+			TlnExtensionLbl.Text = LngText(LngKeys.MainForm_Extension);
 			ProtocolItelexRb.Text = LngText(LngKeys.MainForm_Itelex);
 			ProtocolAsciiRb.Text = LngText(LngKeys.MainForm_ASCII);
 			ConnectBtn.Text = LngText(LngKeys.MainForm_ConnectButton);
@@ -353,7 +353,7 @@ namespace WinTlx
 		private void MainForm_KeyPress(object sender, KeyPressEventArgs e)
 		{
 			// check for controls without special input handling
-			if (SearchTb.Focused || MemberCb.Focused || AddressTb.Focused || PortTb.Focused || ExtensionTb.Focused)
+			if (SearchTb.Focused || TlnNameCb.Focused || TlnAddressTb.Focused || TlnPortTb.Focused || TlnExtensionTb.Focused)
 			{
 				return;
 			}
@@ -435,14 +435,15 @@ namespace WinTlx
 
 		private void PhoneEntryCb_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			PeerQueryData entry = (PeerQueryData)MemberCb.SelectedItem;
+			PeerQueryData entry = (PeerQueryData)TlnNameCb.SelectedItem;
 			if (entry == null)
 			{
 				return;
 			}
-			AddressTb.Text = entry.Address;
-			PortTb.Text = entry.PortNumber != 0 ? entry.PortNumber.ToString() : "";
-			ExtensionTb.Text = entry.ExtensionNumber != 0 ? entry.ExtensionNumber.ToString() : "";
+			TlnAddressTb.Text = entry.Address;
+			TlnPortTb.Text = entry.PortNumber != 0 ? entry.PortNumber.ToString() : "";
+			TlnExtensionTb.Text = entry.ExtensionNumber != 0 ? entry.ExtensionNumber.ToString() : "";
+			TlnTypeTb.Text = entry.PeerType.ToString();
 		}
 
 		private void AddressTb_Leave(object sender, EventArgs e)
@@ -508,11 +509,12 @@ namespace WinTlx
 		{
 			SetFocus();
 
-			MemberCb.DataSource = null;
-			MemberCb.Text = "";
-			AddressTb.Text = "";
-			PortTb.Text = "";
-			ExtensionTb.Text = "";
+			TlnNameCb.DataSource = null;
+			TlnNameCb.Text = "";
+			TlnAddressTb.Text = "";
+			TlnPortTb.Text = "";
+			TlnExtensionTb.Text = "";
+			TlnTypeTb.Text = "";
 
 			SearchTb.Text = SearchTb.Text.Trim();
 			if (string.IsNullOrWhiteSpace(SearchTb.Text))
@@ -544,8 +546,8 @@ namespace WinTlx
 				}
 				if (num > 0)
 				{
-						// query number
-						PeerQueryReply queryReply = _subscriberServer.SendPeerQuery(num.ToString());
+					// query number
+					PeerQueryReply queryReply = _subscriberServer.SendPeerQuery(num.ToString());
 					_subscriberServer.Disconnect();
 					if (!queryReply.Valid)
 					{
@@ -577,21 +579,22 @@ namespace WinTlx
 
 			SubcribeServerMessageHandler($"{list?.Length} {LngText(LngKeys.Message_QueryResult)}");
 
-			MemberCb.DataSource = list;
-			MemberCb.DisplayMember = "Display";
+			TlnNameCb.DataSource = list;
+			TlnNameCb.DisplayMember = "Display";
 			if (list == null)
 			{
 			}
 			else if (list.Length == 0)
 			{
-				MemberCb.Text = "";
-				AddressTb.Text = "";
-				PortTb.Text = "";
-				ExtensionTb.Text = "";
+				TlnNameCb.Text = "";
+				TlnAddressTb.Text = "";
+				TlnPortTb.Text = "";
+				TlnExtensionTb.Text = "";
+				TlnTypeTb.Text = "";
 			}
 			else
 			{
-				MemberCb.SelectedIndex = 0;
+				TlnNameCb.SelectedIndex = 0;
 			}
 
 			//SetConnectState();
@@ -601,7 +604,7 @@ namespace WinTlx
 		private async void ConnectBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			if (_itelex.IsConnected || string.IsNullOrEmpty(PortTb.Text))
+			if (_itelex.IsConnected || string.IsNullOrEmpty(TlnPortTb.Text))
 			{
 				return;
 			}
@@ -806,17 +809,40 @@ namespace WinTlx
 			return;
 		}
 
-		private void RecvOnCb_Click(object sender, EventArgs e)
+		private async void RecvOnCb_Click(object sender, EventArgs e)
 		{
 			if (!_itelex.RecvOn)
 			{
-				_itelex.SetRecvOn(_configData.IncomingLocalPort);
-				UpdateIpAddress();
+				if (!_configData.LimitedClient)
+				{
+					_itelex.SetRecvOn(_configData.IncomingLocalPort);
+					UpdateIpAddress();
+				}
+				else
+				{
+					if (await _itelex.CentralexConnectAsync(_configData.RemoteServerAddress, _configData.RemoteServerPort))
+					{
+						RecvOnCb.Checked = true;
+					}
+					else
+					{
+						RecvOnCb.Checked = false;
+					}
+				}
 			}
 			else
 			{
-				_itelex.SetRecvOff();
+				if (!_configData.LimitedClient)
+				{
+					_itelex.SetRecvOff();
+				}
+				else
+				{
+					_itelex.Disconnect();
+					_itelex.CentralexDisconnect();
+				}
 			}
+			UpdateHandler();
 		}
 
 		private void TapePunchBtn_Click(object sender, EventArgs e)
@@ -1075,26 +1101,26 @@ namespace WinTlx
 
 		private async Task<bool> ConnectOut()
 		{
-			AddressTb.Text = AddressTb.Text.Trim();
-			if (string.IsNullOrWhiteSpace(AddressTb.Text))
+			TlnAddressTb.Text = TlnAddressTb.Text.Trim();
+			if (string.IsNullOrWhiteSpace(TlnAddressTb.Text))
 			{
 				ShowLocalMessage(LngText(LngKeys.Message_ConnectNoAddress));
 				return false;
 			}
 
-			PortTb.Text = PortTb.Text.Trim();
-			int? port = Helper.ToInt(PortTb.Text);
+			TlnPortTb.Text = TlnPortTb.Text.Trim();
+			int? port = Helper.ToInt(TlnPortTb.Text);
 			if (port == null)
 			{
 				ShowLocalMessage(LngText(LngKeys.Message_ConnectInvalidPort));
 				return false;
 			}
 
-			ExtensionTb.Text = ExtensionTb.Text.Trim();
+			TlnExtensionTb.Text = TlnExtensionTb.Text.Trim();
 			int? extension = null;
-			if (!string.IsNullOrWhiteSpace(ExtensionTb.Text))
+			if (!string.IsNullOrWhiteSpace(TlnExtensionTb.Text))
 			{
-				extension = Helper.ToInt(ExtensionTb.Text);
+				extension = Helper.ToInt(TlnExtensionTb.Text);
 				if (extension == null)
 				{
 					ShowLocalMessage(LngText(LngKeys.Message_ConnectInvalidExtension));
@@ -1106,7 +1132,7 @@ namespace WinTlx
 				extension = 0;
 			}
 
-			bool success = await _itelex.ConnectOut(AddressTb.Text, port.Value, extension.Value, false);
+			bool success = await _itelex.ConnectOut(TlnAddressTb.Text, port.Value, extension.Value, false);
 			if (!success)
 			{
 				ShowLocalMessage(LngText(LngKeys.Message_ConnectionError));
@@ -1714,5 +1740,13 @@ namespace WinTlx
 
 		}
 
+		private void TlnTypeTb_MouseHover(object sender, EventArgs e)
+		{
+			ToolTip tt = new ToolTip();
+			tt.IsBalloon = true;
+			tt.InitialDelay = 0;
+			tt.ShowAlways = true;
+			tt.SetToolTip(TlnTypeTb, LngText(LngKeys.MainForm_PeerType));
+		}
 	}
 }

@@ -17,6 +17,9 @@ namespace WinTlx.Config
 		public string SubscribeServerAddress { get; set; }
 
 		[DataMember]
+		public string SubscribeServerAddress2 { get; set; }
+
+		[DataMember]
 		public int SubscribeServerPort { get; set; }
 
 		[DataMember]
@@ -46,6 +49,15 @@ namespace WinTlx.Config
 		[DataMember]
 		public int IncomingPublicPort { get; set; }
 
+		[DataMember]
+		public bool LimitedClient { get; set; }
+
+		[DataMember]
+		public string RemoteServerAddress { get; set; }
+
+		[DataMember]
+		public int RemoteServerPort { get; set; }
+
 		/// <summary>
 		/// Set default values for empty fields
 		/// </summary>
@@ -62,6 +74,10 @@ namespace WinTlx.Config
 			if (string.IsNullOrEmpty(Language))
 			{
 				Language = "en";
+			}
+			if (RemoteServerPort == 0)
+			{
+				RemoteServerPort = Constants.CENTRALEX_PORT;
 			}
 		}
 

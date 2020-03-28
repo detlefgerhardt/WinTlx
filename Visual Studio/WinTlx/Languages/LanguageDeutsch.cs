@@ -24,6 +24,15 @@ namespace WinTlx.Languages
 				{ LngKeys.MainForm_Address, "Adresse" },
 				{ LngKeys.MainForm_Port, "Port" },
 				{ LngKeys.MainForm_Extension, "Extension" },
+				{ LngKeys.MainForm_PeerType,
+					"0 - gelöscht\r\n" + 
+					"1 - texting baudot / Hostname\r\n" +
+					"2 - texting baudot / feste IP\r\n" +
+					"3 - ascii texting / Hostname\r\n" +
+					"4 - ascii texting / feste IP\r\n" +
+					"5 - texting baudot / dyn. IP\r\n" +
+					"6 - Emailadresse"
+				},
 				{ LngKeys.MainForm_Itelex, "i-Telex" },
 				{ LngKeys.MainForm_ASCII, "ASCII" },
 				{ LngKeys.MainForm_ConnectButton, "Verbinden" },
@@ -59,12 +68,13 @@ namespace WinTlx.Languages
 				{ LngKeys.Setup_OutputSpeed, "Ausgabegeschw. (Baud)" },
 				{ LngKeys.Setup_CodeSet, "Zeichensatz" },
 				{ LngKeys.Setup_SubscribeServer, "Teilnehmer-Server" },
-				{ LngKeys.Setup_SubscribeServerAddress, "Server-Adresse" },
-				{ LngKeys.Setup_SubscribeServerPort, "Server-Port" },
+				{ LngKeys.Setup_SubscribeServerAddress, "Tln-Server-Adresse" },
+				{ LngKeys.Setup_SubscribeServerPort, "Tln-Server-Port" },
 				{ LngKeys.Setup_IncomingConnection, "Eingehende Verbindungen" },
 				{ LngKeys.Setup_SubscribeServerPin, "Teilnehmer-Server-Pin*" },
 				{ LngKeys.Setup_OwnTelexNumber, "Telex-Nummer*" },
 				{ LngKeys.Setup_ExtensionNumber, "Extension-Nummer*" },
+				{ LngKeys.Setup_LimitedClient, "Limited client" },
 				{ LngKeys.Setup_IncomingLocalPort, "Lokaler Port" },
 				{ LngKeys.Setup_IncomingPublicPort, "Öffentlicher Port" },
 				{ LngKeys.Setup_ServerDataHint, "* Diese Daten müssen mit den im Teilnehmer-Server gespeicherten Daten übereinstimmen." },
@@ -120,6 +130,7 @@ namespace WinTlx.Languages
 				{ LngKeys.Message_ConnectInvalidExtension, "ungueltige extension-nummer" },
 				{ LngKeys.Message_ConnectionError, "verbindungsfehler" },
 				{ LngKeys.Message_Pangram, "prall vom whisky flog quax den jet zu bruch. 1234567890/(:-),=?" },
+				//{ LngKeys.Message_Pangram, "kaufen sie jede woche vier gute bequeme pelze xy 1234567890/(:-),=?" },
 				{ LngKeys.Message_EyeballCharActive, "bildlocher aktiv - starte lochstreifenstanzer" },
 			};
 

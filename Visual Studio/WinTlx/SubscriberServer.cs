@@ -494,7 +494,7 @@ namespace WinTlx
 
 		public string Address => !string.IsNullOrEmpty(HostName) ? HostName : IpAddress;
 
-		public string Display => $"{Number} {LongName} {PeerType}";
+		public string Display => $"{Number} {LongName}";
 
 		public override string ToString()
 		{

@@ -6,8 +6,6 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Windows.Forms;
-using System.Xml;
-using System.Xml.Serialization;
 
 namespace WinTlx
 {
@@ -238,39 +236,6 @@ namespace WinTlx
 				stream.Position = 0;
 				DataContractSerializer deserializer = new DataContractSerializer(typeof(T));
 				return (T)deserializer.ReadObject(stream);
-			}
-		}
-
-		public static string SerializeObject2<T>(T objectToSerialize)
-		{
-			XmlSerializer xmlserializer = new XmlSerializer(typeof(T));
-			XmlWriterSettings writerSettings = new XmlWriterSettings
-			{
-				// Formatierung des XML -- Zeilenumbrüche
-				Indent = true,
-				Encoding = Encoding.UTF8
-			};
-
-			string xml;
-			using (StringWriterUtf8 stringWriter = new StringWriterUtf8())
-			{
-				using (var xmlWriter = XmlWriter.Create(stringWriter, writerSettings))
-				{
-					xmlserializer.Serialize(xmlWriter, objectToSerialize);
-					xml = stringWriter.ToString();
-				}
-			}
-			return xml;
-		}
-	}
-
-	public class StringWriterUtf8 : StringWriter
-	{
-		public override Encoding Encoding
-		{
-			get
-			{
-				return Encoding.UTF8;
 			}
 		}
 	}

@@ -41,6 +41,8 @@ namespace WinTlx.Config
 				IncomingLocalPort = Constants.DEFAULT_INCOMING_PORT,
 				IncomingPublicPort = Constants.DEFAULT_INCOMING_PORT,
 				IncomingExtensionNumber = 0,
+				LimitedClient = false,
+				RemoteServerPort = Constants.CENTRALEX_PORT,
 			};
 		}
 

@@ -10,7 +10,9 @@
 
 		public const string DEFAULT_LANGUAGE = "EN";
 
-		public const string DEFAULT_ANSWERBACK = "12345 wintlx";
+		public const int CENTRALEX_PORT = 49491;
+
+		public const string DEFAULT_ANSWERBACK = "wintlx";
 		public const int DEFAULT_IDLE_TIMEOUT = 120; // disconnect after 2 minutes without communication
 		public const int DEFAULT_INCOMING_PORT = 134;
 

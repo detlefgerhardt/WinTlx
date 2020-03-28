@@ -32,10 +32,10 @@
 			this.AnswerbackLbl = new System.Windows.Forms.Label();
 			this.AnswerbackTb = new System.Windows.Forms.TextBox();
 			this.IncommingLocalPortTb = new System.Windows.Forms.TextBox();
-			this.SubscribeServerAddressTb = new System.Windows.Forms.TextBox();
+			this.SubscribeServerAddress1Tb = new System.Windows.Forms.TextBox();
 			this.SubscribeServerPortTb = new System.Windows.Forms.TextBox();
 			this.IncomingLocalPortLbl = new System.Windows.Forms.Label();
-			this.SubscribeServerAddressLbl = new System.Windows.Forms.Label();
+			this.SubscribeServerAddress1Lbl = new System.Windows.Forms.Label();
 			this.SubscribeServerPortLbl = new System.Windows.Forms.Label();
 			this.SaveBtn = new System.Windows.Forms.Button();
 			this.CancelBtn = new System.Windows.Forms.Button();
@@ -50,7 +50,8 @@
 			this.OutputSpeedLbl = new System.Windows.Forms.Label();
 			this.OutputSpeedTb = new System.Windows.Forms.TextBox();
 			this.IncomingGb = new System.Windows.Forms.GroupBox();
-			this.ServerDataHintLbl = new System.Windows.Forms.Label();
+			this.LimitedClientCb = new System.Windows.Forms.CheckBox();
+			this.LimitedClientLbl = new System.Windows.Forms.Label();
 			this.ExtensionNumberLbl = new System.Windows.Forms.Label();
 			this.ExtensionNumberTb = new System.Windows.Forms.TextBox();
 			this.GeneralGb = new System.Windows.Forms.GroupBox();
@@ -61,11 +62,19 @@
 			this.CodeSetCb = new System.Windows.Forms.ComboBox();
 			this.CodeSetLbl = new System.Windows.Forms.Label();
 			this.SubscribeServerGb = new System.Windows.Forms.GroupBox();
+			this.SubscribeServerAddress2Tb = new System.Windows.Forms.TextBox();
+			this.SubscribeServerAddress2Lbl = new System.Windows.Forms.Label();
 			this.ItelexGb = new System.Windows.Forms.GroupBox();
+			this.LimitedClientGb = new System.Windows.Forms.GroupBox();
+			this.RemoteServerAddressLbl = new System.Windows.Forms.Label();
+			this.RemoteServerAddressTb = new System.Windows.Forms.TextBox();
+			this.RemoteServerPortLbl = new System.Windows.Forms.Label();
+			this.RemoteServerPortTb = new System.Windows.Forms.TextBox();
 			this.IncomingGb.SuspendLayout();
 			this.GeneralGb.SuspendLayout();
 			this.SubscribeServerGb.SuspendLayout();
 			this.ItelexGb.SuspendLayout();
+			this.LimitedClientGb.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// AnswerbackLbl
@@ -86,21 +95,21 @@
 			// 
 			// IncommingLocalPortTb
 			// 
-			this.IncommingLocalPortTb.Location = new System.Drawing.Point(141, 97);
+			this.IncommingLocalPortTb.Location = new System.Drawing.Point(125, 97);
 			this.IncommingLocalPortTb.Name = "IncommingLocalPortTb";
 			this.IncommingLocalPortTb.Size = new System.Drawing.Size(54, 20);
 			this.IncommingLocalPortTb.TabIndex = 10;
 			// 
-			// SubscribeServerAddressTb
+			// SubscribeServerAddress1Tb
 			// 
-			this.SubscribeServerAddressTb.Location = new System.Drawing.Point(141, 21);
-			this.SubscribeServerAddressTb.Name = "SubscribeServerAddressTb";
-			this.SubscribeServerAddressTb.Size = new System.Drawing.Size(136, 20);
-			this.SubscribeServerAddressTb.TabIndex = 5;
+			this.SubscribeServerAddress1Tb.Location = new System.Drawing.Point(141, 21);
+			this.SubscribeServerAddress1Tb.Name = "SubscribeServerAddress1Tb";
+			this.SubscribeServerAddress1Tb.Size = new System.Drawing.Size(136, 20);
+			this.SubscribeServerAddress1Tb.TabIndex = 5;
 			// 
 			// SubscribeServerPortTb
 			// 
-			this.SubscribeServerPortTb.Location = new System.Drawing.Point(141, 47);
+			this.SubscribeServerPortTb.Location = new System.Drawing.Point(141, 73);
 			this.SubscribeServerPortTb.Name = "SubscribeServerPortTb";
 			this.SubscribeServerPortTb.Size = new System.Drawing.Size(54, 20);
 			this.SubscribeServerPortTb.TabIndex = 6;
@@ -114,19 +123,19 @@
 			this.IncomingLocalPortLbl.TabIndex = 2;
 			this.IncomingLocalPortLbl.Text = "Incoming local port";
 			// 
-			// SubscribeServerAddressLbl
+			// SubscribeServerAddress1Lbl
 			// 
-			this.SubscribeServerAddressLbl.AutoSize = true;
-			this.SubscribeServerAddressLbl.Location = new System.Drawing.Point(9, 24);
-			this.SubscribeServerAddressLbl.Name = "SubscribeServerAddressLbl";
-			this.SubscribeServerAddressLbl.Size = new System.Drawing.Size(126, 13);
-			this.SubscribeServerAddressLbl.TabIndex = 4;
-			this.SubscribeServerAddressLbl.Text = "Subscribe server address";
+			this.SubscribeServerAddress1Lbl.AutoSize = true;
+			this.SubscribeServerAddress1Lbl.Location = new System.Drawing.Point(9, 24);
+			this.SubscribeServerAddress1Lbl.Name = "SubscribeServerAddress1Lbl";
+			this.SubscribeServerAddress1Lbl.Size = new System.Drawing.Size(119, 13);
+			this.SubscribeServerAddress1Lbl.TabIndex = 4;
+			this.SubscribeServerAddress1Lbl.Text = "Subscribe server addr 1";
 			// 
 			// SubscribeServerPortLbl
 			// 
 			this.SubscribeServerPortLbl.AutoSize = true;
-			this.SubscribeServerPortLbl.Location = new System.Drawing.Point(9, 50);
+			this.SubscribeServerPortLbl.Location = new System.Drawing.Point(9, 76);
 			this.SubscribeServerPortLbl.Name = "SubscribeServerPortLbl";
 			this.SubscribeServerPortLbl.Size = new System.Drawing.Size(107, 13);
 			this.SubscribeServerPortLbl.TabIndex = 6;
@@ -134,7 +143,7 @@
 			// 
 			// SaveBtn
 			// 
-			this.SaveBtn.Location = new System.Drawing.Point(511, 295);
+			this.SaveBtn.Location = new System.Drawing.Point(509, 317);
 			this.SaveBtn.Name = "SaveBtn";
 			this.SaveBtn.Size = new System.Drawing.Size(75, 23);
 			this.SaveBtn.TabIndex = 12;
@@ -144,7 +153,7 @@
 			// 
 			// CancelBtn
 			// 
-			this.CancelBtn.Location = new System.Drawing.Point(430, 295);
+			this.CancelBtn.Location = new System.Drawing.Point(426, 317);
 			this.CancelBtn.Name = "CancelBtn";
 			this.CancelBtn.Size = new System.Drawing.Size(75, 23);
 			this.CancelBtn.TabIndex = 13;
@@ -154,9 +163,9 @@
 			// 
 			// OwnNumberTb
 			// 
-			this.OwnNumberTb.Location = new System.Drawing.Point(141, 45);
+			this.OwnNumberTb.Location = new System.Drawing.Point(125, 45);
 			this.OwnNumberTb.Name = "OwnNumberTb";
-			this.OwnNumberTb.Size = new System.Drawing.Size(136, 20);
+			this.OwnNumberTb.Size = new System.Drawing.Size(152, 20);
 			this.OwnNumberTb.TabIndex = 8;
 			// 
 			// OwnNumberLbl
@@ -170,7 +179,7 @@
 			// 
 			// SubscribeServerUpdatePinTb
 			// 
-			this.SubscribeServerUpdatePinTb.Location = new System.Drawing.Point(141, 19);
+			this.SubscribeServerUpdatePinTb.Location = new System.Drawing.Point(125, 19);
 			this.SubscribeServerUpdatePinTb.Name = "SubscribeServerUpdatePinTb";
 			this.SubscribeServerUpdatePinTb.Size = new System.Drawing.Size(54, 20);
 			this.SubscribeServerUpdatePinTb.TabIndex = 7;
@@ -186,7 +195,7 @@
 			// 
 			// IncomingPublicPortTb
 			// 
-			this.IncomingPublicPortTb.Location = new System.Drawing.Point(141, 123);
+			this.IncomingPublicPortTb.Location = new System.Drawing.Point(125, 123);
 			this.IncomingPublicPortTb.Name = "IncomingPublicPortTb";
 			this.IncomingPublicPortTb.Size = new System.Drawing.Size(54, 20);
 			this.IncomingPublicPortTb.TabIndex = 11;
@@ -234,7 +243,6 @@
 			// 
 			// IncomingGb
 			// 
-			this.IncomingGb.Controls.Add(this.ServerDataHintLbl);
 			this.IncomingGb.Controls.Add(this.ExtensionNumberLbl);
 			this.IncomingGb.Controls.Add(this.ExtensionNumberTb);
 			this.IncomingGb.Controls.Add(this.SubscribeServerUpdatePinLbl);
@@ -245,20 +253,29 @@
 			this.IncomingGb.Controls.Add(this.IncomingPublicPortLbl);
 			this.IncomingGb.Controls.Add(this.SubscribeServerUpdatePinTb);
 			this.IncomingGb.Controls.Add(this.IncomingPublicPortTb);
-			this.IncomingGb.Location = new System.Drawing.Point(301, 93);
+			this.IncomingGb.Location = new System.Drawing.Point(301, 12);
 			this.IncomingGb.Name = "IncomingGb";
-			this.IncomingGb.Size = new System.Drawing.Size(283, 196);
+			this.IncomingGb.Size = new System.Drawing.Size(283, 153);
 			this.IncomingGb.TabIndex = 20;
 			this.IncomingGb.TabStop = false;
 			this.IncomingGb.Text = "Incoming connection";
 			// 
-			// ServerDataHintLbl
+			// LimitedClientCb
 			// 
-			this.ServerDataHintLbl.Location = new System.Drawing.Point(12, 157);
-			this.ServerDataHintLbl.Name = "ServerDataHintLbl";
-			this.ServerDataHintLbl.Size = new System.Drawing.Size(252, 34);
-			this.ServerDataHintLbl.TabIndex = 18;
-			this.ServerDataHintLbl.Text = "* Must match...";
+			this.LimitedClientCb.Location = new System.Drawing.Point(125, 23);
+			this.LimitedClientCb.Name = "LimitedClientCb";
+			this.LimitedClientCb.Size = new System.Drawing.Size(15, 14);
+			this.LimitedClientCb.TabIndex = 19;
+			this.LimitedClientCb.UseVisualStyleBackColor = true;
+			// 
+			// LimitedClientLbl
+			// 
+			this.LimitedClientLbl.AutoSize = true;
+			this.LimitedClientLbl.Location = new System.Drawing.Point(10, 23);
+			this.LimitedClientLbl.Name = "LimitedClientLbl";
+			this.LimitedClientLbl.Size = new System.Drawing.Size(94, 13);
+			this.LimitedClientLbl.TabIndex = 18;
+			this.LimitedClientLbl.Text = "Limited client aktiv";
 			// 
 			// ExtensionNumberLbl
 			// 
@@ -271,7 +288,7 @@
 			// 
 			// ExtensionNumberTb
 			// 
-			this.ExtensionNumberTb.Location = new System.Drawing.Point(141, 71);
+			this.ExtensionNumberTb.Location = new System.Drawing.Point(125, 71);
 			this.ExtensionNumberTb.Name = "ExtensionNumberTb";
 			this.ExtensionNumberTb.Size = new System.Drawing.Size(54, 20);
 			this.ExtensionNumberTb.TabIndex = 9;
@@ -284,7 +301,7 @@
 			this.GeneralGb.Controls.Add(this.LanguageCb);
 			this.GeneralGb.Location = new System.Drawing.Point(12, 12);
 			this.GeneralGb.Name = "GeneralGb";
-			this.GeneralGb.Size = new System.Drawing.Size(283, 116);
+			this.GeneralGb.Size = new System.Drawing.Size(283, 84);
 			this.GeneralGb.TabIndex = 21;
 			this.GeneralGb.TabStop = false;
 			this.GeneralGb.Text = "General";
@@ -349,16 +366,34 @@
 			// 
 			// SubscribeServerGb
 			// 
-			this.SubscribeServerGb.Controls.Add(this.SubscribeServerAddressTb);
+			this.SubscribeServerGb.Controls.Add(this.SubscribeServerAddress2Tb);
+			this.SubscribeServerGb.Controls.Add(this.SubscribeServerAddress2Lbl);
+			this.SubscribeServerGb.Controls.Add(this.SubscribeServerAddress1Tb);
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortLbl);
-			this.SubscribeServerGb.Controls.Add(this.SubscribeServerAddressLbl);
+			this.SubscribeServerGb.Controls.Add(this.SubscribeServerAddress1Lbl);
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortTb);
-			this.SubscribeServerGb.Location = new System.Drawing.Point(301, 12);
+			this.SubscribeServerGb.Location = new System.Drawing.Point(12, 235);
 			this.SubscribeServerGb.Name = "SubscribeServerGb";
-			this.SubscribeServerGb.Size = new System.Drawing.Size(283, 75);
+			this.SubscribeServerGb.Size = new System.Drawing.Size(283, 105);
 			this.SubscribeServerGb.TabIndex = 22;
 			this.SubscribeServerGb.TabStop = false;
 			this.SubscribeServerGb.Text = "Subscribe server";
+			// 
+			// SubscribeServerAddress2Tb
+			// 
+			this.SubscribeServerAddress2Tb.Location = new System.Drawing.Point(141, 47);
+			this.SubscribeServerAddress2Tb.Name = "SubscribeServerAddress2Tb";
+			this.SubscribeServerAddress2Tb.Size = new System.Drawing.Size(136, 20);
+			this.SubscribeServerAddress2Tb.TabIndex = 8;
+			// 
+			// SubscribeServerAddress2Lbl
+			// 
+			this.SubscribeServerAddress2Lbl.AutoSize = true;
+			this.SubscribeServerAddress2Lbl.Location = new System.Drawing.Point(9, 50);
+			this.SubscribeServerAddress2Lbl.Name = "SubscribeServerAddress2Lbl";
+			this.SubscribeServerAddress2Lbl.Size = new System.Drawing.Size(119, 13);
+			this.SubscribeServerAddress2Lbl.TabIndex = 7;
+			this.SubscribeServerAddress2Lbl.Text = "Subscribe server addr 2";
 			// 
 			// ItelexGb
 			// 
@@ -370,18 +405,66 @@
 			this.ItelexGb.Controls.Add(this.IdleTimeoutTb);
 			this.ItelexGb.Controls.Add(this.IdleTimeoutLbl);
 			this.ItelexGb.Controls.Add(this.OutputSpeedLbl);
-			this.ItelexGb.Location = new System.Drawing.Point(12, 131);
+			this.ItelexGb.Location = new System.Drawing.Point(12, 102);
 			this.ItelexGb.Name = "ItelexGb";
-			this.ItelexGb.Size = new System.Drawing.Size(283, 158);
+			this.ItelexGb.Size = new System.Drawing.Size(283, 127);
 			this.ItelexGb.TabIndex = 23;
 			this.ItelexGb.TabStop = false;
 			this.ItelexGb.Text = "i-Telex";
+			// 
+			// LimitedClientGb
+			// 
+			this.LimitedClientGb.Controls.Add(this.RemoteServerPortTb);
+			this.LimitedClientGb.Controls.Add(this.RemoteServerPortLbl);
+			this.LimitedClientGb.Controls.Add(this.RemoteServerAddressTb);
+			this.LimitedClientGb.Controls.Add(this.RemoteServerAddressLbl);
+			this.LimitedClientGb.Controls.Add(this.LimitedClientCb);
+			this.LimitedClientGb.Controls.Add(this.LimitedClientLbl);
+			this.LimitedClientGb.Location = new System.Drawing.Point(301, 171);
+			this.LimitedClientGb.Name = "LimitedClientGb";
+			this.LimitedClientGb.Size = new System.Drawing.Size(283, 105);
+			this.LimitedClientGb.TabIndex = 24;
+			this.LimitedClientGb.TabStop = false;
+			this.LimitedClientGb.Text = "Limied client";
+			// 
+			// RemoteServerAddressLbl
+			// 
+			this.RemoteServerAddressLbl.AutoSize = true;
+			this.RemoteServerAddressLbl.Location = new System.Drawing.Point(9, 49);
+			this.RemoteServerAddressLbl.Name = "RemoteServerAddressLbl";
+			this.RemoteServerAddressLbl.Size = new System.Drawing.Size(100, 13);
+			this.RemoteServerAddressLbl.TabIndex = 9;
+			this.RemoteServerAddressLbl.Text = "Remote server addr";
+			// 
+			// RemoteServerAddressTb
+			// 
+			this.RemoteServerAddressTb.Location = new System.Drawing.Point(125, 46);
+			this.RemoteServerAddressTb.Name = "RemoteServerAddressTb";
+			this.RemoteServerAddressTb.Size = new System.Drawing.Size(136, 20);
+			this.RemoteServerAddressTb.TabIndex = 9;
+			// 
+			// RemoteServerPortLbl
+			// 
+			this.RemoteServerPortLbl.AutoSize = true;
+			this.RemoteServerPortLbl.Location = new System.Drawing.Point(9, 75);
+			this.RemoteServerPortLbl.Name = "RemoteServerPortLbl";
+			this.RemoteServerPortLbl.Size = new System.Drawing.Size(100, 13);
+			this.RemoteServerPortLbl.TabIndex = 20;
+			this.RemoteServerPortLbl.Text = "Remote server addr";
+			// 
+			// RemoteServerPortTb
+			// 
+			this.RemoteServerPortTb.Location = new System.Drawing.Point(125, 72);
+			this.RemoteServerPortTb.Name = "RemoteServerPortTb";
+			this.RemoteServerPortTb.Size = new System.Drawing.Size(54, 20);
+			this.RemoteServerPortTb.TabIndex = 21;
 			// 
 			// ConfigForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(598, 332);
+			this.ClientSize = new System.Drawing.Size(598, 352);
+			this.Controls.Add(this.LimitedClientGb);
 			this.Controls.Add(this.ItelexGb);
 			this.Controls.Add(this.SubscribeServerGb);
 			this.Controls.Add(this.GeneralGb);
@@ -401,6 +484,8 @@
 			this.SubscribeServerGb.PerformLayout();
 			this.ItelexGb.ResumeLayout(false);
 			this.ItelexGb.PerformLayout();
+			this.LimitedClientGb.ResumeLayout(false);
+			this.LimitedClientGb.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -410,10 +495,10 @@
 		private System.Windows.Forms.Label AnswerbackLbl;
 		private System.Windows.Forms.TextBox AnswerbackTb;
 		private System.Windows.Forms.TextBox IncommingLocalPortTb;
-		private System.Windows.Forms.TextBox SubscribeServerAddressTb;
+		private System.Windows.Forms.TextBox SubscribeServerAddress1Tb;
 		private System.Windows.Forms.TextBox SubscribeServerPortTb;
 		private System.Windows.Forms.Label IncomingLocalPortLbl;
-		private System.Windows.Forms.Label SubscribeServerAddressLbl;
+		private System.Windows.Forms.Label SubscribeServerAddress1Lbl;
 		private System.Windows.Forms.Label SubscribeServerPortLbl;
 		private System.Windows.Forms.Button SaveBtn;
 		private System.Windows.Forms.Button CancelBtn;
@@ -438,7 +523,15 @@
 		private System.Windows.Forms.Label LanguageLbl;
 		private System.Windows.Forms.Label LogfilePathLbl;
 		private System.Windows.Forms.TextBox LogFilePathTb;
-		private System.Windows.Forms.Label ServerDataHintLbl;
 		private System.Windows.Forms.GroupBox ItelexGb;
+		private System.Windows.Forms.Label LimitedClientLbl;
+		private System.Windows.Forms.CheckBox LimitedClientCb;
+		private System.Windows.Forms.TextBox SubscribeServerAddress2Tb;
+		private System.Windows.Forms.Label SubscribeServerAddress2Lbl;
+		private System.Windows.Forms.GroupBox LimitedClientGb;
+		private System.Windows.Forms.TextBox RemoteServerAddressTb;
+		private System.Windows.Forms.Label RemoteServerAddressLbl;
+		private System.Windows.Forms.TextBox RemoteServerPortTb;
+		private System.Windows.Forms.Label RemoteServerPortLbl;
 	}
 }

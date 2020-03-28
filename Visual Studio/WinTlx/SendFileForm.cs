@@ -48,9 +48,9 @@ namespace WinTlx
 			CropCenterRb.Tag = Cropping.Center;
 			CropRightRb.Checked = true;
 
-			CropRightRb.Checked = true;
-			_textLines = File.ReadAllLines("test.txt");
-			ShowCroppedText();
+			//CropRightRb.Checked = true;
+			//_textLines = File.ReadAllLines("test.txt");
+			//ShowCroppedText();
 		}
 
 		private void LanguageChanged()

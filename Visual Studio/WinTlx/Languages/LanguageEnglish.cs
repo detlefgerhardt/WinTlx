@@ -24,6 +24,15 @@ namespace WinTlx.Languages
 				{ LngKeys.MainForm_Address, "Address" },
 				{ LngKeys.MainForm_Port, "Port" },
 				{ LngKeys.MainForm_Extension, "Extension" },
+				{ LngKeys.MainForm_PeerType,
+					"0 - deleted\r\n" +
+					"1 - texting baudot / hostname\r\n" +
+					"2 - texting baudot / fixed ip\r\n" +
+					"3 - ascii texting / hostname\r\n" +
+					"4 - ascii texting / fixed ip\r\n" +
+					"5 - texting baudot / dyn. ip\r\n" +
+					"6 - email address\r\n"
+				},
 				{ LngKeys.MainForm_Itelex, "i-Telex" },
 				{ LngKeys.MainForm_ASCII, "ASCII" },
 				{ LngKeys.MainForm_ConnectButton, "Connect" },
@@ -65,6 +74,7 @@ namespace WinTlx.Languages
 				{ LngKeys.Setup_SubscribeServerPin, "Subscribe server pin*" },
 				{ LngKeys.Setup_OwnTelexNumber, "Telex number*" },
 				{ LngKeys.Setup_ExtensionNumber, "Extension number*" },
+				{ LngKeys.Setup_LimitedClient, "Limited client" },
 				{ LngKeys.Setup_IncomingLocalPort, "Incoming local port" },
 				{ LngKeys.Setup_IncomingPublicPort, "Incoming public port" },
 				{ LngKeys.Setup_ServerDataHint, "* This data must match the data stored on the subscribe server." },

@@ -36,12 +36,12 @@
 			this.SendBellBtn = new System.Windows.Forms.Button();
 			this.SendLettersBtn = new System.Windows.Forms.Button();
 			this.SendFiguresBtn = new System.Windows.Forms.Button();
-			this.MemberCb = new System.Windows.Forms.ComboBox();
-			this.PortTb = new System.Windows.Forms.TextBox();
-			this.AddressTb = new System.Windows.Forms.TextBox();
-			this.MemberLbl = new System.Windows.Forms.Label();
-			this.AddressLbl = new System.Windows.Forms.Label();
-			this.PortLbl = new System.Windows.Forms.Label();
+			this.TlnNameCb = new System.Windows.Forms.ComboBox();
+			this.TlnPortTb = new System.Windows.Forms.TextBox();
+			this.TlnAddressTb = new System.Windows.Forms.TextBox();
+			this.TlnMemberLbl = new System.Windows.Forms.Label();
+			this.TlnAddressLbl = new System.Windows.Forms.Label();
+			this.TlnPortLbl = new System.Windows.Forms.Label();
 			this.ExitBtn = new System.Windows.Forms.Button();
 			this.SendCarriageReturnBtn = new System.Windows.Forms.Button();
 			this.SendLineFeedBtn = new System.Windows.Forms.Button();
@@ -55,16 +55,19 @@
 			this.SearchLbl = new System.Windows.Forms.Label();
 			this.SearchTb = new System.Windows.Forms.TextBox();
 			this.QueryBtn = new System.Windows.Forms.Button();
-			this.ExtensionLbl = new System.Windows.Forms.Label();
-			this.ExtensionTb = new System.Windows.Forms.TextBox();
+			this.TlnExtensionLbl = new System.Windows.Forms.Label();
+			this.TlnExtensionTb = new System.Windows.Forms.TextBox();
 			this.SendLineBtn = new System.Windows.Forms.Button();
 			this.ClearBtn = new System.Windows.Forms.Button();
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.SendNullBtn = new System.Windows.Forms.Button();
 			this.panel2 = new System.Windows.Forms.Panel();
+			this.TlnTypeLbl = new System.Windows.Forms.Label();
+			this.TlnTypeTb = new System.Windows.Forms.TextBox();
 			this.AnswerbackLbl = new System.Windows.Forms.Label();
 			this.AnswerbackTb = new System.Windows.Forms.TextBox();
 			this.panel3 = new System.Windows.Forms.Panel();
+			this.RecvBufTb = new System.Windows.Forms.TextBox();
 			this.ConnectionStateTb = new System.Windows.Forms.TextBox();
 			this.ConnTimeTb = new System.Windows.Forms.TextBox();
 			this.LnColTb = new System.Windows.Forms.TextBox();
@@ -87,7 +90,6 @@
 			this.ScrollUpBtn = new System.Windows.Forms.Button();
 			this.ScrollEndBtn = new System.Windows.Forms.Button();
 			this.ScrollDownBtn = new System.Windows.Forms.Button();
-			this.RecvBufTb = new System.Windows.Forms.TextBox();
 			this.panel1.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.panel3.SuspendLayout();
@@ -168,58 +170,58 @@
 			this.SendFiguresBtn.UseVisualStyleBackColor = true;
 			this.SendFiguresBtn.Click += new System.EventHandler(this.SendFiguresBtn_Click);
 			// 
-			// MemberCb
+			// TlnNameCb
 			// 
-			this.MemberCb.DropDownWidth = 200;
-			this.MemberCb.FormattingEnabled = true;
-			this.MemberCb.Location = new System.Drawing.Point(174, 23);
-			this.MemberCb.Name = "MemberCb";
-			this.MemberCb.Size = new System.Drawing.Size(271, 21);
-			this.MemberCb.TabIndex = 3;
-			this.MemberCb.SelectedIndexChanged += new System.EventHandler(this.PhoneEntryCb_SelectedIndexChanged);
+			this.TlnNameCb.DropDownWidth = 200;
+			this.TlnNameCb.FormattingEnabled = true;
+			this.TlnNameCb.Location = new System.Drawing.Point(174, 23);
+			this.TlnNameCb.Name = "TlnNameCb";
+			this.TlnNameCb.Size = new System.Drawing.Size(230, 21);
+			this.TlnNameCb.TabIndex = 3;
+			this.TlnNameCb.SelectedIndexChanged += new System.EventHandler(this.PhoneEntryCb_SelectedIndexChanged);
 			// 
-			// PortTb
+			// TlnPortTb
 			// 
-			this.PortTb.Location = new System.Drawing.Point(347, 65);
-			this.PortTb.Name = "PortTb";
-			this.PortTb.Size = new System.Drawing.Size(46, 20);
-			this.PortTb.TabIndex = 5;
-			this.PortTb.Leave += new System.EventHandler(this.PortTb_Leave);
+			this.TlnPortTb.Location = new System.Drawing.Point(358, 64);
+			this.TlnPortTb.Name = "TlnPortTb";
+			this.TlnPortTb.Size = new System.Drawing.Size(46, 20);
+			this.TlnPortTb.TabIndex = 5;
+			this.TlnPortTb.Leave += new System.EventHandler(this.PortTb_Leave);
 			// 
-			// AddressTb
+			// TlnAddressTb
 			// 
-			this.AddressTb.Location = new System.Drawing.Point(174, 65);
-			this.AddressTb.Name = "AddressTb";
-			this.AddressTb.Size = new System.Drawing.Size(165, 20);
-			this.AddressTb.TabIndex = 4;
-			this.AddressTb.Leave += new System.EventHandler(this.AddressTb_Leave);
+			this.TlnAddressTb.Location = new System.Drawing.Point(174, 65);
+			this.TlnAddressTb.Name = "TlnAddressTb";
+			this.TlnAddressTb.Size = new System.Drawing.Size(178, 20);
+			this.TlnAddressTb.TabIndex = 4;
+			this.TlnAddressTb.Leave += new System.EventHandler(this.AddressTb_Leave);
 			// 
-			// MemberLbl
+			// TlnMemberLbl
 			// 
-			this.MemberLbl.AutoSize = true;
-			this.MemberLbl.Location = new System.Drawing.Point(171, 6);
-			this.MemberLbl.Name = "MemberLbl";
-			this.MemberLbl.Size = new System.Drawing.Size(146, 13);
-			this.MemberLbl.TabIndex = 0;
-			this.MemberLbl.Text = "Search result (select member)";
+			this.TlnMemberLbl.AutoSize = true;
+			this.TlnMemberLbl.Location = new System.Drawing.Point(171, 6);
+			this.TlnMemberLbl.Name = "TlnMemberLbl";
+			this.TlnMemberLbl.Size = new System.Drawing.Size(146, 13);
+			this.TlnMemberLbl.TabIndex = 0;
+			this.TlnMemberLbl.Text = "Search result (select member)";
 			// 
-			// AddressLbl
+			// TlnAddressLbl
 			// 
-			this.AddressLbl.AutoSize = true;
-			this.AddressLbl.Location = new System.Drawing.Point(171, 48);
-			this.AddressLbl.Name = "AddressLbl";
-			this.AddressLbl.Size = new System.Drawing.Size(45, 13);
-			this.AddressLbl.TabIndex = 0;
-			this.AddressLbl.Text = "Address";
+			this.TlnAddressLbl.AutoSize = true;
+			this.TlnAddressLbl.Location = new System.Drawing.Point(171, 48);
+			this.TlnAddressLbl.Name = "TlnAddressLbl";
+			this.TlnAddressLbl.Size = new System.Drawing.Size(45, 13);
+			this.TlnAddressLbl.TabIndex = 0;
+			this.TlnAddressLbl.Text = "Address";
 			// 
-			// PortLbl
+			// TlnPortLbl
 			// 
-			this.PortLbl.AutoSize = true;
-			this.PortLbl.Location = new System.Drawing.Point(344, 48);
-			this.PortLbl.Name = "PortLbl";
-			this.PortLbl.Size = new System.Drawing.Size(26, 13);
-			this.PortLbl.TabIndex = 0;
-			this.PortLbl.Text = "Port";
+			this.TlnPortLbl.AutoSize = true;
+			this.TlnPortLbl.Location = new System.Drawing.Point(355, 48);
+			this.TlnPortLbl.Name = "TlnPortLbl";
+			this.TlnPortLbl.Size = new System.Drawing.Size(26, 13);
+			this.TlnPortLbl.TabIndex = 0;
+			this.TlnPortLbl.Text = "Port";
 			// 
 			// ExitBtn
 			// 
@@ -258,7 +260,7 @@
 			// 
 			this.ProtocolItelexRb.AutoSize = true;
 			this.ProtocolItelexRb.Checked = true;
-			this.ProtocolItelexRb.Location = new System.Drawing.Point(466, 20);
+			this.ProtocolItelexRb.Location = new System.Drawing.Point(477, 20);
 			this.ProtocolItelexRb.Name = "ProtocolItelexRb";
 			this.ProtocolItelexRb.Size = new System.Drawing.Size(52, 17);
 			this.ProtocolItelexRb.TabIndex = 7;
@@ -269,7 +271,7 @@
 			// ProtocolAsciiRb
 			// 
 			this.ProtocolAsciiRb.AutoSize = true;
-			this.ProtocolAsciiRb.Location = new System.Drawing.Point(466, 39);
+			this.ProtocolAsciiRb.Location = new System.Drawing.Point(477, 39);
 			this.ProtocolAsciiRb.Name = "ProtocolAsciiRb";
 			this.ProtocolAsciiRb.Size = new System.Drawing.Size(52, 17);
 			this.ProtocolAsciiRb.TabIndex = 8;
@@ -355,21 +357,21 @@
 			this.QueryBtn.UseVisualStyleBackColor = true;
 			this.QueryBtn.Click += new System.EventHandler(this.QueryBtn_Click);
 			// 
-			// ExtensionLbl
+			// TlnExtensionLbl
 			// 
-			this.ExtensionLbl.AutoSize = true;
-			this.ExtensionLbl.Location = new System.Drawing.Point(396, 48);
-			this.ExtensionLbl.Name = "ExtensionLbl";
-			this.ExtensionLbl.Size = new System.Drawing.Size(53, 13);
-			this.ExtensionLbl.TabIndex = 0;
-			this.ExtensionLbl.Text = "Extension";
+			this.TlnExtensionLbl.AutoSize = true;
+			this.TlnExtensionLbl.Location = new System.Drawing.Point(407, 48);
+			this.TlnExtensionLbl.Name = "TlnExtensionLbl";
+			this.TlnExtensionLbl.Size = new System.Drawing.Size(53, 13);
+			this.TlnExtensionLbl.TabIndex = 0;
+			this.TlnExtensionLbl.Text = "Extension";
 			// 
-			// ExtensionTb
+			// TlnExtensionTb
 			// 
-			this.ExtensionTb.Location = new System.Drawing.Point(399, 65);
-			this.ExtensionTb.Name = "ExtensionTb";
-			this.ExtensionTb.Size = new System.Drawing.Size(46, 20);
-			this.ExtensionTb.TabIndex = 6;
+			this.TlnExtensionTb.Location = new System.Drawing.Point(410, 65);
+			this.TlnExtensionTb.Name = "TlnExtensionTb";
+			this.TlnExtensionTb.Size = new System.Drawing.Size(46, 20);
+			this.TlnExtensionTb.TabIndex = 6;
 			// 
 			// SendLineBtn
 			// 
@@ -425,19 +427,21 @@
 			// panel2
 			// 
 			this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.panel2.Controls.Add(this.TlnTypeLbl);
+			this.panel2.Controls.Add(this.TlnTypeTb);
 			this.panel2.Controls.Add(this.AnswerbackLbl);
 			this.panel2.Controls.Add(this.AnswerbackTb);
 			this.panel2.Controls.Add(this.ProtocolAsciiRb);
-			this.panel2.Controls.Add(this.MemberCb);
-			this.panel2.Controls.Add(this.PortTb);
-			this.panel2.Controls.Add(this.ExtensionTb);
-			this.panel2.Controls.Add(this.AddressTb);
-			this.panel2.Controls.Add(this.ExtensionLbl);
-			this.panel2.Controls.Add(this.MemberLbl);
+			this.panel2.Controls.Add(this.TlnNameCb);
+			this.panel2.Controls.Add(this.TlnPortTb);
+			this.panel2.Controls.Add(this.TlnExtensionTb);
+			this.panel2.Controls.Add(this.TlnAddressTb);
+			this.panel2.Controls.Add(this.TlnExtensionLbl);
+			this.panel2.Controls.Add(this.TlnMemberLbl);
 			this.panel2.Controls.Add(this.QueryBtn);
-			this.panel2.Controls.Add(this.AddressLbl);
+			this.panel2.Controls.Add(this.TlnAddressLbl);
 			this.panel2.Controls.Add(this.SearchTb);
-			this.panel2.Controls.Add(this.PortLbl);
+			this.panel2.Controls.Add(this.TlnPortLbl);
 			this.panel2.Controls.Add(this.SearchLbl);
 			this.panel2.Controls.Add(this.ProtocolItelexRb);
 			this.panel2.Location = new System.Drawing.Point(12, 11);
@@ -445,14 +449,32 @@
 			this.panel2.Size = new System.Drawing.Size(540, 100);
 			this.panel2.TabIndex = 0;
 			// 
+			// TlnTypeLbl
+			// 
+			this.TlnTypeLbl.AutoSize = true;
+			this.TlnTypeLbl.Location = new System.Drawing.Point(407, 6);
+			this.TlnTypeLbl.Name = "TlnTypeLbl";
+			this.TlnTypeLbl.Size = new System.Drawing.Size(31, 13);
+			this.TlnTypeLbl.TabIndex = 10;
+			this.TlnTypeLbl.Text = "Type";
+			// 
+			// TlnTypeTb
+			// 
+			this.TlnTypeTb.Location = new System.Drawing.Point(410, 24);
+			this.TlnTypeTb.Name = "TlnTypeTb";
+			this.TlnTypeTb.ReadOnly = true;
+			this.TlnTypeTb.Size = new System.Drawing.Size(46, 20);
+			this.TlnTypeTb.TabIndex = 9;
+			this.TlnTypeTb.MouseHover += new System.EventHandler(this.TlnTypeTb_MouseHover);
+			// 
 			// AnswerbackLbl
 			// 
 			this.AnswerbackLbl.AutoSize = true;
 			this.AnswerbackLbl.Location = new System.Drawing.Point(8, 48);
 			this.AnswerbackLbl.Name = "AnswerbackLbl";
-			this.AnswerbackLbl.Size = new System.Drawing.Size(82, 13);
+			this.AnswerbackLbl.Size = new System.Drawing.Size(66, 13);
 			this.AnswerbackLbl.TabIndex = 0;
-			this.AnswerbackLbl.Text = "Kennungsgeber";
+			this.AnswerbackLbl.Text = "Answerback";
 			// 
 			// AnswerbackTb
 			// 
@@ -476,6 +498,15 @@
 			this.panel3.Name = "panel3";
 			this.panel3.Size = new System.Drawing.Size(203, 76);
 			this.panel3.TabIndex = 0;
+			// 
+			// RecvBufTb
+			// 
+			this.RecvBufTb.Location = new System.Drawing.Point(8, 28);
+			this.RecvBufTb.Name = "RecvBufTb";
+			this.RecvBufTb.ReadOnly = true;
+			this.RecvBufTb.Size = new System.Drawing.Size(90, 20);
+			this.RecvBufTb.TabIndex = 2;
+			this.RecvBufTb.TabStop = false;
 			// 
 			// ConnectionStateTb
 			// 
@@ -702,20 +733,11 @@
 			this.ScrollDownBtn.UseVisualStyleBackColor = true;
 			this.ScrollDownBtn.Click += new System.EventHandler(this.ScrollDownBtn_Click);
 			// 
-			// RecvBufTb
-			// 
-			this.RecvBufTb.Location = new System.Drawing.Point(8, 28);
-			this.RecvBufTb.Name = "RecvBufTb";
-			this.RecvBufTb.ReadOnly = true;
-			this.RecvBufTb.Size = new System.Drawing.Size(90, 20);
-			this.RecvBufTb.TabIndex = 2;
-			this.RecvBufTb.TabStop = false;
-			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(775, 604);
+			this.ClientSize = new System.Drawing.Size(774, 604);
 			this.Controls.Add(this.ScrollDownBtn);
 			this.Controls.Add(this.ScrollEndBtn);
 			this.Controls.Add(this.ScrollUpBtn);
@@ -770,12 +792,12 @@
 		private System.Windows.Forms.Button SendBellBtn;
 		private System.Windows.Forms.Button SendLettersBtn;
 		private System.Windows.Forms.Button SendFiguresBtn;
-		private System.Windows.Forms.ComboBox MemberCb;
-		private System.Windows.Forms.TextBox PortTb;
-		private System.Windows.Forms.TextBox AddressTb;
-		private System.Windows.Forms.Label MemberLbl;
-		private System.Windows.Forms.Label AddressLbl;
-		private System.Windows.Forms.Label PortLbl;
+		private System.Windows.Forms.ComboBox TlnNameCb;
+		private System.Windows.Forms.TextBox TlnPortTb;
+		private System.Windows.Forms.TextBox TlnAddressTb;
+		private System.Windows.Forms.Label TlnMemberLbl;
+		private System.Windows.Forms.Label TlnAddressLbl;
+		private System.Windows.Forms.Label TlnPortLbl;
 		private System.Windows.Forms.Button ExitBtn;
 		private System.Windows.Forms.Button SendCarriageReturnBtn;
 		private System.Windows.Forms.Button SendLineFeedBtn;
@@ -789,8 +811,8 @@
 		private System.Windows.Forms.Label SearchLbl;
 		private System.Windows.Forms.TextBox SearchTb;
 		private System.Windows.Forms.Button QueryBtn;
-		private System.Windows.Forms.Label ExtensionLbl;
-		private System.Windows.Forms.TextBox ExtensionTb;
+		private System.Windows.Forms.Label TlnExtensionLbl;
+		private System.Windows.Forms.TextBox TlnExtensionTb;
 		private System.Windows.Forms.Button SendLineBtn;
 		private System.Windows.Forms.Button ClearBtn;
 		private System.Windows.Forms.Panel panel1;
@@ -822,6 +844,8 @@
 		private System.Windows.Forms.Button ScrollEndBtn;
 		private System.Windows.Forms.Button ScrollDownBtn;
 		private System.Windows.Forms.TextBox RecvBufTb;
+		private System.Windows.Forms.TextBox TlnTypeTb;
+		private System.Windows.Forms.Label TlnTypeLbl;
 	}
 }
 
