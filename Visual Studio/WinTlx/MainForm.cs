@@ -153,9 +153,12 @@ namespace WinTlx
 			Logging.Instance.Log(LogTypes.Info, TAG, nameof(LanguageChanged), $"switch language to {LanguageManager.Instance.CurrentLanguage.Key}");
 
 			SearchLbl.Text = LngText(LngKeys.MainForm_SearchText);
+			Helper.SetToolTip(SearchLbl, LngText(LngKeys.MainForm_SearchText_ToolTip));
 			TlnMemberLbl.Text = LngText(LngKeys.MainForm_SearchResult);
 			QueryBtn.Text = LngText(LngKeys.MainForm_SearchButton);
+			Helper.SetToolTip(QueryBtn, LngText(LngKeys.MainForm_SearchButton_ToolTip));
 			AnswerbackLbl.Text = LngText(LngKeys.MainForm_Answerback);
+			Helper.SetToolTip(AnswerbackLbl, LngText(LngKeys.MainForm_Answerback_ToolTip));
 			TlnAddressLbl.Text = LngText(LngKeys.MainForm_Address);
 			TlnPortLbl.Text = LngText(LngKeys.MainForm_Port);
 			TlnExtensionLbl.Text = LngText(LngKeys.MainForm_Extension);
@@ -172,15 +175,22 @@ namespace WinTlx
 			SendLineFeedBtn.Text = LngText(LngKeys.MainForm_SendLinefeedButton);
 			SendBellBtn.Text = LngText(LngKeys.MainForm_SendBellButton);
 			SendNullBtn.Text = LngText(LngKeys.MainForm_SendNullButton);
+			Helper.SetToolTip(SendNullBtn, LngText(LngKeys.MainForm_SendNullButton_ToolTip));
 			SendTimeBtn.Text = LngText(LngKeys.MainForm_SendTimeButton);
 			SendRyBtn.Text = LngText(LngKeys.MainForm_SendRyButton);
 			SendFoxBtn.Text = LngText(LngKeys.MainForm_SendPanButton);
 			ClearBtn.Text = LngText(LngKeys.MainForm_ClearButton);
+			Helper.SetToolTip(ClearBtn, LngText(LngKeys.MainForm_ClearButton_ToolTip));
 			SendFileBtn.Text = LngText(LngKeys.MainForm_SendfileButton);
+			Helper.SetToolTip(SendFileBtn, LngText(LngKeys.MainForm_SendfileButton_ToolTip));
 			RecvOnCb.Text = LngText(LngKeys.MainForm_RecvOnButton);
+			Helper.SetToolTip(RecvOnCb, LngText(LngKeys.MainForm_RecvOnButton_ToolTip));
 			UpdateIpAddressBtn.Text = LngText(LngKeys.MainForm_UpdateIpAddressButton);
+			Helper.SetToolTip(UpdateIpAddressBtn, LngText(LngKeys.MainForm_UpdateIpAddressButton_ToolTip));
 			TapePunchBtn.Text = LngText(LngKeys.MainForm_TapePunchButton);
+			Helper.SetToolTip(TapePunchBtn, LngText(LngKeys.MainForm_TapePunchButton_ToolTip));
 			EyeballCharCb.Text = LngText(LngKeys.MainForm_EyeBallCharsButton);
+			Helper.SetToolTip(EyeballCharCb, LngText(LngKeys.MainForm_EyeBallCharsButton_ToolTip));
 			ConfigBtn.Text = LngText(LngKeys.MainForm_ConfigButton);
 			AboutBtn.Text = LngText(LngKeys.MainForm_AboutButton);
 			ExitBtn.Text = LngText(LngKeys.MainForm_ExitButton);

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace WinTlx.Languages
 {
@@ -17,10 +13,15 @@ namespace WinTlx.Languages
 					"Die Teilnehmer habe reale Fernschreiber angeschlossen. " +
 					"Sende bitte keine längeren Texte oder Spam an i-Telex-Nummern!" },
 
+				{ LngKeys.NoFunction_ToolTip, "Noch nicht implementiert" },
+
 				{ LngKeys.MainForm_SearchText, "Suchtext" },
+				{ LngKeys.MainForm_SearchText_ToolTip, "Suchtext oder i-Telex-Nummer" },
 				{ LngKeys.MainForm_SearchResult, "Suchergebnisse (auswählen)" },
 				{ LngKeys.MainForm_SearchButton, "Suchen" },
+				{ LngKeys.MainForm_SearchButton_ToolTip, "Auf Teilnehmer-Server suchen" },
 				{ LngKeys.MainForm_Answerback, "Kennung" },
+				{ LngKeys.MainForm_Answerback_ToolTip, "WinTlx Kennung" },
 				{ LngKeys.MainForm_Address, "Adresse" },
 				{ LngKeys.MainForm_Port, "Port" },
 				{ LngKeys.MainForm_Extension, "Extension" },
@@ -46,15 +47,22 @@ namespace WinTlx.Languages
 				{ LngKeys.MainForm_SendLinefeedButton, "\u2261" },
 				{ LngKeys.MainForm_SendBellButton, "Klingel" },
 				{ LngKeys.MainForm_SendNullButton, "Cod32" },
+				{ LngKeys.MainForm_SendNullButton_ToolTip, "Code32/NULL Zeichen senden" },
 				{ LngKeys.MainForm_SendTimeButton, "Zeit" },
 				{ LngKeys.MainForm_SendRyButton, "RY" },
 				{ LngKeys.MainForm_SendPanButton, "Quax" },
 				{ LngKeys.MainForm_ClearButton, "Löschen" },
+				{ LngKeys.MainForm_ClearButton_ToolTip, "Terminal-Fenster löschen" },
 				{ LngKeys.MainForm_SendfileButton, "Datei senden" },
+				{ LngKeys.MainForm_SendfileButton_ToolTip, "Textdatei senden" },
 				{ LngKeys.MainForm_RecvOnButton, "Empfang" },
+				{ LngKeys.MainForm_RecvOnButton_ToolTip, "Empfangs-Modus ein/aus, erfordert gültigen Tln-Server-Eintrag und korrekte TCP-Einstellungen" },
 				{ LngKeys.MainForm_UpdateIpAddressButton, "Update IP" },
+				{ LngKeys.MainForm_UpdateIpAddressButton_ToolTip, "IP-Addresse auf dem Teilnehmerserver aktualiseren" },
 				{ LngKeys.MainForm_TapePunchButton, "Lochstreifen" },
+				{ LngKeys.MainForm_TapePunchButton_ToolTip, "Öffnet Lochstreifen Sender/Empfänger/Editor" },
 				{ LngKeys.MainForm_EyeBallCharsButton, "Bildlocher" },
+				{ LngKeys.MainForm_EyeBallCharsButton_ToolTip, "Bildlocher ein/aus" },
 				{ LngKeys.MainForm_ConfigButton, "Einstellungen" },
 				{ LngKeys.MainForm_AboutButton, "Info" },
 				{ LngKeys.MainForm_ExitButton, "Beenden" },
@@ -92,12 +100,23 @@ namespace WinTlx.Languages
 				{ LngKeys.SendFile_SendButton, "Senden" },
 				{ LngKeys.SendFile_CancelButton, "Abbrechen" },
 
-				{ LngKeys.TapePunch_TapePunch, "Lochstreifen" },
+				{ LngKeys.TapePunch_TapePunch, "Lochstreifen Sender/Empfänger/Editor" },
 				{ LngKeys.TapePunch_RecvButton, "Empf" },
+				{ LngKeys.TapePunch_RecvButton_ToolTip, "LS-Empfänger ein/aus" },
 				{ LngKeys.TapePunch_SendButton, "Senden" },
+				{ LngKeys.TapePunch_SendButton_ToolTip, "LS senden" },
 				{ LngKeys.TapePunch_ClearButton, "Löschen" },
+				{ LngKeys.TapePunch_ClearButton_ToolTip, "LS löschen" },
 				{ LngKeys.TapePunch_LoadButton, "Laden" },
+				{ LngKeys.TapePunch_LoadButton_ToolTip, "LS aus Datei laden" },
 				{ LngKeys.TapePunch_SaveButton, "Speichern" },
+				{ LngKeys.TapePunch_SaveButton_ToolTip, "LS in Datei speichern" },
+				{ LngKeys.TapePunch_EditButton, "Edit" },
+				{ LngKeys.TapePunch_EditButton_ToolTip, "LS-Editor ein/aus" },
+				{ LngKeys.TapePunch_InsertButton, "Einf" },
+				{ LngKeys.TapePunch_InsertButton_ToolTip, "Einfügemodus ein/aus" },
+				{ LngKeys.TapePunch_DeleteButton, "Lösch" },
+				{ LngKeys.TapePunch_DeleteButton_ToolTip, "Zeichen löschen" },
 				{ LngKeys.TapePunch_CloseButton, "Schließen" },
 				{ LngKeys.TapePunch_CodeLetters, "BU" },
 				{ LngKeys.TapePunch_CodeFigures, "ZI" },

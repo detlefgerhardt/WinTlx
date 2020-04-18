@@ -72,3 +72,5 @@ Version history
           New: Support for limited client ("Centralex")
 1.0.4.0 - Chg: Complete rework of virtual tape punch
           New: Virtual tape punch can now edit tapes
+1.0.4.1 - New: Some tooltips added in main wain window and punch tape windows
+          Fix: Code clean up

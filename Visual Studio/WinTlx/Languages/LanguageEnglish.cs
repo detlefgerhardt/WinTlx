@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace WinTlx.Languages
 {
@@ -17,10 +13,15 @@ namespace WinTlx.Languages
 					"The members of the network have real telex machines connected to there i-Telex ports. " +
 					"Please do not send longer text files or spam to i-Telex numbers!" },
 
+				{ LngKeys.NoFunction_ToolTip, "Not implemented yet" },
+
 				{ LngKeys.MainForm_SearchText, "Search text" },
+				{ LngKeys.MainForm_SearchText_ToolTip, "Search text or i-Telex number" },
 				{ LngKeys.MainForm_SearchResult, "Search result (select member)" },
 				{ LngKeys.MainForm_SearchButton, "Search" },
+				{ LngKeys.MainForm_SearchButton_ToolTip, "Search on subscribe server" },
 				{ LngKeys.MainForm_Answerback, "Answerback" },
+				{ LngKeys.MainForm_Answerback_ToolTip, "WinTlx answerback" },
 				{ LngKeys.MainForm_Address, "Address" },
 				{ LngKeys.MainForm_Port, "Port" },
 				{ LngKeys.MainForm_Extension, "Extension" },
@@ -46,15 +47,22 @@ namespace WinTlx.Languages
 				{ LngKeys.MainForm_SendLinefeedButton, "\u2261" },
 				{ LngKeys.MainForm_SendBellButton, "BEL" },
 				{ LngKeys.MainForm_SendNullButton, "Cod32" },
+				{ LngKeys.MainForm_SendNullButton_ToolTip, "Send Code32/NUL character" },
 				{ LngKeys.MainForm_SendTimeButton, "Time" },
 				{ LngKeys.MainForm_SendRyButton, "RY" },
 				{ LngKeys.MainForm_SendPanButton, "Fox" },
 				{ LngKeys.MainForm_ClearButton, "Clear" },
+				{ LngKeys.MainForm_ClearButton_ToolTip, "Clear terminal window" },
 				{ LngKeys.MainForm_SendfileButton, "Send file" },
+				{ LngKeys.MainForm_SendfileButton_ToolTip, "Send text file" },
 				{ LngKeys.MainForm_RecvOnButton, "Recv On" },
+				{ LngKeys.MainForm_RecvOnButton_ToolTip, "Recveive mode on/off, needs valid subscriber server and valid local TCP setup" },
 				{ LngKeys.MainForm_UpdateIpAddressButton, "Update IP" },
+				{ LngKeys.MainForm_UpdateIpAddressButton_ToolTip, "Update ip address on the subscribe server" },
 				{ LngKeys.MainForm_TapePunchButton, "Tape punch" },
+				{ LngKeys.MainForm_TapePunchButton_ToolTip, "Opens punch tape sender/receiver/editor" },
 				{ LngKeys.MainForm_EyeBallCharsButton, "Eyeball char" },
+				{ LngKeys.MainForm_EyeBallCharsButton_ToolTip, "Eyevall characters on/off" },
 				{ LngKeys.MainForm_ConfigButton, "Setup" },
 				{ LngKeys.MainForm_AboutButton, "About" },
 				{ LngKeys.MainForm_ExitButton, "Exit" },
@@ -92,12 +100,23 @@ namespace WinTlx.Languages
 				{ LngKeys.SendFile_SendButton, "Send" },
 				{ LngKeys.SendFile_CancelButton, "Cancel" },
 
-				{ LngKeys.TapePunch_TapePunch, "Tape punch" },
+				{ LngKeys.TapePunch_TapePunch, "Tape punch sender/receiver/editor" },
 				{ LngKeys.TapePunch_RecvButton, "Recv" },
+				{ LngKeys.TapePunch_RecvButton_ToolTip, "Tape punch receiver on/off" },
 				{ LngKeys.TapePunch_SendButton, "Send" },
+				{ LngKeys.TapePunch_SendButton_ToolTip, "Send tape" },
 				{ LngKeys.TapePunch_ClearButton, "Clear" },
+				{ LngKeys.TapePunch_ClearButton_ToolTip, "Clear tape" },
 				{ LngKeys.TapePunch_LoadButton, "Load" },
+				{ LngKeys.TapePunch_LoadButton_ToolTip, "Load tape from file" },
 				{ LngKeys.TapePunch_SaveButton, "Save" },
+				{ LngKeys.TapePunch_SaveButton_ToolTip, "Save tape to file" },
+				{ LngKeys.TapePunch_EditButton, "Edit" },
+				{ LngKeys.TapePunch_EditButton_ToolTip, "Tape editor on/off" },
+				{ LngKeys.TapePunch_InsertButton, "Ins" },
+				{ LngKeys.TapePunch_InsertButton_ToolTip, "Insert mode on/off" },
+				{ LngKeys.TapePunch_DeleteButton, "Del" },
+				{ LngKeys.TapePunch_DeleteButton_ToolTip, "Delete character" },
 				{ LngKeys.TapePunch_CloseButton, "Close" },
 				{ LngKeys.TapePunch_CodeLetters, "LTR" },
 				{ LngKeys.TapePunch_CodeFigures, "FIG" },

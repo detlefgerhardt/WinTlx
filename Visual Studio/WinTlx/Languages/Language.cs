@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WinTlx.Languages
 {
@@ -11,11 +8,15 @@ namespace WinTlx.Languages
 		Invalid,
 
 		Start_Text,
+		NoFunction_ToolTip,
 
 		MainForm_SearchText,
+		MainForm_SearchText_ToolTip,
 		MainForm_SearchResult,
 		MainForm_SearchButton,
+		MainForm_SearchButton_ToolTip,
 		MainForm_Answerback,
+		MainForm_Answerback_ToolTip,
 		MainForm_Address,
 		MainForm_Port,
 		MainForm_Extension,
@@ -33,15 +34,22 @@ namespace WinTlx.Languages
 		MainForm_SendLinefeedButton,
 		MainForm_SendBellButton,
 		MainForm_SendNullButton,
+		MainForm_SendNullButton_ToolTip,
 		MainForm_SendTimeButton,
 		MainForm_SendRyButton,
 		MainForm_SendPanButton,
 		MainForm_ClearButton,
+		MainForm_ClearButton_ToolTip,
 		MainForm_SendfileButton,
+		MainForm_SendfileButton_ToolTip,
 		MainForm_RecvOnButton,
+		MainForm_RecvOnButton_ToolTip,
 		MainForm_UpdateIpAddressButton,
+		MainForm_UpdateIpAddressButton_ToolTip,
 		MainForm_TapePunchButton,
+		MainForm_TapePunchButton_ToolTip,
 		MainForm_EyeBallCharsButton,
+		MainForm_EyeBallCharsButton_ToolTip,
 		MainForm_ConfigButton,
 		MainForm_AboutButton,
 		MainForm_ExitButton,
@@ -81,10 +89,21 @@ namespace WinTlx.Languages
 
 		TapePunch_TapePunch,
 		TapePunch_RecvButton,
+		TapePunch_RecvButton_ToolTip,
 		TapePunch_SendButton,
+		TapePunch_SendButton_ToolTip,
 		TapePunch_ClearButton,
+		TapePunch_ClearButton_ToolTip,
 		TapePunch_LoadButton,
+		TapePunch_LoadButton_ToolTip,
 		TapePunch_SaveButton,
+		TapePunch_SaveButton_ToolTip,
+		TapePunch_EditButton,
+		TapePunch_EditButton_ToolTip,
+		TapePunch_InsertButton,
+		TapePunch_InsertButton_ToolTip,
+		TapePunch_DeleteButton,
+		TapePunch_DeleteButton_ToolTip,
 		TapePunch_CloseButton,
 		TapePunch_CodeLetters,
 		TapePunch_CodeFigures,

@@ -114,7 +114,7 @@
     </Compile>
     <Compile Include="ScreenChar.cs" />
     <Compile Include="ScreenLine.cs" />
-    <Compile Include="SelectablePictureBox.cs">
+    <Compile Include="Controls\SelectablePictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="SendFileForm.cs">

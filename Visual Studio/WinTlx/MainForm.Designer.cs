@@ -1,4 +1,6 @@
-﻿namespace WinTlx
+﻿using WinTlx.Controls;
+
+namespace WinTlx
 {
 	partial class MainForm
 	{

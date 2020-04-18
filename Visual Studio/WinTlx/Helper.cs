@@ -204,6 +204,28 @@ namespace WinTlx
 			}
 		}
 
+		public static void SetToolTip(Control ctrl, string text)
+		{
+			ToolTip toolTip = (ToolTip)ctrl.Tag;
+			if (toolTip != null)
+			{
+				toolTip.RemoveAll();
+			}
+			else
+			{
+				toolTip = new ToolTip()
+				{
+					AutoPopDelay = 5000,
+					InitialDelay = 1000,
+					ReshowDelay = 500,
+					ShowAlways = true
+				};
+				ctrl.Tag = toolTip;
+			}
+
+			toolTip.SetToolTip(ctrl, text);
+		}
+
 		public static long MilliTicks()
 		{
 			return DateTime.Now.Ticks / 10000;

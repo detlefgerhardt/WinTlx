@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WinTlx.Config;
-using System.Runtime.Serialization;
 
 namespace WinTlx.Scheduler
 {
@@ -155,7 +150,7 @@ namespace WinTlx.Scheduler
 		{
 			try
 			{
-				string configXml = Helper.SerializeObject<ScheduleData>(ScheduleData);
+				string configXml = Helper.SerializeObject2<ScheduleData>(ScheduleData);
 				File.WriteAllText(SCHEDULE_NAME, configXml);
 				return true;
 			}
