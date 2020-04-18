@@ -12,7 +12,7 @@ A Windows test und diagnostic tool for the i-Telex network
 - Sending text files
 - Logging all communication to a text file
 - Runs on any Windows version with .NET Framework 4.5 and above
-- Virtual tape punch with tape editor eyeball characters (Bildlocher)
+- Virtual tape punch with tape editor and eyeball characters (Bildlocher)
 - Send and receive of binary ITA-2 files (via tape punch function)
 - ITA-2 and US-TTY suport
 - Multi-language support
