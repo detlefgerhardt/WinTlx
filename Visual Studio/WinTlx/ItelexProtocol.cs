@@ -792,6 +792,7 @@ namespace WinTlx
 
 		public void SendAckCmd(int ackVal)
 		{
+			Debug.WriteLine($"Send Ack {ackVal}");
 			byte[] data = new byte[] { (byte)ackVal };
 			SendCmd(ItelexCommands.Ack, data);
 		}
@@ -892,6 +893,8 @@ namespace WinTlx
 				return;
 			}
 
+			EnqueueSend(codes );
+			/*
 			lock (_sendLock)
 			{
 				for (int i = 0; i < codes.Length; i++)
@@ -899,6 +902,7 @@ namespace WinTlx
 					_sendBuffer.Enqueue(codes[i]);
 				}
 			}
+			*/
 			//Logging.Instance.Debug(TAG, nameof(SendCode), $"_sendBuffer.Count={_sendBuffer.Count}");
 			Update?.Invoke();
 		}
@@ -907,17 +911,35 @@ namespace WinTlx
 		{
 			string asciiStr = CodeManager.BaudotStringToAscii(new byte[] { code }, ref _shiftState, _config.CodeSet, CodeManager.SendRecv.Send);
 			Send?.Invoke(asciiStr);
-
-			if (IsConnected && !Local)
+			if (!IsConnected || Local)
 			{
-				lock (_sendLock)
-				{
-					_sendBuffer.Enqueue(code);
-				}
+				return;
 			}
 
+			EnqueueSend(new byte[] { code });
+			/*
+			lock (_sendLock)
+			{
+				_sendBuffer.Enqueue(code);
+			}
+			*/
+
 			Update?.Invoke();
-			//_lastSentMs = Helper.GetTicksMs();
+		}
+
+		private void EnqueueSend(byte[] codes)
+		{
+			while (_sendBuffer.Count > 10)
+			{
+				Thread.Sleep(100);
+			}
+			lock (_sendLock)
+			{
+				for (int i = 0; i < codes.Length; i++)
+				{
+					_sendBuffer.Enqueue(codes[i]);
+				}
+			}
 		}
 
 		public void SendCmd(ItelexCommands cmd, byte[] data = null)
@@ -1076,6 +1098,7 @@ namespace WinTlx
 				int dataPos = 0;
 				while (dataPos + 2 <= newData.Length)
 				{
+					Debug.WriteLine($"datapos={dataPos} cmd={newData[dataPos]:X02}");
 					int packetLen = newData[dataPos + 1] + 2;
 					if (dataPos + packetLen > newData.Length)
 					{
@@ -1090,6 +1113,7 @@ namespace WinTlx
 					if (packetData.Length >= 2 && packetData.Length >= packetData[1] + 2)
 					{
 						ItelexPacket packet = new ItelexPacket(packetData);
+						Debug.WriteLine($"packet={packet}");
 						DecodePacket(packet);
 					}
 				}
@@ -1172,6 +1196,7 @@ namespace WinTlx
 					{
 						Logging.Instance.AppendBinary(packet.Data, Logging.BinaryModes.Recv);
 						string asciiStr = CodeManager.BaudotStringToAscii(packet.Data, ref _shiftState, _config.CodeSet, CodeManager.SendRecv.Recv);
+						Debug.WriteLine(asciiStr);
 						Logging.Instance.Debug(TAG, nameof(DecodePacket), $"recv baudot data {packet.Len} \"{CodeManager.AsciiToDebugStr(asciiStr)}\"");
 						AddReceivedCharCount(packet.Data.Length);
 						Received?.Invoke(asciiStr);

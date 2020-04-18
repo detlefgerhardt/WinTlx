@@ -787,17 +787,38 @@ namespace WinTlx
 			ShowScreen();
 		}
 
-		private void SendFileBtn_Click(object sender, EventArgs e)
+		private async void SendFileBtn_Click(object sender, EventArgs e)
 		{
-			SetFocus();
-			SendFileForm sendFileForm = new SendFileForm();
-			sendFileForm.ShowDialog();
-
-			if (sendFileForm.AsciiText != null)
+			try
 			{
-				SendAsciiText(sendFileForm.AsciiText);
+				SendFileBtn.Enabled = false;
+				SetFocus();
+				SendFileForm sendFileForm = new SendFileForm();
+				sendFileForm.ShowDialog();
+
+				if (sendFileForm.AsciiText == null)
+				{
+					return;
+				}
+
+				await Task.Run(() =>
+				{
+					for (int i = 0; i < sendFileForm.AsciiText.Length; i++)
+					{
+						_itelex.SendAsciiChar(sendFileForm.AsciiText[i]);
+					}
+				});
+
+				/*
+				{
+					SendAsciiText(sendFileForm.AsciiText);
+				}
+				*/
 			}
-			return;
+			finally
+			{
+				SendFileBtn.Enabled = true;
+			}
 		}
 
 		private void SchedulerBtn_Click(object sender, EventArgs e)

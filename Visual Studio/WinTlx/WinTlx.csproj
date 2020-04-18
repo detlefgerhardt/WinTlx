@@ -69,6 +69,9 @@
   <ItemGroup>
     <Compile Include="Codes\AsciiConvItem.cs" />
     <Compile Include="Codes\CodeItem.cs" />
+    <Compile Include="Controls\DelayedHScrollBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Scheduler\ScheduleData.cs" />
     <Compile Include="Codes\EyeballChar.cs" />
     <Compile Include="Codes\CodeManager.cs" />

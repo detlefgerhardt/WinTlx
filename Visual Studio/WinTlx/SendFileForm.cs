@@ -127,6 +127,8 @@ namespace WinTlx
 
 		private void SendBtn_Click(object sender, EventArgs e)
 		{
+			AsciiText = TextTb.Text;
+			/*
 			if (!string.IsNullOrWhiteSpace(TextTb.Text))
 			{
 				AsciiText = ConvertAscii(TextTb.Text);
@@ -135,6 +137,7 @@ namespace WinTlx
 			{
 				AsciiText = null;
 			}
+			*/
 			Close();
 		}
 

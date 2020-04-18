@@ -45,7 +45,7 @@ namespace WinTlx.Languages
 				{ LngKeys.MainForm_SendReturnButton, "<" },
 				{ LngKeys.MainForm_SendLinefeedButton, "\u2261" },
 				{ LngKeys.MainForm_SendBellButton, "Klingel" },
-				{ LngKeys.MainForm_SendNullButton, "....." },
+				{ LngKeys.MainForm_SendNullButton, "Cod32" },
 				{ LngKeys.MainForm_SendTimeButton, "Zeit" },
 				{ LngKeys.MainForm_SendRyButton, "RY" },
 				{ LngKeys.MainForm_SendPanButton, "Quax" },

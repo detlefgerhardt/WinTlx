@@ -70,3 +70,5 @@ Version history
 1.0.2.4 - Fix: Improved i-Telex protocol
 1.0.3.0 - Fix: Improved i-Telex protocol
           New: Support for limited client ("Centralex")
+1.0.4.0 - Chg: Complete rework of virtual tape punch
+          New: Virtual tape punch can now edit tapes
