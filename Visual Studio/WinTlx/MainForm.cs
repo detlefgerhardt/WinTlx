@@ -419,9 +419,53 @@ namespace WinTlx
 
 		private void ClockTimer_Elapsed(object sender, ElapsedEventArgs e)
 		{
+			// clock
+
 			DateTime dt = DateTime.Now;
 			Helper.ControlInvokeRequired(DateTb, () => DateTb.Text = $"{dt:dd.MM.yyyy}");
 			Helper.ControlInvokeRequired(TimeTb, () => TimeTb.Text = $"{dt:HH:mm:ss}");
+
+			// timeout
+
+			Helper.ControlInvokeRequired(IdleTimoutTb, () =>
+			{
+				IdleTimoutTb.ForeColor = Color.Black;
+				if (!_itelex.IsConnected || _configData.IdleTimeout == 0)
+				{
+					IdleTimoutTb.Text = $"Timeout -";
+				}
+				else
+				{
+					int timeout = _configData.IdleTimeout - _itelex.IdleTimerMs / 1000;
+					IdleTimoutTb.Text = $"Timeout {timeout} s";
+					if (timeout<10)
+					{
+						IdleTimoutTb.ForeColor = Color.Red;
+					}
+				}
+				// trigger change of forecolor
+				IdleTimoutTb.BackColor = IdleTimoutTb.BackColor;
+			});
+
+			if (_itelex.IsConnected && _configData.IdleTimeout>0 && IdleTimeout()==0)
+			{
+				ShowLocalMessage("inactivity timeout");
+				_itelex.Disconnect();
+			}
+		}
+
+		private int IdleTimeout()
+		{
+			if (!_itelex.IsConnected)
+			{
+				return 0;
+			}
+			int timeout = _configData.IdleTimeout - _itelex.IdleTimerMs / 1000;
+			if (timeout<0)
+			{
+				timeout = 0;
+			}
+			return timeout;
 		}
 
 		private void FocusTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -996,7 +1040,12 @@ namespace WinTlx
 
 		private void DroppedHandler()
 		{
+			Debug.WriteLine($"DroppedHandler() ConnectionState={_itelex.ConnectionState}");
+
 			ShowLocalMessage(LngText(LngKeys.Message_Disconnected));
+			//Helper.ControlInvokeRequired(ConnectBtn, () => ConnectBtn.Enabled = true);
+			//Helper.ControlInvokeRequired(DisconnectBtn, () => DisconnectBtn.Enabled = false);
+
 			//SetConnectState();
 			UpdateHandler();
 		}
@@ -1040,6 +1089,7 @@ namespace WinTlx
 		{
 			Helper.ControlInvokeRequired(ConnectBtn, () =>
 			{
+				Debug.WriteLine($"UpdateHandler() ConnectionState={_itelex.ConnectionState}");
 				if (!_itelex.IsConnected)
 				{
 					ConnectBtn.Enabled = true;
@@ -1099,7 +1149,7 @@ namespace WinTlx
 
 			Helper.ControlInvokeRequired(SendAckTb, () => SendAckTb.Text = $"Itx Buf={_itelex.CharsToSendCount} Ack={_itelex.CharsAckCount}");
 			Helper.ControlInvokeRequired(RecvBufTb, () => RecvBufTb.Text = $"I={_outputBuffer.Count} S={_sendBuffer.Count}");
-			Helper.ControlInvokeRequired(IdleTimoutTb, () => IdleTimoutTb.Text = $"Timeout {_itelex.IdleTimer} sec");
+
 			Helper.ControlInvokeRequired(ConnTimeTb, () => ConnTimeTb.Text = $"Conn {_itelex.ConnTimeMin} min");
 
 			Helper.ControlInvokeRequired(AnswerbackTb, () => AnswerbackTb.Text = _configData.Answerback);

@@ -76,4 +76,7 @@ Version history
           Fix: Code clean up
 1.0.4.2 - Fix: Improvement of send buffer handling
           Fix: Pasting texts with Ctrl-V was broken
-          Chg: Punch tape is now always send from the current position
+          Fix: Reject-handling was broken
+          Fix: Idle display and idle timout was broken
+          New: Send 2 x LTRS (Bu) after a pause of 25 seconds in case the remote teletype fell asleep
+          Chg: Punch tape data is now always send from the current position
