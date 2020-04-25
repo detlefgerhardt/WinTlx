@@ -74,3 +74,6 @@ Version history
           New: Virtual tape punch can now edit tapes
 1.0.4.1 - New: Some tooltips added in main wain window and punch tape windows
           Fix: Code clean up
+1.0.4.2 - Fix: Improvement of send buffer handling
+          Fix: Pasting texts with Ctrl-V was broken
+          Chg: Punch tape is now always send from the current position

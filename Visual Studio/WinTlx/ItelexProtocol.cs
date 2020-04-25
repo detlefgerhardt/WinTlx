@@ -334,6 +334,7 @@ namespace WinTlx
 					{
 						Logging.Instance.Error(TAG, nameof(Listener), "", ex);
 					}
+					Disconnect();
 				}
 			}
 		}
@@ -593,23 +594,24 @@ namespace WinTlx
 
 		private void SendTimer_Elapsed(object sender, ElapsedEventArgs e)
 		{
+			//Debug.WriteLine("SendTimer_Elapsed");
 			if (!IsConnected || _ackTimerActive || _sendTimerActive)
 			{
 				//Debug.WriteLine($"SendTimer_Elapsed: !IsConnected || _ackSendTimerActive || _sendTimerActive");
 				return;
 			}
-			_sendTimerActive = true;
-
-			//Debug.WriteLine($"SendTimer_Elapsed");
-			if (_client != null && !_client.Connected)
-			{
-				Logging.Instance.Info(TAG, nameof(SendTimer_Elapsed), $"!_client.Connected");
-				Disconnect();
-				return;
-			}
 
 			try
 			{
+				_sendTimerActive = true;
+
+				//Debug.WriteLine($"SendTimer_Elapsed");
+				if (_client != null && !_client.Connected)
+				{
+					Logging.Instance.Info(TAG, nameof(SendTimer_Elapsed), $"!_client.Connected");
+					Disconnect();
+					return;
+				}
 				SendTimer();
 			}
 			catch (Exception ex)
@@ -660,6 +662,7 @@ namespace WinTlx
 			{
 				//Debug.WriteLine($"#1 {_itelixSendCount} < {Constants.ITELIX_SENDBUFFER_SIZE} && {Helper.GetTicksMs() - _lastSentMs} < {Constants.WAIT_BEFORE_SEND_MSEC}");
 				//Logging.Instance.Log(LogTypes.Info, TAG, nameof(SendTimer), $"#1 {_itelixSendCount} < {Constants.ITELIX_SENDBUFFER_SIZE} && {Helper.GetTicksMs() - _lastSentMs} < {Constants.WAIT_BEFORE_SEND_MSEC}");
+				Debug.WriteLine($"lastsend={Helper.GetTicksMs() - _lastSentMs}");
 				return;
 			}
 
@@ -741,11 +744,15 @@ namespace WinTlx
 			_ackTimerActive = false;
 		}
 
+		public int GetSendBufferCount()
+		{
+			return _sendBuffer != null ? _sendBuffer.Count : 0;
+		}
+
 		public void SendAsciiChar(char asciiChr)
 		{
 			SetLastSendRecv();
-			string asciiStr = asciiChr.ToString();
-			SendAsciiText(asciiStr);
+			SendAsciiText(asciiChr.ToString());
 		}
 
 		public void SendAsciiText(string asciiStr)
@@ -929,10 +936,12 @@ namespace WinTlx
 
 		private void EnqueueSend(byte[] codes)
 		{
+			/*
 			while (_sendBuffer.Count > 10)
 			{
 				Thread.Sleep(100);
 			}
+			*/
 			lock (_sendLock)
 			{
 				for (int i = 0; i < codes.Length; i++)

@@ -140,7 +140,7 @@ namespace WinTlx.Scheduler
 			}
 			catch (Exception ex)
 			{
-				Logging.Instance.Error(TAG, nameof(LoadScheduler), "Error read scheduler file", ex);
+				Logging.Instance.Error(TAG, nameof(LoadScheduler), "Error reading scheduler file", ex);
 				ScheduleData = new ScheduleData();
 				return false;
 			}

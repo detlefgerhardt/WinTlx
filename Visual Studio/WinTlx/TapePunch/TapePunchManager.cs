@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WinTlx.Codes;
 using WinTlx.Config;
 using WinTlx.Languages;
@@ -98,6 +92,16 @@ namespace WinTlx.TapePunch
 			}
 			_updateActive = true;
 			InvokeChanged();
+		}
+
+		public byte[] GetBufferFromCurrentPos()
+		{
+			byte[] buffer = new byte[_buffer.Count-DisplayPos];
+			for (int i = DisplayPos; i < _buffer.Count; i++)
+			{
+				buffer[i-DisplayPos] = _buffer[i].Code;
+			}
+			return buffer;
 		}
 
 		public byte[] GetBuffer()
@@ -234,9 +238,10 @@ namespace WinTlx.TapePunch
 
 			//int pos = DisplayPos - 1;
 			int pos;
-			if (EditOn)
+			//if (EditOn)
+			if (true)
 			{
-				pos = DisplayPos - VisiblePunchLines / 2 - 2 + 1;
+					pos = DisplayPos - VisiblePunchLines / 2 - 2 + 1;
 			}
 			else
 			{
@@ -299,7 +304,8 @@ namespace WinTlx.TapePunch
 
 			// draw position marker
 			int mx;
-			if (EditOn)
+			if (true)
+			//if (EditOn)
 			{
 				mx = (VisiblePunchLines / 2 + 2) * HOLE_DIST + 1;
 			}

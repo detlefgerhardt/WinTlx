@@ -103,9 +103,11 @@ namespace WinTlx
 				catch
 				{
 					// try to log in program directory
+					/*
 					string newName = Path.Combine(Helper.GetExePath(), Constants.DEBUG_LOG);
 					File.AppendAllText(newName, $"{prefix} [AppendLog] Error writing logfile to {fullName}\r\n");
 					File.AppendAllText(newName, logStr);
+					*/
 				}
 			}
 		}

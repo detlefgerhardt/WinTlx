@@ -41,8 +41,18 @@ namespace WinTlx
 		private int _screenEditPos0 = 0;
 		private int _screenShowPos0 = 0;
 
+		/// <summary>
+		/// Timer for screen output buffer
+		/// </summary>
 		private System.Timers.Timer _outputTimer;
 		private Queue<ScreenChar> _outputBuffer;
+
+		/// <summary>
+		/// Timer for send buffer
+		/// </summary>
+		private bool _sendTimerActive;
+		private System.Timers.Timer _sendTimer;
+		private Queue<char> _sendBuffer;
 
 		private ConfigManager _configManager;
 
@@ -130,8 +140,14 @@ namespace WinTlx
 
 			_outputBuffer = new Queue<ScreenChar>();
 			_outputTimer = new System.Timers.Timer();
-			_outputTimer.Elapsed += _outputTimer_Elapsed;
+			_outputTimer.Elapsed += OutputTimer_Elapsed;
 			SetOutputTimer(_configData.OutputSpeed);
+
+			_sendBuffer = new Queue<char>();
+			_sendTimerActive = false;
+			_sendTimer = new System.Timers.Timer(100);
+			_sendTimer.Elapsed += SendTimer_Elapsed;
+			_sendTimer.Start();
 
 			_tapePunch = TapePunchManager.Instance;
 
@@ -320,25 +336,25 @@ namespace WinTlx
 					SendAsciiText("\r\n");
 					return true;
 				case Keys.Return | Keys.Shift:
-					SendAsciiText("\n");
+					SendAsciiChar('\n');
 					return true;
 				case Keys.Return | Keys.Control:
-					SendAsciiText("\r");
+					SendAsciiChar('\r');
 					return true;
 				case Keys.C | Keys.Control:
 					CopyAction(null, null);
 					return true;
 				case Keys.V | Keys.Control:
-					PasteAction(null, null);
+					DoPaste();
 					return true;
 				case Keys.F | Keys.Alt:
-					SendAsciiText(CodeManager.ASC_SHIFTF.ToString());
+					SendAsciiChar(CodeManager.ASC_SHIFTF);
 					break;
 				case Keys.G | Keys.Alt:
-					SendAsciiText(CodeManager.ASC_SHIFTG.ToString());
+					SendAsciiChar(CodeManager.ASC_SHIFTG);
 					break;
 				case Keys.H | Keys.Alt:
-					SendAsciiText(CodeManager.ASC_SHIFTH.ToString());
+					SendAsciiChar(CodeManager.ASC_SHIFTH);
 					break;
 			}
 
@@ -389,7 +405,7 @@ namespace WinTlx
 						SendWhoAreYou();
 						break;
 					default: // all other keys
-						SendAsciiText(chr.ToString());
+						SendAsciiChar(chr.Value);
 						break;
 				}
 			}
@@ -429,13 +445,13 @@ namespace WinTlx
 			{   //click event
 				ContextMenu contextMenu = new ContextMenu();
 				MenuItem menuItem = new MenuItem("Clear");
-				menuItem.Click += new EventHandler(ClearAction);
+				menuItem.Click += ClearAction;
 				contextMenu.MenuItems.Add(menuItem);
 				menuItem = new MenuItem("Copy");
-				menuItem.Click += new EventHandler(CopyAction);
+				menuItem.Click += CopyAction;
 				contextMenu.MenuItems.Add(menuItem);
 				menuItem = new MenuItem("Paste");
-				menuItem.Click += new EventHandler(PasteAction);
+				menuItem.Click += PasteAction;
 				contextMenu.MenuItems.Add(menuItem);
 				TerminalPb.ContextMenu = contextMenu;
 			}
@@ -675,31 +691,31 @@ namespace WinTlx
 		private void SendBellBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			_itelex.SendAsciiChar(CodeManager.ASC_BEL);
+			SendAsciiChar(CodeManager.ASC_BEL);
 		}
 
 		private void SendLettersBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			_itelex.SendAsciiChar(CodeManager.ASC_LTRS);
+			SendAsciiChar(CodeManager.ASC_LTRS);
 		}
 
 		private void SendFiguresBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			_itelex.SendAsciiChar(CodeManager.ASC_FIGS);
+			SendAsciiChar(CodeManager.ASC_FIGS);
 		}
 
 		private void SendCarriageReturnBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			_itelex.SendAsciiText("\r");
+			SendAsciiChar('\r');
 		}
 
 		private void SendLineFeedBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			_itelex.SendAsciiText("\n");
+			SendAsciiChar('\n');
 		}
 
 		private void SendTimeBtn_Click(object sender, EventArgs e)
@@ -711,7 +727,7 @@ namespace WinTlx
 		private void SendNullBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			SendAsciiText(CodeManager.ASC_NUL.ToString());
+			SendAsciiChar(CodeManager.ASC_NUL);
 		}
 
 		private void SendLineBtn_Click(object sender, EventArgs e)
@@ -797,7 +813,7 @@ namespace WinTlx
 			ShowScreen();
 		}
 
-		private async void SendFileBtn_Click(object sender, EventArgs e)
+		private void SendFileBtn_Click(object sender, EventArgs e)
 		{
 			try
 			{
@@ -810,20 +826,7 @@ namespace WinTlx
 				{
 					return;
 				}
-
-				await Task.Run(() =>
-				{
-					for (int i = 0; i < sendFileForm.AsciiText.Length; i++)
-					{
-						_itelex.SendAsciiChar(sendFileForm.AsciiText[i]);
-					}
-				});
-
-				/*
-				{
-					SendAsciiText(sendFileForm.AsciiText);
-				}
-				*/
+				SendAsciiText(sendFileForm.AsciiText);
 			}
 			finally
 			{
@@ -836,7 +839,6 @@ namespace WinTlx
 			SetFocus();
 			SchedulerForm schedulerForm = new SchedulerForm();
 			schedulerForm.ShowDialog();
-
 			return;
 		}
 
@@ -901,7 +903,7 @@ namespace WinTlx
 		{
 			if (EyeballCharCb.Checked)
 			{
-				_itelex.SendAsciiText($"\r\n{LngText(LngKeys.Message_EyeballCharActive)}\r\n");
+				SendAsciiText($"\r\n{LngText(LngKeys.Message_EyeballCharActive)}\r\n");
 			}
 			_itelex.EyeballCharActive = EyeballCharCb.Checked;
 			SetFocus();
@@ -939,6 +941,7 @@ namespace WinTlx
 
 		private void ReceivedHandler(string asciiText)
 		{
+			//Debug.WriteLine(asciiText);
 			for (int i = 0; i < asciiText.Length; i++)
 			{
 				switch (asciiText[i])
@@ -975,6 +978,7 @@ namespace WinTlx
 				}
 				dispText += c;
 			}
+			Debug.WriteLine(dispText);
 			AddText(dispText, CharAttributes.Send);
 		}
 
@@ -1093,8 +1097,8 @@ namespace WinTlx
 				}
 			});
 
-			Helper.ControlInvokeRequired(SendAckTb, () => SendAckTb.Text = $"O Buf={_itelex.CharsToSendCount} Ack={_itelex.CharsAckCount}");
-			Helper.ControlInvokeRequired(RecvBufTb, () => RecvBufTb.Text = $"I Buf={_outputBuffer.Count}");
+			Helper.ControlInvokeRequired(SendAckTb, () => SendAckTb.Text = $"Itx Buf={_itelex.CharsToSendCount} Ack={_itelex.CharsAckCount}");
+			Helper.ControlInvokeRequired(RecvBufTb, () => RecvBufTb.Text = $"I={_outputBuffer.Count} S={_sendBuffer.Count}");
 			Helper.ControlInvokeRequired(IdleTimoutTb, () => IdleTimoutTb.Text = $"Timeout {_itelex.IdleTimer} sec");
 			Helper.ControlInvokeRequired(ConnTimeTb, () => ConnTimeTb.Text = $"Conn {_itelex.ConnTimeMin} min");
 
@@ -1186,12 +1190,12 @@ namespace WinTlx
 
 		private void SendBel()
 		{
-			SendAsciiText(CodeManager.ASC_BEL.ToString());
+			SendAsciiChar(CodeManager.ASC_BEL);
 		}
 
 		private void SendWhoAreYou()
 		{
-			SendAsciiText(CodeManager.ASC_WRU.ToString());
+			SendAsciiChar(CodeManager.ASC_WRU);
 		}
 
 		private void SendHereIs()
@@ -1205,13 +1209,47 @@ namespace WinTlx
 
 		private void SendAsciiText(string text)
 		{
-			_itelex?.SendAsciiText(text);
+			foreach(char chr in text)
+			{
+				SendAsciiChar(chr);
+			}
 		}
-		
+
+		private void SendAsciiChar(char chr)
+		{
+			_sendBuffer.Enqueue(chr);
+			UpdateHandler();
+		}
+
+		private void SendTimer_Elapsed(object sender, ElapsedEventArgs e)
+		{
+			if (_sendTimerActive)
+			{
+				return;
+			}
+
+			try
+			{
+				_sendTimerActive = true;
+				if (_sendBuffer.Count == 0)
+				{
+					return;
+				}
+				while (_itelex.GetSendBufferCount() < 10 && _sendBuffer.Count > 0)
+				{
+					_itelex.SendAsciiChar(_sendBuffer.Dequeue());
+				}
+				UpdateHandler();
+			}
+			finally
+			{
+				_sendTimerActive = false;
+			}
+		}
+
 		private void ClearScreen()
 		{
 			_outputBuffer.Clear();
-
 			_screen.Clear();
 			_screenX = 0;
 			_screenY = 0;
@@ -1248,7 +1286,7 @@ namespace WinTlx
 			}
 		}
 
-		private void _outputTimer_Elapsed(object sender, ElapsedEventArgs e)
+		private void OutputTimer_Elapsed(object sender, ElapsedEventArgs e)
 		{
 			if (_outputBuffer.Count > 0)
 			{
@@ -1410,9 +1448,15 @@ namespace WinTlx
 
 		private void PasteAction(object sender, EventArgs e)
 		{
+			DoPaste();
+		}
+
+		private void DoPaste()
+		{
 			if (Clipboard.ContainsText(TextDataFormat.Text))
 			{
-				SendAsciiText(Clipboard.GetText());
+				string text = Clipboard.GetText();
+				SendAsciiText(text);
 			}
 		}
 
@@ -1644,12 +1688,12 @@ namespace WinTlx
 				WaitRecv(5000);
 				//ShowLocalMessage("wait greeting ok");
 
-				_itelex.SendAsciiText("\r\n");
+				SendAsciiText("\r\n");
 				WaitSend(5000);
 
 				ScheduleWru();
 
-				_itelex.SendAsciiText("\r\n");
+				SendAsciiText("\r\n");
 				WaitSend(5000);
 
 				foreach (string line in fileData)
@@ -1663,24 +1707,24 @@ namespace WinTlx
 						}
 						if (col>68)
 						{
-							_itelex.SendAsciiText("\r\n");
+							SendAsciiText("\r\n");
 							col = 0;
 						}
-						_itelex.SendAsciiChar(line[i]);
+						SendAsciiChar(line[i]);
 						col++;
 					}
-					_itelex.SendAsciiText("\r\n");
+					SendAsciiText("\r\n");
 					WaitSend(5000);
 				}
 
-				_itelex.SendAsciiText("\r\n");
+				SendAsciiText("\r\n");
 				WaitSend(5000);
 
 				//ShowLocalMessage("wait text ok");
 
 				ScheduleWru();
 
-				_itelex.SendAsciiText("\r\n\r\n\r\n\r\n");
+				SendAsciiText("\r\n\r\n\r\n\r\n");
 				WaitSend(5000);
 
 				Logging.Instance.Debug(TAG, nameof(DoSchedule), $"Success");
@@ -1705,7 +1749,7 @@ namespace WinTlx
 
 		private void ScheduleWru()
 		{
-			_itelex.SendAsciiChar(CodeManager.ASC_WRU);
+			SendAsciiChar(CodeManager.ASC_WRU);
 			WaitSend(5000);
 			WaitRecv(5000);
 			//ShowLocalMessage("wait WRU ok");

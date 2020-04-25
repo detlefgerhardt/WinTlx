@@ -80,11 +80,26 @@ namespace WinTlx.TapePunch
 
 			this.Text = $"{Constants.PROGRAM_NAME} {LngText(LngKeys.TapePunch_TapePunch)}";
 			RecvCb.Text = LngText(LngKeys.TapePunch_RecvButton);
+			Helper.SetToolTip(RecvCb, LngText(LngKeys.TapePunch_RecvButton_ToolTip));
 			SendBtn.Text = LngText(LngKeys.TapePunch_SendButton);
+			Helper.SetToolTip(SendBtn, LngText(LngKeys.TapePunch_SendButton_ToolTip));
 			ClearBtn.Text = LngText(LngKeys.TapePunch_ClearButton);
+			Helper.SetToolTip(ClearBtn, LngText(LngKeys.TapePunch_ClearButton_ToolTip));
 			LoadBtn.Text = LngText(LngKeys.TapePunch_LoadButton);
+			Helper.SetToolTip(LoadBtn, LngText(LngKeys.TapePunch_LoadButton_ToolTip));
 			SaveBtn.Text = LngText(LngKeys.TapePunch_SaveButton);
+			Helper.SetToolTip(SaveBtn, LngText(LngKeys.TapePunch_SaveButton_ToolTip));
 			CloseBtn.Text = LngText(LngKeys.TapePunch_CloseButton);
+			EditCb.Text = LngText(LngKeys.TapePunch_EditButton);
+			Helper.SetToolTip(EditCb, LngText(LngKeys.TapePunch_EditButton_ToolTip));
+			EditInsertCb.Text = LngText(LngKeys.TapePunch_InsertButton);
+			Helper.SetToolTip(EditInsertCb, LngText(LngKeys.TapePunch_InsertButton_ToolTip));
+			EditDeleteBtn.Text = LngText(LngKeys.TapePunch_DeleteButton);
+			Helper.SetToolTip(EditDeleteBtn, LngText(LngKeys.TapePunch_DeleteButton_ToolTip));
+
+			Helper.SetToolTip(EditStartBtn, LngText(LngKeys.NoFunction_ToolTip));
+			Helper.SetToolTip(EditEndBtn, LngText(LngKeys.NoFunction_ToolTip));
+			Helper.SetToolTip(EditCropBtn, LngText(LngKeys.NoFunction_ToolTip));
 		}
 
 		private string LngText(LngKeys key)
@@ -190,16 +205,25 @@ namespace WinTlx.TapePunch
 		private async void SendBtn_Click(object sender, EventArgs e)
 		{
 			SendBtnActive(true);
+			bool recvStat = _tapePunch.PuncherOn;
 			SetRecv(false);
 			await Task.Run(() =>
 			{
-				byte[] buffer = _tapePunch.GetBuffer();
+				byte[] buffer = _tapePunch.GetBufferFromCurrentPos();
 				for (int i = 0; i < buffer.Length; i++)
 				{
+					while(_itelex.GetSendBufferCount()>2)
+					{
+						Task.Delay(100);
+					}
 					_itelex.SendBaudotCode(buffer[i]);
+					_tapePunch.ScrollLeft(1);
+					//PunchedTapePb.Refresh();
+					//UpdateScrollbar();
 				}
 			});
 			SendBtnActive(false);
+			SetRecv(recvStat);
 		}
 
 		private void LoadBtn_Click(object sender, EventArgs e)
