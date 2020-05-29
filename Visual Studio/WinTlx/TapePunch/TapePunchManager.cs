@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using WinTlx.Codes;
 using WinTlx.Config;
@@ -15,9 +16,12 @@ namespace WinTlx.TapePunch
 		private const int TRANSPORT_HOLE_SIZE = 3;
 		private const int BORDER = 5;
 
+		private const int MAX_UNDO = 10;
+
 		private ItelexProtocol _itelex;
 
 		private List<PunchLine> _buffer;
+		private List<List<PunchLine>> _undoBuffer;
 
 		public int VisiblePunchLines { get; set; }
 		public int DisplayPos { get; set; }
@@ -52,6 +56,7 @@ namespace WinTlx.TapePunch
 			_itelex.BaudotSendRecv += BaudotSendRecvHandler;
 
 			_buffer = new List<PunchLine>();
+			_undoBuffer = new List<List<PunchLine>>();
 			PuncherOn = true;
 			_updateActive = true;
 		}
@@ -67,6 +72,7 @@ namespace WinTlx.TapePunch
 
 		public void Clear()
 		{
+			PushUndo();
 			_buffer = new List<PunchLine>();
 			DisplayPos = 0;
 			InvokeChanged();
@@ -129,7 +135,6 @@ namespace WinTlx.TapePunch
 
 		private void InternPunchCode(byte baudotCode, ShiftStates shiftState)
 		{
-
 			string text = CodeManager.BaudotCodeToPuncherText(baudotCode, shiftState, _config.CodeSet);
 			switch (text)
 			{
@@ -186,16 +191,26 @@ namespace WinTlx.TapePunch
 				}
 			}
 
-
-			/*
-			if (BufferPos >= _buffer.Count)
-			{
-				BufferPos = 0;
-				DisplayPos = 0;
-			}
-			*/
-			//InvokePunched();
 			InvokeChanged();
+		}
+
+		private void PushUndo()
+		{
+			_undoBuffer.Add(_buffer);
+			if (_undoBuffer.Count>MAX_UNDO)
+			{
+				_undoBuffer.RemoveAt(0);
+			}
+		}
+
+		public void PullUndo()
+		{
+			if (_undoBuffer.Count > 0)
+			{
+				_buffer = _undoBuffer[_undoBuffer.Count - 1];
+				_undoBuffer.RemoveAt(_undoBuffer.Count - 1);
+				InvokeChanged();
+			}
 		}
 
 		public void DeleteCode()
@@ -205,6 +220,8 @@ namespace WinTlx.TapePunch
 				return;
 			}
 
+			PushUndo();
+
 			_buffer.RemoveAt(DisplayPos);
 			if (DisplayPos > _buffer.Count)
 			{
@@ -213,6 +230,39 @@ namespace WinTlx.TapePunch
 
 			InvokeChanged();
 		}
+
+		public void CropStart()
+		{
+			Debug.WriteLine($"CropStart {_buffer.Count} {DisplayPos} {_buffer.Count - DisplayPos}");
+			if (DisplayPos >= _buffer.Count - 1)
+			{
+				PushUndo();
+				_buffer = new List<PunchLine>();
+				DisplayPos = 0;
+				InvokeChanged();
+				return;
+			}
+
+			if (DisplayPos < _buffer.Count)
+			{
+				PushUndo();
+				_buffer = _buffer.GetRange(DisplayPos + 1, _buffer.Count - DisplayPos - 1);
+				DisplayPos = 0;
+				InvokeChanged();
+			}
+		}
+
+		public void CropEnd()
+		{
+			if (DisplayPos < _buffer.Count)
+			{
+				PushUndo();
+				_buffer = _buffer.GetRange(0, DisplayPos);
+				DisplayPos = _buffer.Count;
+				InvokeChanged();
+			}
+		}
+
 
 		private string LngText(LngKeys key)
 		{
@@ -404,5 +454,6 @@ namespace WinTlx.TapePunch
 				Punched?.Invoke();
 			}
 		}
+
 	}
 }

@@ -40,8 +40,8 @@ namespace WinTlx.Languages
 		MainForm_SendPanButton,
 		MainForm_ClearButton,
 		MainForm_ClearButton_ToolTip,
-		MainForm_SendfileButton,
-		MainForm_SendfileButton_ToolTip,
+		MainForm_EditorButton,
+		MainForm_EditorButton_ToolTip,
 		MainForm_RecvOnButton,
 		MainForm_RecvOnButton_ToolTip,
 		MainForm_UpdateIpAddressButton,
@@ -104,6 +104,8 @@ namespace WinTlx.Languages
 		TapePunch_InsertButton_ToolTip,
 		TapePunch_DeleteButton,
 		TapePunch_DeleteButton_ToolTip,
+		TapePunch_CropStartButton_ToolTip,
+		TapePunch_CropEndButton_ToolTip,
 		TapePunch_CloseButton,
 		TapePunch_CodeLetters,
 		TapePunch_CodeFigures,
@@ -137,9 +139,30 @@ namespace WinTlx.Languages
 		Message_ConnectionError,
 		Message_Pangram,
 		Message_EyeballCharActive,
+
+		Editor_Header,
+		Editor_Clear,
+		Editor_Load,
+		Editor_Save,
+		Editor_Send,
+		Editor_Close,
+		Editor_ConvBaudot,
+		Editor_ConvRtty,
+		Editor_AlignBlock,
+		Editor_AlignLeft,
+		Editor_ShiftLeft,
+		Editor_ShiftRight,
+		Editor_LineNr,
+		Editor_ColumnNr,
+		Editor_CharWidth,
+		Editor_NotSavedHeader,
+		Editor_NotSavedMessage,
+		Editor_LoadError,
+		Editor_SaveError,
+		Editor_Error,
 	}
 
-class Language
+	class Language
 	{
 		public string Key { get; set; }
 
@@ -163,8 +186,7 @@ class Language
 
 		public static LngKeys StringToLngKey(string keyStr)
 		{
-			LngKeys lngKey;
-			if (Enum.TryParse(keyStr, true, out lngKey))
+			if (Enum.TryParse(keyStr, true, out LngKeys lngKey))
 			{
 				return lngKey;
 			}

@@ -148,8 +148,7 @@ namespace WinTlx.Config
 
 		private int StrToInt(string valStr)
 		{
-			int intValue;
-			if (int.TryParse(valStr.Trim(), out intValue))
+			if (int.TryParse(valStr.Trim(), out int intValue))
 			{
 				return intValue;
 			}

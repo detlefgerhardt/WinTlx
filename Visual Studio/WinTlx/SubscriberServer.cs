@@ -141,8 +141,7 @@ namespace WinTlx
 
 			// convert number to Int32
 			number = number.Replace(" ", "");
-			UInt32 num;
-			if (!UInt32.TryParse(number, out num))
+			if (!UInt32.TryParse(number, out uint num))
 			{
 				reply.Error = "invalid number";
 				return reply;
@@ -343,16 +342,18 @@ namespace WinTlx
 				return null;
 			}
 
-			PeerQueryData data = new PeerQueryData();
-			data.Number = BitConverter.ToUInt32(bytes, offset).ToString();
-			data.LongName = Encoding.ASCII.GetString(bytes, offset+4, 40).Trim(new char[] { '\x00' });
-			data.SpecialAttribute = BitConverter.ToUInt16(bytes, offset+44);
-			data.PeerType = bytes[offset+46];
-			data.HostName = Encoding.ASCII.GetString(bytes, offset+47, 40).Trim(new char[] { '\x00' });
-			data.IpAddress = $"{bytes[offset+87]}.{bytes[offset + 88]}.{bytes[offset + 89]}.{bytes[offset + 90]}";
-			data.PortNumber = BitConverter.ToUInt16(bytes, offset + 91);
-			data.ExtensionNumber = bytes[offset + 93];
-			data.Pin = BitConverter.ToUInt16(bytes, offset + 94);
+			PeerQueryData data = new PeerQueryData
+			{
+				Number = BitConverter.ToUInt32(bytes, offset).ToString(),
+				LongName = Encoding.ASCII.GetString(bytes, offset + 4, 40).Trim(new char[] { '\x00' }),
+				SpecialAttribute = BitConverter.ToUInt16(bytes, offset + 44),
+				PeerType = bytes[offset + 46],
+				HostName = Encoding.ASCII.GetString(bytes, offset + 47, 40).Trim(new char[] { '\x00' }),
+				IpAddress = $"{bytes[offset + 87]}.{bytes[offset + 88]}.{bytes[offset + 89]}.{bytes[offset + 90]}",
+				PortNumber = BitConverter.ToUInt16(bytes, offset + 91),
+				ExtensionNumber = bytes[offset + 93],
+				Pin = BitConverter.ToUInt16(bytes, offset + 94)
+			};
 
 			UInt32 timestamp = BitConverter.ToUInt32(bytes, offset + 96);
 			DateTime dt = new DateTime(1900, 1, 1, 0, 0, 0, 0);

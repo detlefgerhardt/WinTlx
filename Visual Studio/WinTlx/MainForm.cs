@@ -13,6 +13,7 @@ using WinTlx.Config;
 using WinTlx.Languages;
 using WinTlx.Scheduler;
 using WinTlx.TapePunch;
+using WinTlx.TextEditor;
 
 namespace WinTlx
 {
@@ -76,6 +77,8 @@ namespace WinTlx
 			_configManager.LoadConfig();
 			_configData = _configManager.Config;
 			Logging.Instance.LogfilePath = _configData.LogfilePath;
+
+			TextEditorManager.Instance.Send += TextEditor_Send;
 
 			Logging.Instance.Info(TAG, nameof(MainForm), $"---------- Start {Helper.GetVersion()} ----------");
 
@@ -197,8 +200,8 @@ namespace WinTlx
 			SendFoxBtn.Text = LngText(LngKeys.MainForm_SendPanButton);
 			ClearBtn.Text = LngText(LngKeys.MainForm_ClearButton);
 			Helper.SetToolTip(ClearBtn, LngText(LngKeys.MainForm_ClearButton_ToolTip));
-			SendFileBtn.Text = LngText(LngKeys.MainForm_SendfileButton);
-			Helper.SetToolTip(SendFileBtn, LngText(LngKeys.MainForm_SendfileButton_ToolTip));
+			TextEditorBtn.Text = LngText(LngKeys.MainForm_EditorButton);
+			Helper.SetToolTip(TextEditorBtn, LngText(LngKeys.MainForm_EditorButton_ToolTip));
 			RecvOnCb.Text = LngText(LngKeys.MainForm_RecvOnButton);
 			Helper.SetToolTip(RecvOnCb, LngText(LngKeys.MainForm_RecvOnButton_ToolTip));
 			UpdateIpAddressBtn.Text = LngText(LngKeys.MainForm_UpdateIpAddressButton);
@@ -290,9 +293,15 @@ namespace WinTlx
 			Disconnect();
 		}
 
-#endregion
+		private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			// make shure that editor text is saved
+			e.Cancel = !TextEditorManager.Instance.Closing();
+		}
 
-#region keyboard handling
+		#endregion
+
+		#region keyboard handling
 
 		/// <summary>
 		/// Catch cursor up/cursor down/return
@@ -857,27 +866,6 @@ namespace WinTlx
 			ShowScreen();
 		}
 
-		private void SendFileBtn_Click(object sender, EventArgs e)
-		{
-			try
-			{
-				SendFileBtn.Enabled = false;
-				SetFocus();
-				SendFileForm sendFileForm = new SendFileForm();
-				sendFileForm.ShowDialog();
-
-				if (sendFileForm.AsciiText == null)
-				{
-					return;
-				}
-				SendAsciiText(sendFileForm.AsciiText);
-			}
-			finally
-			{
-				SendFileBtn.Enabled = true;
-			}
-		}
-
 		private void SchedulerBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
@@ -928,6 +916,7 @@ namespace WinTlx
 			{
 				_tapePunchForm = new TapePunchForm(this.Bounds);
 				_tapePunchForm.Closed += TapePunchForm_Closed;
+				_tapePunchForm.Click += TapePunchForm_Click;
 				_tapePunchForm.Show();
 			}
 			else
@@ -937,9 +926,15 @@ namespace WinTlx
 			SetFocus();
 		}
 
+		private void TapePunchForm_Click()
+		{
+			throw new NotImplementedException();
+		}
+
 		private void TapePunchForm_Closed()
 		{
 			_tapePunchForm.Closed -= TapePunchForm_Closed;
+			_tapePunchForm.Click -= TapePunchForm_Click;
 			_tapePunchForm = null;
 		}
 
@@ -1872,6 +1867,28 @@ namespace WinTlx
 			tt.InitialDelay = 0;
 			tt.ShowAlways = true;
 			tt.SetToolTip(TlnTypeTb, LngText(LngKeys.MainForm_PeerType));
+		}
+
+		private void TextEditorBtn_Click(object sender, EventArgs e)
+		{
+			try
+			{
+				TextEditorBtn.Enabled = false;
+				SetFocus();
+				TextEditorForm editor = new TextEditorForm();
+				editor.Show();
+
+			}
+			finally
+			{
+				TextEditorBtn.Enabled = true;
+			}
+
+		}
+
+		private void TextEditor_Send(string text)
+		{
+			SendAsciiText(text);
 		}
 	}
 }

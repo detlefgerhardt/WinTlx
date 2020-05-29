@@ -9,7 +9,7 @@ A Windows test und diagnostic tool for the i-Telex network
 - Resizable and scrollable terminal window
 - Inactivity timeout
 - Copy and paste function
-- Sending text files
+- Text editor for messages
 - Logging all communication to a text file
 - Runs on any Windows version with .NET Framework 4.5 and above
 - Virtual tape punch with tape editor and eyeball characters (Bildlocher)

@@ -53,7 +53,6 @@ namespace WinTlx
 			this.SendRyBtn = new System.Windows.Forms.Button();
 			this.SendFoxBtn = new System.Windows.Forms.Button();
 			this.LocalBtn = new System.Windows.Forms.Button();
-			this.SendFileBtn = new System.Windows.Forms.Button();
 			this.SearchLbl = new System.Windows.Forms.Label();
 			this.SearchTb = new System.Windows.Forms.TextBox();
 			this.QueryBtn = new System.Windows.Forms.Button();
@@ -87,11 +86,12 @@ namespace WinTlx
 			this.RecvOnCb = new System.Windows.Forms.CheckBox();
 			this.LinealPnl = new System.Windows.Forms.Panel();
 			this.SchedulerBtn = new System.Windows.Forms.Button();
-			this.TerminalPb = new SelectablePictureBox();
+			this.TerminalPb = new WinTlx.Controls.SelectablePictureBox();
 			this.ScrollStartBtn = new System.Windows.Forms.Button();
 			this.ScrollUpBtn = new System.Windows.Forms.Button();
 			this.ScrollEndBtn = new System.Windows.Forms.Button();
 			this.ScrollDownBtn = new System.Windows.Forms.Button();
+			this.TextEditorBtn = new System.Windows.Forms.Button();
 			this.panel1.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.panel3.SuspendLayout();
@@ -320,16 +320,6 @@ namespace WinTlx
 			this.LocalBtn.Text = "Local";
 			this.LocalBtn.UseVisualStyleBackColor = true;
 			this.LocalBtn.Click += new System.EventHandler(this.LocalBtn_Click);
-			// 
-			// SendFileBtn
-			// 
-			this.SendFileBtn.Location = new System.Drawing.Point(680, 257);
-			this.SendFileBtn.Name = "SendFileBtn";
-			this.SendFileBtn.Size = new System.Drawing.Size(80, 23);
-			this.SendFileBtn.TabIndex = 25;
-			this.SendFileBtn.Text = "Send file";
-			this.SendFileBtn.UseVisualStyleBackColor = true;
-			this.SendFileBtn.Click += new System.EventHandler(this.SendFileBtn_Click);
 			// 
 			// SearchLbl
 			// 
@@ -735,11 +725,22 @@ namespace WinTlx
 			this.ScrollDownBtn.UseVisualStyleBackColor = true;
 			this.ScrollDownBtn.Click += new System.EventHandler(this.ScrollDownBtn_Click);
 			// 
+			// TextEditorBtn
+			// 
+			this.TextEditorBtn.Location = new System.Drawing.Point(680, 262);
+			this.TextEditorBtn.Name = "TextEditorBtn";
+			this.TextEditorBtn.Size = new System.Drawing.Size(80, 23);
+			this.TextEditorBtn.TabIndex = 62;
+			this.TextEditorBtn.Text = "Text editor";
+			this.TextEditorBtn.UseVisualStyleBackColor = true;
+			this.TextEditorBtn.Click += new System.EventHandler(this.TextEditorBtn_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(774, 604);
+			this.Controls.Add(this.TextEditorBtn);
 			this.Controls.Add(this.ScrollDownBtn);
 			this.Controls.Add(this.ScrollEndBtn);
 			this.Controls.Add(this.ScrollUpBtn);
@@ -756,7 +757,6 @@ namespace WinTlx
 			this.Controls.Add(this.panel5);
 			this.Controls.Add(this.panel4);
 			this.Controls.Add(this.panel3);
-			this.Controls.Add(this.SendFileBtn);
 			this.Controls.Add(this.panel2);
 			this.Controls.Add(this.panel1);
 			this.Controls.Add(this.ExitBtn);
@@ -765,6 +765,7 @@ namespace WinTlx
 			this.MinimumSize = new System.Drawing.Size(750, 480);
 			this.Name = "MainForm";
 			this.Text = "WinTlx";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.Shown += new System.EventHandler(this.MainForm_Shown);
@@ -809,7 +810,6 @@ namespace WinTlx
 		private System.Windows.Forms.Button SendRyBtn;
 		private System.Windows.Forms.Button SendFoxBtn;
 		private System.Windows.Forms.Button LocalBtn;
-		private System.Windows.Forms.Button SendFileBtn;
 		private System.Windows.Forms.Label SearchLbl;
 		private System.Windows.Forms.TextBox SearchTb;
 		private System.Windows.Forms.Button QueryBtn;
@@ -848,6 +848,7 @@ namespace WinTlx
 		private System.Windows.Forms.TextBox RecvBufTb;
 		private System.Windows.Forms.TextBox TlnTypeTb;
 		private System.Windows.Forms.Label TlnTypeLbl;
+		private System.Windows.Forms.Button TextEditorBtn;
 	}
 }
 

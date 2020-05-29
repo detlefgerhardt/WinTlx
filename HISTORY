@@ -80,3 +80,5 @@ Version history
           Fix: Idle display and idle timout was broken
           New: Send 2 x LTRS (Bu) after a pause of 25 seconds in case the remote teletype fell asleep
           Chg: Punch tape data is now always send from the current position
+1.0.5.0 - New: Send text file was replaced by a real text editor that can load text files and punch tape data
+

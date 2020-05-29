@@ -33,9 +33,11 @@ namespace WinTlx.Languages
 
 		private LanguageManager()
 		{
-			LanguageList = new List<Language>();
-			LanguageList.Add(LanguageEnglish.GetLng());
-			LanguageList.Add(LanguageDeutsch.GetLng());
+			LanguageList = new List<Language>
+			{
+				LanguageEnglish.GetLng(),
+				LanguageDeutsch.GetLng()
+			};
 
 #if DEBUG
 			SaveLanguage(LanguageEnglish.GetLng());

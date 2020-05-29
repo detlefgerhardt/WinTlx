@@ -120,7 +120,7 @@ namespace WinTlx.Codes
 		/// <returns></returns>
 		private static string AsciiCharToTelex(char asciiChr, CodeSets codeSet)
 		{
-			AsciiConvItem[] asciiToTelexTab = null;
+			AsciiConvItem[] asciiToTelexTab;
 			switch (codeSet)
 			{
 				default:
@@ -250,7 +250,7 @@ namespace WinTlx.Codes
 			{
 				char ascChr = ascStr[i];
 				int ascCode = (int)ascChr;
-				string newChr = "";
+				string newChr;
 				if (ascCode < 32)
 				{
 					switch (ascCode)
