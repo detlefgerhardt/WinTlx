@@ -28,8 +28,16 @@ namespace WinTlx
 
 		private SubscriberServer _subscriberServer;
 		private ItelexProtocol _itelex;
-		TapePunchForm _tapePunchForm;
+		private TapePunchManager _tapePunch;
 		SpecialCharacters _specialCharacters = SpecialCharacters.Instance;
+
+		private TapePunchForm _tapePunchForm;
+		private TextEditorForm _textEditorForm;
+		private ConfigManager _configManager;
+		private ConfigData _configData;
+		private SchedulerManager _schedulerManager;
+
+
 
 		public const int SCREEN_WIDTH = 68;
 		public const int CHAR_HEIGHT = 19;
@@ -55,13 +63,6 @@ namespace WinTlx
 		private System.Timers.Timer _sendTimer;
 		private Queue<char> _sendBuffer;
 
-		private ConfigManager _configManager;
-
-		private ConfigData _configData;
-
-		private SchedulerManager _schedulerManager;
-
-		private TapePunchManager _tapePunch;
 
 		public MainForm()
 		{
@@ -1084,7 +1085,7 @@ namespace WinTlx
 		{
 			Helper.ControlInvokeRequired(ConnectBtn, () =>
 			{
-				Debug.WriteLine($"UpdateHandler() ConnectionState={_itelex.ConnectionState}");
+				//Debug.WriteLine($"UpdateHandler() ConnectionState={_itelex.ConnectionState}");
 				if (!_itelex.IsConnected)
 				{
 					ConnectBtn.Enabled = true;
@@ -1145,9 +1146,9 @@ namespace WinTlx
 			Helper.ControlInvokeRequired(SendAckTb, () => SendAckTb.Text = $"Itx Buf={_itelex.CharsToSendCount} Ack={_itelex.CharsAckCount}");
 			Helper.ControlInvokeRequired(RecvBufTb, () => RecvBufTb.Text = $"I={_outputBuffer.Count} S={_sendBuffer.Count}");
 
-			Helper.ControlInvokeRequired(ConnTimeTb, () => ConnTimeTb.Text = $"Conn {_itelex.ConnTimeMin} min");
+			Helper.ControlInvokeRequired(ConnTimeTb, () => ConnTimeTb.Text = $"Conn {_itelex.ConnTimeMinSek}");
 
-			Helper.ControlInvokeRequired(AnswerbackTb, () => AnswerbackTb.Text = _configData.Answerback);
+			Helper.ControlInvokeRequired(AnswerbackTb, () => AnswerbackTb.Text = _configData.AnswerbackPlain);
 
 			Helper.ControlInvokeRequired(SendLettersBtn, () =>
 			{
@@ -1245,11 +1246,18 @@ namespace WinTlx
 
 		private void SendHereIs()
 		{
-#if DEBUG
-			SendAsciiText($"\r\n{AnswerbackTb.Text}");
-#else
-			SendAsciiText($"\r\n{AnswerbackTb.Text} (wintlx)");
-#endif
+			string answerBack = _configData.AnswerbackPlain;
+			answerBack = answerBack.Replace(@"\r", "\r");
+			answerBack = answerBack.Replace(@"\n", "\n");
+			int len = answerBack.Length;
+			if (answerBack.Contains(Constants.DEFAULT_ANSWERBACK) || _configData.AnswerbackTweak)
+			{
+				SendAsciiText($"{answerBack}");
+			}
+			else
+			{
+				SendAsciiText($"{answerBack} (wintlx)");
+			}
 		}
 
 		private void SendAsciiText(string text)
@@ -1871,19 +1879,19 @@ namespace WinTlx
 
 		private void TextEditorBtn_Click(object sender, EventArgs e)
 		{
-			try
-			{
-				TextEditorBtn.Enabled = false;
-				SetFocus();
-				TextEditorForm editor = new TextEditorForm();
-				editor.Show();
+			TextEditorBtn.Enabled = false;
+			SetFocus();
+			_textEditorForm = new TextEditorForm();
+			_textEditorForm.CloseEditor += TextEditorForm_CloseEditor;
+			_textEditorForm.Show();
+			TextEditorBtn.Enabled = false;
+		}
 
-			}
-			finally
-			{
-				TextEditorBtn.Enabled = true;
-			}
-
+		private void TextEditorForm_CloseEditor()
+		{
+			_textEditorForm.CloseEditor -= TextEditorForm_CloseEditor;
+			_textEditorForm = null;
+			TextEditorBtn.Enabled = true;
 		}
 
 		private void TextEditor_Send(string text)

@@ -272,6 +272,7 @@
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "TextEditorForm";
 			this.Text = "TextEditor";
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.TextEditorForm_FormClosed);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

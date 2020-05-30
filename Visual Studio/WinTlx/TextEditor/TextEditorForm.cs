@@ -12,6 +12,9 @@ namespace WinTlx.TextEditor
 
 		private TextEditorManager _tem;
 
+		public delegate void CloseEventHandler();
+		public event CloseEventHandler CloseEditor;
+
 		public TextEditorForm()
 		{
 			InitializeComponent();
@@ -65,6 +68,11 @@ namespace WinTlx.TextEditor
 			return false;
 		}
 
+		private void TextEditorForm_FormClosed(object sender, FormClosedEventArgs e)
+		{
+			EditorRtb.Dispose();
+			CloseEditor?.Invoke();
+		}
 
 		private void ClearBtn_Click(object sender, EventArgs e)
 		{

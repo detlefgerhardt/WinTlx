@@ -28,7 +28,7 @@ namespace WinTlx.Config
 			return new ConfigData()
 			{
 				Language = "en",
-				Answerback = Constants.DEFAULT_ANSWERBACK,
+				Answerback = @"\r\n" + Constants.DEFAULT_ANSWERBACK,
 				IdleTimeout = Constants.DEFAULT_IDLE_TIMEOUT,
 				OutputSpeed = 0,
 				CodeSet = CodeSets.ITA2,

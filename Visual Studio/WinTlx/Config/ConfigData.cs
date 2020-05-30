@@ -69,7 +69,7 @@ namespace WinTlx.Config
 			}
 			if (string.IsNullOrWhiteSpace(Answerback))
 			{
-				Answerback = Constants.DEFAULT_ANSWERBACK;
+				Answerback = @"\r\n" + Constants.DEFAULT_ANSWERBACK;
 			}
 			if (string.IsNullOrEmpty(Language))
 			{
@@ -78,6 +78,37 @@ namespace WinTlx.Config
 			if (RemoteServerPort == 0)
 			{
 				RemoteServerPort = Constants.CENTRALEX_PORT;
+			}
+		}
+
+		public string AnswerbackPlain
+		{
+			get
+			{
+				if (string.IsNullOrWhiteSpace(Answerback))
+				{
+					return Answerback;
+				}
+				else
+				{
+					int len = Answerback.Length;
+					if (Answerback[len-1]=='-')
+					{
+						return Answerback.Substring(0, len - 1);
+					}
+					else
+					{
+						return Answerback;
+					}
+				}
+			}
+		}
+
+		public bool AnswerbackTweak
+		{
+			get
+			{
+				return !string.IsNullOrWhiteSpace(Answerback) && Answerback[Answerback.Length - 1] == '-';
 			}
 		}
 
@@ -121,5 +152,6 @@ namespace WinTlx.Config
 			};
 			return path;
 		}
+
 	}
 }

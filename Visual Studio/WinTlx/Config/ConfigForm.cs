@@ -114,7 +114,7 @@ namespace WinTlx.Config
 		public void GetData()
 		{
 			_config.LogfilePath = ConfigData.FormatLogPath(LogFilePathTb.Text.Trim());
-			_config.Answerback = AnswerbackTb.Text.Trim();
+			_config.Answerback = AnswerbackTb.Text.Trim().ToLower();
 			_config.IdleTimeout = StrToInt(IdleTimeoutTb.Text);
 			_config.CodeSet = ConfigData.StringToCodeSet((string)CodeSetCb.SelectedItem);
 			_config.OutputSpeed = StrToInt(OutputSpeedTb.Text);

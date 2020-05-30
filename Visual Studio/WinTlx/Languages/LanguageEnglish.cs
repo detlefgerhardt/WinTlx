@@ -72,7 +72,7 @@ namespace WinTlx.Languages
 				{ LngKeys.Setup_LogfilePath, "Logfile path" },
 				{ LngKeys.Setup_Language, "Language / Sprache" },
 				{ LngKeys.Setup_Answerback, "Answerback" },
-				{ LngKeys.Setup_IdleTimeout, "Idle timeout" },
+				{ LngKeys.Setup_IdleTimeout, "Idle timeout (s)" },
 				{ LngKeys.Setup_OutputSpeed, "Output speed (Baud)" },
 				{ LngKeys.Setup_CodeSet, "Code set" },
 				{ LngKeys.Setup_SubscribeServer, "Subscribe server" },

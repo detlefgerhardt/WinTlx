@@ -109,7 +109,7 @@ namespace WinTlx
 		private int _lastRecvAckValue;
 		private bool _ackRecvFlag;
 
-		private long _lastSendRecvMs;
+		private long _lastSendRecvIdleMs;
 		private long _lastSentMs;
 		public int IdleTimerMs
 		{
@@ -121,7 +121,7 @@ namespace WinTlx
 				}
 				else
 				{
-					return (int)(Helper.GetTicksMs() - _lastSendRecvMs);
+					return (int)(Helper.GetTicksMs() - _lastSendRecvIdleMs);
 				}
 			}
 		}
@@ -141,6 +141,29 @@ namespace WinTlx
 				else
 				{
 					return (int)(DateTime.Now.Subtract(_connStartTime.Value).Ticks / (10000000 * 60));
+				}
+			}
+		}
+
+		public string ConnTimeMinSek
+		{
+			get
+			{
+				if (_connStartTime == null || !IsConnected)
+				{
+					return "";
+				}
+				else
+				{
+					int secs = (int)(DateTime.Now.Subtract(_connStartTime.Value).Ticks / 10000000);
+					if (secs<120)
+					{
+						return $"{secs} sec";
+					}
+					else
+					{
+						return $"{secs / 60} min";
+					}
 				}
 			}
 		}
@@ -550,7 +573,7 @@ namespace WinTlx
 			EyeballCharActive = false;
 
 			_shiftState = ShiftStates.Unknown;
-			_lastSendRecvMs = Helper.GetTicksMs();
+			_lastSendRecvIdleMs = Helper.GetTicksMs();
 
 			Local = false;
 
@@ -677,7 +700,7 @@ namespace WinTlx
 			SendCmd(ItelexCommands.BaudotData, baudotData);
 			_itelixSendCount = 0;
 			_lastSentMs = Helper.GetTicksMs();
-			_lastSendRecvMs = Helper.GetTicksMs();
+			_lastSendRecvIdleMs = Helper.GetTicksMs();
 		}
 
 		private void AckTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -751,6 +774,8 @@ namespace WinTlx
 			{
 				return;
 			}
+
+			//_lastSendRecvIdleMs = Helper.GetTicksMs();
 
 			string telexData = CodeManager.AsciiStringToTelex(asciiStr, _config.CodeSet);
 			Send?.Invoke(telexData);
@@ -1101,7 +1126,7 @@ namespace WinTlx
 				string asciiText = Encoding.ASCII.GetString(newData, 0, newData.Length);
 				asciiText = asciiText.Replace('@', CodeManager.ASC_WRU);
 				Received?.Invoke(asciiText);
-				_lastSendRecvMs = Helper.GetTicksMs();
+				_lastSendRecvIdleMs = Helper.GetTicksMs();
 			}
 			else
 			{	// i-telex
@@ -1205,7 +1230,7 @@ namespace WinTlx
 						string asciiStr = CodeManager.BaudotStringToAscii(packet.Data, ref _shiftState, _config.CodeSet, CodeManager.SendRecv.Recv);
 						Logging.Instance.Debug(TAG, nameof(DecodePacket), $"recv baudot data {packet.Len} \"{CodeManager.AsciiToDebugStr(asciiStr)}\"");
 						AddReceivedCharCount(packet.Data.Length);
-						_lastSendRecvMs = Helper.GetTicksMs();
+						_lastSendRecvIdleMs = Helper.GetTicksMs();
 						Received?.Invoke(asciiStr);
 						BaudotSendRecv?.Invoke(packet.Data);
 						Update?.Invoke();
