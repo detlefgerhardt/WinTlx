@@ -10,7 +10,7 @@ namespace WinTlx.TextEditor
 	{
 		private const string TAG = nameof(TextEditorForm);
 
-		private TextEditorManager _tem;
+		private readonly TextEditorManager _tem;
 
 		public delegate void CloseEventHandler();
 		public event CloseEventHandler CloseEditor;
@@ -70,7 +70,7 @@ namespace WinTlx.TextEditor
 
 		private void TextEditorForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
-			EditorRtb.Dispose();
+			_tem.Text = EditorRtb.Text;
 			CloseEditor?.Invoke();
 		}
 
@@ -182,6 +182,7 @@ namespace WinTlx.TextEditor
 
 		private void EditorRtb_TextChanged(object sender, EventArgs e)
 		{
+			_tem.Text = EditorRtb.Text;
 			ShowLineAndColumn();
 		}
 
@@ -193,11 +194,6 @@ namespace WinTlx.TextEditor
 		private void EditorRtb_SelectionChanged(object sender, EventArgs e)
 		{
 			ShowLineAndColumn();
-		}
-
-		private void EditorRtb_Leave(object sender, EventArgs e)
-		{
-			_tem.Text = EditorRtb.Text;
 		}
 
 		private void CharWidthTb_Leave(object sender, EventArgs e)

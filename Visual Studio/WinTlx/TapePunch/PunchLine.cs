@@ -11,5 +11,10 @@
 			Code = code;
 			Text = text;
 		}
+
+		public override string ToString()
+		{
+			return $"{Code} {Text}";
+		}
 	}
 }

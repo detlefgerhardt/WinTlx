@@ -21,30 +21,28 @@ namespace WinTlx
 	{
 		private const string TAG = nameof(MainForm);
 
-		private System.Timers.Timer _clockTimer;
-		private System.Timers.Timer _focusTimer;
+		private readonly System.Timers.Timer _clockTimer;
+		private readonly System.Timers.Timer _focusTimer;
 
-		private int _fixedWidth;
+		private readonly int _fixedWidth;
 
-		private SubscriberServer _subscriberServer;
-		private ItelexProtocol _itelex;
-		private TapePunchManager _tapePunch;
-		SpecialCharacters _specialCharacters = SpecialCharacters.Instance;
+		private readonly SubscriberServer _subscriberServer;
+		private readonly ItelexProtocol _itelex;
+		private readonly TapePunchManager _tapePunch;
+		private readonly SpecialCharacters _specialCharacters = SpecialCharacters.Instance;
 
 		private TapePunchForm _tapePunchForm;
 		private TextEditorForm _textEditorForm;
-		private ConfigManager _configManager;
-		private ConfigData _configData;
-		private SchedulerManager _schedulerManager;
-
-
+		private readonly ConfigManager _configManager;
+		private readonly ConfigData _configData;
+		private readonly SchedulerManager _schedulerManager;
 
 		public const int SCREEN_WIDTH = 68;
 		public const int CHAR_HEIGHT = 19;
 		public const int CHAR_WIDTH = 9;
 
 		private int _screenHeight = 25;
-		private List<ScreenLine> _screen = new List<ScreenLine>();
+		private readonly List<ScreenLine> _screen = new List<ScreenLine>();
 		private int _screenX = 0;
 		private int _screenY = 0;
 		private int _screenEditPos0 = 0;
@@ -53,15 +51,15 @@ namespace WinTlx
 		/// <summary>
 		/// Timer for screen output buffer
 		/// </summary>
-		private System.Timers.Timer _outputTimer;
-		private Queue<ScreenChar> _outputBuffer;
+		private readonly System.Timers.Timer _outputTimer;
+		private readonly Queue<ScreenChar> _outputBuffer;
 
 		/// <summary>
 		/// Timer for send buffer
 		/// </summary>
 		private bool _sendTimerActive;
-		private System.Timers.Timer _sendTimer;
-		private Queue<char> _sendBuffer;
+		private readonly System.Timers.Timer _sendTimer;
+		private readonly Queue<char> _sendBuffer;
 
 
 		public MainForm()
@@ -489,6 +487,7 @@ namespace WinTlx
 
 		private void TerminalPb_Paint(object sender, PaintEventArgs e)
 		{
+			//Debug.WriteLine("TerminalPb_Paint");
 			Graphics g = e.Graphics;
 			TerminalDraw(g, TerminalPb.Focused);
 		}
@@ -543,7 +542,7 @@ namespace WinTlx
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private async void SearchTb_Validated(object sender, EventArgs e)
+		private void SearchTb_Validated(object sender, EventArgs e)
 		{
 			//if (!string.IsNullOrWhiteSpace(SearchTb.Text))
 			//{
@@ -614,8 +613,7 @@ namespace WinTlx
 
 			PeerQueryData[] list = null;
 
-			uint num;
-			if (!uint.TryParse(SearchTb.Text, out num))
+			if (!uint.TryParse(SearchTb.Text, out uint num))
 				num = 0;
 
 			await Task.Run(() =>
@@ -822,8 +820,8 @@ namespace WinTlx
 
 		private void ClearBtn_Click(object sender, EventArgs e)
 		{
-			SetFocus();
 			ClearScreen();
+			SetFocus();
 		}
 
 		private void ScrollStartBtn_Click(object sender, EventArgs e)
@@ -855,6 +853,10 @@ namespace WinTlx
 			if (newPos > _screen.Count - _screenHeight)
 			{
 				_screenShowPos0 = _screen.Count - _screenHeight;
+				if (_screenShowPos0 < 0)
+				{
+					_screenShowPos0 = 0;
+				}
 			}
 			else if (newPos < 0)
 			{
@@ -904,8 +906,8 @@ namespace WinTlx
 				}
 				else
 				{
-					_itelex.Disconnect();
 					_itelex.CentralexDisconnect();
+					ShowLocalMessage("centralex end received");
 				}
 			}
 			UpdateHandler();
@@ -916,8 +918,8 @@ namespace WinTlx
 			if (_tapePunchForm == null)
 			{
 				_tapePunchForm = new TapePunchForm(this.Bounds);
-				_tapePunchForm.Closed += TapePunchForm_Closed;
-				_tapePunchForm.Click += TapePunchForm_Click;
+				_tapePunchForm.ClosedEvt += TapePunchForm_Closed;
+				_tapePunchForm.ClickEvt += TapePunchForm_Click;
 				_tapePunchForm.Show();
 			}
 			else
@@ -934,8 +936,8 @@ namespace WinTlx
 
 		private void TapePunchForm_Closed()
 		{
-			_tapePunchForm.Closed -= TapePunchForm_Closed;
-			_tapePunchForm.Click -= TapePunchForm_Click;
+			_tapePunchForm.ClosedEvt -= TapePunchForm_Closed;
+			_tapePunchForm.ClickEvt -= TapePunchForm_Click;
 			_tapePunchForm = null;
 		}
 
@@ -1018,7 +1020,7 @@ namespace WinTlx
 				}
 				dispText += c;
 			}
-			Debug.WriteLine(dispText);
+			//Debug.WriteLine(dispText);
 			AddText(dispText, CharAttributes.Send);
 		}
 
@@ -1148,7 +1150,7 @@ namespace WinTlx
 
 			Helper.ControlInvokeRequired(ConnTimeTb, () => ConnTimeTb.Text = $"Conn {_itelex.ConnTimeMinSek}");
 
-			Helper.ControlInvokeRequired(AnswerbackTb, () => AnswerbackTb.Text = _configData.AnswerbackPlain);
+			Helper.ControlInvokeRequired(AnswerbackTb, () => AnswerbackTb.Text = _configData.AnswerbackWinTlx);
 
 			Helper.ControlInvokeRequired(SendLettersBtn, () =>
 			{
@@ -1198,7 +1200,7 @@ namespace WinTlx
 			}
 
 			TlnExtensionTb.Text = TlnExtensionTb.Text.Trim();
-			int? extension = null;
+			int? extension;
 			if (!string.IsNullOrWhiteSpace(TlnExtensionTb.Text))
 			{
 				extension = Helper.ToInt(TlnExtensionTb.Text);
@@ -1246,10 +1248,11 @@ namespace WinTlx
 
 		private void SendHereIs()
 		{
-			string answerBack = _configData.AnswerbackPlain;
+			string answerBack = _configData.AnswerbackWinTlx;
 			answerBack = answerBack.Replace(@"\r", "\r");
 			answerBack = answerBack.Replace(@"\n", "\n");
-			int len = answerBack.Length;
+			SendAsciiText($"{answerBack}");
+			/*
 			if (answerBack.Contains(Constants.DEFAULT_ANSWERBACK) || _configData.AnswerbackTweak)
 			{
 				SendAsciiText($"{answerBack}");
@@ -1258,6 +1261,7 @@ namespace WinTlx
 			{
 				SendAsciiText($"{answerBack} (wintlx)");
 			}
+			*/
 		}
 
 		private void SendAsciiText(string text)
@@ -1441,7 +1445,7 @@ namespace WinTlx
 			TerminalPb.Refresh();
 		}
 
-		private object _commLogLock = new object();
+		private readonly object _commLogLock = new object();
 
 		private void CommLog(string text)
 		{
@@ -1466,10 +1470,12 @@ namespace WinTlx
 		private ContextMenuStrip CreateContextMenu()
 		{
 			ContextMenuStrip contextMenu = new ContextMenuStrip();
-			List<ToolStripMenuItem> endItems = new List<ToolStripMenuItem>();
-			endItems.Add(new ToolStripMenuItem("Clear"));
-			endItems.Add(new ToolStripMenuItem("Copy"));
-			endItems.Add(new ToolStripMenuItem("Paste"));
+			List<ToolStripMenuItem> endItems = new List<ToolStripMenuItem>
+			{
+				new ToolStripMenuItem("Clear"),
+				new ToolStripMenuItem("Copy"),
+				new ToolStripMenuItem("Paste")
+			};
 			contextMenu.ItemClicked += ConectMenu_ItemClicked;
 			return contextMenu;
 		}
@@ -1574,7 +1580,7 @@ namespace WinTlx
 				g.Clear(Color.LightGray);
 			}
 
-			// Debug.WriteLine($"{_screen.Count} {_screenShowPos0} {_screenEditPos0} {_screenX} {_screenY}");
+			//Debug.WriteLine($"{_screen.Count} {_screenShowPos0} {_screenEditPos0} {_screenX} {_screenY}");
 
 			for (int y = 0; y < _screenHeight; y++)
 			{
@@ -1670,9 +1676,8 @@ namespace WinTlx
 					return false;
 				}
 
-				uint num;
 				string dest = scheduleItem.Destination.Replace(" ", "");
-				if (!uint.TryParse(dest, out num))
+				if (!uint.TryParse(dest, out uint num))
 				{
 					Logging.Instance.Warn(TAG, nameof(DoSchedule), $"Invalid destination number {dest}");
 					scheduleItem.Error = true;
@@ -1870,10 +1875,12 @@ namespace WinTlx
 
 		private void TlnTypeTb_MouseHover(object sender, EventArgs e)
 		{
-			ToolTip tt = new ToolTip();
-			tt.IsBalloon = true;
-			tt.InitialDelay = 0;
-			tt.ShowAlways = true;
+			ToolTip tt = new ToolTip
+			{
+				IsBalloon = true,
+				InitialDelay = 0,
+				ShowAlways = true
+			};
 			tt.SetToolTip(TlnTypeTb, LngText(LngKeys.MainForm_PeerType));
 		}
 

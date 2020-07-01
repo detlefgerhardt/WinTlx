@@ -45,10 +45,10 @@
 			this.EditCb = new System.Windows.Forms.CheckBox();
 			this.EditDeleteBtn = new System.Windows.Forms.Button();
 			this.EditInsertCb = new System.Windows.Forms.CheckBox();
-			this.EditStartBtn = new System.Windows.Forms.Button();
-			this.EditEndBtn = new System.Windows.Forms.Button();
+			this.CropStartBtn = new System.Windows.Forms.Button();
+			this.CropEndBtn = new System.Windows.Forms.Button();
 			this.EditPl = new System.Windows.Forms.Panel();
-			this.EditCropBtn = new System.Windows.Forms.Button();
+			this.EditUndoBtn = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.PunchedTapePb)).BeginInit();
 			this.EditPl.SuspendLayout();
 			this.SuspendLayout();
@@ -57,15 +57,17 @@
 			// 
 			this.PunchedTapePb.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.PunchedTapePb.Location = new System.Drawing.Point(12, 71);
+			this.PunchedTapePb.Location = new System.Drawing.Point(12, 72);
 			this.PunchedTapePb.Name = "PunchedTapePb";
 			this.PunchedTapePb.Size = new System.Drawing.Size(480, 129);
 			this.PunchedTapePb.TabIndex = 0;
 			this.PunchedTapePb.TabStop = false;
+			this.PunchedTapePb.Click += new System.EventHandler(this.PunchedTapePb_Click);
 			this.PunchedTapePb.Paint += new System.Windows.Forms.PaintEventHandler(this.PunchedTapePb_Paint);
 			// 
 			// ClearBtn
 			// 
+			this.ClearBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.ClearBtn.Location = new System.Drawing.Point(154, 13);
 			this.ClearBtn.Name = "ClearBtn";
 			this.ClearBtn.Size = new System.Drawing.Size(65, 23);
@@ -221,44 +223,48 @@
 			this.EditInsertCb.UseVisualStyleBackColor = true;
 			this.EditInsertCb.Click += new System.EventHandler(this.EditInsertCb_Click);
 			// 
-			// EditStartBtn
+			// CropStartBtn
 			// 
-			this.EditStartBtn.Location = new System.Drawing.Point(127, 0);
-			this.EditStartBtn.Name = "EditStartBtn";
-			this.EditStartBtn.Size = new System.Drawing.Size(40, 22);
-			this.EditStartBtn.TabIndex = 20;
-			this.EditStartBtn.Text = "Start";
-			this.EditStartBtn.UseVisualStyleBackColor = true;
+			this.CropStartBtn.Location = new System.Drawing.Point(127, 0);
+			this.CropStartBtn.Name = "CropStartBtn";
+			this.CropStartBtn.Size = new System.Drawing.Size(40, 22);
+			this.CropStartBtn.TabIndex = 20;
+			this.CropStartBtn.Text = "<Del";
+			this.CropStartBtn.UseVisualStyleBackColor = true;
+			this.CropStartBtn.Click += new System.EventHandler(this.CropStartBtn_Click);
 			// 
-			// EditEndBtn
+			// CropEndBtn
 			// 
-			this.EditEndBtn.Location = new System.Drawing.Point(173, 0);
-			this.EditEndBtn.Name = "EditEndBtn";
-			this.EditEndBtn.Size = new System.Drawing.Size(40, 22);
-			this.EditEndBtn.TabIndex = 21;
-			this.EditEndBtn.Text = "End";
-			this.EditEndBtn.UseVisualStyleBackColor = true;
+			this.CropEndBtn.Location = new System.Drawing.Point(173, 0);
+			this.CropEndBtn.Name = "CropEndBtn";
+			this.CropEndBtn.Size = new System.Drawing.Size(40, 22);
+			this.CropEndBtn.TabIndex = 21;
+			this.CropEndBtn.Text = "Del>";
+			this.CropEndBtn.UseVisualStyleBackColor = true;
+			this.CropEndBtn.Click += new System.EventHandler(this.CropEndBtn_Click);
 			// 
 			// EditPl
 			// 
-			this.EditPl.Controls.Add(this.EditCropBtn);
+			this.EditPl.Controls.Add(this.EditUndoBtn);
 			this.EditPl.Controls.Add(this.EditInsertCb);
-			this.EditPl.Controls.Add(this.EditEndBtn);
+			this.EditPl.Controls.Add(this.CropEndBtn);
 			this.EditPl.Controls.Add(this.EditDeleteBtn);
-			this.EditPl.Controls.Add(this.EditStartBtn);
+			this.EditPl.Controls.Add(this.CropStartBtn);
 			this.EditPl.Location = new System.Drawing.Point(104, 226);
 			this.EditPl.Name = "EditPl";
 			this.EditPl.Size = new System.Drawing.Size(295, 26);
 			this.EditPl.TabIndex = 22;
 			// 
-			// EditCropBtn
+			// EditUndoBtn
 			// 
-			this.EditCropBtn.Location = new System.Drawing.Point(219, 0);
-			this.EditCropBtn.Name = "EditCropBtn";
-			this.EditCropBtn.Size = new System.Drawing.Size(40, 22);
-			this.EditCropBtn.TabIndex = 22;
-			this.EditCropBtn.Text = "Crop";
-			this.EditCropBtn.UseVisualStyleBackColor = true;
+			this.EditUndoBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.EditUndoBtn.Location = new System.Drawing.Point(219, 0);
+			this.EditUndoBtn.Name = "EditUndoBtn";
+			this.EditUndoBtn.Size = new System.Drawing.Size(40, 22);
+			this.EditUndoBtn.TabIndex = 22;
+			this.EditUndoBtn.Text = "Undo";
+			this.EditUndoBtn.UseVisualStyleBackColor = true;
+			this.EditUndoBtn.Click += new System.EventHandler(this.EditUndoBtn_Click);
 			// 
 			// TapePunchForm
 			// 
@@ -280,6 +286,7 @@
 			this.Controls.Add(this.RecvCb);
 			this.Controls.Add(this.ClearBtn);
 			this.Controls.Add(this.PunchedTapePb);
+			this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MinimumSize = new System.Drawing.Size(520, 300);
 			this.Name = "TapePunchForm";
@@ -312,9 +319,9 @@
 		private System.Windows.Forms.CheckBox EditCb;
 		private System.Windows.Forms.Button EditDeleteBtn;
 		private System.Windows.Forms.CheckBox EditInsertCb;
-		private System.Windows.Forms.Button EditStartBtn;
-		private System.Windows.Forms.Button EditEndBtn;
+		private System.Windows.Forms.Button CropStartBtn;
+		private System.Windows.Forms.Button CropEndBtn;
 		private System.Windows.Forms.Panel EditPl;
-		private System.Windows.Forms.Button EditCropBtn;
+		private System.Windows.Forms.Button EditUndoBtn;
 	}
 }

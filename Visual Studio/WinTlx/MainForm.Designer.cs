@@ -473,7 +473,7 @@ namespace WinTlx
 			this.AnswerbackTb.Location = new System.Drawing.Point(8, 65);
 			this.AnswerbackTb.Name = "AnswerbackTb";
 			this.AnswerbackTb.ReadOnly = true;
-			this.AnswerbackTb.Size = new System.Drawing.Size(131, 20);
+			this.AnswerbackTb.Size = new System.Drawing.Size(159, 20);
 			this.AnswerbackTb.TabIndex = 0;
 			this.AnswerbackTb.TabStop = false;
 			// 
@@ -654,7 +654,6 @@ namespace WinTlx
 			this.RecvOnCb.Text = "Recv On";
 			this.RecvOnCb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			this.RecvOnCb.UseVisualStyleBackColor = true;
-			this.RecvOnCb.CheckedChanged += new System.EventHandler(this.RecvOnCb_CheckedChanged);
 			this.RecvOnCb.Click += new System.EventHandler(this.RecvOnCb_Click);
 			// 
 			// LinealPnl

@@ -1,4 +1,3 @@
-
 Version history
 
 1.0.0.1 - Add: Logging
@@ -83,3 +82,6 @@ Version history
 1.0.5.0 - New: Send text file was replaced by a real text editor that can load text files and punch tape data
 1.0.5.1 - Fix: Some minor bugfixes
           Chg: Handling of answerback changed changed: cr and lf must now be specified explicitly
+1.0.5.2 - Fix: Extension number did not work
+          Fix: Justification error in text editor
+          Fix: Closing the text editor window sometimes cleared the text

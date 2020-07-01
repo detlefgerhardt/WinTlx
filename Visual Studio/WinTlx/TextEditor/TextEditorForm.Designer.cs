@@ -65,7 +65,6 @@
 			this.EditorRtb.SelectionChanged += new System.EventHandler(this.EditorRtb_SelectionChanged);
 			this.EditorRtb.TextChanged += new System.EventHandler(this.EditorRtb_TextChanged);
 			this.EditorRtb.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.EditorRtb_KeyPress);
-			this.EditorRtb.Leave += new System.EventHandler(this.EditorRtb_Leave);
 			// 
 			// LinealPnl
 			// 

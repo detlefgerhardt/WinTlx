@@ -6,10 +6,10 @@ namespace WinTlx.Controls
 	class SelectablePictureBox : PictureBox
 	{
 		public delegate void EnterEventHandler();
-		public event EnterEventHandler Enter;
+		public event EnterEventHandler EnterEvt;
 
 		public delegate void LeaveEventHandler();
-		public event LeaveEventHandler Leave;
+		public event LeaveEventHandler LeaveEvt;
 
 
 		public SelectablePictureBox()
@@ -25,13 +25,13 @@ namespace WinTlx.Controls
 		protected override void OnEnter(EventArgs e)
 		{
 			this.Invalidate();
-			Enter?.Invoke();
+			EnterEvt?.Invoke();
 			base.OnEnter(e);
 		}
 		protected override void OnLeave(EventArgs e)
 		{
 			this.Invalidate();
-			Leave?.Invoke();
+			LeaveEvt?.Invoke();
 			base.OnLeave(e);
 		}
 		protected override void OnPaint(PaintEventArgs pe)

@@ -391,22 +391,25 @@ namespace WinTlx
 				// wait for cr/lf
 				Stopwatch sw = new Stopwatch();
 				sw.Start();
-				while(sw.ElapsedMilliseconds<2000 && ConnectionState==ConnectionStates.TcpConnected)
+				while (sw.ElapsedMilliseconds < 2000 && ConnectionState == ConnectionStates.TcpConnected)
 				{
 					Thread.Sleep(100);
 				}
 				sw.Stop();
 
-				if (!asciiMode)
-				{
-					SendVersionCodeCmd();
-				}
-
 				Update?.Invoke();
 
 				if (!asciiMode)
 				{
+					//SendVersionCodeCmd();
+				}
+
+				if (!asciiMode)
+				{
+					SendVersionCodeCmd();
+					Thread.Sleep(200);
 					SendDirectDialCmd(extensionNumber);
+					Thread.Sleep(200);
 				}
 
 				if (ConnectionState==ConnectionStates.Disconnected)
@@ -532,6 +535,8 @@ namespace WinTlx
 
 		public void CentralexDisconnect()
 		{
+			SendEndCmd();
+			Thread.Sleep(2000);
 			Disconnect();
 			CentralexState = CentralexStates.None;
 			RecvOn = false;
@@ -718,7 +723,8 @@ namespace WinTlx
 				return;
 			}
 
-			if (!IsConnected || ConnectionState == ConnectionStates.AsciiTexting)
+			//if (!IsConnected || ConnectionState != ConnectionStates.ItelexTexting)
+			if (!IsConnected || ConnectionState != ConnectionStates.AsciiTexting && ConnectionState != ConnectionStates.ItelexTexting)
 			{
 				_ackTimerActive = false;
 				return;
@@ -835,22 +841,29 @@ namespace WinTlx
 		public void SendVersionCodeCmd()
 		{
 			string version = Helper.GetVersionCode();
-			byte[] versionData = Encoding.ASCII.GetBytes(version);
-			Logging.Instance.Info(TAG, nameof(SendVersionCodeCmd), $"version={version}");
-
-			byte[] data = new byte[versionData.Length + 2];
-			data[0] = 1;    // version 1
-			Buffer.BlockCopy(versionData, 0, data, 1, versionData.Length);
-			data[data.Length - 1] = 0;
-
-			/*
-			data = new byte[5];
+			string[] versList = version.Split('.');
+			byte[] data = new byte[6];
 			data[0] = 1;
-			data[1] = 56;
-			data[2] = 51;
-			data[3] = 55;
-			data[4] = 0;
-			*/
+			for (int i=0; i<4; i++)
+			{
+				data[i + 1] = (byte)versList[i][0];
+			}
+			data[5] = 0;
+
+			//byte[] versionData = Encoding.ASCII.GetBytes(version);
+			//Logging.Instance.Info(TAG, nameof(SendVersionCodeCmd), $"version={version}");
+			//byte[] data = new byte[versionData.Length + 2];
+			//data[0] = 1;    // version 1
+			//Buffer.BlockCopy(versionData, 0, data, 1, versionData.Length);
+			//data[data.Length - 1] = 0;
+
+			//data = new byte[6];
+			//data[0] = 1;
+			//data[1] = 56;
+			//data[2] = 51;
+			//data[3] = 55;
+			//data[4] = 55;
+			//data[5] = 0;
 
 			SendCmd(ItelexCommands.ProtocolVersion, data);
 		}

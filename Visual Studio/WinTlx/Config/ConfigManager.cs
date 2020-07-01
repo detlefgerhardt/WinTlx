@@ -44,6 +44,13 @@ namespace WinTlx.Config
 		{
 			try
 			{
+				if (!File.Exists(CONFIG_NAME))
+				{
+					Config = GetDefaultConfig();
+					Logging.Instance.Info(TAG, nameof(LoadConfig), "No config file found");
+					return false;
+				}
+
 				string configXml = File.ReadAllText(CONFIG_NAME);
 				Config = Helper.Deserialize<ConfigData>(configXml);
 				Config.SetDefaults();
@@ -68,7 +75,7 @@ namespace WinTlx.Config
 			}
 			catch(Exception ex)
 			{
-				Logging.Instance.Error(TAG, nameof(SaveConfig), "Error writing scheduler file", ex);
+				Logging.Instance.Error(TAG, nameof(SaveConfig), "Error writing config file", ex);
 				return false;
 			}
 		}

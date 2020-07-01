@@ -13,13 +13,16 @@ namespace WinTlx.TapePunch
 		private const string TAG = nameof(TapePunchForm);
 
 		public delegate void ClosedEventHandler();
-		public event ClosedEventHandler Closed;
+		public event ClosedEventHandler ClosedEvt;
+
+		public delegate void ClickEventHandler();
+		public event ClickEventHandler ClickEvt;
 
 		private Rectangle _parentWindowsPosition;
 
-		private ItelexProtocol _itelex;
+		private readonly ItelexProtocol _itelex;
 
-		private TapePunchManager _tapePunch;
+		private readonly TapePunchManager _tapePunch;
 
 		public TapePunchForm(Rectangle position)
 		{
@@ -42,9 +45,8 @@ namespace WinTlx.TapePunch
 			_tapePunch.EditOn = false;
 			EditCbSet(false);
 
-			EditStartBtn.Enabled = false;
-			EditEndBtn.Enabled = false;
-			EditCropBtn.Enabled = false;
+			//CropStartBtn.Enabled = false;
+			//CropEndBtn.Enabled = false;
 
 			TapePositionSb.SmallChange = 1;
 			TapePositionSb.LargeChange = 1;
@@ -97,9 +99,8 @@ namespace WinTlx.TapePunch
 			EditDeleteBtn.Text = LngText(LngKeys.TapePunch_DeleteButton);
 			Helper.SetToolTip(EditDeleteBtn, LngText(LngKeys.TapePunch_DeleteButton_ToolTip));
 
-			Helper.SetToolTip(EditStartBtn, LngText(LngKeys.NoFunction_ToolTip));
-			Helper.SetToolTip(EditEndBtn, LngText(LngKeys.NoFunction_ToolTip));
-			Helper.SetToolTip(EditCropBtn, LngText(LngKeys.NoFunction_ToolTip));
+			Helper.SetToolTip(CropStartBtn, LngText(LngKeys.TapePunch_CropStartButton_ToolTip));
+			Helper.SetToolTip(CropEndBtn, LngText(LngKeys.TapePunch_CropEndButton_ToolTip));
 		}
 
 		private string LngText(LngKeys key)
@@ -228,11 +229,13 @@ namespace WinTlx.TapePunch
 
 		private void LoadBtn_Click(object sender, EventArgs e)
 		{
-			OpenFileDialog openFileDialog = new OpenFileDialog();
-			//openFileDialog.InitialDirectory = "c:\\";
-			openFileDialog.Filter = "ls files (*.ls)|*.ls|bin files (*.bin)|*.bin|All files (*.*)|*.*";
-			openFileDialog.FilterIndex = 1;
-			openFileDialog.RestoreDirectory = true;
+			OpenFileDialog openFileDialog = new OpenFileDialog
+			{
+				//openFileDialog.InitialDirectory = "c:\\";
+				Filter = "ls files (*.ls)|*.ls|bin files (*.bin)|*.bin|All files (*.*)|*.*",
+				FilterIndex = 1,
+				RestoreDirectory = true
+			};
 
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
 			{
@@ -247,11 +250,12 @@ namespace WinTlx.TapePunch
 
 		private void SaveBtn_Click(object sender, EventArgs e)
 		{
-			SaveFileDialog saveFileDialog = new SaveFileDialog();
-
-			saveFileDialog.Filter = "ls files (*.ls)|*.ls|bin files (*.bin)|*.bin|All files (*.*)|*.*";
-			saveFileDialog.FilterIndex = 1;
-			saveFileDialog.RestoreDirectory = true;
+			SaveFileDialog saveFileDialog = new SaveFileDialog
+			{
+				Filter = "ls files (*.ls)|*.ls|bin files (*.bin)|*.bin|All files (*.*)|*.*",
+				FilterIndex = 1,
+				RestoreDirectory = true
+			};
 
 			if (saveFileDialog.ShowDialog() == DialogResult.OK)
 			{
@@ -260,9 +264,29 @@ namespace WinTlx.TapePunch
 			}
 		}
 
+		private void CropStartBtn_Click(object sender, EventArgs e)
+		{
+			_tapePunch.CropStart();
+		}
+
+		private void CropEndBtn_Click(object sender, EventArgs e)
+		{
+			_tapePunch.CropEnd();
+		}
+
+		private void EditUndoBtn_Click(object sender, EventArgs e)
+		{
+			_tapePunch.PullUndo();
+		}
+
+		private void PunchedTapePb_Click(object sender, EventArgs e)
+		{
+			ClickEvt?.Invoke();
+		}
+
 		private void TapePunchHorizontalForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
-			Closed?.Invoke();
+			ClosedEvt?.Invoke();
 		}
 
 		private void ScrollLeftBtn_Click(object sender, EventArgs e)

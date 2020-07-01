@@ -18,10 +18,10 @@ namespace WinTlx.TapePunch
 
 		private const int MAX_UNDO = 10;
 
-		private ItelexProtocol _itelex;
+		private readonly ItelexProtocol _itelex;
 
 		private List<PunchLine> _buffer;
-		private List<List<PunchLine>> _undoBuffer;
+		private readonly List<List<PunchLine>> _undoBuffer;
 
 		public int VisiblePunchLines { get; set; }
 		public int DisplayPos { get; set; }

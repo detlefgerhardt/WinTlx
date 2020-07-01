@@ -272,7 +272,7 @@ namespace WinTlx.TextEditor
 		{
 			if (string.IsNullOrWhiteSpace(textLine))
 			{
-				return textLine;
+				return textLine + '\n';
 			}
 
 			string newLine = "";

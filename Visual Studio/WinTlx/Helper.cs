@@ -49,8 +49,7 @@ namespace WinTlx
 		{
 			//string dateStr = ConfigurationManager.AppSettings.Get("builddate");
 			string dateStr = Properties.Resources.BuildDate.Trim();
-			DateTime dt;
-			if (!DateTime.TryParse(dateStr, out dt))
+			if (!DateTime.TryParse(dateStr, out DateTime dt))
 			{
 				// invalid build time
 				return null;
@@ -132,8 +131,7 @@ namespace WinTlx
 
 		public static int? ToInt(string dataStr)
 		{
-			int value;
-			if (int.TryParse(dataStr, out value))
+			if (int.TryParse(dataStr, out int value))
 				return value;
 			else
 				return null;

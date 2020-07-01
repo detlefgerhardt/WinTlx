@@ -20,7 +20,7 @@ namespace WinTlx.Scheduler
 		public delegate void ChangedEventHandler();
 		public event ChangedEventHandler Changed;
 
-		private System.Timers.Timer _scheduleTimer;
+		private readonly System.Timers.Timer _scheduleTimer;
 
 		/// <summary>
 		/// singleton pattern
@@ -51,7 +51,7 @@ namespace WinTlx.Scheduler
 			_schedulerActive = true;
 
 			DateTime now = DateTime.Now;
-			bool changed = false;
+			//bool changed = false;
 			for(int i=0; i< ScheduleData.SchedulerList.Count; i++)
 			{
 				SchedulerItem item = ScheduleData.SchedulerList[i];
@@ -63,7 +63,7 @@ namespace WinTlx.Scheduler
 				if (!item.Executable)
 				{
 					item.Error = true;
-					changed = true;
+					//changed = true;
 					continue;
 				}
 
@@ -103,16 +103,10 @@ namespace WinTlx.Scheduler
 					SchedulerActive = -1;
 				}
 			}
-			/*
-			if (changed)
-			{
-				SaveScheduler();
-				Changed?.Invoke();
-			}
-			*/
 			_schedulerActive = false;
 		}
 
+		/*
 		public void Test()
 		{
 			ScheduleData = new ScheduleData();
@@ -125,11 +119,19 @@ namespace WinTlx.Scheduler
 				Filename = @"d:\test.bat"
 			});
 		}
+		*/
 
 		public bool LoadScheduler()
 		{
 			try
 			{
+				if (!File.Exists(SCHEDULE_NAME))
+				{
+					ScheduleData = new ScheduleData();
+					Logging.Instance.Info(TAG, nameof(LoadScheduler), "No schedular file found");
+					return false;
+				}
+
 				string configXml = File.ReadAllText(SCHEDULE_NAME);
 				ScheduleData = Helper.Deserialize<ScheduleData>(configXml);
 				if (ScheduleData.SchedulerList==null)
