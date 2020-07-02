@@ -83,5 +83,6 @@ Version history
 1.0.5.1 - Fix: Some minor bugfixes
           Chg: Handling of answerback changed changed: cr and lf must now be specified explicitly
 1.0.5.2 - Fix: Extension number did not work
+          Fix: Compatibility problems with newer i-Telex firmware versions
           Fix: Justification error in text editor
           Fix: Closing the text editor window sometimes cleared the text
