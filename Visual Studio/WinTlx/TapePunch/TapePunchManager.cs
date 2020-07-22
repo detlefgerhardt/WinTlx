@@ -287,7 +287,8 @@ namespace WinTlx.TapePunch
 			g.FillRectangle(tapeBrush, 0, y0, width, th);
 
 			//int pos = DisplayPos - 1;
-			int pos;
+			int pos = DisplayPos - VisiblePunchLines / 2 - 2 + 1;
+			/*
 			//if (EditOn)
 			if (true)
 			{
@@ -297,6 +298,7 @@ namespace WinTlx.TapePunch
 			{
 				pos = DisplayPos - VisiblePunchLines + 1;
 			}
+			*/
 
 			// draw from left to right
 			for (int line = 0; line < VisiblePunchLines; line++)
@@ -306,7 +308,7 @@ namespace WinTlx.TapePunch
 					pos++;
 					continue;
 				}
-				int xp = (int)(line * HOLE_DIST + HOLE_DIST - 2);
+				int xp = line * HOLE_DIST + HOLE_DIST - 2;
 				int bit = 16;
 				PunchLine punchLine = _buffer[pos++];
 				for (int col = 0; col < 6; col++)
@@ -353,16 +355,17 @@ namespace WinTlx.TapePunch
 			g.FillPolygon(backBrush, pol);
 
 			// draw position marker
-			int mx;
+			int mx = (VisiblePunchLines / 2 + 2) * HOLE_DIST + 1;
+			/*
 			if (true)
 			//if (EditOn)
 			{
-				mx = (VisiblePunchLines / 2 + 2) * HOLE_DIST + 1;
 			}
 			else
 			{
 				mx = VisiblePunchLines * HOLE_DIST + 1;
 			}
+			*/
 			Brush posBrush = new SolidBrush(Color.Red);
 			int my = y0 + BORDER + HOLE_DIST * 6 + 5;
 			g.FillPolygon(posBrush, PosPolygon(mx, my));

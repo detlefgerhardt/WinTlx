@@ -397,7 +397,7 @@ namespace WinTlx.TextEditor
 		}
 
 		/// <summary>
-		/// Warp one long line to sevaral shot lines (<=len), additinal spaces are preserved
+		/// Warps one long line to sevaral short lines (<=len), additional spaces are preserved
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="len"></param>
@@ -413,7 +413,7 @@ namespace WinTlx.TextEditor
 			while (line.Length >= len)
 			{
 				int pos = -1;
-				for (int i = len; i > 0; i--)
+				for (int i = len-1; i > 0; i--)
 				{
 					Debug.WriteLine(line[i]);
 					if (DELIMITER.Contains(line[i]))

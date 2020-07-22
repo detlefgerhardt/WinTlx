@@ -66,8 +66,8 @@ Version history
           Fix: Improved code set handling
           Fix: Tape punch manual scroll direction
           Chg: Removed ITA2-EXT code set
-1.0.2.4 - Fix: Improved i-Telex protocol
-1.0.3.0 - Fix: Improved i-Telex protocol
+1.0.2.4 - Fix: i-Telex protocol improvements
+1.0.3.0 - Fix: i-Telex protocol improvements
           New: Support for limited client ("Centralex")
 1.0.4.0 - Chg: Complete rework of virtual tape punch
           New: Virtual tape punch can now edit tapes
@@ -86,3 +86,5 @@ Version history
           Fix: Compatibility problems with newer i-Telex firmware versions
           Fix: Justification error in text editor
           Fix: Closing the text editor window sometimes cleared the text
+1.0.5.3 - Fix: Text editor crashed, when line length was exact 68 characters
+          Fix: Disconnect problems with newer i-Telex versions

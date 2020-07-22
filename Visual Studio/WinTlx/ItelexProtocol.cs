@@ -94,16 +94,16 @@ namespace WinTlx
 
 		private TcpListener _tcpListener;
 
-		private object DisconnectLock = new object();
+		private readonly object DisconnectLock = new object();
 
 		private TcpClient _client;
 
-		private System.Timers.Timer _sendTimer;
+		private readonly System.Timers.Timer _sendTimer;
 		private bool _sendTimerActive;
 
-		private System.Timers.Timer _centralexReconnectTimer;
+		private readonly System.Timers.Timer _centralexReconnectTimer;
 
-		private System.Timers.Timer _ackTimer;
+		private readonly System.Timers.Timer _ackTimer;
 		private bool _ackTimerActive;
 		private long _lastAckReceived;
 		private int _lastRecvAckValue;
@@ -126,7 +126,7 @@ namespace WinTlx
 			}
 		}
 
-		private byte[] _itelixSendBuffer = new byte[Constants.ITELIX_SENDBUFFER_SIZE];
+		private readonly byte[] _itelixSendBuffer = new byte[Constants.ITELIX_SENDBUFFER_SIZE];
 		private int _itelixSendCount;
 
 		private DateTime? _connStartTime = null;
@@ -170,7 +170,7 @@ namespace WinTlx
 
 		private ConfigData _config => ConfigManager.Instance.Config;
 
-		private EyeballChar _eyeballChar;
+		private readonly EyeballChar _eyeballChar;
 		public bool EyeballCharActive { get; set; }
 
 		private ShiftStates _shiftState;
@@ -184,7 +184,7 @@ namespace WinTlx
 		private int _n_trans;
 		private int _n_ack;
 		private ConcurrentQueue<byte> _sendBuffer;
-		private object _sendLock = new object();
+		private readonly object _sendLock = new object();
 
 		public int CharsToSendCount
 		{
@@ -592,36 +592,41 @@ namespace WinTlx
 			Debug.WriteLine($"{nameof(ConnectInit)} end");
 		}
 
+		private bool _disconnecting = false;
 		public void Disconnect()
 		{
-			lock (DisconnectLock)
+			if (ConnectionState == ConnectionStates.Disconnected)
 			{
-				if (ConnectionState == ConnectionStates.Disconnected)
-				{
-					return;
-				}
-
-				_ackTimer?.Stop();
-				_sendTimer?.Stop();
-
-				ConnectionState = ConnectionStates.Disconnected;
-				Debug.WriteLine($"Disconnect() ConnectionState={ConnectionState}");
-
-				_client?.Close();
-
-				Local = false;
-
-				Logging.Instance.Log(LogTypes.Info, TAG, nameof(Disconnect), $"connection dropped");
-
-				Dropped?.Invoke();
-				Update?.Invoke();
-
-				if (CentralexState==CentralexStates.CentralexConnected)
-				{
-					_centralexReconnectTimer.Interval = 5000;
-					_centralexReconnectTimer.Start();
-				}
+				return;
 			}
+
+			if (_disconnecting)
+			{
+				return;
+			}
+			_disconnecting = true;
+
+			_ackTimer?.Stop();
+			_sendTimer?.Stop();
+
+			ConnectionState = ConnectionStates.Disconnected;
+			Debug.WriteLine($"Disconnect() ConnectionState={ConnectionState}");
+
+			_client?.Close();
+
+			Local = false;
+
+			Logging.Instance.Log(LogTypes.Info, TAG, nameof(Disconnect), $"connection dropped");
+
+			Dropped?.Invoke();
+			Update?.Invoke();
+
+			if (CentralexState == CentralexStates.CentralexConnected)
+			{
+				_centralexReconnectTimer.Interval = 5000;
+				_centralexReconnectTimer.Start();
+			}
+			_disconnecting = false;
 		}
 
 		private void SendTimer_Elapsed(object sender, ElapsedEventArgs e)

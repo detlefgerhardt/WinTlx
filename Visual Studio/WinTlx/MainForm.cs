@@ -1230,9 +1230,8 @@ namespace WinTlx
 			if (_itelex != null)
 			{
 				_itelex.SendEndCmd();
+				Thread.Sleep(2000);
 				_itelex.Disconnect();
-				//SetConnectState();
-				//UpdatedHandler();
 			}
 		}
 
@@ -1243,6 +1242,7 @@ namespace WinTlx
 
 		private void SendWhoAreYou()
 		{
+			SendAsciiChar(CodeManager.ASC_FIGS);
 			SendAsciiChar(CodeManager.ASC_WRU);
 		}
 
@@ -1252,16 +1252,6 @@ namespace WinTlx
 			answerBack = answerBack.Replace(@"\r", "\r");
 			answerBack = answerBack.Replace(@"\n", "\n");
 			SendAsciiText($"{answerBack}");
-			/*
-			if (answerBack.Contains(Constants.DEFAULT_ANSWERBACK) || _configData.AnswerbackTweak)
-			{
-				SendAsciiText($"{answerBack}");
-			}
-			else
-			{
-				SendAsciiText($"{answerBack} (wintlx)");
-			}
-			*/
 		}
 
 		private void SendAsciiText(string text)
