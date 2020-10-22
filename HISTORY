@@ -91,4 +91,5 @@ Version history
 1.1.0.0 - Chg: Punch tape data (ls-files) are now saved in reversed bit order.
                Use new Mirror function to correct the bit order of exiting ls-files.
         - Fix: Improved i-Telex buffer handling
-
+        - Add: Save current buffer to text
+        - Add: Save current buffer to image (PNG)
