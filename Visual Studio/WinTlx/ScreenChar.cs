@@ -75,5 +75,10 @@ namespace WinTlx
 			Char = chr;
 			Attr = attr;
 		}
+
+		public override string ToString()
+		{
+			return Char.ToString();
+		}
 	}
 }

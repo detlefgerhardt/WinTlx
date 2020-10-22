@@ -120,6 +120,16 @@ namespace WinTlx.TapePunch
 			return buffer;
 		}
 
+		public void MirrorBuffer()
+		{
+			byte[] newBuffer = new byte[_buffer.Count];
+			for (int i = 0; i < _buffer.Count; i++)
+			{
+				newBuffer[i] = CodeManager.MirrorCode(_buffer[i].Code);
+			}
+			SetBuffer(newBuffer);
+		}
+
 		/// <summary>
 		/// Punch a baudot code character
 		/// </summary>
@@ -151,7 +161,6 @@ namespace WinTlx.TapePunch
 					text = LngText(LngKeys.TapePunch_CodeFigures);
 					break;
 			}
-
 			PunchLine newLine = new PunchLine(baudotCode, text);
 
 			if (!EditOn)

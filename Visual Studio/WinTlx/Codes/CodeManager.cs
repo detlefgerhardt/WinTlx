@@ -66,15 +66,7 @@ namespace WinTlx.Codes
 				return (char)ASC_INV;
 			}
 
-			char asciiChr = _codeTab[baudotCode].GetCode(shiftState, codeSet);
-			/*
-			if (asciiChr == ASC_INV && sendRecv==SendRecv.Recv)
-			{
-				// received an invalid code: try extended code page
-				asciiChr = _codeTab[baudotCode].GetCode(shiftState, CodeSets.ITA2EXT);
-			}
-			*/
-			return asciiChr;
+			return _codeTab[baudotCode].GetCode(shiftState, codeSet);
 		}
 
 		public static string BaudotCodeToPuncherText(byte baudotCode, ShiftStates shiftState, CodeSets codeSet)
@@ -359,7 +351,30 @@ namespace WinTlx.Codes
 			}
 		}
 
-#region ASCII -> ASCII Telex character set
+		public static byte[] MirrorByteArray(byte[] buffer)
+		{
+			byte[] newBuffer = new byte[buffer.Length];
+			for (int i = 0; i < buffer.Length; i++)
+			{
+				newBuffer[i] = MirrorCode(buffer[i]);
+			}
+			return newBuffer;
+		}
+
+		public static byte MirrorCode(byte code)
+		{
+			byte inv = 0;
+			for (int i = 0; i < 5; i++)
+			{
+				if ((code & (1 << i)) != 0)
+				{
+					inv = (byte)(inv | (1 << (4 - i)));
+				}
+			}
+			return inv;
+		}
+
+		#region ASCII -> ASCII Telex character set
 
 		private static AsciiConvItem[] _asciiIta2Tab = new AsciiConvItem[]
 		{

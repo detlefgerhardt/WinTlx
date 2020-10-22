@@ -336,8 +336,8 @@
 			this.LanguageCb.FormattingEnabled = true;
 			this.LanguageCb.ItemHeight = 13;
 			this.LanguageCb.Items.AddRange(new object[] {
-            "ITA-2",
-            "US-TTY"});
+			"ITA-2",
+			"US-TTY"});
 			this.LanguageCb.Location = new System.Drawing.Point(141, 20);
 			this.LanguageCb.Name = "LanguageCb";
 			this.LanguageCb.Size = new System.Drawing.Size(136, 21);
@@ -348,8 +348,8 @@
 			this.CodeSetCb.FormattingEnabled = true;
 			this.CodeSetCb.ItemHeight = 13;
 			this.CodeSetCb.Items.AddRange(new object[] {
-            "ITA-2",
-            "US-TTY"});
+			"ITA-2",
+			"US-TTY"});
 			this.CodeSetCb.Location = new System.Drawing.Point(141, 42);
 			this.CodeSetCb.Name = "CodeSetCb";
 			this.CodeSetCb.Size = new System.Drawing.Size(73, 21);
@@ -425,7 +425,7 @@
 			this.LimitedClientGb.Size = new System.Drawing.Size(283, 105);
 			this.LimitedClientGb.TabIndex = 24;
 			this.LimitedClientGb.TabStop = false;
-			this.LimitedClientGb.Text = "Limied client";
+			this.LimitedClientGb.Text = "Limited client";
 			// 
 			// RemoteServerAddressLbl
 			// 

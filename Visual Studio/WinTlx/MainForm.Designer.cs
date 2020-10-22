@@ -92,6 +92,8 @@ namespace WinTlx
 			this.ScrollEndBtn = new System.Windows.Forms.Button();
 			this.ScrollDownBtn = new System.Windows.Forms.Button();
 			this.TextEditorBtn = new System.Windows.Forms.Button();
+			this.SaveImageBtn = new System.Windows.Forms.Button();
+			this.SaveBufferBtn = new System.Windows.Forms.Button();
 			this.panel1.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.panel3.SuspendLayout();
@@ -734,11 +736,33 @@ namespace WinTlx
 			this.TextEditorBtn.UseVisualStyleBackColor = true;
 			this.TextEditorBtn.Click += new System.EventHandler(this.TextEditorBtn_Click);
 			// 
+			// SaveImageBtn
+			// 
+			this.SaveImageBtn.Location = new System.Drawing.Point(680, 320);
+			this.SaveImageBtn.Name = "SaveImageBtn";
+			this.SaveImageBtn.Size = new System.Drawing.Size(80, 23);
+			this.SaveImageBtn.TabIndex = 63;
+			this.SaveImageBtn.Text = "Save image";
+			this.SaveImageBtn.UseVisualStyleBackColor = true;
+			this.SaveImageBtn.Click += new System.EventHandler(this.SaveImageBtn_Click);
+			// 
+			// SaveBufferBtn
+			// 
+			this.SaveBufferBtn.Location = new System.Drawing.Point(680, 291);
+			this.SaveBufferBtn.Name = "SaveBufferBtn";
+			this.SaveBufferBtn.Size = new System.Drawing.Size(80, 23);
+			this.SaveBufferBtn.TabIndex = 64;
+			this.SaveBufferBtn.Text = "Save buffer";
+			this.SaveBufferBtn.UseVisualStyleBackColor = true;
+			this.SaveBufferBtn.Click += new System.EventHandler(this.SaveBufferBtn_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(774, 604);
+			this.Controls.Add(this.SaveBufferBtn);
+			this.Controls.Add(this.SaveImageBtn);
 			this.Controls.Add(this.TextEditorBtn);
 			this.Controls.Add(this.ScrollDownBtn);
 			this.Controls.Add(this.ScrollEndBtn);
@@ -848,6 +872,8 @@ namespace WinTlx
 		private System.Windows.Forms.TextBox TlnTypeTb;
 		private System.Windows.Forms.Label TlnTypeLbl;
 		private System.Windows.Forms.Button TextEditorBtn;
+		private System.Windows.Forms.Button SaveImageBtn;
+		private System.Windows.Forms.Button SaveBufferBtn;
 	}
 }
 

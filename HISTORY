@@ -88,3 +88,7 @@ Version history
           Fix: Closing the text editor window sometimes cleared the text
 1.0.5.3 - Fix: Text editor crashed, when line length was exact 68 characters
           Fix: Disconnect problems with newer i-Telex versions
+1.1.0.0 - Chg: Punch tape data (ls-files) are now saved in reversed bit order.
+               Use new Mirror function to correct the bit order of exiting ls-files.
+        - Fix: Improved i-Telex buffer handling
+

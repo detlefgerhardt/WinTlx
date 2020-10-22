@@ -49,6 +49,11 @@
 			this.CropEndBtn = new System.Windows.Forms.Button();
 			this.EditPl = new System.Windows.Forms.Panel();
 			this.EditUndoBtn = new System.Windows.Forms.Button();
+			this.StepBtn = new System.Windows.Forms.Button();
+			this.StopBtn = new System.Windows.Forms.Button();
+			this.SlowerBtn = new System.Windows.Forms.Button();
+			this.FasterBtn = new System.Windows.Forms.Button();
+			this.MirrorCodeBtn = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.PunchedTapePb)).BeginInit();
 			this.EditPl.SuspendLayout();
 			this.SuspendLayout();
@@ -68,7 +73,7 @@
 			// ClearBtn
 			// 
 			this.ClearBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.ClearBtn.Location = new System.Drawing.Point(154, 13);
+			this.ClearBtn.Location = new System.Drawing.Point(82, 41);
 			this.ClearBtn.Name = "ClearBtn";
 			this.ClearBtn.Size = new System.Drawing.Size(65, 23);
 			this.ClearBtn.TabIndex = 3;
@@ -79,7 +84,7 @@
 			// RecvCb
 			// 
 			this.RecvCb.Appearance = System.Windows.Forms.Appearance.Button;
-			this.RecvCb.Location = new System.Drawing.Point(12, 12);
+			this.RecvCb.Location = new System.Drawing.Point(82, 12);
 			this.RecvCb.Name = "RecvCb";
 			this.RecvCb.Size = new System.Drawing.Size(65, 24);
 			this.RecvCb.TabIndex = 4;
@@ -101,7 +106,7 @@
 			// 
 			// SaveBtn
 			// 
-			this.SaveBtn.Location = new System.Drawing.Point(83, 42);
+			this.SaveBtn.Location = new System.Drawing.Point(11, 41);
 			this.SaveBtn.Name = "SaveBtn";
 			this.SaveBtn.Size = new System.Drawing.Size(65, 23);
 			this.SaveBtn.TabIndex = 7;
@@ -111,7 +116,7 @@
 			// 
 			// LoadBtn
 			// 
-			this.LoadBtn.Location = new System.Drawing.Point(12, 42);
+			this.LoadBtn.Location = new System.Drawing.Point(11, 12);
 			this.LoadBtn.Name = "LoadBtn";
 			this.LoadBtn.Size = new System.Drawing.Size(65, 23);
 			this.LoadBtn.TabIndex = 8;
@@ -121,7 +126,7 @@
 			// 
 			// SendBtn
 			// 
-			this.SendBtn.Location = new System.Drawing.Point(82, 13);
+			this.SendBtn.Location = new System.Drawing.Point(153, 12);
 			this.SendBtn.Name = "SendBtn";
 			this.SendBtn.Size = new System.Drawing.Size(65, 23);
 			this.SendBtn.TabIndex = 9;
@@ -131,12 +136,12 @@
 			// 
 			// BufferStatusLbl
 			// 
-			this.BufferStatusLbl.AutoSize = true;
-			this.BufferStatusLbl.Location = new System.Drawing.Point(256, 18);
+			this.BufferStatusLbl.Location = new System.Drawing.Point(397, 47);
 			this.BufferStatusLbl.Name = "BufferStatusLbl";
-			this.BufferStatusLbl.Size = new System.Drawing.Size(30, 13);
+			this.BufferStatusLbl.Size = new System.Drawing.Size(95, 18);
 			this.BufferStatusLbl.TabIndex = 10;
 			this.BufferStatusLbl.Text = "0 / 0";
+			this.BufferStatusLbl.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// ScrollLeftBtn
 			// 
@@ -192,9 +197,9 @@
 			// EditCb
 			// 
 			this.EditCb.Appearance = System.Windows.Forms.Appearance.Button;
-			this.EditCb.Location = new System.Drawing.Point(154, 41);
+			this.EditCb.Location = new System.Drawing.Point(108, 225);
 			this.EditCb.Name = "EditCb";
-			this.EditCb.Size = new System.Drawing.Size(65, 24);
+			this.EditCb.Size = new System.Drawing.Size(40, 24);
 			this.EditCb.TabIndex = 17;
 			this.EditCb.Text = "Edit";
 			this.EditCb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -203,7 +208,7 @@
 			// 
 			// EditDeleteBtn
 			// 
-			this.EditDeleteBtn.Location = new System.Drawing.Point(81, 0);
+			this.EditDeleteBtn.Location = new System.Drawing.Point(51, 2);
 			this.EditDeleteBtn.Name = "EditDeleteBtn";
 			this.EditDeleteBtn.Size = new System.Drawing.Size(40, 22);
 			this.EditDeleteBtn.TabIndex = 18;
@@ -214,7 +219,7 @@
 			// EditInsertCb
 			// 
 			this.EditInsertCb.Appearance = System.Windows.Forms.Appearance.Button;
-			this.EditInsertCb.Location = new System.Drawing.Point(35, 0);
+			this.EditInsertCb.Location = new System.Drawing.Point(5, 2);
 			this.EditInsertCb.Name = "EditInsertCb";
 			this.EditInsertCb.Size = new System.Drawing.Size(40, 22);
 			this.EditInsertCb.TabIndex = 19;
@@ -225,7 +230,7 @@
 			// 
 			// CropStartBtn
 			// 
-			this.CropStartBtn.Location = new System.Drawing.Point(127, 0);
+			this.CropStartBtn.Location = new System.Drawing.Point(97, 2);
 			this.CropStartBtn.Name = "CropStartBtn";
 			this.CropStartBtn.Size = new System.Drawing.Size(40, 22);
 			this.CropStartBtn.TabIndex = 20;
@@ -235,7 +240,7 @@
 			// 
 			// CropEndBtn
 			// 
-			this.CropEndBtn.Location = new System.Drawing.Point(173, 0);
+			this.CropEndBtn.Location = new System.Drawing.Point(143, 2);
 			this.CropEndBtn.Name = "CropEndBtn";
 			this.CropEndBtn.Size = new System.Drawing.Size(40, 22);
 			this.CropEndBtn.TabIndex = 21;
@@ -250,15 +255,15 @@
 			this.EditPl.Controls.Add(this.CropEndBtn);
 			this.EditPl.Controls.Add(this.EditDeleteBtn);
 			this.EditPl.Controls.Add(this.CropStartBtn);
-			this.EditPl.Location = new System.Drawing.Point(104, 226);
+			this.EditPl.Location = new System.Drawing.Point(159, 225);
 			this.EditPl.Name = "EditPl";
-			this.EditPl.Size = new System.Drawing.Size(295, 26);
+			this.EditPl.Size = new System.Drawing.Size(232, 26);
 			this.EditPl.TabIndex = 22;
 			// 
 			// EditUndoBtn
 			// 
 			this.EditUndoBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.EditUndoBtn.Location = new System.Drawing.Point(219, 0);
+			this.EditUndoBtn.Location = new System.Drawing.Point(189, 2);
 			this.EditUndoBtn.Name = "EditUndoBtn";
 			this.EditUndoBtn.Size = new System.Drawing.Size(40, 22);
 			this.EditUndoBtn.TabIndex = 22;
@@ -266,11 +271,69 @@
 			this.EditUndoBtn.UseVisualStyleBackColor = true;
 			this.EditUndoBtn.Click += new System.EventHandler(this.EditUndoBtn_Click);
 			// 
+			// StepBtn
+			// 
+			this.StepBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.StepBtn.Location = new System.Drawing.Point(224, 12);
+			this.StepBtn.Name = "StepBtn";
+			this.StepBtn.Size = new System.Drawing.Size(65, 23);
+			this.StepBtn.TabIndex = 23;
+			this.StepBtn.Text = "Step";
+			this.StepBtn.UseVisualStyleBackColor = true;
+			this.StepBtn.Click += new System.EventHandler(this.StepBtn_Click);
+			// 
+			// StopBtn
+			// 
+			this.StopBtn.Location = new System.Drawing.Point(153, 41);
+			this.StopBtn.Name = "StopBtn";
+			this.StopBtn.Size = new System.Drawing.Size(65, 23);
+			this.StopBtn.TabIndex = 24;
+			this.StopBtn.Text = "Stop";
+			this.StopBtn.UseVisualStyleBackColor = true;
+			this.StopBtn.Click += new System.EventHandler(this.StopBtn_Click);
+			// 
+			// SlowerBtn
+			// 
+			this.SlowerBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.SlowerBtn.Location = new System.Drawing.Point(224, 41);
+			this.SlowerBtn.Name = "SlowerBtn";
+			this.SlowerBtn.Size = new System.Drawing.Size(23, 23);
+			this.SlowerBtn.TabIndex = 25;
+			this.SlowerBtn.Text = "-";
+			this.SlowerBtn.UseVisualStyleBackColor = true;
+			this.SlowerBtn.Click += new System.EventHandler(this.SlowerBtn_Click);
+			// 
+			// FasterBtn
+			// 
+			this.FasterBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.FasterBtn.Location = new System.Drawing.Point(266, 41);
+			this.FasterBtn.Name = "FasterBtn";
+			this.FasterBtn.Size = new System.Drawing.Size(23, 23);
+			this.FasterBtn.TabIndex = 26;
+			this.FasterBtn.Text = "+";
+			this.FasterBtn.UseVisualStyleBackColor = true;
+			this.FasterBtn.Click += new System.EventHandler(this.FasterBtn_Click);
+			// 
+			// MirrorCodeBtn
+			// 
+			this.MirrorCodeBtn.Location = new System.Drawing.Point(323, 13);
+			this.MirrorCodeBtn.Name = "MirrorCodeBtn";
+			this.MirrorCodeBtn.Size = new System.Drawing.Size(65, 23);
+			this.MirrorCodeBtn.TabIndex = 27;
+			this.MirrorCodeBtn.Text = "Mirror";
+			this.MirrorCodeBtn.UseVisualStyleBackColor = true;
+			this.MirrorCodeBtn.Click += new System.EventHandler(this.MirrorCodeBtn_Click);
+			// 
 			// TapePunchForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(504, 262);
+			this.Controls.Add(this.MirrorCodeBtn);
+			this.Controls.Add(this.FasterBtn);
+			this.Controls.Add(this.SlowerBtn);
+			this.Controls.Add(this.StopBtn);
+			this.Controls.Add(this.StepBtn);
 			this.Controls.Add(this.EditPl);
 			this.Controls.Add(this.EditCb);
 			this.Controls.Add(this.ScrollLastBtn);
@@ -297,7 +360,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.PunchedTapePb)).EndInit();
 			this.EditPl.ResumeLayout(false);
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
 		}
 
@@ -323,5 +385,10 @@
 		private System.Windows.Forms.Button CropEndBtn;
 		private System.Windows.Forms.Panel EditPl;
 		private System.Windows.Forms.Button EditUndoBtn;
+		private System.Windows.Forms.Button StepBtn;
+		private System.Windows.Forms.Button StopBtn;
+		private System.Windows.Forms.Button SlowerBtn;
+		private System.Windows.Forms.Button FasterBtn;
+		private System.Windows.Forms.Button MirrorCodeBtn;
 	}
 }

@@ -72,7 +72,8 @@ namespace WinTlx.Config
 			ExtensionNumberLbl.Text = LngText(LngKeys.Setup_ExtensionNumber);
 			IncomingLocalPortLbl.Text = LngText(LngKeys.Setup_IncomingLocalPort);
 			IncomingPublicPortLbl.Text = LngText(LngKeys.Setup_IncomingPublicPort);
-			LimitedClientLbl.Text = LngText(LngKeys.Setup_LimitedClient);
+			LimitedClientGb.Text = LngText(LngKeys.Setup_LimitedClient);
+			LimitedClientLbl.Text = LngText(LngKeys.Setup_LimitedClientActive);
 			//ServerDataHintLbl.Text = LngText(LngKeys.Setup_ServerDataHint);
 
 			CancelBtn.Text = LngText(LngKeys.Setup_CancelButton);

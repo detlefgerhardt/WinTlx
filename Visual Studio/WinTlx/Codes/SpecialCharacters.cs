@@ -92,7 +92,7 @@ namespace WinTlx.Codes
 			return bmp;
 		}
 
-		private static string[] _bellChar =
+		private static readonly string[] _bellChar =
 		{
 			"",
 			"",
@@ -124,7 +124,7 @@ namespace WinTlx.Codes
 			"    ******         ******",
 		};
 
-		private static string[] _wruChar =
+		private static readonly string[] _wruChar =
 		{
 			"",
 			"",
@@ -155,7 +155,7 @@ namespace WinTlx.Codes
 			"         **********",
 		};
 
-		private static string[] _shiftF =
+		private static readonly string[] _shiftF =
 		{
 			"",
 			"",
@@ -186,7 +186,7 @@ namespace WinTlx.Codes
 			"  *********************",
 		};
 
-		private static string[] _shiftG =
+		private static readonly string[] _shiftG =
 		{
 			"",
 			"",
@@ -217,7 +217,7 @@ namespace WinTlx.Codes
 			"  *********************",
 		};
 
-		private static string[] _shiftH =
+		private static readonly string[] _shiftH =
 		{
 			"",
 			"",
@@ -249,7 +249,7 @@ namespace WinTlx.Codes
 		};
 
 
-		private static string[] _scrollStartChar =
+		private static readonly string[] _scrollStartChar =
 		{
 			"",
 			"",
@@ -269,7 +269,7 @@ namespace WinTlx.Codes
 			"",
 		};
 
-		private static string[] _scrollUpChar =
+		private static readonly string[] _scrollUpChar =
 		{
 			"",
 			"",
@@ -288,7 +288,7 @@ namespace WinTlx.Codes
 			"",
 		};
 
-		private static string[] _scrollDownChar =
+		private static readonly string[] _scrollDownChar =
 		{
 			"",
 			"",
@@ -307,7 +307,7 @@ namespace WinTlx.Codes
 			"",
 		};
 
-		private static string[] _scrollEndChar =
+		private static readonly string[] _scrollEndChar =
 		{
 			"",
 			"",

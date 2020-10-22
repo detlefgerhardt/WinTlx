@@ -78,6 +78,12 @@
     </Compile>
     <Compile Include="Favorites\FavoriteItem.cs" />
     <Compile Include="Favorites\FavoritesManager.cs" />
+    <Compile Include="LoadTape.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoadTape.Designer.cs">
+      <DependentUpon>LoadTape.cs</DependentUpon>
+    </Compile>
     <Compile Include="Scheduler\ScheduleData.cs" />
     <Compile Include="Codes\EyeballChar.cs" />
     <Compile Include="Codes\CodeManager.cs" />
@@ -142,6 +148,9 @@
     <Compile Include="TextEditor\TextEditorManager.cs" />
     <EmbeddedResource Include="Config\ConfigForm.resx">
       <DependentUpon>ConfigForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoadTape.resx">
+      <DependentUpon>LoadTape.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

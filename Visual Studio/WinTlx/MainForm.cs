@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Media;
 using System.Threading;
@@ -38,8 +39,11 @@ namespace WinTlx
 		private readonly SchedulerManager _schedulerManager;
 
 		public const int SCREEN_WIDTH = 68;
-		public const int CHAR_HEIGHT = 19;
+		//public const int CHAR_HEIGHT = 19;
+		public const int CHAR_HEIGHT = 16;
 		public const int CHAR_WIDTH = 9;
+
+		private string _screenBuffer = "";
 
 		private int _screenHeight = 25;
 		private readonly List<ScreenLine> _screen = new List<ScreenLine>();
@@ -172,11 +176,15 @@ namespace WinTlx
 
 			SearchLbl.Text = LngText(LngKeys.MainForm_SearchText);
 			Helper.SetToolTip(SearchLbl, LngText(LngKeys.MainForm_SearchText_ToolTip));
+
 			TlnMemberLbl.Text = LngText(LngKeys.MainForm_SearchResult);
+
 			QueryBtn.Text = LngText(LngKeys.MainForm_SearchButton);
 			Helper.SetToolTip(QueryBtn, LngText(LngKeys.MainForm_SearchButton_ToolTip));
+
 			AnswerbackLbl.Text = LngText(LngKeys.MainForm_Answerback);
 			Helper.SetToolTip(AnswerbackLbl, LngText(LngKeys.MainForm_Answerback_ToolTip));
+
 			TlnAddressLbl.Text = LngText(LngKeys.MainForm_Address);
 			TlnPortLbl.Text = LngText(LngKeys.MainForm_Port);
 			TlnExtensionLbl.Text = LngText(LngKeys.MainForm_Extension);
@@ -192,23 +200,38 @@ namespace WinTlx
 			SendCarriageReturnBtn.Text = LngText(LngKeys.MainForm_SendReturnButton);
 			SendLineFeedBtn.Text = LngText(LngKeys.MainForm_SendLinefeedButton);
 			SendBellBtn.Text = LngText(LngKeys.MainForm_SendBellButton);
+
 			SendNullBtn.Text = LngText(LngKeys.MainForm_SendNullButton);
 			Helper.SetToolTip(SendNullBtn, LngText(LngKeys.MainForm_SendNullButton_ToolTip));
+
 			SendTimeBtn.Text = LngText(LngKeys.MainForm_SendTimeButton);
 			SendRyBtn.Text = LngText(LngKeys.MainForm_SendRyButton);
 			SendFoxBtn.Text = LngText(LngKeys.MainForm_SendPanButton);
+
 			ClearBtn.Text = LngText(LngKeys.MainForm_ClearButton);
 			Helper.SetToolTip(ClearBtn, LngText(LngKeys.MainForm_ClearButton_ToolTip));
-			TextEditorBtn.Text = LngText(LngKeys.MainForm_EditorButton);
-			Helper.SetToolTip(TextEditorBtn, LngText(LngKeys.MainForm_EditorButton_ToolTip));
+
+			TextEditorBtn.Text = LngText(LngKeys.MainForm_TextEditorButton);
+			Helper.SetToolTip(TextEditorBtn, LngText(LngKeys.MainForm_TextEditorButton_ToolTip));
+
+			SaveImageBtn.Text = LngText(LngKeys.MainForm_SaveImageButton);
+			Helper.SetToolTip(SaveImageBtn, LngText(LngKeys.MainForm_SaveImageButton_ToolTip));
+
+			SaveBufferBtn.Text = LngText(LngKeys.MainForm_SaveBufferButton);
+			Helper.SetToolTip(SaveBufferBtn, LngText(LngKeys.MainForm_SaveBufferButton_ToolTip));
+
 			RecvOnCb.Text = LngText(LngKeys.MainForm_RecvOnButton);
 			Helper.SetToolTip(RecvOnCb, LngText(LngKeys.MainForm_RecvOnButton_ToolTip));
+
 			UpdateIpAddressBtn.Text = LngText(LngKeys.MainForm_UpdateIpAddressButton);
 			Helper.SetToolTip(UpdateIpAddressBtn, LngText(LngKeys.MainForm_UpdateIpAddressButton_ToolTip));
+
 			TapePunchBtn.Text = LngText(LngKeys.MainForm_TapePunchButton);
 			Helper.SetToolTip(TapePunchBtn, LngText(LngKeys.MainForm_TapePunchButton_ToolTip));
+
 			EyeballCharCb.Text = LngText(LngKeys.MainForm_EyeBallCharsButton);
 			Helper.SetToolTip(EyeballCharCb, LngText(LngKeys.MainForm_EyeBallCharsButton_ToolTip));
+
 			ConfigBtn.Text = LngText(LngKeys.MainForm_ConfigButton);
 			AboutBtn.Text = LngText(LngKeys.MainForm_AboutButton);
 			ExitBtn.Text = LngText(LngKeys.MainForm_ExitButton);
@@ -270,7 +293,6 @@ namespace WinTlx
 
 			TerminalPb.Height = this.Height - 310 + 50;
 			_screenHeight = TerminalPb.Height / CHAR_HEIGHT;
-
 
 			_screenEditPos0 = _screen.Count - _screenHeight;
 			if (_screenEditPos0 < 0)
@@ -697,8 +719,8 @@ namespace WinTlx
 		private void DisconnectBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			_outputBuffer.Clear();
 			Disconnect();
+			_outputBuffer.Clear();
 		}
 
 		private void LocalBtn_Click(object sender, EventArgs e)
@@ -931,7 +953,7 @@ namespace WinTlx
 
 		private void TapePunchForm_Click()
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 
 		private void TapePunchForm_Closed()
@@ -1032,7 +1054,6 @@ namespace WinTlx
 		private void ConnectedHandler()
 		{
 			ShowLocalMessage(LngText(LngKeys.Message_Connected));
-			//SetConnectState();
 			UpdateHandler();
 		}
 
@@ -1040,11 +1061,8 @@ namespace WinTlx
 		{
 			Debug.WriteLine($"DroppedHandler() ConnectionState={_itelex.ConnectionState}");
 
+			_outputBuffer.Clear();
 			ShowLocalMessage(LngText(LngKeys.Message_Disconnected));
-			//Helper.ControlInvokeRequired(ConnectBtn, () => ConnectBtn.Enabled = true);
-			//Helper.ControlInvokeRequired(DisconnectBtn, () => DisconnectBtn.Enabled = false);
-
-			//SetConnectState();
 			UpdateHandler();
 		}
 
@@ -1302,6 +1320,7 @@ namespace WinTlx
 			_screenY = 0;
 			_screenEditPos0 = 0;
 			_screenShowPos0 = 0;
+			_screenBuffer = "";
 			ShowScreen();
 		}
 
@@ -1364,9 +1383,11 @@ namespace WinTlx
 				{
 					case '\n':
 						IncScreenY();
+						_screenBuffer += "\n";
 						break;
 					case '\r':
 						_screenX = 0;
+						_screenBuffer += "\r";
 						break;
 					case '\x0': // code32
 						break;
@@ -1378,6 +1399,7 @@ namespace WinTlx
 						//_screen[_screenEditPos0 + _screenY].Line[_screenX] = new ScreenChar(asciiText[i], attr);
 						_screen[_screenEditPos0 + _screenY].Line[_screenX].Char = asciiText[i];
 						_screen[_screenEditPos0 + _screenY].Line[_screenX].Attr = attr;
+						_screenBuffer += asciiText[i];
 						IncScreenX();
 						break;
 				}
@@ -1895,5 +1917,80 @@ namespace WinTlx
 		{
 			SendAsciiText(text);
 		}
+
+		private void SaveBufferBtn_Click(object sender, EventArgs e)
+		{
+			if (_screen.Count == 0)
+			{
+				return;
+			}
+
+			SaveFileDialog saveFileDialog = new SaveFileDialog
+			{
+				Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*",
+				FilterIndex = 1,
+				RestoreDirectory = true,
+			};
+
+			if (saveFileDialog.ShowDialog() == DialogResult.OK)
+			{
+				string filePath = saveFileDialog.FileName;
+				try
+				{
+					File.WriteAllText(filePath, _screenBuffer);
+				}
+				catch (Exception)
+				{
+				}
+			}
+		}
+
+		private void SaveImageBtn_Click(object sender, EventArgs e)
+		{
+			if (_screen.Count==0)
+			{
+				return;
+			}
+
+			Bitmap image = new Bitmap(CHAR_WIDTH * 68, CHAR_HEIGHT * _screen.Count);
+			Graphics g = Graphics.FromImage(image);
+
+
+			Font font = new Font("Consolas", 12);
+			g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+			g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+			g.Clear(Color.White);
+
+			//Debug.WriteLine($"{_screen.Count} {_screenShowPos0} {_screenEditPos0} {_screenX} {_screenY}");
+
+			for (int y = 0; y < _screen.Count; y++)
+			{
+				for (int x = 0; x < SCREEN_WIDTH + 1; x++)
+				{
+					ScreenChar scrChr = _screen[y].Line[x];
+					TerminalDrawChar(g, font, x, y, scrChr);
+				}
+			}
+
+			SaveFileDialog saveFileDialog = new SaveFileDialog
+			{
+				Filter = "png files (*.png)|*.png|All files (*.*)|*.*",
+				FilterIndex = 1,
+				RestoreDirectory = true,
+			};
+
+			if (saveFileDialog.ShowDialog() == DialogResult.OK)
+			{
+				string filePath = saveFileDialog.FileName;
+				try
+				{
+					image.Save(filePath, ImageFormat.Png);
+				}
+				catch (Exception)
+				{
+				}
+			}
+		}
+
 	}
 }

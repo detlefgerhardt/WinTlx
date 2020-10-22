@@ -328,6 +328,7 @@ namespace WinTlx
 				}
 			}
 
+			list.Sort(new PeerQueryDataSorter(PeerQueryDataSorter.Sort.Number));
 			reply.List = list.ToArray();
 			reply.Valid = true;
 			reply.Error = "ok";
@@ -499,6 +500,30 @@ namespace WinTlx
 		public override string ToString()
 		{
 			return $"{Number} {LongName} {PeerType} {Address} {PortNumber} {ExtensionNumber}";
+		}
+	}
+
+	class PeerQueryDataSorter : IComparer<PeerQueryData>
+	{
+		public enum Sort { Number, Name }
+
+		private Sort _sort;
+
+		public PeerQueryDataSorter(Sort sort)
+		{
+			_sort = sort;
+		}
+
+		public int Compare(PeerQueryData item1, PeerQueryData item2)
+		{
+			switch (_sort)
+			{
+				case Sort.Number:
+					return item1.Number.CompareTo(item2.Number);
+				case Sort.Name:
+					return item1.LongName.CompareTo(item2.LongName);
+			}
+			return 0;
 		}
 	}
 }
