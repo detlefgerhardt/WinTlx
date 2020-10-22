@@ -93,3 +93,4 @@ Version history
         - Fix: Improved i-Telex buffer handling
         - Add: Save current buffer to text
         - Add: Save current buffer to image (PNG)
+        - Chg: Improved tape editor (mostly experimentel)
