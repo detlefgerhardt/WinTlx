@@ -64,8 +64,7 @@ namespace WinTlx.Scheduler
 			string[] list = dest.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 			if (list.Length == 1)
 			{
-				uint number;
-				if (uint.TryParse(list[0], out number))
+				if (uint.TryParse(list[0], out uint number))
 				{
 					DestNumber = (int)number;
 				}
@@ -73,13 +72,11 @@ namespace WinTlx.Scheduler
 			else if (list.Length == 3)
 			{
 				DestAddress = list[0];
-				uint port;
-				if (uint.TryParse(list[0], out port))
+				if (uint.TryParse(list[0], out uint port))
 				{
 					DestNumber = (int)port;
 				}
-				uint extension;
-				if (uint.TryParse(list[0], out extension))
+				if (uint.TryParse(list[0], out uint extension))
 				{
 					DestNumber = (int)extension;
 				}

@@ -94,3 +94,13 @@ Version history
         - Add: Save current buffer to text
         - Add: Save current buffer to image (PNG)
         - Chg: Improved tape editor (mostly experimentel)
+1.1.0.1 - Fix: Text editor improvements (load and paste text)
+
+2.0.0.0 - Very experimental beta version
+          New: Complete rework of UI
+          New: Dropdown menus
+          New: Favorites window
+          New: All debug informations moved to a separate debug window
+          New: Support for cyrillic character set (third baudot level)
+          New: Now supports 3 subscribe server entires
+          Chg: Some i-telex protocol changes

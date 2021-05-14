@@ -6,220 +6,92 @@ using System.Threading.Tasks;
 
 namespace WinTlx.Codes
 {
-	public enum ShiftStates
-	{
-		Unknown,
-		Ltr,
-		Figs,
-		Both
-	}
-
-	//public enum CodeSets { ITA2 = 0, ITA2EXT = 1, USTTY = 2 };
-	public enum CodeSets { ITA2 = 0, USTTY = 1 };
-
 	public class CodeItem
 	{
-
-		public const int CODESETS_COUNT = 2;
+		public const int CODESETS_COUNT = 3;
 
 		public byte Code { get; set; }
 
-		public char?[] CharLtr { get; set; }
+		public char CharLtr { get; set; }
+		public string NameLtr { get; set; }
 
-		public char?[] CharFig { get; set; }
+		public char CharFig { get; set; }
+		public string NameFig { get; set; }
 
-		private char? CharExt { get; set; }
+		public char Char3rd { get; set; }
+		public string Name3rd { get; set; }
 
-		public char GetCharExt(int codeSet)
-		{
-			if (CharFig[codeSet]!=null)
-			{
-				return CharFig[codeSet].Value;
-			}
-			else
-			{
-				return CharExt.Value;
-			}
-		}
+		//private readonly Exception _illegalCodeExeption = new Exception("illegal code definition");
 
-		public string[] NameLtr { get; set; }
-
-		public string[] NameFig { get; set; }
-
-		public string NameExt { get; set; }
-		public string GetNameExt(int codeSet)
-		{
-			if (CharFig[codeSet] != null)
-			{
-				return NameFig[codeSet];
-			}
-			else
-			{
-				return NameExt;
-			}
-		}
-
-		private Exception _illegalCodeExeption = new Exception("illegal code definition");
-
-		public CodeItem(byte code, char?[] charLtr, char?[] charFig, string[] nameLtr, string[] nameFig, char? charExt = null, string nameExt = null)
+		public CodeItem(byte code, char charLtr, string nameLtr)
 		{
 			Code = code;
-
-			if (charLtr.Length==CODESETS_COUNT)
-			{
-				CharLtr = charLtr;
-			}
-			else if (charLtr.Length==1)
-			{
-				SetCharLtr(charLtr[0]);
-			}
-			else
-			{
-				throw _illegalCodeExeption;
-			}
-
-			if (charFig.Length == CODESETS_COUNT)
-			{
-				CharFig = charFig;
-			}
-			else if (charFig.Length==1)
-			{
-				SetCharFig(charFig[0]);
-			}
-			else
-			{
-				throw _illegalCodeExeption;
-			}
-
-			if (nameLtr.Length == CODESETS_COUNT)
-			{
-				NameLtr = nameLtr;
-			}
-			else if (nameLtr.Length == 1)
-			{
-				SetNameLtr(nameLtr[0]);
-			}
-			else
-			{
-				throw _illegalCodeExeption;
-			}
-
-			if (nameFig.Length == CODESETS_COUNT)
-			{
-				NameFig = nameFig;
-			}
-			else if (nameFig.Length == 1)
-			{
-				SetNameFig(nameFig[0]);
-			}
-			else
-			{
-				throw _illegalCodeExeption;
-			}
-
-			CharExt = charExt;
-			NameExt = nameExt;
+			CharLtr = charLtr;
+			NameLtr = nameLtr;
+			CharFig = charLtr;
+			NameFig = nameLtr;
 		}
 
-		/// <summary>
-		/// Short initialization if both shift levels are equal
-		/// </summary>
-		/// <param name="code"></param>
-		/// <param name="charLtrFig"></param>
-		/// <param name="nameLtrFig"></param>
-		public CodeItem(byte code, char charLtrFig, string[] nameLtrFig)
+		public CodeItem(byte code, char charLtr, string nameLtr, char charFig, string nameFig)
 		{
 			Code = code;
-			SetCharLtr(charLtrFig);
-			SetCharFig(charLtrFig);
-			NameLtr = nameLtrFig;
-			NameFig = nameLtrFig;
-			CharExt = null;
-			NameExt = null;
+			CharLtr = charLtr;
+			NameLtr = nameLtr;
+			CharFig = charFig;
+			NameFig = nameFig;
 		}
 
-		private void SetCharLtr(char? code)
+		public CodeItem(byte code, char charLtr, string nameLtr, char charFig, string nameFig, char char3rd, string name3rd)
 		{
-			CharLtr = new char?[CODESETS_COUNT];
-			for (int i = 0; i < CODESETS_COUNT; i++)
-			{
-				CharLtr[i] = code;
-			}
+			Code = code;
+			CharLtr = charLtr;
+			NameLtr = nameLtr;
+			CharFig = charFig;
+			NameFig = nameFig;
+			Char3rd = char3rd;
+			Name3rd = name3rd;
 		}
 
-		private void SetCharFig(char? code)
-		{
-			CharFig = new char?[CODESETS_COUNT];
-			for (int i = 0; i < CODESETS_COUNT; i++)
-			{
-				CharFig[i] = code;
-			}
-		}
-
-		private void SetNameLtr(string name)
-		{
-			NameLtr = new string[CODESETS_COUNT];
-			for (int i = 0; i < CODESETS_COUNT; i++)
-			{
-				NameLtr[i] = name;
-			}
-		}
-
-		private void SetNameFig(string name)
-		{
-			NameFig = new string[CODESETS_COUNT];
-			for (int i = 0; i < CODESETS_COUNT; i++)
-			{
-				NameFig[i] = name;
-			}
-		}
-
-		public char GetCode(ShiftStates shiftState, CodeSets codeSet)
+		public char GetChar(ShiftStates shiftState)
 		{
 			char? chr;
 			switch (shiftState)
 			{
 				case ShiftStates.Ltr:
 				case ShiftStates.Both:
-					chr = CharLtr[(int)codeSet];
+					chr = CharLtr;
 					break;
 				case ShiftStates.Figs:
-					chr = CharFig[(int)codeSet];
+					chr = CharFig;
+					break;
+				case ShiftStates.Third:
+					chr = Char3rd;
 					break;
 				default:
 				case ShiftStates.Unknown:
 					chr = null;
 					break;
 			}
-			if (chr==null)
+
+			if (chr == null)
 			{
-				chr = CodeManager.ASC_INV;
-				/*
-				if (ext && CharExt!=null)
-				{
-					chr = CharExt.Value;
-				}
-				else
-				{
-					chr = CodeConversion.ASC_INV;
-				}
-				*/
+				chr = CodeManager.ASC_INVALID;
 			}
 
 			return chr.Value;
 		}
 
-		public string GetName(ShiftStates shiftState, CodeSets codeSet)
+		public string GetName(ShiftStates shiftState)
 		{
 			string name;
 			switch (shiftState)
 			{
 				case ShiftStates.Ltr:
 				case ShiftStates.Both:
-					name = NameLtr[(int)codeSet];
+					name = NameLtr;
 					break;
 				case ShiftStates.Figs:
-					name = NameFig[(int)codeSet];
+					name = NameFig;
 					break;
 				default:
 				case ShiftStates.Unknown:
@@ -228,17 +100,7 @@ namespace WinTlx.Codes
 			}
 			if (name == null)
 			{
-				name = CodeManager.ASC_INV.ToString();
-				/*
-				if (ext && CharExt != null)
-				{
-					name = NameExt;
-				}
-				else
-				{
-					name = CodeConversion.ASC_INV.ToString();
-				}
-				*/
+				name = CodeManager.ASC_INVALID.ToString();
 			}
 
 			return name;

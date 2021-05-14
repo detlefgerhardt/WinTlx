@@ -30,13 +30,14 @@ namespace WinTlx.Config
 				Language = "en",
 				Answerback = @"\r\n" + Constants.DEFAULT_ANSWERBACK,
 				IdleTimeout = Constants.DEFAULT_IDLE_TIMEOUT,
-				OutputSpeed = 0,
+				OutputSpeed = 50,
 				CodeSet = CodeSets.ITA2,
 				IncomingLocalPort = Constants.DEFAULT_INCOMING_PORT,
 				IncomingPublicPort = Constants.DEFAULT_INCOMING_PORT,
 				IncomingExtensionNumber = 0,
 				LimitedClient = false,
-				RemoteServerPort = Constants.CENTRALEX_PORT,
+				//RemoteServerPort = Constants.CENTRALEX_PORT,
+				RemoteServerPort = 0,
 			};
 		}
 
@@ -79,6 +80,5 @@ namespace WinTlx.Config
 				return false;
 			}
 		}
-
 	}
 }

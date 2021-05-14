@@ -4,27 +4,102 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WinTlx.Codes;
 using WinTlx.Config;
+using WinTlx.Debugging;
 using WinTlx.Languages;
 
 namespace WinTlx.TextEditor
 {
+	public enum Cmds { Wru, HereIs, Delay, Wait, SendFile, Send, Dial, Disconnect }
+
+	public enum CmdParamTypes { None, Str, Num };
+
 	class TextEditorManager
 	{
+		private readonly List<CmdItem> _cmdList = new List<CmdItem>()
+		{
+			new CmdItem(Cmds.Wru, "wru"),
+			new CmdItem(Cmds.HereIs, "hereis"),
+			new CmdItem(Cmds.Delay, "delay", CmdParamTypes.Num),
+			new CmdItem(Cmds.Wait, "wait", new CmdParamTypes[] { CmdParamTypes.Str, CmdParamTypes.Num }),
+			new CmdItem(Cmds.SendFile, "sendfile", CmdParamTypes.Str),
+			new CmdItem(Cmds.Send, "send", CmdParamTypes.Str),
+			new CmdItem(Cmds.Dial, "dial", new CmdParamTypes[] { CmdParamTypes.Num, CmdParamTypes.Num }),
+			new CmdItem(Cmds.Disconnect, "disconnect"),
+		};
+
 		public const int DEFAULT_LINE_LENGTH = 68;
 
 		// delimiters in RichRextBox
 		private const string DELIMITER = " -?()";
+		private readonly List<DelimiterItem> _delimiters = new List<DelimiterItem>()
+		{
+			new DelimiterItem(' ', true),
+			new DelimiterItem('-', true),
+			new DelimiterItem('+', true),
+			new DelimiterItem('(', true),
+			new DelimiterItem('.', false),
+			new DelimiterItem(',', false),
+			new DelimiterItem(':', false),
+			new DelimiterItem('?', false),
+			new DelimiterItem(')', false),
+			new DelimiterItem('=', false),
+		};
 
-		public delegate void SendEventHandler(string asciiText);
-		public event SendEventHandler Send;
+		private readonly ConfigManager _configManager;
+
+		private readonly BufferManager _bufferManager;
+
+		private readonly ItelexProtocol _itelex;
+
+		private bool _stopScript;
+
+		private string _recvString = null;
+
+		public delegate void DialEventHandler(string number);
+		public event DialEventHandler Dial;
+
+		public delegate void DisconnectEventHandler();
+		public event DisconnectEventHandler Disconnect;
+
+		public delegate void SavedStatusChangedEventHandler();
+		public event SavedStatusChangedEventHandler SavedStatusChanged;
 
 		public const string ALLOWED_CHARS = "abcdefghijklmnopqrstuvwxyzäöüß01234567890/()=?'.,:+- ";
 
-		public bool Saved { get; set; }
+		private bool _saved;
+		public bool Saved
+		{
+			get
+			{
+				return _saved;
+			}
+			set
+			{
+				bool changed = value != _saved;
+				_saved = value;
+				if (changed) SavedStatusChanged?.Invoke();
+			}
+		}
+
+		private string _filename;
+		public string Filename
+		{
+			get
+			{
+				return _filename;
+			}
+			set
+			{
+				bool changed = value != _filename;
+				_filename = value;
+				if (changed) SavedStatusChanged?.Invoke();
+			}
+		}
 
 		public int CharWidth { get; set; }
 
@@ -46,7 +121,7 @@ namespace WinTlx.TextEditor
 					_undoPtr = UndoStack.Count - 1;
 				}
 				if (value != _text)
-				{ 
+				{
 					_text = value;
 					Saved = false;
 				}
@@ -62,23 +137,25 @@ namespace WinTlx.TextEditor
 
 		private TextEditorManager()
 		{
+			_configManager = ConfigManager.Instance;
+
+			_bufferManager = BufferManager.Instance;
+
+			_itelex = ItelexProtocol.Instance;
+			_itelex.Received += Itelex_Received;
+			_itelex.Dropped += Itelex_Dropped;
+
 			ResetUndo();
 			CharWidth = DEFAULT_LINE_LENGTH;
 			Text = "";
 			Saved = true;
-
-			/*
-			Text = 
-			"Ich habe alle meine Scans bisher mit dem Original Adobe Acrobat Programm erledigt. Deutsches Wörterbuch ist immer eingeschaltet, ebenso die Scan-Verbessserung, die vor dem OCR Prozess eine evtl. leicht schief eingezogene Seite gerade ausrichtet.\n" +
-			"Man könnte es natürlich auch einmal mit dem Finereader machen.\n" +
-			"Ich schaue mal nach, ob ich noch die Original-Scandaten, also ohne OCR habe, dann könnte man diese Daten einmal mit einer anderen OCR Software laufen lassen. Kann Euch aber aber erst am Montag berichten, morgen hat meine Frau Geburtstag und es gibt immer noch Präferenzen.\n";
-			*/
+			Filename = null;
 		}
 
 		public void Undo(string text)
 		{
-			Debug.WriteLine($"Undo: count={UndoStack.Count} _undoPtr={_undoPtr}");
-			if (UndoStack.Count>0 && _undoPtr>0)
+			//Debug.WriteLine($"Undo: count={UndoStack.Count} _undoPtr={_undoPtr}");
+			if (UndoStack.Count > 0 && _undoPtr > 0)
 			{
 				if (UndoStack.Last() != text)
 				{
@@ -87,17 +164,17 @@ namespace WinTlx.TextEditor
 				_text = UndoStack[--_undoPtr];
 				UndoStack.Add(_text);
 			}
-			Debug.WriteLine($"    count={UndoStack.Count} _undoPtr={_undoPtr}");
+			//Debug.WriteLine($"    count={UndoStack.Count} _undoPtr={_undoPtr}");
 		}
 
 		public void Redo()
 		{
-			Debug.WriteLine($"Redo: count={UndoStack.Count} _undoPtr={_undoPtr}");
+			//Debug.WriteLine($"Redo: count={UndoStack.Count} _undoPtr={_undoPtr}");
 			if (UndoStack.Count > 0 && _undoPtr < UndoStack.Count - 1)
 			{
 				_text = UndoStack[++_undoPtr];
 			}
-			Debug.WriteLine($"    count={UndoStack.Count} _undoPtr={_undoPtr}");
+			//Debug.WriteLine($"    count={UndoStack.Count} _undoPtr={_undoPtr}");
 		}
 
 		private void ResetUndo()
@@ -106,33 +183,34 @@ namespace WinTlx.TextEditor
 			_undoPtr = -1;
 		}
 
-		public void LoadFile()
+		public void LoadFile(string fullName = null)
 		{
-			OpenFileDialog openFileDialog = new OpenFileDialog
+			if (string.IsNullOrEmpty(fullName))
 			{
-				InitialDirectory = "..",
-				Filter = "txt files (*.txt)|*.txt|punch files (*.ls)|*.ls|All files (*.*)|*.*",
-				FilterIndex = 1,
-				RestoreDirectory = true
-			};
+				OpenFileDialog openFileDialog = new OpenFileDialog
+				{
+					InitialDirectory = "..",
+					Filter = "txt files (*.txt)|*.txt|punch files (*.ls)|*.ls|All files (*.*)|*.*",
+					FilterIndex = 1,
+					RestoreDirectory = true,
+				};
 
-			if (openFileDialog.ShowDialog() != DialogResult.OK)
-			{
-				return;
+				if (openFileDialog.ShowDialog() != DialogResult.OK) return;
+				fullName = openFileDialog.FileName;
 			}
 
 			try
 			{
-				string ext = Path.GetExtension(openFileDialog.FileName).ToLower();
+				string ext = Path.GetExtension(fullName).ToLower();
 				if (ext == ".ls")
 				{
-					ReadPunchFile(openFileDialog.FileName);
+					ReadPunchFile(fullName);
 				}
 				else
 				{
-					string fullName = openFileDialog.FileName;
 					ResetUndo();
-					Text = File.ReadAllText(fullName);
+					Text = ConvertText(File.ReadAllText(fullName), ConfigManager.Instance.Config.CodeSet);
+					Filename = fullName;
 				}
 				Saved = true;
 			}
@@ -161,21 +239,21 @@ namespace WinTlx.TextEditor
 		private string PunchDataToText(byte[] punchData)
 		{
 			string text = "";
-			ShiftStates shiftState = ShiftStates.Ltr;
+			KeyStates keyStates = new KeyStates(ShiftStates.Ltr, ConfigManager.Instance.Config.CodeSet);
 
 			foreach (byte code in punchData)
 			{
 				if (code == CodeManager.BAU_LTRS)
 				{
-					shiftState = ShiftStates.Ltr;
+					keyStates.ShiftState = ShiftStates.Ltr;
 				}
 				else if (code == CodeManager.BAU_FIGS)
 				{
-					shiftState = ShiftStates.Figs;
+					keyStates.ShiftState = ShiftStates.Figs;
 				}
 				else
 				{
-					char ascii = CodeManager.BaudotCharToAscii(code, shiftState, ConfigManager.Instance.Config.CodeSet, CodeManager.SendRecv.Send);
+					char ascii = CodeManager.BaudotCharToAscii(code, keyStates, CodeManager.SendRecv.Send);
 					if (ascii != '\r')
 					{
 						text += ascii;
@@ -185,40 +263,33 @@ namespace WinTlx.TextEditor
 			return text;
 		}
 
-		public bool SaveFile()
+		public bool SaveFile(string fullname=null)
 		{
-			SaveFileDialog saveFileDialog = new SaveFileDialog
+			if (string.IsNullOrEmpty(fullname))
 			{
-				Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*",
-				FilterIndex = 1,
-				RestoreDirectory = true
-			};
+				SaveFileDialog saveFileDialog = new SaveFileDialog
+				{
+					Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*",
+					FilterIndex = 1,
+					RestoreDirectory = true,
+					FileName = Path.GetFileName(Filename),
+				};
+
+				if (saveFileDialog.ShowDialog() != DialogResult.OK) return false;
+				fullname = saveFileDialog.FileName;
+			}
 
 			try
 			{
-				if (saveFileDialog.ShowDialog() == DialogResult.OK)
-				{
-					File.WriteAllText(saveFileDialog.FileName, Text, Encoding.UTF8);
-					Saved = true;
-				}
+				File.WriteAllText(fullname, Text, Encoding.UTF8);
+				Saved = true;
+				Filename = Path.GetFileName(fullname);
 				return true;
 			}
 			catch (Exception)
 			{
 				ShowError(LanguageManager.Instance.GetText(LngKeys.Editor_SaveError));
 				return false;
-			}
-		}
-
-		public void SendText(string[] lines)
-		{
-			foreach(string line in lines)
-			{
-				List<string> newLines = WrapLine(line, CharWidth);
-				foreach(string nl in newLines)
-				{
-					Send?.Invoke(nl + "\r\n");
-				}
 			}
 		}
 
@@ -413,12 +484,14 @@ namespace WinTlx.TextEditor
 			while (line.Length >= len)
 			{
 				int pos = -1;
-				for (int i = len-1; i > 0; i--)
+				for (int i = len - 1; i > 0; i--)
 				{
-					Debug.WriteLine(line[i]);
-					if (DELIMITER.Contains(line[i]))
+					//Debug.WriteLine(line[i]);
+					DelimiterItem delim = _delimiters.Find(d => d.Char == line[i]);
+					if (delim != null)
 					{
-						pos = i;
+						pos = delim.WrapBefore ? i : i + 1;
+						//Debug.WriteLine($"delim {line[i]}, pos={pos}");
 						break;
 					}
 				}
@@ -426,8 +499,11 @@ namespace WinTlx.TextEditor
 				{
 					pos = len - 1;
 				}
+				//Debug.WriteLine($"newline '{line}'");
+				//Debug.WriteLine($"pos={pos}, sub='{line.Substring(0, pos)}'");
 				newLines.Add(line.Substring(0, pos));
-				line = line.Substring(pos + 1);
+				line = line.Substring(pos);
+				//Debug.WriteLine($"line='{line}'");
 			}
 			if (line.Length > 0)
 			{
@@ -486,6 +562,25 @@ namespace WinTlx.TextEditor
 		public void ConvertToBaudot()
 		{
 			Text = CodeManager.AsciiStringToTelex(Text, ConfigManager.Instance.Config.CodeSet);
+		}
+
+		public string ConvertText(string text, CodeSets codeSet)
+		{
+			string newText = "";
+			foreach (char chr in text)
+			{
+				newText += ConvertTextChar(chr, codeSet);
+			}
+			return newText;
+		}
+
+		public string ConvertTextChar(char chr, CodeSets codeSet)
+		{
+			string scripChar = @"{}\";
+
+			if (scripChar.Contains(chr)) return chr.ToString();
+
+			return CodeManager.AsciiCharToTelex(chr, codeSet, true);
 		}
 
 		public void ConvertToRtty()
@@ -595,6 +690,535 @@ namespace WinTlx.TextEditor
 		private string LngText(LngKeys key)
 		{
 			return LanguageManager.Instance.GetText(key);
+		}
+
+		public async Task SendTextAsync(string[] lines)
+		{
+			_stopScript = false;
+			bool script = false;
+
+			foreach (string line in lines)
+			{
+				if (line.StartsWith("{script}"))
+				{
+					script = true;
+					continue;
+				}
+				if (line.StartsWith("{endscript}"))
+				{
+					script = false;
+					continue;
+				}
+
+				if (!script)
+				{
+					List<string> newLines = WrapLine(line, CharWidth);
+					foreach (string nl in newLines)
+					{
+						if (_stopScript) return;
+						await SendTextLine(nl.Trim() + "\r\n");
+					}
+				}
+				else
+				{
+					string scriptLine = line.Trim();
+					if (!string.IsNullOrEmpty(scriptLine) && !scriptLine.StartsWith("//"))
+					{
+						//SendDebugText(scriptLine, DebugForm.Modes.Command);
+						await DoScriptCmd(scriptLine);
+					}
+				}
+			}
+		}
+
+		private async Task SendTextLine(string line)
+		{
+			Debug.WriteLine($"SendTextLine {line}");
+			while (true)
+			{
+				if (_stopScript) return;
+
+				int pos = line.IndexOf('{');
+				if (pos == -1)
+				{
+					await SendLocalAndText(line);
+					break;
+				}
+
+				string line1 = line.Substring(0, pos);
+				string line2 = line.Substring(pos + 1);
+				int pos2 = line2.IndexOf('}');
+				if (pos2 == -1)
+				{
+					await SendLocalAndText(line);
+					break;
+				}
+				await SendLocalAndText(line1);
+				//await _bufferManager.WaitLocalOutpuBufferEmpty();
+				string cmd = line2.Substring(0, pos2);
+				await DoScriptCmd(cmd);
+				await _bufferManager.WaitSendBufferEmpty();
+				line = line2.Substring(pos2 + 1);
+			}
+		}
+
+		private async Task DoScriptCmd(string cmdStr)
+		{
+			if (string.IsNullOrWhiteSpace(cmdStr))
+			{
+				Debug.Write("");
+				return;
+			}
+
+			cmdStr = cmdStr.Trim();
+			CmdItem cmdItem = null;
+			foreach (CmdItem cmd in _cmdList)
+			{
+				if (cmdStr.Length >= cmd.Name.Length && cmdStr.Substring(0, cmd.Name.Length) == cmd.Name)
+				{
+					cmdItem = cmd;
+					break;
+				}
+			}
+
+			CmdParameter[] prms = null;
+			bool error;
+			if (cmdItem == null)
+			{
+				error = true;
+			}
+			else
+			{
+				prms = ParseCmdParams(cmdStr, cmdItem.ParamList, out error);
+			}
+
+			if (!error)
+			{
+				//await SendLocalMsg($"@{cmdStr}@");
+			}
+			else
+			{
+				await SendLocalMsg($"?{cmdStr}?");
+				return;
+			}
+
+			if (cmdItem == null) return;
+
+			Debug.WriteLine($"Cmd {cmdItem.Name} {cmdStr}");
+
+			bool result = true;
+			switch (cmdItem.Type)
+			{
+				case Cmds.Wru:
+					await SendWru();
+					break;
+				case Cmds.HereIs:
+					await SendAnswerBack();
+					break;
+				case Cmds.Delay:
+					await Task.Delay(prms[0].NumValue * 1000);
+					break;
+				case Cmds.Wait:
+					result = await CmdWait(prms);
+					break;
+				case Cmds.Send:
+					await SendLocalAndText(prms[0].StrValue);
+					break;
+				case Cmds.SendFile:
+					result = await CmdSendFile(prms[0].StrValue);
+					break;
+				case Cmds.Dial:
+					result = await CmdDial(prms);
+					break;
+				case Cmds.Disconnect:
+					Disconnect?.Invoke();
+					await Task.Delay(3000);
+					break;
+			}
+			//SendDebugText("{1}", TextDebugForm.Modes.Command);
+			Debug.WriteLine("wait start");
+			//await _bufferManager.WaitSendBufferEmpty();
+			Debug.WriteLine("wait stop");
+			//SendDebugText("{2}", TextDebugForm.Modes.Command);
+
+			if (!result)
+			{
+				_stopScript = true;
+			}
+		}
+
+		private CmdParameter[] ParseCmdParams(string cmdStr, CmdParamTypes[] prmTypes, out bool error)
+		{
+			int prmCount = prmTypes == null ? 0 : prmTypes.Length;
+			error = true;
+			int pos = cmdStr.IndexOf('(');
+			if (pos == -1)
+			{
+				// no params in command, error if params required
+				error = prmCount != 0;
+				return null;
+			}
+
+			cmdStr = cmdStr.Substring(pos + 1);
+			if (!cmdStr.EndsWith(")")) return null; // error, no closing ')'
+
+			cmdStr = cmdStr.TrimEnd(')'); // remove closing ')'
+
+			List<string> prms = SplitCmdParams(cmdStr);
+			if (prms.Count != prmCount) return null;
+
+			// retrieve all parameters
+			List<CmdParameter> cmdPrms = new List<CmdParameter>();
+			for (int i=0; i<prms.Count; i++)
+			{
+				prms[i] = prms[i].Trim();
+				CmdParameter prm = new CmdParameter(prmTypes[i], prms[i].Trim());
+				if (prm.Error)
+				{
+					// invalid parameter
+					error = true;
+					return null;
+				}
+				cmdPrms.Add(prm);
+			}
+
+			error = false;
+			return cmdPrms.ToArray();
+		}
+
+		private List<string> SplitCmdParams(string prmStr)
+		{
+			List<string> prms = new List<string>();
+			bool quote = false;
+			bool esc = false;
+			string prm = "";
+			for (int i=0; i<prmStr.Length; i++)
+			{
+				char chr = prmStr[i];
+				if (esc)
+				{
+					if (chr == 'x' && i < prmStr.Length - 2)
+					{
+						byte? code = ParseEscCode(prmStr[i + 1], prmStr[i + 2]);
+						if (code.HasValue)
+						{
+							prm += (char)(code + 128);
+							i += 2;
+						}
+					}
+					else
+					{
+						prm += ParseEscChar(chr);
+					}
+					esc = false;
+					continue;
+				}
+				if (quote)
+				{
+					if (chr == '\\')
+					{
+						esc = true;
+						continue;
+					}
+					prm += chr;
+					if (chr=='\'')
+					{
+						quote = false;
+					}
+					continue;
+				}
+				if (chr=='\'')
+				{
+					prm += chr;
+					quote = true;
+					continue;
+				}
+				if (chr==',')
+				{
+					prms.Add(prm.Trim());
+					prm = "";
+					continue;
+				}
+				if (chr==')')
+				{
+					prms.Add(prm.Trim());
+					break;
+				}
+				prm += chr;
+			}
+			if (!string.IsNullOrWhiteSpace(prm))
+			{
+				prms.Add(prm.Trim());
+			}
+			return prms;
+		}
+
+		private char ParseEscChar(char chr)
+		{
+			switch (chr)
+			{
+				case 'b':
+					return CodeManager.ASC_BEL;
+				case 'r':
+					return CodeManager.ASC_CR;
+				case 'n':
+					return CodeManager.ASC_LF;
+				case 'w':
+					return CodeManager.ASC_WRU;
+				case 'a':
+					return CodeManager.ASC_LTRS;
+				case '1':
+					return CodeManager.ASC_FIGS;
+				case '0':
+					return CodeManager.ASC_NUL;
+				default:
+					return chr;
+			}
+
+		}
+
+		private byte? ParseEscCode(char chr1, char chr2)
+		{
+			string str = new string(new char[] { chr1, chr2 });
+			if (int.TryParse(str, out int code))
+			{
+				return code < 32 ? (byte?)code : null;
+			}
+			return null;
+		}
+
+		private async Task SendAnswerBack()
+		{
+			string answerBack = _configManager.Config.AnswerbackWinTlx;
+			answerBack = answerBack.Replace(@"\r", "\r");
+			answerBack = answerBack.Replace(@"\n", "\n");
+			await SendLocalAndText(answerBack);
+		}
+
+		/// <summary>
+		/// wait(text,timeout)
+		/// </summary>
+		/// <param name="prms"></param>
+		/// <returns></returns>
+		private async Task<bool> CmdWait(CmdParameter[] prms)
+		{
+			_recvString = "";
+			string waitStr = prms[0].StrValue;
+			int timeout = prms[1].NumValue;
+			//Debug.WriteLine($"start wait {waitStr},{timeout}");
+			bool result = await Task.Run<bool>(async () =>
+			{
+				Stopwatch sw = new Stopwatch();
+				sw.Start();
+				while (true)
+				{
+					await Task.Delay(100);
+					if (_recvString.Contains(waitStr))
+					{
+						//Debug.WriteLine($"found wait 1 {waitStr}");
+						await _bufferManager.WaitLocalOutpuBufferEmpty();
+						//Debug.WriteLine($"found wait 2 {waitStr}");
+						return true;
+					}
+					if (sw.ElapsedMilliseconds > timeout * 1000) return false;
+				}
+			});
+			_recvString = null;
+			return result;
+		}
+
+		private async Task<bool> CmdSendFile(string filename)
+		{
+			CodeSets codeSet = ConfigManager.Instance.Config.CodeSet;
+
+			string[] lines;
+			try
+			{
+				//string text = ConvertText(File.ReadAllText(filename));
+				lines = File.ReadAllLines(filename);
+			}
+			catch(Exception)
+			{
+				return false;
+			}
+
+			foreach (string line in lines)
+			{
+				List<string> wrappedLines = WrapLine(line, CharWidth);
+				foreach (string wrappedLine in wrappedLines)
+				{
+					if (_stopScript) return false;
+					string convLine = ConvertText(wrappedLine, codeSet).Trim();
+					await SendTextLine(convLine + "\r\n");
+					Debug.WriteLine($"SendBufferCount={_bufferManager.SendBufferCount}");
+				}
+			}
+			return true;
+		}
+
+		private async Task<bool> CmdDial(CmdParameter[] prms)
+		{
+			bool result = await Task.Run<bool>(async () =>
+			{
+				int itelexNumber = prms[0].NumValue;
+				int waitSec = prms[1].NumValue;
+				if (waitSec == -1) waitSec = 4;
+				Dial?.Invoke(itelexNumber.ToString());
+				Stopwatch sw = new Stopwatch();
+				sw.Start();
+				while (true)
+				{
+					await Task.Delay(100);
+					if (sw.ElapsedMilliseconds > 10 * 1000)
+					{
+						return false;
+					}
+					if (_itelex.ConnectionState == ItelexProtocol.ConnectionStates.Connected)
+					{
+						await Task.Delay(waitSec * 1000);
+						//await _bufferManager.WaitLocalOutpuBufferEmpty();
+						return true;
+					}
+				}
+			});
+			return result;
+		}
+
+		private async Task SendWru()
+		{
+			//SendDebugText("{WRU}", DebugForm.Modes.Output);
+
+			await _bufferManager.WaitSendBufferEmpty();
+			await SendLocalAndText(CodeManager.ASC_FIGS.ToString());
+			await SendLocalAndText(CodeManager.ASC_WRU.ToString());
+			await Task.Delay(10000);
+		}
+
+		private async Task SendLocalAndText(string asciiText)
+		{
+			//SendDebugText(asciiText, DebugForm.Modes.Output);
+
+			await Task.Run(() =>
+			{
+				_bufferManager.SendBufferEnqueueString(asciiText);
+			});
+		}
+
+		private async Task SendLocalMsg(string asciiText)
+		{
+			await Task.Run(async () =>
+			{
+				foreach (char chr in asciiText)
+				{
+					await _bufferManager.WaitLocalOutpuBufferEmpty();
+					_bufferManager.LocalOutputMsg(chr.ToString());
+				}
+			});
+		}
+
+		private void Itelex_Received(string asciiText)
+		{
+			//SendDebugText(asciiText, DebugForm.Modes.Input);
+
+			if (_recvString != null)
+			{
+				_recvString += asciiText;
+			}
+		}
+
+		private void Itelex_Dropped()
+		{
+			_stopScript = true;
+		}
+	}
+
+	class CmdItem
+	{
+		public Cmds Type { get; set; }
+
+		public string Name { get; set; }
+
+		public CmdParamTypes[] ParamList { get; set; }
+
+		public CmdItem(Cmds type, string name, CmdParamTypes paramType)
+		{
+			Type = type;
+			Name = name;
+			ParamList = new CmdParamTypes[] { paramType };
+		}
+
+		public CmdItem(Cmds type, string name, CmdParamTypes[] paramList = null)
+		{
+			Type = type;
+			Name = name;
+			ParamList = paramList;
+		}
+
+		public override string ToString()
+		{
+			return $"{Name} {Type} {ParamList}";
+		}
+	}
+
+	class CmdParameter
+	{
+		public object Value { get; private set; }
+
+		public int NumValue
+		{
+			get
+			{
+				return Value != null ? (int)Value : 0;
+			}
+		}
+
+		public string StrValue
+		{
+			get
+			{
+				return Value != null ? (string)Value : "";
+			}
+		}
+
+		public CmdParamTypes Type { get; private set; }
+
+		public bool Error { get; private set; }
+
+		public CmdParameter(CmdParamTypes type, string valStr)
+		{
+			Type = type;
+			Error = false;
+			switch(type)
+			{
+				case CmdParamTypes.Str:
+					if (valStr.StartsWith("'") && valStr.EndsWith("'"))
+					{
+						Value = valStr.Substring(1, valStr.Length - 2);
+					}
+					else
+					{
+						Value = valStr;
+					}
+					break;
+				case CmdParamTypes.Num:
+					if (int.TryParse(valStr, out int num))
+					{
+						Value = num;
+					}
+					else
+					{
+						Error = true;
+					}
+					break;
+				default:
+					Error = true;
+					break;
+			}
+		}
+
+		public override string ToString()
+		{
+			return $"{Type} {StrValue} {NumValue} {Error}";
 		}
 	}
 }

@@ -8,29 +8,29 @@ namespace WinTlx.Codes
 {
 	class AsciiConvItem
 	{
-		public byte FromAscii { get; set; }
+		public int FromAscii { get; set; }
 
-		public byte ToAscii { get; set; }
+		public int ToAscii { get; set; }
 
-		public byte? NewAsciiOffset { get; set; }
+		public int? NewAsciiOffset { get; set; }
 
 		public string NewAscii { get; set; }
 
-		public AsciiConvItem(byte fromAscii, byte? toAscii, char newAsciiOffset)
+		public AsciiConvItem(int fromAscii, int? toAscii, char newAsciiOffset)
 		{
 			FromAscii = fromAscii;
 			ToAscii = toAscii != null ? toAscii.Value : fromAscii;
-			NewAsciiOffset = (byte)newAsciiOffset;
+			NewAsciiOffset = (int)newAsciiOffset;
 		}
 
-		public AsciiConvItem(byte fromAscii, char newAscii)
+		public AsciiConvItem(int fromAscii, char newAscii)
 		{
 			FromAscii = fromAscii;
 			ToAscii = fromAscii;
 			NewAscii = newAscii.ToString();
 		}
 
-		public AsciiConvItem(byte fromAscii, string newAscii)
+		public AsciiConvItem(int fromAscii, string newAscii)
 		{
 			FromAscii = fromAscii;
 			ToAscii = fromAscii;
@@ -39,12 +39,12 @@ namespace WinTlx.Codes
 
 		public string GetCodeInRange(char code)
 		{
-			if (code<FromAscii || code>ToAscii)
+			if (code < FromAscii || code > ToAscii)
 			{
 				return null;
 			}
 
-			if (NewAsciiOffset!=null)
+			if (NewAsciiOffset != null)
 			{
 				int offset = (int)NewAsciiOffset - (int)FromAscii;
 				return ((char)(code + offset)).ToString();
@@ -53,6 +53,11 @@ namespace WinTlx.Codes
 			{
 				return NewAscii;
 			}
+		}
+
+		public override string ToString()
+		{
+			return $"{FromAscii} {ToAscii} {NewAsciiOffset} {NewAscii}";
 		}
 	}
 }

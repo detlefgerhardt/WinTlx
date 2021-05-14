@@ -279,13 +279,15 @@ namespace WinTlx.Languages
 #if DEBUG
 		public bool SaveLanguage(Language lng)
 		{
-			List<string> lines = new List<string>();
-			lines.Add($"; {Constants.PROGRAM_NAME} language file");
-			lines.Add($"version 1");
-			lines.Add($"key \"{lng.Key}\"");
-			lines.Add($"name \"{lng.DisplayName}\"");
-			lines.Add($";");
-			foreach(var item in lng.Items)
+			List<string> lines = new List<string>
+			{
+				$"; {Constants.PROGRAM_NAME} language file",
+				$"version 1",
+				$"key \"{lng.Key}\"",
+				$"name \"{lng.DisplayName}\"",
+				$";"
+			};
+			foreach (var item in lng.Items)
 			{
 				lines.Add($"text {item.Key} \"{item.Value}\"");
 			}

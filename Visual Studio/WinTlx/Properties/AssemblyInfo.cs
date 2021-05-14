@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("WinTlx")]
-[assembly: AssemblyDescription("Windows test- and diagnostic tool for the i-Telex protocol")]
+[assembly: AssemblyDescription("i-Telex test- and diagnostic tool")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("*dg*")]
 [assembly: AssemblyProduct("WinTlx")]
-[assembly: AssemblyCopyright("(C) Detlef Gerhardt 2019-2020")]
+[assembly: AssemblyCopyright("(C) Detlef Gerhardt 2019-2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyFileVersion("2.0.0.0")]

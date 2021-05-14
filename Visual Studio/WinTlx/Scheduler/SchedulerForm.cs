@@ -12,6 +12,9 @@ namespace WinTlx.Scheduler
 	{
 		private const string TAG = nameof(SchedulerForm);
 
+		public delegate void ClosedEventHandler();
+		public event ClosedEventHandler ClosedEvent;
+
 		private const int SCHEDULE_COL_ACTIVE = 0;
 		private const int SCHEDULE_COL_SUCCESS = 1;
 		private const int SCHEDULE_COL_ERROR = 2;
@@ -21,12 +24,16 @@ namespace WinTlx.Scheduler
 		private const int SCHEDULE_COL_FILE = 6;
 		private const int SCHEDULE_COL_COUNT = 7;
 
-		private SchedulerManager _manager;
+		private readonly SchedulerManager _manager;
 
 		private DataGridViewCellEventArgs _contextMenuLocation;
 
-		public SchedulerForm()
+		private Rectangle _parentWindowsPosition;
+
+		public SchedulerForm(Rectangle position)
 		{
+			_parentWindowsPosition = position;
+
 			InitializeComponent();
 
 			//LanguageManager.Instance.LanguageChanged += LanguageChanged;
@@ -46,6 +53,12 @@ namespace WinTlx.Scheduler
 			//_manager.LoadScheduler();
 
 			ShowSchedules();
+		}
+
+		private void SchedulerForm_Load(object sender, EventArgs e)
+		{
+			Point pos = Helper.CenterForm(this, _parentWindowsPosition);
+			SetBounds(pos.X, pos.Y, Bounds.Width, Bounds.Height);
 		}
 
 		private void SetSchedulerColumns()
@@ -168,7 +181,7 @@ namespace WinTlx.Scheduler
 
 		private void InitView()
 		{
-			List<DataGridViewRow> rows = new List<DataGridViewRow>();
+			//List<DataGridViewRow> rows = new List<DataGridViewRow>();
 
 			DataGridViewRow row = new DataGridViewRow();
 			row.CreateCells(SchedularView);
@@ -374,8 +387,14 @@ namespace WinTlx.Scheduler
 
 		private void SchedularView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
 		{
-			Debug.WriteLine("end edit");
+			//Debug.WriteLine("end edit");
 			_manager.SaveScheduler();
 		}
+
+		private void SchedulerForm_FormClosed(object sender, FormClosedEventArgs e)
+		{
+			ClosedEvent?.Invoke();
+		}
+
 	}
 }

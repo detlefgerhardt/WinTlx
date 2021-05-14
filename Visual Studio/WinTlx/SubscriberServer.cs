@@ -16,7 +16,43 @@ namespace WinTlx
 		private TcpClient client = null;
 		private NetworkStream stream = null;
 
-		public bool Connect(string address, int port)
+		public ClientUpdateReply DoClientUpdate(string[] serverAddresses, int serverPort, int clientNumber, int clientPin, int clientPort)
+		{
+			if (!ConnectToAnyServer(serverAddresses, serverPort)) return null;
+			ClientUpdateReply reply = SendClientUpdate(clientNumber, clientPin, clientPort);
+			Disconnect();
+			return reply;
+		}
+
+		public PeerQueryReply DoPeerQuery(string[] serverAddresses, int serverPort, string number)
+		{
+			if (!ConnectToAnyServer(serverAddresses, serverPort)) return null;
+			PeerQueryReply reply = SendPeerQuery(number);
+			Disconnect();
+			return reply;
+		}
+
+		public PeerSearchReply DoPeerSearch(string[] serverAddresses, int serverPort, string name)
+		{
+			if (!ConnectToAnyServer(serverAddresses, serverPort)) return null;
+			PeerSearchReply reply = SendPeerSearch(name);
+			Disconnect();
+			return reply;
+		}
+
+		private bool ConnectToAnyServer(string[] serverAddresses, int port)
+		{
+			foreach (string servAddr in serverAddresses)
+			{
+				if (!string.IsNullOrWhiteSpace(servAddr))
+				{
+					if (Connect(servAddr, port)) return true;
+				}
+			}
+			return false;
+		}
+
+		private bool Connect(string address, int port)
 		{
 			try
 			{
@@ -36,7 +72,7 @@ namespace WinTlx
 			}
 		}
 
-		public bool Disconnect()
+		private bool Disconnect()
 		{
 			stream?.Close();
 			client?.Close();
@@ -120,13 +156,13 @@ namespace WinTlx
 		/// </summary>
 		/// <param name="number"></param>
 		/// <returns>peer or null</returns>
-		public PeerQueryReply SendPeerQuery(string number)
+		private PeerQueryReply SendPeerQuery(string number)
 		{
 			Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendPeerQuery), $"number='{number}'");
 
 			PeerQueryReply reply = new PeerQueryReply();
 
-			if (client==null)
+			if (client == null)
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), "no server connection");
 				reply.Error = "no server connection";
@@ -158,7 +194,7 @@ namespace WinTlx
 			{
 				stream.Write(sendData, 0, sendData.Length);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error sending data to subscribe server", ex);
 				reply.Error = "reply server error";
@@ -171,7 +207,7 @@ namespace WinTlx
 			{
 				recvLen = stream.Read(recvData, 0, recvData.Length);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error receiving data from subscribe server", ex);
 				reply.Error = "reply server error";
@@ -201,21 +237,21 @@ namespace WinTlx
 				return reply;
 			}
 
-			if (recvLen < 2+0x64)
+			if (recvLen < 2 + 0x64)
 			{
 				Logging.Instance.Log(LogTypes.Error, TAG, nameof(SendPeerSearch), $"received data to short ({recvLen} bytes)");
 				reply.Error = $"received data to short ({recvLen} bytes)";
 				return reply;
 			}
 
-			if (recvData[1]!=0x64)
+			if (recvData[1] != 0x64)
 			{
 				Logging.Instance.Log(LogTypes.Error, TAG, nameof(SendPeerSearch), $"invalid length value ({recvData[1]})");
 				reply.Error = $"invalid length value ({recvData[1]})";
 				return reply;
 			}
 
-			reply.Data =  ByteArrayToPeerData(recvData, 2);
+			reply.Data = ByteArrayToPeerData(recvData, 2);
 
 			reply.Valid = true;
 			reply.Error = "ok";
@@ -228,7 +264,7 @@ namespace WinTlx
 		/// </summary>
 		/// <param name="name"></param>
 		/// <returns>search reply with list of peers</returns>
-		public PeerSearchReply SendPeerSearch(string name)
+		private PeerSearchReply SendPeerSearch(string name)
 		{
 			Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendPeerSearch), $"name='{name}'");
 			PeerSearchReply reply = new PeerSearchReply();
@@ -368,7 +404,7 @@ namespace WinTlx
 		/// </summary>
 		/// <param name="number"></param>
 		/// <returns>peer or null</returns>
-		public ClientUpdateReply SendClientUpdate(int number, int pin, int port)
+		private ClientUpdateReply SendClientUpdate(int number, int pin, int port)
 		{
 			Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendClientUpdate), $"number='{number}'");
 			ClientUpdateReply reply = new ClientUpdateReply();
@@ -507,7 +543,7 @@ namespace WinTlx
 	{
 		public enum Sort { Number, Name }
 
-		private Sort _sort;
+		private readonly Sort _sort;
 
 		public PeerQueryDataSorter(Sort sort)
 		{

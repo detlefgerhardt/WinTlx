@@ -145,7 +145,8 @@ namespace WinTlx.TapePunch
 
 		private void InternPunchCode(byte baudotCode, ShiftStates shiftState)
 		{
-			string text = CodeManager.BaudotCodeToPuncherText(baudotCode, shiftState, _config.CodeSet);
+			KeyStates keyStates = new KeyStates(shiftState, _config.CodeSet);
+			string text = CodeManager.BaudotCodeToPuncherText(baudotCode, keyStates);
 			switch (text)
 			{
 				case "CR":
@@ -242,7 +243,7 @@ namespace WinTlx.TapePunch
 
 		public void CropStart()
 		{
-			Debug.WriteLine($"CropStart {_buffer.Count} {DisplayPos} {_buffer.Count - DisplayPos}");
+			//Debug.WriteLine($"CropStart {_buffer.Count} {DisplayPos} {_buffer.Count - DisplayPos}");
 			if (DisplayPos >= _buffer.Count - 1)
 			{
 				PushUndo();
@@ -337,7 +338,7 @@ namespace WinTlx.TapePunch
 				}
 
 				// draw char, skip left most line
-				//if (line < VisiblePunchLines-1)
+				if (!string.IsNullOrEmpty(punchLine.Text))
 				{
 					Font font = new Font("Arial", 8);
 					string text = punchLine.Text;

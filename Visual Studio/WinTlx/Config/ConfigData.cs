@@ -20,6 +20,9 @@ namespace WinTlx.Config
 		public string SubscribeServerAddress2 { get; set; }
 
 		[DataMember]
+		public string SubscribeServerAddress3 { get; set; }
+
+		[DataMember]
 		public int SubscribeServerPort { get; set; }
 
 		[DataMember]
@@ -78,6 +81,31 @@ namespace WinTlx.Config
 			if (RemoteServerPort == 0)
 			{
 				RemoteServerPort = Constants.CENTRALEX_PORT;
+			}
+		}
+
+		public string[] SubscribeServerAddresses
+		{
+			get
+			{
+				string[] addresses = new string[3];
+				addresses[0] = SubscribeServerAddress;
+				addresses[1] = SubscribeServerAddress2;
+				addresses[2] = SubscribeServerAddress3;
+				return addresses;
+			}
+		}
+
+		public bool SubscribeServerAddressExists
+		{
+			get
+			{
+				string[] addresses = SubscribeServerAddresses;
+				foreach(string addr in addresses)
+				{
+					if (!string.IsNullOrWhiteSpace(addr)) return true;
+				}
+				return false;
 			}
 		}
 
@@ -148,10 +176,10 @@ namespace WinTlx.Config
 				default:
 				case "ITA-2":
 					return CodeSets.ITA2;
-				//case "ITA-2 EXT":
-				//	return CodeSets.ITA2EXT;
 				case "US-TTY":
 					return CodeSets.USTTY;
+				case "CYRILL":
+					return CodeSets.CYRILL;
 			}
 		}
 
@@ -162,10 +190,10 @@ namespace WinTlx.Config
 				default:
 				case CodeSets.ITA2:
 					return "ITA-2";
-				//case CodeSets.ITA2EXT:
-				//	return "ITA-2 EXT";
 				case CodeSets.USTTY:
 					return "US-TTY";
+				case CodeSets.CYRILL:
+					return "CYRILL";
 			}
 		}
 

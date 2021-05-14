@@ -16,7 +16,6 @@ namespace WinTlx.Config
 	public partial class ConfigForm : Form
 	{
 		private const string TAG = "ConfigForm";
-		//private ConfigData _config;x:
 
 		private Rectangle _parentWindowsPosition;
 
@@ -65,6 +64,7 @@ namespace WinTlx.Config
 			SubscribeServerGb.Text = LngText(LngKeys.Setup_SubscribeServer);
 			SubscribeServerAddress1Lbl.Text = LngText(LngKeys.Setup_SubscribeServerAddress) + " 1";
 			SubscribeServerAddress2Lbl.Text = LngText(LngKeys.Setup_SubscribeServerAddress) + " 2";
+			SubscribeServerAddress3Lbl.Text = LngText(LngKeys.Setup_SubscribeServerAddress) + " 3";
 			SubscribeServerPortLbl.Text = LngText(LngKeys.Setup_SubscribeServerPort);
 			IncomingGb.Text = LngText(LngKeys.Setup_IncomingConnection);
 			SubscribeServerUpdatePinLbl.Text = LngText(LngKeys.Setup_SubscribeServerPin);
@@ -101,6 +101,7 @@ namespace WinTlx.Config
 			OutputSpeedTb.Text = IntToStr(_config.OutputSpeed);
 			SubscribeServerAddress1Tb.Text = _config.SubscribeServerAddress;
 			SubscribeServerAddress2Tb.Text = _config.SubscribeServerAddress2;
+			SubscribeServerAddress3Tb.Text = _config.SubscribeServerAddress3;
 			SubscribeServerPortTb.Text = IntToStr(_config.SubscribeServerPort);
 			SubscribeServerUpdatePinTb.Text = IntToStr(_config.SubscribeServerUpdatePin);
 			OwnNumberTb.Text = IntToStr(_config.OwnNumber);
@@ -121,6 +122,7 @@ namespace WinTlx.Config
 			_config.OutputSpeed = StrToInt(OutputSpeedTb.Text);
 			_config.SubscribeServerAddress = SubscribeServerAddress1Tb.Text.Trim();
 			_config.SubscribeServerAddress2 = SubscribeServerAddress2Tb.Text.Trim();
+			_config.SubscribeServerAddress3 = SubscribeServerAddress3Tb.Text.Trim();
 			_config.SubscribeServerPort = StrToInt(SubscribeServerPortTb.Text);
 			_config.SubscribeServerUpdatePin = StrToInt(SubscribeServerUpdatePinTb.Text);
 			_config.OwnNumber = StrToInt(OwnNumberTb.Text);
@@ -139,7 +141,6 @@ namespace WinTlx.Config
 			{
 				LanguageManager.Instance.ChangeLanguage(_config.Language);
 			}
-
 		}
 
 		private string IntToStr(int intValue)
@@ -173,7 +174,10 @@ namespace WinTlx.Config
 
 		private void ConfigForm_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			GetData();
+			if (!Canceled)
+			{
+				GetData();
+			}
 		}
 	}
 }

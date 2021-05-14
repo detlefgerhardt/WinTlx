@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using WinTlx.Codes;
 using WinTlx.Config;
 using WinTlx.Languages;
 
@@ -15,8 +19,12 @@ namespace WinTlx.TextEditor
 		public delegate void CloseEventHandler();
 		public event CloseEventHandler CloseEditor;
 
-		public TextEditorForm()
+		private Rectangle _parentWindowsPosition;
+
+		public TextEditorForm(Rectangle position)
 		{
+			_parentWindowsPosition = position;
+
 			InitializeComponent();
 			this.KeyPreview = true;
 
@@ -24,16 +32,56 @@ namespace WinTlx.TextEditor
 			LanguageManager.Instance.ChangeLanguage(ConfigManager.Instance.Config.Language);
 
 			_tem = TextEditorManager.Instance;
+			_tem.SavedStatusChanged += Tem_SavedStatusChanged;
+
+			EditorRtb.PasteEvent += EditorRtb_Paste;
 			EditorRtb.Text = _tem.Text;
+
 			SetCharWidth();
+
+			//InitLoad(@"c:\Itelex\script5.txt");
+
 			ShowLineAndColumn();
+
+			SetTitle();
+		}
+
+		private void TextEditorForm_Load(object sender, EventArgs e)
+		{
+			Point pos = Helper.CenterForm(this, _parentWindowsPosition);
+			SetBounds(pos.X, pos.Y, Bounds.Width, Bounds.Height);
+		}
+
+		private void TextEditorForm_FormClosed(object sender, FormClosedEventArgs e)
+		{
+			_tem.Text = EditorRtb.Text;
+			CloseEditor?.Invoke();
+		}
+
+		private void SetTitle()
+		{
+			if (string.IsNullOrEmpty(_tem.Filename))
+			{
+				this.Text = LngText(LngKeys.Editor_Header);
+			}
+			else
+			{
+				this.Text = $"{LngText(LngKeys.Editor_Header)} {_tem.Filename}";
+			}
+		}
+
+		private void InitLoad(string filename)
+		{
+			_tem.LoadFile(filename);
+			EditorRtb.Text = _tem.Text;
+			SetTitle();
 		}
 
 		private void LanguageChanged()
 		{
 			Logging.Instance.Log(LogTypes.Info, TAG, nameof(LanguageChanged), $"switch language to {LanguageManager.Instance.CurrentLanguage.Key}");
 
-			this.Text = LngText(LngKeys.Editor_Header);
+			ShowTitle();
 			ClearBtn.Text = LngText(LngKeys.Editor_Clear);
 			LoadBtn.Text = LngText(LngKeys.Editor_Load);
 			SaveBtn.Text = LngText(LngKeys.Editor_Save);
@@ -47,9 +95,30 @@ namespace WinTlx.TextEditor
 			ShowLineAndColumn();
 		}
 
+		private void ShowTitle()
+		{
+			if (_tem == null) return;
+
+			string title;
+			if (string.IsNullOrEmpty(_tem?.Filename))
+			{
+				title = $"{LngText(LngKeys.Editor_Header)} unbenannt";
+			}
+			else
+			{
+				title = $"{LngText(LngKeys.Editor_Header)} {_tem.Filename}";
+			}
+			if (!_tem.Saved) title += " *";
+			this.Text = title;
+		}
+
 		private string LngText(LngKeys key)
 		{
 			return LanguageManager.Instance.GetText(key);
+		}
+
+		private void TextEditorForm_KeyPress(object sender, KeyPressEventArgs e)
+		{
 		}
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -64,14 +133,16 @@ namespace WinTlx.TextEditor
 					_tem.Redo();
 					EditorRtb.Text = _tem.Text;
 					return true;
+				case Keys.S | Keys.Control:
+					_tem.SaveFile(_tem.Filename);
+					return true;
 			}
 			return false;
 		}
 
-		private void TextEditorForm_FormClosed(object sender, FormClosedEventArgs e)
+		private void Tem_SavedStatusChanged()
 		{
-			_tem.Text = EditorRtb.Text;
-			CloseEditor?.Invoke();
+			ShowTitle();
 		}
 
 		private void ClearBtn_Click(object sender, EventArgs e)
@@ -84,16 +155,18 @@ namespace WinTlx.TextEditor
 		{
 			_tem.LoadFile();
 			EditorRtb.Text = _tem.Text;
+			SetTitle();
 		}
 
 		private void SaveBtn_Click(object sender, EventArgs e)
 		{
 			_tem.SaveFile();
+			SetTitle();
 		}
 
-		private void SendBtn_Click(object sender, EventArgs e)
+		private async void SendBtn_Click(object sender, EventArgs e)
 		{
-			_tem.SendText(EditorRtb.Lines);
+			await _tem.SendTextAsync(EditorRtb.Lines);
 		}
 
 		private void CloseBtn_Click(object sender, EventArgs e)
@@ -115,69 +188,24 @@ namespace WinTlx.TextEditor
 
 		private void EditorRtb_KeyPress(object sender, KeyPressEventArgs e)
 		{
-			string keyChars = char.ToLower(e.KeyChar).ToString();
+			string chrStr = _tem.ConvertTextChar(e.KeyChar, ConfigManager.Instance.Config.CodeSet);
 
-			// convert chars
-			switch (keyChars)
+			if (chrStr.Length == 1)
 			{
-				case "à":
-				case "á":
-				case "â":
-					keyChars = "e";
-					break;
-				case "è":
-				case "é":
-				case "ê":
-					keyChars = "e";
-					break;
-				case "ì":
-				case "í":
-				case "î":
-					keyChars = "i";
-					break;
-				case "ä":
-					keyChars = "ae";
-					break;
-				case "ö":
-					keyChars = "oe";
-					break;
-				case "ü":
-					keyChars = "ue";
-					break;
-				case "ß":
-					keyChars = "ss";
-					break;
-				case "´":
-				case "`":
-					keyChars = "'";
-					break;
-				case "\"":
-					keyChars = "''";
-					break;
-				case "*":
-					keyChars = "x";
-					break;
-			}
-
-			// skip invalid chars
-			string keyChars2 = "";
-			for (int i=0; i<keyChars.Length; i++)
-			{
-				if (TextEditorManager.ALLOWED_CHARS.Contains(keyChars[i]))
-				{
-					keyChars2 += keyChars[i];
-				}
-			}
-
-			if (keyChars2.Length==1)
-			{
-				e.KeyChar = keyChars[0];
+				e.KeyChar = chrStr[0];
 			}
 			else
 			{
-				SendKeys.Send(keyChars2);
+				SendKeys.Send(chrStr);
 				e.Handled = true;
 			}
+		}
+
+		private void EditorRtb_Paste(object sender, EventArgs e)
+		{
+			//Debug.WriteLine(EditorRtb.Text);
+			EditorRtb.Text = _tem.ConvertText(EditorRtb.Text, ConfigManager.Instance.Config.CodeSet);
+			//Debug.WriteLine(EditorRtb.Text);
 		}
 
 		private void EditorRtb_TextChanged(object sender, EventArgs e)
@@ -261,6 +289,10 @@ namespace WinTlx.TextEditor
 		{
 			LinealPnl.Refresh();
 			EditorRtb.RightMargin = (int)(3 + 8.98F * _tem.CharWidth);
+		}
+
+		private void ShowFilename()
+		{
 		}
 
 	}

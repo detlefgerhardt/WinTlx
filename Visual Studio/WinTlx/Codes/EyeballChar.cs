@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace WinTlx.Codes
@@ -79,11 +80,27 @@ namespace WinTlx.Codes
 			}
 
 			int code = baudotCode;
-			if (shift==ShiftStates.Figs)
+			if (shift == ShiftStates.Figs)
 			{
 				code += 32;
 			}
-			return (from p in _punchCodes where p.BaudotCode == code select p.Pattern).FirstOrDefault();
+			byte[] pattern = (from p in _punchCodes where p.BaudotCode == code select p.Pattern).FirstOrDefault();
+			if (pattern==null)
+			{
+				return null;
+			}
+
+			return pattern;
+
+			/*
+			// add one space row
+			byte[] pattern2 = new byte[pattern.Length + 1];
+			Buffer.BlockCopy(pattern, 0, pattern2, 0, pattern.Length);
+			pattern2[pattern2.Length - 1] = 0;
+			return pattern2;
+
+			//return (from p in _punchCodes where p.BaudotCode == code select p.Pattern).FirstOrDefault();
+			*/
 		}
 
 		private int[,] _charPos =
@@ -593,5 +610,10 @@ namespace WinTlx.Codes
 		public int Length { get; set; }
 
 		public byte[] Pattern { get; set; }
+
+		public override string ToString()
+		{
+			return $"{AsciiCaracter} {BaudotCode} {Length}";
+		}
 	}
 }

@@ -272,6 +272,8 @@
 			this.Name = "TextEditorForm";
 			this.Text = "TextEditor";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.TextEditorForm_FormClosed);
+			this.Load += new System.EventHandler(this.TextEditorForm_Load);
+			this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextEditorForm_KeyPress);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

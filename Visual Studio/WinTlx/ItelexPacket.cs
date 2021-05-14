@@ -2,7 +2,7 @@
 
 namespace WinTlx
 {
-	class ItelexPacket
+	public class ItelexPacket
 	{
 		public int Command { get; set; }
 

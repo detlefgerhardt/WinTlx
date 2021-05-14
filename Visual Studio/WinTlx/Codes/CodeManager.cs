@@ -1,14 +1,30 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using WinTlx.Config;
+using WinTlx.Languages;
 
 namespace WinTlx.Codes
 {
+	//public enum CodeSets { ITA2 = 0, ITA2EXT = 1, USTTY = 2 };
+	public enum CodeSets { ITA2 = 0, USTTY = 1, CYRILL = 2 };
+
+	public enum ShiftStates
+	{
+		Unknown,
+		Ltr,
+		Figs,
+		Third,
+		Both
+	}
+
+	//public enum ThirdLevelStates { Inactive = 0, Active = 1}
+
 	public static class CodeManager
 	{
 		// F=Quadrat ohne Inhalt., G=Quadrat mit Querstrich, H=Quadrat mit Schrägstrich
 
 		// special ASCII codes
-		public const char ASC_INV = '~'; // replace invalid baudot character
+		public const char ASC_INVALID = '~'; // replace invalid baudot character
 		public const char ASC_NUL = '\x00';
 		public const char ASC_WRU = '\x05'; // = enquire
 		public const char ASC_BEL = '\x07';
@@ -20,10 +36,12 @@ namespace WinTlx.Codes
 		public const char ASC_SHIFTH = '\x12';
 		public const char ASC_LTRS = '\x1E';
 		public const char ASC_FIGS = '\x1F';
+		public const char ASC_SPC = '\x20';
 
 		// special ITA2 codes
 		public const byte BAU_NUL = 0x00;
 		public const byte BAU_CR = 0x02;
+		public const byte BAU_SPC = 0x04;
 		public const byte BAU_LF = 0x08;
 		public const byte BAU_WRU = 0x12;
 		public const byte BAU_BEL = 0x1A;
@@ -36,7 +54,7 @@ namespace WinTlx.Codes
 
 		public enum SendRecv { Send, Recv };
 
-		public static string BaudotStringToAscii(byte[] baudotData, ref ShiftStates shiftState, CodeSets codeSet, SendRecv sendRecv)
+		public static string BaudotStringToAscii(byte[] baudotData, KeyStates keyStates, SendRecv sendRecv, bool debug)
 		{
 			string asciiStr = "";
 			for (int i = 0; i < baudotData.Length; i++)
@@ -44,47 +62,73 @@ namespace WinTlx.Codes
 				byte baudotChr = baudotData[i];
 				if (baudotChr == BAU_LTRS)
 				{
-					shiftState = ShiftStates.Ltr;
+					keyStates.ShiftState = ShiftStates.Ltr;
+					if (debug) asciiStr += ASC_LTRS;
 				}
 				else if (baudotChr == BAU_FIGS)
 				{
-					shiftState = ShiftStates.Figs;
+					keyStates.ShiftState = ShiftStates.Figs;
+					if (debug) asciiStr += ASC_FIGS;
+				}
+				else if (baudotChr == BAU_NUL)
+				{
+					bool hasThirdLevel = GetCodeTab(keyStates.CodeSet).HasThirdLevel;
+					if (hasThirdLevel)
+					{
+						keyStates.ShiftState = ShiftStates.Third;
+						if (debug) asciiStr += ASC_NUL;
+					}
 				}
 				else
 				{
-					char asciiChr = BaudotCharToAscii(baudotData[i], shiftState, codeSet, sendRecv);
+					char asciiChr = BaudotCharToAscii(baudotData[i], keyStates, sendRecv);
 					asciiStr += asciiChr;
 				}
 			}
 			return asciiStr;
 		}
 
-		public static char BaudotCharToAscii(byte baudotCode, ShiftStates shiftState, CodeSets codeSet, SendRecv sendRecv)
+		public static char BaudotCharToAscii(byte baudotCode, KeyStates keyStates, SendRecv sendRecv)
 		{
 			if (baudotCode > 0x1F)
 			{
-				return (char)ASC_INV;
+				return ASC_INVALID;
 			}
 
-			return _codeTab[baudotCode].GetCode(shiftState, codeSet);
+			CodeItem codeItem = GetCodeItem(keyStates.CodeSet, baudotCode);
+			return codeItem.GetChar(keyStates.ShiftState);
 		}
 
-		public static string BaudotCodeToPuncherText(byte baudotCode, ShiftStates shiftState, CodeSets codeSet)
+		public static string BaudotCodeToPuncherText(byte baudotCode, KeyStates keyStates)
 		{
 			if (baudotCode > 0x1F)
 			{
-				return ASC_INV.ToString();
+				return ASC_INVALID.ToString();
 			}
-			return _codeTab[baudotCode].GetName(shiftState, codeSet);
+
+			CodeItem codeItem = GetCodeItem(keyStates.CodeSet, baudotCode);
+			char codeChar = codeItem.GetChar(keyStates.ShiftState);
+			string codeName = GetCodeName(codeChar, LanguageManager.Instance.CurrentLanguage.Key);
+			if (!string.IsNullOrEmpty(codeName)) return codeName;
+			return codeItem.GetName(keyStates.ShiftState);
 		}
 
-		public static byte[] AsciiStringToBaudot(string asciiStr, ref ShiftStates shiftState, CodeSets codeSet)
+		public static byte[] AsciiStringToBaudot(string asciiStr, KeyStates keyStates)
 		{
 			byte[] baudotData = new byte[0];
 			for (int i = 0; i < asciiStr.Length; i++)
 			{
-				string telexData = AsciiCharToTelex(asciiStr[i], codeSet);
-				byte[] data = TelexStringToBaudot(telexData, ref shiftState, codeSet);
+				char chr = asciiStr[i];
+				byte[] data;
+				if (chr >= 128 && chr <= 255)
+				{
+					data = new byte[] { (byte)(chr - 128) };
+				}
+				else
+				{
+					string telexData = AsciiCharToTelex(asciiStr[i], keyStates.CodeSet);
+					data = TelexStringToBaudot(telexData, keyStates);
+				}
 				baudotData = baudotData.Concat(data).ToArray();
 			}
 			return baudotData;
@@ -94,70 +138,103 @@ namespace WinTlx.Codes
 		/// convert ASCII string to printable characters and replacement characters
 		/// </summary>
 		/// <param name="asciiStr"></param>
+		/// <param name="nobrackets">true: do not convert various forms of brackets</param>
 		/// <returns></returns>
-		public static string AsciiStringToTelex(string asciiStr, CodeSets codeSet)
+		public static string AsciiStringToTelex(string asciiStr, CodeSets codeSet, bool noBracketConversion = false)
 		{
 			string telexStr = "";
 			for (int i = 0; i < asciiStr.Length; i++)
 			{
-				telexStr += AsciiCharToTelex(asciiStr[i], codeSet);
+				telexStr += AsciiCharToTelex(asciiStr[i], codeSet, noBracketConversion);
 			}
 			return telexStr;
 		}
 
+		public static string AsciiWithBaudotEscCodeToAscii(string asciiStrWithEscCodes, KeyStates keyStates)
+		{
+			string asciiStr = "";
+			foreach(char chr in asciiStrWithEscCodes)
+			{
+				if (chr >= 128 && chr <= 255)
+				{
+					byte code = (byte)(chr - 128);
+					asciiStr += BaudotStringToAscii(new byte[] { code }, keyStates, SendRecv.Send, false);
+				}
+				else
+				{
+					asciiStr += chr;
+				}
+			}
+			return asciiStr;
+		}
+
+		/*
 		/// <summary>
-		/// convert ASCII character to baudot printable character and replacement character
+		/// check if there is a baudot escape sequence ("\xx") at position pos an return value
+		/// </summary>
+		/// <param name="asciiStr"></param>
+		/// <param name="pos"></param>
+		/// <returns></returns>
+		public static byte? GetBaudotEscCode(string asciiStr, int pos)
+		{
+			if (asciiStr[pos] != '\\') return null;
+			if (pos + 2 >= asciiStr.Length) return null;
+			if (int.TryParse(asciiStr.Substring(pos + 1, 2), out int code))
+			{
+				return code < 32 ? (byte?)code : null;
+			}
+			return null;
+		}
+		*/
+
+		private const string BRACKETS = "[]{}<>";
+
+		/// <summary>
+		/// convert any ASCII character to a baudot printable ASCII character or replacement character
 		/// </summary>
 		/// <param name="asciiChr"></param>
+		/// <param name="nobracketConversion">true: do not convert various forms of brackets</param>
 		/// <returns></returns>
-		private static string AsciiCharToTelex(char asciiChr, CodeSets codeSet)
+		public static string AsciiCharToTelex(char asciiChr, CodeSets codeSet, bool noBracketConversion = false)
 		{
-			AsciiConvItem[] asciiToTelexTab;
-			switch (codeSet)
-			{
-				default:
-				case CodeSets.ITA2:
-					asciiToTelexTab = _asciiIta2Tab;
-					break;
-				//case CodeSets.ITA2EXT:
-				//	asciiToTelexTab = _asciiIta2ExtTab;
-				//	break;
-				case CodeSets.USTTY:
-					asciiToTelexTab = _asciiUsTtyTab;
-					break;
-			}
+			if (noBracketConversion && BRACKETS.Contains(asciiChr)) return "";
 
-			string asciiData = CodePage437ToPlainAscii(asciiChr);
+			ICodeTab codeTab = GetCodeTab(codeSet);
+			string asciiData = CodePageToPlainAscii(asciiChr, codeSet);
 			string telexData = "";
 			for (int i = 0; i < asciiData.Length; i++)
 			{
-				foreach (AsciiConvItem convItem in asciiToTelexTab)
+				foreach (AsciiConvItem convItem in codeTab.AsciiTab)
 				{
 					string ascii = convItem.GetCodeInRange(asciiData[i]);
-					if (!string.IsNullOrEmpty(ascii))
+
+					if (ascii != null)
 					{
-						telexData += ascii;
+						ascii = convItem.GetCodeInRange(asciiData[i]);
 					}
+
+					if (!string.IsNullOrEmpty(ascii)) telexData += ascii;
 				}
 			}
 			return telexData;
 		}
 
-		public static byte[] TelexStringToBaudot(string telexStr, ref ShiftStates shiftState, CodeSets codeSet)
+		public static byte[] TelexStringToBaudot(string telexStr, KeyStates keyStates)
 		{
 			byte[] buffer = new byte[0];
 			for (int i = 0; i < telexStr.Length; i++)
 			{
-				byte[] baudotData = TelexCharToBaudotWithShift(telexStr[i], ref shiftState, codeSet);
+				byte[] baudotData = TelexCharToBaudotWithShift(telexStr[i], keyStates);
 				buffer = buffer.Concat(baudotData).ToArray();
 			}
 			return buffer;
 		}
 
-		public static byte[] TelexCharToBaudotWithShift(char telexChr, ref ShiftStates shiftState, CodeSets codeSet)
+		public static byte[] TelexCharToBaudotWithShift(char telexChr, KeyStates keyStates)
 		{
-			byte? ltrCode = FindBaudot(telexChr, ShiftStates.Ltr, codeSet);
-			byte? figCode = FindBaudot(telexChr, ShiftStates.Figs, codeSet);
+			byte? ltrCode = FindBaudot(telexChr, ShiftStates.Ltr, keyStates.CodeSet);
+			byte? figCode = FindBaudot(telexChr, ShiftStates.Figs, keyStates.CodeSet);
+			byte? thirdLevel = FindBaudot(telexChr, ShiftStates.Third, keyStates.CodeSet);
 			byte baudCode;
 			ShiftStates newShiftState;
 			if (ltrCode != null && figCode != null)
@@ -165,6 +242,11 @@ namespace WinTlx.Codes
 				baudCode = ltrCode.Value;
 				newShiftState = ShiftStates.Both;
 			}
+			//else if (keyStates.ShiftState == ShiftStates.Third && ltrCode != null)
+			//{
+			//	baudCode = ltrCode.Value;
+			//	newShiftState = ShiftStates.Third;
+			//}
 			else if (ltrCode != null)
 			{
 				baudCode = ltrCode.Value;
@@ -175,57 +257,77 @@ namespace WinTlx.Codes
 				baudCode = figCode.Value;
 				newShiftState = ShiftStates.Figs;
 			}
+			else if (thirdLevel != null)
+			{
+				baudCode = thirdLevel.Value;
+				newShiftState = ShiftStates.Third;
+			}
 			else
 			{
 				return new byte[0];
 			}
 
-			return BaudotCodeToBaudotWithShift(baudCode, newShiftState, ref shiftState);
+			return BaudotCodeToBaudotWithShift(baudCode, newShiftState, keyStates);
 		}
 
-		public static byte[] BaudotCodeToBaudotWithShift(byte baudCode, ShiftStates newShiftState, ref ShiftStates shiftState)
+		public static byte[] BaudotCodeToBaudotWithShift(byte baudCode, ShiftStates newShiftState, KeyStates keyStates)
 		{
 			byte[] buffer = new byte[0];
 
 			if (baudCode == BAU_LTRS)
 			{
 				buffer = Helper.AddByte(buffer, BAU_LTRS);
-				shiftState = ShiftStates.Ltr;
+				keyStates.ShiftState = ShiftStates.Ltr;
 				return buffer;
 			}
-
 			if (baudCode == BAU_FIGS)
 			{
 				buffer = Helper.AddByte(buffer, BAU_FIGS);
-				shiftState = ShiftStates.Figs;
+				keyStates.ShiftState = ShiftStates.Figs;
+				return buffer;
+			}
+			if (baudCode == BAU_NUL)
+			{
+				bool hasThirdLevel = GetCodeTab(keyStates.CodeSet).HasThirdLevel;
+				if (hasThirdLevel)
+				{
+					keyStates.ShiftState = ShiftStates.Third;
+				}
+				buffer = Helper.AddByte(buffer, BAU_NUL);
 				return buffer;
 			}
 
-			if (shiftState == ShiftStates.Unknown && newShiftState == ShiftStates.Unknown)
+			if (keyStates.ShiftState == ShiftStates.Unknown && newShiftState == ShiftStates.Unknown)
 			{
 				buffer = Helper.AddByte(buffer, BAU_LTRS);
 				newShiftState = ShiftStates.Ltr;
 			}
 
-			if (shiftState == ShiftStates.Unknown && newShiftState == ShiftStates.Ltr ||
-				shiftState == ShiftStates.Figs && newShiftState == ShiftStates.Ltr)
+			if (newShiftState == ShiftStates.Ltr && keyStates.ShiftState != ShiftStates.Ltr)
 			{
 				buffer = Helper.AddByte(buffer, BAU_LTRS);
 				buffer = Helper.AddByte(buffer, baudCode);
-				shiftState = ShiftStates.Ltr;
+				keyStates.ShiftState = ShiftStates.Ltr;
 				return buffer;
 			}
 
-			if (shiftState == ShiftStates.Unknown && newShiftState == ShiftStates.Figs ||
-				shiftState == ShiftStates.Ltr && newShiftState == ShiftStates.Figs)
+			if (newShiftState == ShiftStates.Figs && keyStates.ShiftState != ShiftStates.Figs)
 			{
 				buffer = Helper.AddByte(buffer, BAU_FIGS);
 				buffer = Helper.AddByte(buffer, baudCode);
-				shiftState = ShiftStates.Figs;
+				keyStates.ShiftState = ShiftStates.Figs;
 				return buffer;
 			}
 
-			if (shiftState == newShiftState || newShiftState == ShiftStates.Both)
+			if (newShiftState == ShiftStates.Third && keyStates.ShiftState != ShiftStates.Third)
+			{
+				buffer = Helper.AddByte(buffer, BAU_NUL);
+				buffer = Helper.AddByte(buffer, baudCode);
+				keyStates.ShiftState = ShiftStates.Third;
+				return buffer;
+			}
+
+			if (keyStates.ShiftState == newShiftState || newShiftState == ShiftStates.Both)
 			{
 				buffer = Helper.AddByte(buffer, baudCode);
 				return buffer;
@@ -284,15 +386,107 @@ namespace WinTlx.Codes
 
 		private static byte? FindBaudot(char asciiChar, ShiftStates shiftState, CodeSets codeSet)
 		{
-			for (int c = 0; c < 32; c++)
+			if (codeSet == CodeSets.CYRILL && ConfigManager.Instance.Config.CodeSet != CodeSets.CYRILL) return null;
+
+			for (byte c = 0; c < 32; c++)
 			{
-				char chr = _codeTab[c].GetCode(shiftState, codeSet);
-				if (chr==asciiChar)
+				CodeItem codeItem = GetCodeItem(codeSet, c);
+				char chr = codeItem.GetChar(shiftState);
+				if (chr == asciiChar)
 				{
-					return (byte)c;
+					return c;
 				}
 			}
 			return null;
+		}
+
+		/*
+		public static CodeItem FindBaudot(char asciiChar, KeyStates keyStates)
+		{
+			for (byte c = 0; c < 32; c++)
+			{
+				CodeItem codeItem = GetCodeItem(keyStates.CodeSet, c);
+
+				if (codeItem.GetChar(ShiftStates.Ltr, keyStates.ThirdLevelState) == asciiChar)
+				{
+					keyStates.ShiftState = ShiftStates.Ltr;
+					return codeItem;
+				}
+				if (codeItem.GetChar(ShiftStates.Figs, keyStates.ThirdLevelState) == asciiChar)
+				{
+					keyStates.ShiftState = ShiftStates.Figs;
+					return codeItem;
+				}
+			}
+			keyStates.ShiftState = ShiftStates.Unknown;
+			return null;
+		}
+		*/
+
+		private static string CodePageToPlainAscii(char asciiChar, CodeSets codeSet)
+		{
+			switch (asciiChar)
+			{
+				case 'ä':
+				case 'Ä':
+					return "ae";
+				case 'á':
+				case 'à':
+				case 'â':
+				case 'Á':
+				case 'À':
+				case 'Â':
+					return "a";
+				case 'ö':
+				case 'Ö':
+					return "oe";
+				case 'ó':
+				case 'ò':
+				case 'ô':
+				case 'Ó':
+				case 'Ò':
+				case 'Ô':
+					return "o";
+				case 'ü':
+				case 'Ü':
+					return "ue";
+				case 'ú':
+				case 'ù':
+				case 'Ú':
+				case 'Ù':
+				case 'û':
+				case 'Û':
+					return "u";
+				case 'ß':
+					return "ss";
+				case '°':
+					return "o";
+				default:
+					if (asciiChar < 128)
+					{
+						return asciiChar.ToString();
+					}
+					else if (asciiChar >= 0x0410 && asciiChar <= 0x044F)
+					{
+						return asciiChar.ToString();
+					}
+					else
+					{
+						return "";
+					}
+			}
+
+			/*
+			switch (codeSet)
+			{
+				case CodeSets.ITA2:
+				case CodeSets.USTTY:
+				default:
+					return CodePage437ToPlainAscii(asciiChar);
+				case CodeSets.CYRILL:
+					return CodeCyrillToPlanAscii(asciiChar);
+			}
+			*/
 		}
 
 		/// <summary>
@@ -374,143 +568,84 @@ namespace WinTlx.Codes
 			return inv;
 		}
 
-		#region ASCII -> ASCII Telex character set
-
-		private static AsciiConvItem[] _asciiIta2Tab = new AsciiConvItem[]
+		public static CodeItem GetCodeItem(CodeSets codeSet, byte code)
 		{
-			new AsciiConvItem(0x00, ASC_NUL),
-			new AsciiConvItem(0x05, ASC_WRU),
-			new AsciiConvItem(0x07, ASC_BEL),
-			new AsciiConvItem(0x0A, ASC_LF),
-			new AsciiConvItem(0x0D, ASC_CR),
-			new AsciiConvItem(0x10, ASC_SHIFTF),
-			new AsciiConvItem(0x11, ASC_SHIFTG),
-			new AsciiConvItem(0x12, ASC_SHIFTH),
-			new AsciiConvItem(0x1E, ASC_LTRS),
-			new AsciiConvItem(0x1F, ASC_FIGS),
-			new AsciiConvItem(0x20, ' '),
-			new AsciiConvItem(0x22, "''"), // "
-			new AsciiConvItem(0x27, '\''),
-			new AsciiConvItem(0x28, '('),
-			new AsciiConvItem(0x29, ')'),
-			new AsciiConvItem(0x2B, '+'),
-			new AsciiConvItem(0x2C, ','),
-			new AsciiConvItem(0x2D, '-'),
-			new AsciiConvItem(0x2E, '.'),
-			new AsciiConvItem(0x2F, '/'),
-			new AsciiConvItem(0x30, 0x39, '0'), // 0..9
-			new AsciiConvItem(0x3A, ':'),
-			new AsciiConvItem(0x3C, "(."), // <
-			new AsciiConvItem(0x3D, '='),
-			new AsciiConvItem(0x3E, ".)"), // >
-			new AsciiConvItem(0x3F, '?'),
-			new AsciiConvItem(0x41, 0x5A, 'a'), // A..Z
-			new AsciiConvItem(0x5B, "(:"), // [
-			//new AsciiConvItem(0x5C, ""), // \
-			new AsciiConvItem(0x5D, ":)"), // ]
-			//new AsciiConvItem(0x5E, ""), // ^
-			new AsciiConvItem(0x5F, ' '), // _
-			new AsciiConvItem(0x60, '\''), // `
-			new AsciiConvItem(0x61, 0x7A, 'a'), // a..z
-			new AsciiConvItem(0x7B, "(,"), // {
-			new AsciiConvItem(0x7C, '/'),
-			new AsciiConvItem(0x7D, ",)"), // }
-			new AsciiConvItem(0x7E, '-'), // ~
+			return GetCodeTab(codeSet).CodeTab[code];
+		}
+
+		private static ICodeTab GetCodeTab(CodeSets codeSet)
+		{
+			switch (codeSet)
+			{
+				case CodeSets.ITA2:
+				default:
+					return new CodeTabIta2();
+				case CodeSets.USTTY:
+					return new CodeTabUstty();
+				case CodeSets.CYRILL:
+					return new CodeTabCyrill();
+			}
+		}
+
+		private static Dictionary<char, string> _codeNamesDe = new Dictionary<char, string>()
+		{
+			{ ASC_NUL, "NUL" },
+			{ ASC_CR, "WR" },
+			{ ASC_SPC, "ZWR" },
+			{ ASC_LF, "ZL" },
+			{ ASC_WRU, "WRU" },
+			{ ASC_BEL, "KL" },
+			{ ASC_FIGS, "Zi" },
+			{ ASC_LTRS, "Bu" },
 		};
+
+		private static Dictionary<char, string> _codeNamesEn = new Dictionary<char, string>()
+		{
+			{ ASC_NUL, "NUL" },
+			{ ASC_CR, "CR" },
+			{ ASC_SPC, "SP" },
+			{ ASC_LF, "LF" },
+			{ ASC_WRU, "WRU" },
+			{ ASC_BEL, "BEL" },
+			{ ASC_FIGS, "FIGS" },
+			{ ASC_LTRS, "LTRS" },
+		};
+
+		private static Dictionary<char, string> _codeNamesRu = new Dictionary<char, string>()
+		{
+			{ ASC_NUL, "PYC" },
+			{ ASC_CR, "CR" },
+			{ ASC_SPC, "SP" },
+			{ ASC_LF, "LF" },
+			{ ASC_WRU, "WRU" },
+			{ ASC_BEL, "BEL" },
+			{ ASC_FIGS, "1..." },
+			{ ASC_LTRS, "LAT" },
+		};
+
+		public static string GetCodeName(char code, string lngKey)
+		{
+			Dictionary<char, string> codeNames;
+			switch (lngKey)
+			{
+				case "de":
+				default:
+					codeNames = _codeNamesDe;
+					break;
+				case "en":
+					codeNames = _codeNamesEn;
+					break;
+				case "ru":
+					codeNames = _codeNamesRu;
+					break;
+			}
+
+			if (codeNames.ContainsKey(code)) return codeNames[code];
+			return null;
+		}
 
 		/*
-		private static AsciiConvItem[] _asciiIta2ExtTab = new AsciiConvItem[]
-		{
-			new AsciiConvItem(0x00, ASC_NUL),
-			new AsciiConvItem(0x05, ASC_WRU),
-			new AsciiConvItem(0x07, ASC_BEL),
-			new AsciiConvItem(0x0A, ASC_LF),
-			new AsciiConvItem(0x0D, ASC_CR),
-			new AsciiConvItem(0x1E, ASC_LTRS),
-			new AsciiConvItem(0x1F, ASC_FIGS),
-			new AsciiConvItem(0x20, ' '),
-			new AsciiConvItem(0x21, '!'),
-			new AsciiConvItem(0x22, "''"), // "
-			new AsciiConvItem(0x23, '#'),
-			new AsciiConvItem(0x26, '&'),
-			new AsciiConvItem(0x27, '\''),
-			new AsciiConvItem(0x28, '('),
-			new AsciiConvItem(0x29, ')'),
-			new AsciiConvItem(0x2B, '+'),
-			new AsciiConvItem(0x2C, ','),
-			new AsciiConvItem(0x2D, '-'),
-			new AsciiConvItem(0x2E, '.'),
-			new AsciiConvItem(0x2F, '/'),
-			new AsciiConvItem(0x30, 0x39, '0'), // 0..9
-			new AsciiConvItem(0x3A, ':'),
-			new AsciiConvItem(0x3C, "(."), // <
-			new AsciiConvItem(0x3D, '='),
-			new AsciiConvItem(0x3E, ".)"), // >
-			new AsciiConvItem(0x3F, '?'),
-			new AsciiConvItem(0x41, 0x5A, 'a'), // A..Z
-			new AsciiConvItem(0x5B, "(:"), // [
-			//new AsciiConvItem(0x5C, ""), // \
-			new AsciiConvItem(0x5D, ":)"), // ]
-			//new AsciiConvItem(0x5E, ""), // ^
-			new AsciiConvItem(0x5F, ' '), // _
-			new AsciiConvItem(0x60, '\''), // `
-			new AsciiConvItem(0x61, 0x7A, 'a'), // a..z
-			new AsciiConvItem(0x7B, "(,"), // {
-			new AsciiConvItem(0x7C, '/'),
-			new AsciiConvItem(0x7D, ",)"), // }
-			new AsciiConvItem(0x7E, '-'), // ~
-		};
-		*/
-
-		private static AsciiConvItem[] _asciiUsTtyTab = new AsciiConvItem[]
-		{
-			new AsciiConvItem(0x00, ASC_NUL),
-			new AsciiConvItem(0x05, ASC_WRU),
-			new AsciiConvItem(0x07, ASC_BEL),
-			new AsciiConvItem(0x0A, ASC_LF),
-			new AsciiConvItem(0x0D, ASC_CR),
-			new AsciiConvItem(0x1E, ASC_LTRS),
-			new AsciiConvItem(0x1F, ASC_FIGS),
-			new AsciiConvItem(0x20, ' '),
-			new AsciiConvItem(0x21, '!'),
-			new AsciiConvItem(0x22, '"'), // "
-			new AsciiConvItem(0x23, '#'),
-			new AsciiConvItem(0x24, '$'),
-			new AsciiConvItem(0x26, '&'),
-			new AsciiConvItem(0x27, '\''),
-			new AsciiConvItem(0x28, '('),
-			new AsciiConvItem(0x29, ')'),
-			new AsciiConvItem(0x2B, '+'),
-			new AsciiConvItem(0x2C, ','),
-			new AsciiConvItem(0x2D, '-'),
-			new AsciiConvItem(0x2E, '.'),
-			new AsciiConvItem(0x2F, '/'),
-			new AsciiConvItem(0x30, 0x39, '0'), // 0..9
-			new AsciiConvItem(0x3A, ':'),
-			new AsciiConvItem(0x3C, "(."), // <
-			new AsciiConvItem(0x3D, '='),
-			new AsciiConvItem(0x3E, ".)"), // >
-			new AsciiConvItem(0x3F, '?'),
-			new AsciiConvItem(0x40, '@'),
-			new AsciiConvItem(0x41, 0x5A, 'a'), // A..Z
-			new AsciiConvItem(0x5B, "(:"), // [
-			//new AsciiConvItem(0x5C, ""), // \
-			new AsciiConvItem(0x5D, ":)"), // ]
-			//new AsciiConvItem(0x5E, ""), // ^
-			new AsciiConvItem(0x5F, ' '), // _
-			new AsciiConvItem(0x60, '\''), // `
-			new AsciiConvItem(0x61, 0x7A, 'a'), // a..z
-			new AsciiConvItem(0x7B, "(,"), // {
-			new AsciiConvItem(0x7C, '/'),
-			new AsciiConvItem(0x7D, ",)"), // }
-			new AsciiConvItem(0x7E, '-'), // ~
-		};
-
-
-
-#endregion
-
-		private static CodeItem[] _codeTab = new CodeItem[32]
+		private static readonly CodeItem[] _codeTab = new CodeItem[32]
 		{
 			new CodeItem(
 				0x00,
@@ -731,6 +866,7 @@ namespace WinTlx.Codes
 				new string[] { "Bu", "Ltr" }
 				)
 		};
+		*/
 
 #region Keyboard handling
 
@@ -761,6 +897,7 @@ namespace WinTlx.Codes
 				case ',':
 				case '.':
 				case ':':
+				case '"':
 				case '\'':
 				case '/':
 				case '(':
@@ -801,4 +938,33 @@ namespace WinTlx.Codes
 
 #endregion
 	}
+
+	interface ICodeTab
+	{
+		bool HasThirdLevel { get; }
+
+		AsciiConvItem[] AsciiTab { get; }
+
+		CodeItem[] CodeTab { get; }
+	}
+
+	/*
+	class CodeTabBase : ICodeTab
+	{
+		public AsciiConvItem[] GetAsciiTab()
+		{
+			return AsciiTab;
+		}
+
+		public CodeItem[] GetCodeTab()
+		{
+			return CodeTab;
+		}
+
+		public bool GetThirdLevelState()
+		{
+			return THIRD_LEVEL_STATE;
+		}
+	}
+	*/
 }

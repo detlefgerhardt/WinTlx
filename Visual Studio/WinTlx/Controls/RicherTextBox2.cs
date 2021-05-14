@@ -12,11 +12,13 @@ namespace WinTlx.Controls
 	public class RicherTextBox2 : System.Windows.Forms.RichTextBox
 	{
 		public event EventHandler CursorPositionChanged;
+		public event EventHandler PasteEvent;
+
+		private bool _pasteOccured = false;
 
 		protected virtual void OnCursorPositionChanged(EventArgs e)
 		{
-			if (CursorPositionChanged != null)
-				CursorPositionChanged(this, e);
+			CursorPositionChanged?.Invoke(this, e);
 		}
 
 		protected override void OnSelectionChanged(EventArgs e)
@@ -25,6 +27,28 @@ namespace WinTlx.Controls
 				OnCursorPositionChanged(e);
 			else
 				base.OnSelectionChanged(e);
+		}
+
+		protected override void OnTextChanged(EventArgs e)
+		{
+			base.OnTextChanged(e);
+			if (_pasteOccured)
+			{
+				PasteEvent?.Invoke(this, e);
+				_pasteOccured = false;
+			}
+		}
+
+		protected override void OnKeyDown(KeyEventArgs e)
+		{
+			bool ctrlV = e.Modifiers == Keys.Control && e.KeyCode == Keys.V;
+			bool shiftIns = e.Modifiers == Keys.Shift && e.KeyCode == Keys.Insert;
+
+			if (ctrlV || shiftIns)
+			{
+				//Debug.WriteLine("paste");
+				_pasteOccured = true;
+			}
 		}
 
 		public int CurrentColumn
