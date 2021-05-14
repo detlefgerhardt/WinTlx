@@ -25,7 +25,7 @@ Requires .NET Frame 4.5 or higher.
 
 ![Screenshot](https://github.com/detlefgerhardt/WinTlx/blob/master/WinTlxScreen2.png)
 
-
+ 
 ## Links
 
 An [i-Telex-Library](https://sourceforge.net/projects/itelex) for Arduino/Atmel by Fred Sonnenrein.
