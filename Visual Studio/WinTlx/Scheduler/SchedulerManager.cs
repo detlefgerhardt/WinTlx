@@ -128,7 +128,7 @@ namespace WinTlx.Scheduler
 				if (!File.Exists(SCHEDULE_NAME))
 				{
 					ScheduleData = new ScheduleData();
-					Logging.Instance.Info(TAG, nameof(LoadScheduler), "No schedular file found");
+					Logging.Instance.Info(TAG, nameof(LoadScheduler), "No scheduler file found");
 					return false;
 				}
 

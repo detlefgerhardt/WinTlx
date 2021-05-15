@@ -100,6 +100,18 @@ namespace WinTlx.Debugging
 					}
 				case ItelexCommands.End:
 					return $"End {itxPkt.GetDebugData()}";
+				case ItelexCommands.Reject:
+					cmdStr = "Reject";
+					if (itxPkt.Data.Length == 0)
+					{
+						return $"{cmdStr} no data";
+					}
+					else
+					{
+						string rejectReason = Encoding.ASCII.GetString(itxPkt.Data, 0, itxPkt.Data.Length);
+						rejectReason = rejectReason.TrimEnd('\x00');
+						return $"{cmdStr} '{rejectReason}' [{itxPkt.GetDebugPacket()}]";
+					}
 				case ItelexCommands.Ack:
 					cmdStr = $"Ack";
 					if (itxPkt.Data.Length == 0)

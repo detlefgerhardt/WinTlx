@@ -56,6 +56,7 @@ namespace WinTlx.Languages
 				{ LngKeys.MainForm_IdleTimeLabel, "Timeout" },
 				{ LngKeys.MainForm_ReceiveStatusOn, "Receive on" },
 				{ LngKeys.MainForm_ReceiveStatusOff, "Receive off" },
+				{ LngKeys.MainForm_ToSendStatus, "to send" },
 
 				{ LngKeys.MainMenu_FileMenu, "File" },
 				{ LngKeys.MainMenu_SaveBufferAsText, "Save buffer as text-file" },

@@ -29,27 +29,27 @@
 		private void InitializeComponent()
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SchedulerForm));
-			this.SchedularView = new System.Windows.Forms.DataGridView();
+			this.SchedulerView = new System.Windows.Forms.DataGridView();
 			this.AddEntryBtn = new System.Windows.Forms.Button();
 			this.CloseBtn = new System.Windows.Forms.Button();
-			((System.ComponentModel.ISupportInitialize)(this.SchedularView)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.SchedulerView)).BeginInit();
 			this.SuspendLayout();
 			// 
-			// SchedularView
+			// SchedulerView
 			// 
-			this.SchedularView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+			this.SchedulerView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.SchedularView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-			this.SchedularView.Location = new System.Drawing.Point(12, 12);
-			this.SchedularView.Name = "SchedularView";
-			this.SchedularView.Size = new System.Drawing.Size(719, 257);
-			this.SchedularView.TabIndex = 0;
-			this.SchedularView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SchedularView_CellClick);
-			this.SchedularView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.SchedularView_CellEndEdit);
-			this.SchedularView.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.SchedularView_CellMouseEnter);
-			this.SchedularView.CellMouseUp += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.SchedularView_CellMouseUp);
-			this.SchedularView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.SchedularView_CellValueChanged);
+			this.SchedulerView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			this.SchedulerView.Location = new System.Drawing.Point(12, 12);
+			this.SchedulerView.Name = "SchedulerView";
+			this.SchedulerView.Size = new System.Drawing.Size(719, 257);
+			this.SchedulerView.TabIndex = 0;
+			this.SchedulerView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SchedulerView_CellClick);
+			this.SchedulerView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.SchedulerView_CellEndEdit);
+			this.SchedulerView.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.SchedulerView_CellMouseEnter);
+			this.SchedulerView.CellMouseUp += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.SchedulerView_CellMouseUp);
+			this.SchedulerView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.SchedulerView_CellValueChanged);
 			// 
 			// AddEntryBtn
 			// 
@@ -80,21 +80,21 @@
 			this.ClientSize = new System.Drawing.Size(743, 311);
 			this.Controls.Add(this.CloseBtn);
 			this.Controls.Add(this.AddEntryBtn);
-			this.Controls.Add(this.SchedularView);
+			this.Controls.Add(this.SchedulerView);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MinimumSize = new System.Drawing.Size(300, 200);
 			this.Name = "SchedulerForm";
 			this.Text = "Scheduler";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.SchedulerForm_FormClosed);
 			this.Load += new System.EventHandler(this.SchedulerForm_Load);
-			((System.ComponentModel.ISupportInitialize)(this.SchedularView)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.SchedulerView)).EndInit();
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
-		private System.Windows.Forms.DataGridView SchedularView;
+		private System.Windows.Forms.DataGridView SchedulerView;
 		private System.Windows.Forms.Button AddEntryBtn;
 		private System.Windows.Forms.Button CloseBtn;
 	}

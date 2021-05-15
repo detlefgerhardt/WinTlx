@@ -486,7 +486,14 @@ namespace WinTlx
 				SetFocus();
 			}
 
-			char? chr = CodeManager.KeyboardCharacters(e.KeyChar);
+			char? chr = e.KeyChar;
+
+			if (_itelex.ShiftState == ShiftStates.Third && chr.HasValue)
+			{
+				chr = CodeTabCyrill.CyrillicKeyToUnicode(chr.Value);
+			}
+
+			chr = CodeManager.KeyboardCharacters(chr);
 			if (chr != null)
 			{
 				switch(chr)
@@ -1199,37 +1206,18 @@ namespace WinTlx
 				}
 			});
 
+			Helper.ControlInvokeRequired(ToSendStatusLbl, () =>
+			{
+				string valueStr = _itelex.IsConnected ? $"{_itelex.SendBufferCount + _bufferManager.SendBufferCount}" : "-";
+				ToSendStatusLbl.Text = $"{LngText(LngKeys.MainForm_ToSendStatus)}: {valueStr}";
+			});
+
+
 			Helper.ControlInvokeRequired(ReceiveStatusLbl, () =>
 			{
 				ReceiveStatusLbl.Text = _recvOn ? LngText(LngKeys.MainForm_ReceiveStatusOn) : LngText(LngKeys.MainForm_ReceiveStatusOff);
 				ReceiveStatusLbl.ForeColor = _recvOn ? Color.Green : Color.Black;
 			});
-
-			/*
-			Helper.ControlInvokeRequired(RecvOnCb, () =>
-			{
-				RecvOnCb.Enabled = !_itelex.IsConnected;
-				RecvOnCb.Checked = _itelex.RecvOn;
-			});
-			*/
-
-			/*
-			Helper.ControlInvokeRequired(UpdateIpAddressBtn, () =>
-			{
-				UpdateIpAddressBtn.Enabled = !_itelex.IsConnected;
-			});
-			*/
-
-			/*
-			Helper.ControlInvokeRequired(ProtocolItelexRb, () =>
-			{
-				if (_itelex.IsConnected)
-				{
-					ProtocolItelexRb.Checked = _itelex.IsConnected && _itelex.Texting == ItelexProtocol.Textings.Itelex;
-					ProtocolAsciiRb.Checked = _itelex.IsConnected && _itelex.Texting == ItelexProtocol.Textings.Ascii;
-				}
-			});
-			*/
 
 			Helper.ControlInvokeRequired(AnswerbackTb, () => AnswerbackTb.Text = _configData.AnswerbackWinTlx);
 
@@ -1310,9 +1298,14 @@ namespace WinTlx
 			}
 			else
 			{
-				string reason = !string.IsNullOrEmpty(_itelex.RejectReason) ? _itelex.RejectReason : "no conn";
+				string reason = _itelex.RejectReason;
+				if (string.IsNullOrEmpty(reason))
+				{
+					string msg = LngText(LngKeys.Message_ConnectionError);
+					reason = "no conn";
+					ShowLocalMessage($"{msg} {reason}");
+				}
 				_favoritesManager.CallHistoryAddCall(_currentTlnNumber, _currentTlnName, reason);
-				ShowLocalMessage($"{LngText(LngKeys.Message_ConnectionError)} {reason}");
 				return false;
 			}
 

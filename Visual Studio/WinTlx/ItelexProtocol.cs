@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -12,6 +13,7 @@ using WinTlx.Codes;
 using WinTlx.Config;
 using WinTlx.Debugging;
 using WinTlx.Languages;
+using WinTlx.Tools;
 
 namespace WinTlx
 {
@@ -105,6 +107,7 @@ namespace WinTlx
 
 		private readonly object DisconnectLock = new object();
 
+		private TcpClientWithTimeout _tcpClientWithTimeout;
 		private TcpClient _client;
 
 		private readonly System.Timers.Timer _sendTimer;
@@ -409,7 +412,10 @@ namespace WinTlx
 			{
 				try
 				{
-					_client = new TcpClient(host, port);
+					_debugManager.Write($"connect to {host}:{port} ext={extensionNumber}\r\n", DebugManager.Modes.Message);
+
+					_tcpClientWithTimeout = new TcpClientWithTimeout(host, port, 5000);
+					_client = _tcpClientWithTimeout.Connect();
 					if (_client == null || !_client.Connected)
 					{
 						Logging.Instance.Log(LogTypes.Info, TAG, nameof(ConnectOut), $"outgoing connection {host}:{port} failed");
@@ -419,6 +425,7 @@ namespace WinTlx
 				catch (Exception ex)
 				{
 					Logging.Instance.Error(TAG, nameof(ConnectOut), "", ex);
+					_debugManager.Write($"error {ex.Message}\r\n", DebugManager.Modes.Message);
 					return false;
 				}
 
@@ -435,7 +442,8 @@ namespace WinTlx
 				}
 				else
 				{
-					return await ConnectOutAscii(extensionNumber);
+					return false;
+					//return await ConnectOutAscii(extensionNumber);
 				}
 			});
 			return status;
@@ -448,74 +456,55 @@ namespace WinTlx
 			//byte[] data = Encoding.ASCII.GetBytes("@");
 			//_client.Client.BeginSend(data, 0, data.Length, SocketFlags.None, EndSend, null);
 
-			// wait 2 seconds for ascii code or version packet from remote
-			Stopwatch sw = new Stopwatch();
-			sw.Start();
-			while (Texting != Textings.Ascii)
+			// wait 2 seconds for ascii code
+			TickTimer timer = new TickTimer();
+			while (timer.ElapsedMilliseconds < 2000)
 			{
+				if (Texting != Textings.Unknown) break;
+				if (ConnectionState == ConnectionStates.Disconnected) return false;
 				await Task.Delay(100);
-				if (sw.ElapsedMilliseconds > 2000) break;
 			}
-			Logging.Instance.Debug(TAG, nameof(ConnectOutItelex), $"ConnectionState={ConnectionState} Texting={Texting} sw.Elapsed={sw.ElapsedMilliseconds}ms");
+			Logging.Instance.Debug(TAG, nameof(ConnectOutItelex), $"ConnectionState={ConnectionState} Texting={Texting} ElapsedMilliseconds={timer.ElapsedMilliseconds}ms");
 			if (ConnectionState == ConnectionStates.Disconnected) return false;
-			sw.Stop();
 
-			if (Texting != Textings.Ascii)
-			{
-				Message?.Invoke($"send version cmd {VersionCode} {Helper.GetVersionStr()}");
-				SendVersionCodeCmd();
-
-				// wait 5 seconds for ascii code or version cmd from remote
-				sw.Start();
-				while (RemoteVersion == null && Texting != Textings.Ascii)
-				{
-					await Task.Delay(100);
-					if (sw.ElapsedMilliseconds > 10000)
-					{
-						sw.Stop();
-						Logging.Instance.Info(TAG, nameof(ConnectOut), $"Timeout waiting for version response");
-						Message?.Invoke($"no version packet received");
-						Disconnect();
-						return false;
-					}
-				}
-				sw.Stop();
-			}
-
-			bool result;
 			if (Texting == Textings.Ascii)
 			{
 				Message?.Invoke($"ascii texting");
-				result = true;
+				Logging.Instance.Info(TAG, nameof(ConnectOut), $"ascii texting");
+				return true;
+			}
+
+			if (ConnectionState == ConnectionStates.Disconnected) return false;
+ 
+			Message?.Invoke($"send version cmd {VersionCode} {Helper.GetVersionStr()}");
+			SendVersionCodeCmd();
+
+			// wait 5 seconds for version cmd and extension cmd from remote
+			timer.Start();
+			while (timer.ElapsedMilliseconds < 5000)
+			{
+				if (RemoteVersion != null) break;
+				if (ConnectionState == ConnectionStates.Disconnected) return false;
+				await Task.Delay(100);
+			}
+			if (RemoteVersion == null)
+			{
+				Logging.Instance.Info(TAG, nameof(ConnectOut), $"Timeout waiting for version response");
+				Message?.Invoke($"no version packet received");
 			}
 			else
 			{
 				Message?.Invoke($"received version cmd {RemoteVersion}");
-				if (extensionNumber.HasValue)
-				{
-					Message?.Invoke($"send direct dial cmd {extensionNumber}");
-					SendDirectDialCmd(extensionNumber.Value);
-				}
-				//SendCode(CodeManager.BAU_LTRS, ref _shiftState);
-				result = true;
+				Logging.Instance.Info(TAG, nameof(ConnectOut), $"received version {RemoteVersion}");
 			}
 
-			// check if we are still connected
-			if (ConnectionState == ConnectionStates.Disconnected)
-			{
-				result = false;
-			}
+			if (ConnectionState == ConnectionStates.Disconnected) return false;
+
+			Message?.Invoke($"send direct dial cmd {extensionNumber}");
+			SendDirectDialCmd(extensionNumber.GetValueOrDefault());
 
 			ConnectionState = ConnectionStates.Connected;
 			Update?.Invoke();
-			return result;
-		}
-
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-		private async Task<bool> ConnectOutAscii(int? extensionNumber)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-		{
-			//SendAsciiText("\n\r");
 			return true;
 		}
 
@@ -933,7 +922,6 @@ namespace WinTlx
 		public void SendRejectCmd(string reason)
 		{
 			Logging.Instance.Info(TAG, nameof(SendRejectCmd), $"reason={reason}");
-			reason += '\0';
 			byte[] data = Encoding.ASCII.GetBytes(reason);
 			SendCmd(ItelexCommands.Reject, data);
 		}
@@ -942,15 +930,18 @@ namespace WinTlx
 		{
 			string version = Helper.GetVersionStr();
 			//string version = "867";
-			byte[] data = new byte[version.Length + 2];
-			data[0] = VersionCode;
+			List<byte> data = new List<byte>();
+			//byte[] data = new byte[version.Length + 2];
+			data.Add(VersionCode);
 			for (int i=0; i<version.Length; i++)
 			{
-				data[i + 1] = (byte)version[i];
+				if (char.IsDigit(version[i])) data.Add((byte)version[i]);
+				//data[i + 1] = (byte)version[i];
 			}
-			data[version.Length + 1] = 0;
+			data.Add(0x00);
+			//data[data.Length - 1] = 0;
 
-			SendCmd(ItelexCommands.ProtocolVersion, data);
+			SendCmd(ItelexCommands.ProtocolVersion, data.ToArray());
 		}
 
 		public void SendEndCmd()
@@ -1084,16 +1075,6 @@ namespace WinTlx
 					AddTransCharCount(data.Length);
 					Logging.Instance.AppendBinary(packet.Data, Logging.BinaryModes.Send);
 					break;
-				case ItelexCommands.Heartbeat:
-				case ItelexCommands.Ack:
-					break;
-				case ItelexCommands.DirectDial:
-				case ItelexCommands.End:
-				case ItelexCommands.Reject:
-				case ItelexCommands.ProtocolVersion:
-				case ItelexCommands.SelfTest:
-				case ItelexCommands.RemoteConfig:
-					break;
 			}
 
 			_debugManager.WriteCmd(packet, DebugManager.Modes.Send, _ackReceive);
@@ -1134,7 +1115,7 @@ namespace WinTlx
 
 		private void EndSend(IAsyncResult ar)
 		{
-			if (ConnectionState == ConnectionStates.Disconnected && CentralexState==CentralexStates.None)
+			if (ConnectionState == ConnectionStates.Disconnected && CentralexState == CentralexStates.None)
 			{
 				return;
 			}
@@ -1329,7 +1310,7 @@ namespace WinTlx
 					}
 					else
 					{   // not connected
-						byte[] data = Encoding.ASCII.GetBytes("nc");
+						byte[] data = Encoding.ASCII.GetBytes("nc" + 0x00);
 						SendCmd(ItelexCommands.Reject, data);
 						Message?.Invoke($"send reject ncc");
 						Disconnect();
@@ -1357,6 +1338,7 @@ namespace WinTlx
 
 				case ItelexCommands.Reject:
 					RejectReason = Encoding.ASCII.GetString(packet.Data, 0, packet.Data.Length);
+					RejectReason = RejectReason.TrimEnd('\x00');
 					Logging.Instance.Info(TAG, nameof(DecodePacket), $"recv reject cmd {packet.GetDebugPacket()}, reason={RejectReason}");
 					Message?.Invoke($"{LngText(LngKeys.Message_Reject)} {RejectReason.ToUpper()} ({ReasonToString(RejectReason).ToUpper()})");
 					if (CentralexState == CentralexStates.CentralexConnect && RejectReason == "na")

@@ -491,9 +491,9 @@ namespace WinTlx.Codes
 					return '\u0427'; // CHE
 				case 'ä':
 					return '\u0447'; // che
+				default:
+					return key;
 			}
-
-			return null;
 		}
 
 	}

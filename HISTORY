@@ -104,3 +104,5 @@ Version history
           New: Support for cyrillic character set (third baudot level)
           New: Now supports 3 subscribe server entires
           Chg: Some i-telex protocol changes
+2.0.0.1   Fix: Problem with protocol-version-packet with some i-Telex firmware-versions
+          Fix: Cyrillic characters can now be entered via the keyboard when PYC is active

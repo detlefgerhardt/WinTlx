@@ -876,17 +876,23 @@ namespace WinTlx.Codes
 		/// </summary>
 		/// <param name="keyChar"></param>
 		/// <returns></returns>
-		public static char? KeyboardCharacters(char keyChar)
+		public static char? KeyboardCharacters(char? keyChar)
 		{
-			int code = (int)keyChar;
+			if (keyChar == null) return null;
+
+			int code = (int)keyChar.Value;
 			char? newChar = null;
 
 			// all characters that are to be recognized as input in the terminal windows must be explicitly defined here.
-			switch (char.ToLower(keyChar))
+			switch (char.ToLower(keyChar.Value))
 			{
 				default:
 					// letters and numbers
 					if (code >= 0x30 && code <= 0x39 || code >= 0x41 && code <= 0x5A || code >= 0x61 && code <= 0x7A)
+					{
+						newChar = keyChar;
+					}
+					else if (code >= 0x0400 && code <= 0x044F)
 					{
 						newChar = keyChar;
 					}

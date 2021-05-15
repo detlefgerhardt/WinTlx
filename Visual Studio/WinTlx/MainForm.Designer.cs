@@ -76,6 +76,7 @@ namespace WinTlx
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.ConnectStatusLbl = new System.Windows.Forms.Label();
 			this.ReceiveStatusLbl = new System.Windows.Forms.Label();
+			this.ToSendStatusLbl = new System.Windows.Forms.Label();
 			this.panel2.SuspendLayout();
 			this.panel4.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.TerminalPb)).BeginInit();
@@ -495,7 +496,7 @@ namespace WinTlx
 			// 
 			this.ConnTimeLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ConnTimeLbl.AutoSize = true;
-			this.ConnTimeLbl.Location = new System.Drawing.Point(214, 506);
+			this.ConnTimeLbl.Location = new System.Drawing.Point(299, 506);
 			this.ConnTimeLbl.Name = "ConnTimeLbl";
 			this.ConnTimeLbl.Size = new System.Drawing.Size(61, 13);
 			this.ConnTimeLbl.TabIndex = 73;
@@ -505,7 +506,7 @@ namespace WinTlx
 			// 
 			this.TimeoutLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.TimeoutLbl.AutoSize = true;
-			this.TimeoutLbl.Location = new System.Drawing.Point(317, 506);
+			this.TimeoutLbl.Location = new System.Drawing.Point(402, 506);
 			this.TimeoutLbl.Name = "TimeoutLbl";
 			this.TimeoutLbl.Size = new System.Drawing.Size(48, 13);
 			this.TimeoutLbl.TabIndex = 75;
@@ -543,12 +544,23 @@ namespace WinTlx
 			this.ReceiveStatusLbl.Text = "Receive Off";
 			this.ReceiveStatusLbl.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
+			// ToSendStatusLbl
+			// 
+			this.ToSendStatusLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.ToSendStatusLbl.AutoSize = true;
+			this.ToSendStatusLbl.Location = new System.Drawing.Point(171, 506);
+			this.ToSendStatusLbl.Name = "ToSendStatusLbl";
+			this.ToSendStatusLbl.Size = new System.Drawing.Size(48, 13);
+			this.ToSendStatusLbl.TabIndex = 80;
+			this.ToSendStatusLbl.Text = "ToSend:";
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
 			this.ClientSize = new System.Drawing.Size(804, 525);
+			this.Controls.Add(this.ToSendStatusLbl);
 			this.Controls.Add(this.ReceiveStatusLbl);
 			this.Controls.Add(this.ConnectStatusLbl);
 			this.Controls.Add(this.panel1);
@@ -646,6 +658,7 @@ namespace WinTlx
 		private System.Windows.Forms.Panel panel1;
 		private System.Windows.Forms.Label ConnectStatusLbl;
 		private System.Windows.Forms.Label ReceiveStatusLbl;
+		private System.Windows.Forms.Label ToSendStatusLbl;
 	}
 }
 

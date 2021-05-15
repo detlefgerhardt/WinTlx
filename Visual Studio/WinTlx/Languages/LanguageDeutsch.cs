@@ -56,6 +56,7 @@ namespace WinTlx.Languages
 				{ LngKeys.MainForm_IdleTimeLabel, "Inaktiv" },
 				{ LngKeys.MainForm_ReceiveStatusOn, "Empfang ein" },
 				{ LngKeys.MainForm_ReceiveStatusOff, "Empfang aus" },
+				{ LngKeys.MainForm_ToSendStatus, "zu senden" },
 
 				{ LngKeys.MainMenu_FileMenu, "Datei" },
 				{ LngKeys.MainMenu_SaveBufferAsText, "Puffer als Text speichern" },
@@ -70,7 +71,7 @@ namespace WinTlx.Languages
 				{ LngKeys.MainMenu_OpenTapePunchEditor, "Lochstreifen-Editor öffnen" },
 				{ LngKeys.MainMenu_EyeballCharOnOff, "Bildlocher ein/aus" },
 				{ LngKeys.MainMenu_TestPattern, "Prüftextsender öffnen" },
-				{ LngKeys.MainMenu_OpenScheduler, "Schedular öffnen" },
+				{ LngKeys.MainMenu_OpenScheduler, "Scheduler öffnen" },
 				{ LngKeys.MainMenu_ReceiveMenu, "Empfang" },
 				{ LngKeys.MainMenu_ReceiveOnOff, "Empfang ein/aus" },
 				{ LngKeys.MainMenu_UpdateSubscribeServer, "Teilnehmer-Server-Eintrag aktualisieren" },

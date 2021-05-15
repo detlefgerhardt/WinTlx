@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.Net.Sockets;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Windows.Forms;
@@ -282,6 +283,48 @@ namespace WinTlx
 			}
 			return xml;
 		}
+
+		/// <summary>
+		/// Open tcp/ip connection to meter
+		/// </summary>
+		/// <param name="tcpClient">host ip address</param>
+		/// <param name="host">host ip address</param>
+		/// <param name="port">host tcp port</param>
+		/// <param name="unitId">unit/slave id</param>
+		/// <param name="timeout">timeout in seconds</param>
+		/// <returns></returns>
+		public static bool TcpConnectWithTimeout(TcpClient tcpClient, string host, int port, int timeout = 20)
+		{
+			if (tcpClient != null) return false;
+
+			try
+			{
+				IAsyncResult ar = tcpClient.BeginConnect(host, port, null, null);
+				System.Threading.WaitHandle wh = ar.AsyncWaitHandle;
+				try
+				{
+					if (!ar.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(timeout), false))
+					{
+						tcpClient.Close();
+						return false;
+					}
+
+					tcpClient.EndConnect(ar);
+				}
+				finally
+				{
+					wh.Close();
+				}
+
+				return true;
+			}
+			catch (Exception)
+			{
+				// general error
+				return false;
+			}
+		}
+
 	}
 
 	public class StringWriterUtf8 : StringWriter
@@ -294,4 +337,5 @@ namespace WinTlx
 			}
 		}
 	}
+
 }

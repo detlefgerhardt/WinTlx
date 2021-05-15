@@ -43,6 +43,7 @@ namespace WinTlx.Languages
 		MainForm_IdleTimeLabel,
 		MainForm_ReceiveStatusOn,
 		MainForm_ReceiveStatusOff,
+		MainForm_ToSendStatus,
 
 		MainMenu_FileMenu,
 		MainMenu_SaveBufferAsText,

@@ -39,12 +39,12 @@ namespace WinTlx.Scheduler
 			//LanguageManager.Instance.LanguageChanged += LanguageChanged;
 			LanguageChanged();
 
-			SchedularView.BackgroundColor = Color.White;
-			SchedularView.RowHeadersVisible = false;
-			SchedularView.ScrollBars = ScrollBars.Both;
-			//SchedularView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-			SchedularView.AllowUserToAddRows = false;
-			SchedularView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+			SchedulerView.BackgroundColor = Color.White;
+			SchedulerView.RowHeadersVisible = false;
+			SchedulerView.ScrollBars = ScrollBars.Both;
+			//SchedulerView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+			SchedulerView.AllowUserToAddRows = false;
+			SchedulerView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
 			SetSchedulerColumns();
 			SetContextMenu();
 
@@ -67,43 +67,43 @@ namespace WinTlx.Scheduler
 			chkCol.Name = "Active";
 			chkCol.HeaderText = $"{LngText(LngKeys.Scheduler_ActiveRow)}";
 			chkCol.Width = 55;
-			SchedularView.Columns.Add(chkCol);
+			SchedulerView.Columns.Add(chkCol);
 
 			chkCol = new DataGridViewCheckBoxColumn();
 			chkCol.Name = "Success";
 			chkCol.HeaderText = $"{LngText(LngKeys.Scheduler_SuccessRow)}";
 			chkCol.Width = 55;
-			SchedularView.Columns.Add(chkCol);
+			SchedulerView.Columns.Add(chkCol);
 
 			chkCol = new DataGridViewCheckBoxColumn();
 			chkCol.Name = "Error";
 			chkCol.HeaderText = $"{LngText(LngKeys.Scheduler_ErrorRow)}";
 			chkCol.Width = 55;
-			SchedularView.Columns.Add(chkCol);
+			SchedulerView.Columns.Add(chkCol);
 
 			var calCol = new CalendarColumn();
 			calCol.Name = "Date";
 			calCol.HeaderText = $"{LngText(LngKeys.Scheduler_DateRow)}";
 			calCol.Width = 80;
-			SchedularView.Columns.Add(calCol);
+			SchedulerView.Columns.Add(calCol);
 
 			var timeCol = new TimeColumn();
 			timeCol.Name = "Time";
 			timeCol.HeaderText = $"{LngText(LngKeys.Scheduler_TimeRow)}";
 			timeCol.Width = 70;
-			SchedularView.Columns.Add(timeCol);
+			SchedulerView.Columns.Add(timeCol);
 
 			var destCol = new DataGridViewTextBoxColumn();
 			destCol.Name = "Destination";
 			destCol.HeaderText = $"{LngText(LngKeys.Scheduler_DestRow)}";
 			destCol.Width = 200;
-			SchedularView.Columns.Add(destCol);
+			SchedulerView.Columns.Add(destCol);
 
 			var fileCol = new DataGridViewTextBoxColumn();
 			fileCol.Name = "File";
 			fileCol.HeaderText = $"{LngText(LngKeys.Scheduler_FileRow)}";
 			fileCol.Width = 200;
-			SchedularView.Columns.Add(fileCol);
+			SchedulerView.Columns.Add(fileCol);
 		}
 
 		private void SetContextMenu()
@@ -124,19 +124,19 @@ namespace WinTlx.Scheduler
 
 			for (int i = 1; i < SCHEDULE_COL_COUNT; i++)
 			{
-				SchedularView.Columns[i].ContextMenuStrip = strip;
+				SchedulerView.Columns[i].ContextMenuStrip = strip;
 				//EpgView.Columns[8].ContextMenuStrip.Items.Add(toolStripItem1);
 			}
 		}
 
-		private void SchedularView_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
+		private void SchedulerView_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
 		{
 			_contextMenuLocation = e;
 		}
 
 		private void ContextMenu_Delete_Handler(object sender, EventArgs e)
 		{
-			SchedulerItem item = (SchedulerItem)SchedularView.Rows[_contextMenuLocation.RowIndex].Tag;
+			SchedulerItem item = (SchedulerItem)SchedulerView.Rows[_contextMenuLocation.RowIndex].Tag;
 			_manager.ScheduleData.SchedulerList.Remove(item);
 
 			ShowSchedules();
@@ -144,7 +144,7 @@ namespace WinTlx.Scheduler
 
 		private void ContextMenu_Copy_Handler(object sender, EventArgs e)
 		{
-			SchedulerItem item = (SchedulerItem)SchedularView.Rows[_contextMenuLocation.RowIndex].Tag;
+			SchedulerItem item = (SchedulerItem)SchedulerView.Rows[_contextMenuLocation.RowIndex].Tag;
 
 			SchedulerItem newItem = new SchedulerItem()
 			{
@@ -184,11 +184,11 @@ namespace WinTlx.Scheduler
 			//List<DataGridViewRow> rows = new List<DataGridViewRow>();
 
 			DataGridViewRow row = new DataGridViewRow();
-			row.CreateCells(SchedularView);
+			row.CreateCells(SchedulerView);
 			//rows.Add(row);
 
-			SchedularView.Rows.Clear();
-			//SchedularView.Rows.AddRange(rows.ToArray());
+			SchedulerView.Rows.Clear();
+			//SchedulerView.Rows.AddRange(rows.ToArray());
 		}
 
 		private void ShowSchedules()
@@ -198,7 +198,7 @@ namespace WinTlx.Scheduler
 			List<SchedulerItem> schedule = _manager.ScheduleData?.SchedulerList;
 			if (schedule == null)
 			{
-				SchedularView.Rows.Clear();
+				SchedulerView.Rows.Clear();
 				return;
 			}
 
@@ -207,7 +207,7 @@ namespace WinTlx.Scheduler
 			foreach (SchedulerItem item in schedule)
 			{
 				DataGridViewRow row = new DataGridViewRow();
-				row.CreateCells(SchedularView);
+				row.CreateCells(SchedulerView);
 
 				row.Cells[SCHEDULE_COL_ACTIVE].Value = item.Active;
 				row.Cells[SCHEDULE_COL_SUCCESS].Value = item.Success;
@@ -248,10 +248,10 @@ namespace WinTlx.Scheduler
 				rows.Add(row);
 			}
 
-			Helper.ControlInvokeRequired(SchedularView, () =>
+			Helper.ControlInvokeRequired(SchedulerView, () =>
 				{
-					SchedularView.Rows.Clear();
-					SchedularView.Rows.AddRange(rows.ToArray());
+					SchedulerView.Rows.Clear();
+					SchedulerView.Rows.AddRange(rows.ToArray());
 				});
 		}
 
@@ -268,14 +268,14 @@ namespace WinTlx.Scheduler
 			ShowSchedules();
 		}
 
-		private void SchedularView_CellClick(object sender, DataGridViewCellEventArgs e)
+		private void SchedulerView_CellClick(object sender, DataGridViewCellEventArgs e)
 		{
 			if (e.ColumnIndex == -1 || e.RowIndex == -1)
 			{
 				return;
 			}
 
-			SchedularView.CurrentCell = SchedularView[e.ColumnIndex, e.RowIndex];
+			SchedulerView.CurrentCell = SchedulerView[e.ColumnIndex, e.RowIndex];
 
 			switch (e.ColumnIndex)
 			{
@@ -284,7 +284,7 @@ namespace WinTlx.Scheduler
 				case SCHEDULE_COL_FILE:
 					// select file
 					OpenFileDialog dialog = new OpenFileDialog();
-					string fullName = (string)SchedularView[e.ColumnIndex, e.RowIndex].Tag;
+					string fullName = (string)SchedulerView[e.ColumnIndex, e.RowIndex].Tag;
 					if (!string.IsNullOrWhiteSpace(fullName))
 					{
 						dialog.InitialDirectory = Path.GetDirectoryName(fullName);
@@ -293,14 +293,14 @@ namespace WinTlx.Scheduler
 
 					if (dialog.ShowDialog() == DialogResult.OK)
 					{
-						SchedularView[e.ColumnIndex, e.RowIndex].Tag = dialog.FileName;
-						SchedularView[e.ColumnIndex, e.RowIndex].Value = Path.GetFileName(dialog.FileName);
+						SchedulerView[e.ColumnIndex, e.RowIndex].Tag = dialog.FileName;
+						SchedulerView[e.ColumnIndex, e.RowIndex].Value = Path.GetFileName(dialog.FileName);
 					}
 					break;
 				case SCHEDULE_COL_DATE:
 				case SCHEDULE_COL_TIME:
 				case SCHEDULE_COL_DEST:
-					SchedularView.BeginEdit(true);
+					SchedulerView.BeginEdit(true);
 					//((TextBox)dataGridView1.EditingControl).SelectionStart = dataGridView1.CurrentCell.Value.ToString().Length;
 					break;
 			}
@@ -310,7 +310,7 @@ namespace WinTlx.Scheduler
 		{
 			/*
 			_manager.ScheduleData.SchedulerList = new List<SchedulerItem>();
-			foreach (DataGridViewRow row in SchedularView.Rows)
+			foreach (DataGridViewRow row in SchedulerView.Rows)
 			{
 				SchedulerItem item = new SchedulerItem();
 				item.Active = (bool)row.Cells[SCHEDULE_COL_ACTIVE].Value;
@@ -329,7 +329,7 @@ namespace WinTlx.Scheduler
 			Close();
 		}
 
-		private void SchedularView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+		private void SchedulerView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
 		{
 			int rowIndex = e.RowIndex;
 			if (rowIndex==-1)
@@ -338,7 +338,7 @@ namespace WinTlx.Scheduler
 			}
 
 			SchedulerItem item = _manager.ScheduleData.SchedulerList[rowIndex];
-			DataGridViewRow row = SchedularView.Rows[rowIndex];
+			DataGridViewRow row = SchedulerView.Rows[rowIndex];
 
 			switch(e.ColumnIndex)
 			{
@@ -368,7 +368,7 @@ namespace WinTlx.Scheduler
 			ShowSchedules();
 		}
 
-		private void SchedularView_CellMouseUp(object sender, DataGridViewCellMouseEventArgs e)
+		private void SchedulerView_CellMouseUp(object sender, DataGridViewCellMouseEventArgs e)
 		{
 			// end of edition on each click on column of checkbox
 			if (e.RowIndex == -1)
@@ -380,12 +380,12 @@ namespace WinTlx.Scheduler
 				case SCHEDULE_COL_ACTIVE:
 				case SCHEDULE_COL_SUCCESS:
 				case SCHEDULE_COL_ERROR:
-					SchedularView.EndEdit();
+					SchedulerView.EndEdit();
 					break;
 			}
 		}
 
-		private void SchedularView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+		private void SchedulerView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
 		{
 			//Debug.WriteLine("end edit");
 			_manager.SaveScheduler();
