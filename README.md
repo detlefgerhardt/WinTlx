@@ -7,15 +7,13 @@ A Windows test und diagnostic tool for the i-Telex network
 - Subscribe server query
 - Automatic ITA-2 (Baudot-Murray) code conversion
 - Resizable and scrollable terminal window
-- Inactivity timeout
 - Copy and paste function
 - Text editor for messages
 - Logging all communication to a text file
-- Runs on any Windows version with .NET Framework 4.5 and above
 - Virtual tape punch with tape editor and eyeball characters (Bildlocher)
 - Send and receive of binary ITA-2 files (via tape punch function)
-- ITA-2 and US-TTY suport
-- Multi-language support
+- ITA-2, US-TTY and support for cyrillic codes
+- Multi-language support (German and English)
 - Scheduler for automatic sending of text file (experimental)
 
 WinTlx is a single Windows EXE file with optinal language files. No installation required.
