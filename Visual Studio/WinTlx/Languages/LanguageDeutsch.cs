@@ -56,7 +56,7 @@ namespace WinTlx.Languages
 				{ LngKeys.MainForm_IdleTimeLabel, "Inaktiv" },
 				{ LngKeys.MainForm_ReceiveStatusOn, "Empfang ein" },
 				{ LngKeys.MainForm_ReceiveStatusOff, "Empfang aus" },
-				{ LngKeys.MainForm_ToSendStatus, "zu senden" },
+				{ LngKeys.MainForm_SendBufferStatus, "Sendepuffer" },
 
 				{ LngKeys.MainMenu_FileMenu, "Datei" },
 				{ LngKeys.MainMenu_SaveBufferAsText, "Puffer als Text speichern" },
@@ -217,12 +217,17 @@ namespace WinTlx.Languages
 				{ LngKeys.Favorites_ClearHistHeader, "Löschen" },
 				{ LngKeys.Favorites_ClearHistMessage, "Letzte Anrufe löschen?" },
 
-				{ LngKeys.Pattern_Ryry, "ryry" },
-				{ LngKeys.Pattern_Fox, "Fox" },
-				{ LngKeys.Pattern_Pelze, "Pelze" },
-				{ LngKeys.Pattern_Quax, "Quax" },
-				{ LngKeys.Pattern_Line, "Linie" },
-				{ LngKeys.Pattern_DateTime, "Datum/Zeit" },
+				{ LngKeys.TestPattern_Header, "Prüftextsender" },
+				{ LngKeys.TestPattern_DamperTest, "Dämpfer-Test" },
+				{ LngKeys.TestPattern_Selection, "Auswahl" },
+				{ LngKeys.TestPattern_Count, "Anzahl" },
+				{ LngKeys.TestPattern_Send, "Senden" },
+				{ LngKeys.TestPattern_Ryry, "ryry" },
+				{ LngKeys.TestPattern_Fox, "Fox" },
+				{ LngKeys.TestPattern_Pelze, "Pelze" },
+				{ LngKeys.TestPattern_Quax, "Quax" },
+				{ LngKeys.TestPattern_Line, "Linie" },
+				{ LngKeys.TestPattern_DateTime, "Datum/Zeit" },
 			};
 
 			return lng;

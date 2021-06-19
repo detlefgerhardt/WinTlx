@@ -488,9 +488,16 @@ namespace WinTlx
 
 			char? chr = e.KeyChar;
 
-			if (_itelex.ShiftState == ShiftStates.Third && chr.HasValue)
+			if (chr.HasValue && _configData.CodeSet == CodeSets.CYRILL)
 			{
-				chr = CodeTabCyrill.CyrillicKeyToUnicode(chr.Value);
+				if (_itelex.ShiftState == ShiftStates.Third || "äöüÄÖ".Contains(chr.Value.ToString()))
+				{
+					chr = CodeTabCyrill.CyrillicKeyToUnicode(chr.Value);
+				}
+				else if (chr >= 'A' && chr <= 'Z')
+				{
+					chr = CodeTabCyrill.CyrillicKeyToUnicode(char.ToLower(chr.Value));
+				}
 			}
 
 			chr = CodeManager.KeyboardCharacters(chr);
@@ -824,19 +831,45 @@ namespace WinTlx
 		private void SendFBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			SendAsciiChar(CodeManager.ASC_SHIFTF);
+			SendFigFGH(CodeManager.ASC_SHIFTF);
 		}
 
 		private void SendGBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			SendAsciiChar(CodeManager.ASC_SHIFTG);
+			SendFigFGH(CodeManager.ASC_SHIFTG);
 		}
 
 		private void SendHBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			SendAsciiChar(CodeManager.ASC_SHIFTH);
+			SendFigFGH(CodeManager.ASC_SHIFTH);
+		}
+
+		private void SendFigFGH(char chr)
+		{
+			if (_configData.CodeSet == CodeSets.CYRILL)
+			{
+				int code = 0;
+				switch(chr)
+				{
+					case CodeManager.ASC_SHIFTF:
+						code = 0x16;
+						break;
+					case CodeManager.ASC_SHIFTG:
+						code = 0x0B;
+						break;
+					case CodeManager.ASC_SHIFTH:
+						code = 0x05;
+						break;
+				}
+				ICodeTab tab = new CodeTabCyrill();
+				SendAsciiChar(tab.CodeTab[code].Char3rd);
+			}
+			else
+			{
+				SendAsciiChar(chr);
+			}
 		}
 
 		private void SendLettersBtn_Click(object sender, EventArgs e)
@@ -1206,10 +1239,10 @@ namespace WinTlx
 				}
 			});
 
-			Helper.ControlInvokeRequired(ToSendStatusLbl, () =>
+			Helper.ControlInvokeRequired(SendBufferStatusLbl, () =>
 			{
 				string valueStr = _itelex.IsConnected ? $"{_itelex.SendBufferCount + _bufferManager.SendBufferCount}" : "-";
-				ToSendStatusLbl.Text = $"{LngText(LngKeys.MainForm_ToSendStatus)}: {valueStr}";
+				SendBufferStatusLbl.Text = $"{LngText(LngKeys.MainForm_SendBufferStatus)}: {valueStr}";
 			});
 
 
@@ -1689,7 +1722,7 @@ namespace WinTlx
 				// query number
 				if (string.IsNullOrWhiteSpace(scheduleItem.Destination))
 				{
-					// invalid distination
+					// invalid destination
 					Logging.Instance.Warn(TAG, nameof(DoSchedule), $"Invalid destination {scheduleItem.Destination}");
 					scheduleItem.Error = true;
 					return false;

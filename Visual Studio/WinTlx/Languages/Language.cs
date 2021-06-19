@@ -43,7 +43,7 @@ namespace WinTlx.Languages
 		MainForm_IdleTimeLabel,
 		MainForm_ReceiveStatusOn,
 		MainForm_ReceiveStatusOff,
-		MainForm_ToSendStatus,
+		MainForm_SendBufferStatus,
 
 		MainMenu_FileMenu,
 		MainMenu_SaveBufferAsText,
@@ -199,12 +199,18 @@ namespace WinTlx.Languages
 		Favorites_EntryResult,
 		Favorites_ClearHistHeader,
 		Favorites_ClearHistMessage,
-		Pattern_Ryry,
-		Pattern_Fox,
-		Pattern_Pelze,
-		Pattern_Quax,
-		Pattern_Line,
-		Pattern_DateTime,
+
+		TestPattern_Header,
+		TestPattern_Selection,
+		TestPattern_Count,
+		TestPattern_Send,
+		TestPattern_Ryry,
+		TestPattern_Fox,
+		TestPattern_Pelze,
+		TestPattern_Quax,
+		TestPattern_Line,
+		TestPattern_DateTime,
+		TestPattern_DamperTest,
 	}
 
 	class Language

@@ -32,15 +32,17 @@ namespace WinTlx.Prueftexte
 			this.SendBtn = new System.Windows.Forms.Button();
 			this.PatternSelectCb = new System.Windows.Forms.ComboBox();
 			this.LineCountTb = new System.Windows.Forms.TextBox();
-			this.PatternSelectLbl = new System.Windows.Forms.Label();
-			this.LineCountLbl = new System.Windows.Forms.Label();
+			this.SelectionLbl = new System.Windows.Forms.Label();
+			this.CountLbl = new System.Windows.Forms.Label();
+			this.PreViewTb = new System.Windows.Forms.TextBox();
 			this.SuspendLayout();
 			// 
 			// SendBtn
 			// 
-			this.SendBtn.Location = new System.Drawing.Point(306, 28);
+			this.SendBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.SendBtn.Location = new System.Drawing.Point(375, 28);
 			this.SendBtn.Name = "SendBtn";
-			this.SendBtn.Size = new System.Drawing.Size(50, 24);
+			this.SendBtn.Size = new System.Drawing.Size(65, 24);
 			this.SendBtn.TabIndex = 27;
 			this.SendBtn.Text = "Send";
 			this.SendBtn.UseVisualStyleBackColor = true;
@@ -54,6 +56,7 @@ namespace WinTlx.Prueftexte
 			this.PatternSelectCb.Name = "PatternSelectCb";
 			this.PatternSelectCb.Size = new System.Drawing.Size(237, 22);
 			this.PatternSelectCb.TabIndex = 26;
+			this.PatternSelectCb.SelectedIndexChanged += new System.EventHandler(this.PatternSelectCb_SelectedIndexChanged);
 			// 
 			// LineCountTb
 			// 
@@ -64,31 +67,45 @@ namespace WinTlx.Prueftexte
 			this.LineCountTb.TabIndex = 28;
 			this.LineCountTb.Leave += new System.EventHandler(this.LineCountTb_Leave);
 			// 
-			// PatternSelectLbl
+			// SelectionLbl
 			// 
-			this.PatternSelectLbl.AutoSize = true;
-			this.PatternSelectLbl.Location = new System.Drawing.Point(12, 11);
-			this.PatternSelectLbl.Name = "PatternSelectLbl";
-			this.PatternSelectLbl.Size = new System.Drawing.Size(47, 13);
-			this.PatternSelectLbl.TabIndex = 29;
-			this.PatternSelectLbl.Text = "Auswahl";
+			this.SelectionLbl.AutoSize = true;
+			this.SelectionLbl.Location = new System.Drawing.Point(12, 11);
+			this.SelectionLbl.Name = "SelectionLbl";
+			this.SelectionLbl.Size = new System.Drawing.Size(47, 13);
+			this.SelectionLbl.TabIndex = 29;
+			this.SelectionLbl.Text = "Auswahl";
 			// 
-			// LineCountLbl
+			// CountLbl
 			// 
-			this.LineCountLbl.AutoSize = true;
-			this.LineCountLbl.Location = new System.Drawing.Point(256, 10);
-			this.LineCountLbl.Name = "LineCountLbl";
-			this.LineCountLbl.Size = new System.Drawing.Size(39, 13);
-			this.LineCountLbl.TabIndex = 30;
-			this.LineCountLbl.Text = "Anzahl";
+			this.CountLbl.AutoSize = true;
+			this.CountLbl.Location = new System.Drawing.Point(256, 10);
+			this.CountLbl.Name = "CountLbl";
+			this.CountLbl.Size = new System.Drawing.Size(39, 13);
+			this.CountLbl.TabIndex = 30;
+			this.CountLbl.Text = "Anzahl";
+			// 
+			// PreViewTb
+			// 
+			this.PreViewTb.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.PreViewTb.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.PreViewTb.Location = new System.Drawing.Point(12, 58);
+			this.PreViewTb.Multiline = true;
+			this.PreViewTb.Name = "PreViewTb";
+			this.PreViewTb.ReadOnly = true;
+			this.PreViewTb.Size = new System.Drawing.Size(427, 210);
+			this.PreViewTb.TabIndex = 31;
 			// 
 			// TestPatternForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(366, 71);
-			this.Controls.Add(this.LineCountLbl);
-			this.Controls.Add(this.PatternSelectLbl);
+			this.ClientSize = new System.Drawing.Size(449, 280);
+			this.Controls.Add(this.PreViewTb);
+			this.Controls.Add(this.CountLbl);
+			this.Controls.Add(this.SelectionLbl);
 			this.Controls.Add(this.LineCountTb);
 			this.Controls.Add(this.SendBtn);
 			this.Controls.Add(this.PatternSelectCb);
@@ -106,7 +123,8 @@ namespace WinTlx.Prueftexte
 		private System.Windows.Forms.Button SendBtn;
 		private System.Windows.Forms.ComboBox PatternSelectCb;
 		private System.Windows.Forms.TextBox LineCountTb;
-		private System.Windows.Forms.Label PatternSelectLbl;
-		private System.Windows.Forms.Label LineCountLbl;
+		private System.Windows.Forms.Label SelectionLbl;
+		private System.Windows.Forms.Label CountLbl;
+		private System.Windows.Forms.TextBox PreViewTb;
 	}
 }

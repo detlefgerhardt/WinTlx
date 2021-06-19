@@ -56,7 +56,7 @@ namespace WinTlx.Languages
 				{ LngKeys.MainForm_IdleTimeLabel, "Timeout" },
 				{ LngKeys.MainForm_ReceiveStatusOn, "Receive on" },
 				{ LngKeys.MainForm_ReceiveStatusOff, "Receive off" },
-				{ LngKeys.MainForm_ToSendStatus, "to send" },
+				{ LngKeys.MainForm_SendBufferStatus, "Sendbuffer" },
 
 				{ LngKeys.MainMenu_FileMenu, "File" },
 				{ LngKeys.MainMenu_SaveBufferAsText, "Save buffer as text-file" },
@@ -216,12 +216,17 @@ namespace WinTlx.Languages
 				{ LngKeys.Favorites_ClearHistHeader, "Clear" },
 				{ LngKeys.Favorites_ClearHistMessage, "Clear last calls?" },
 
-				{ LngKeys.Pattern_Ryry, "ryry" },
-				{ LngKeys.Pattern_Fox, "Fox" },
-				{ LngKeys.Pattern_Pelze, "Pelze" },
-				{ LngKeys.Pattern_Quax, "Quax" },
-				{ LngKeys.Pattern_Line, "Line" },
-				{ LngKeys.Pattern_DateTime, "Date/Time" },
+				{ LngKeys.TestPattern_Header, "Test-pattern sender" },
+				{ LngKeys.TestPattern_DamperTest, "Damper test" },
+				{ LngKeys.TestPattern_Selection, "Selection" },
+				{ LngKeys.TestPattern_Count, "Count" },
+				{ LngKeys.TestPattern_Send, "Send" },
+				{ LngKeys.TestPattern_Ryry, "ryry" },
+				{ LngKeys.TestPattern_Fox, "Fox" },
+				{ LngKeys.TestPattern_Pelze, "Pelze" },
+				{ LngKeys.TestPattern_Quax, "Quax" },
+				{ LngKeys.TestPattern_Line, "Line" },
+				{ LngKeys.TestPattern_DateTime, "Date/Time" },
 			};
 
 			return lng;

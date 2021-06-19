@@ -92,7 +92,7 @@ namespace WinTlx.Codes
 			new AsciiConvItem(0x442, '\u0422'), // t
 			new AsciiConvItem(0x423, '\u0423'), // U
 			new AsciiConvItem(0x443, '\u0423'), // u
-			new AsciiConvItem(0x416, '\u0436'), // V
+			new AsciiConvItem(0x416, '\u0416'), // V
 			new AsciiConvItem(0x436, '\u0436'), // v
 			new AsciiConvItem(0x412, '\u0412'), // W
 			new AsciiConvItem(0x432, '\u0412'), // w
@@ -105,9 +105,11 @@ namespace WinTlx.Codes
 			new AsciiConvItem(0x429, '\u0429'),
 			new AsciiConvItem(0x449, '\u0429'),
 			new AsciiConvItem(0x42D, '\u042D'),
-			new AsciiConvItem(0x44D, '\u042D'),
+			new AsciiConvItem(0x44D, '\u044D'),
 			new AsciiConvItem(0x427, '\u0427'),
 			new AsciiConvItem(0x447, '\u0427'),
+			new AsciiConvItem(0x42E, '\u042E'), // ü
+			new AsciiConvItem(0x428, '\u0428'), // Ö
 		};
 
 		public CodeItem[] CodeTab => new CodeItem[32]
@@ -361,15 +363,15 @@ namespace WinTlx.Codes
 			new UpLoItem('\u042C','\u044C', 'x'),
 			new UpLoItem('\u042B','\u044B', 'y'),
 			new UpLoItem('\u0417','\u0437', 'z'),
-			new UpLoItem('\u042E','\u044E', 'ü'),
+			new UpLoItem('\u042E','\u042E', 'ü'),
 			new UpLoItem('\u0429','\u0449', 'ß'),
-			new UpLoItem('\u042D','\u044D', 'e'),
+			new UpLoItem('\u042D','\u044D', 'ö'),
 			new UpLoItem('\u0427','\u0447', 'ä'),
 		};
 
 		public static char? CyrillicKeyToUnicode(char key)
 		{
-			key = char.ToUpper(key);
+			if (key >= 'a' && key <= 'z') key = char.ToUpper(key);
 
 			switch (key)
 			{
@@ -478,19 +480,20 @@ namespace WinTlx.Codes
 				case 'z':
 					return '\u0437'; // ze
 				case 'Ü':
-					return '\u042E'; // YU
-				case 'ü':
 					return '\u044E'; // yu
-				case 'ß':
-					return '\u0429'; // SHCHA
+				case 'ü':
+					return '\u042E'; // YU
 				case 'Ö':
-					return '\u042D'; // E
+					//return '\u042D'; // E
+					return '\u0428'; // SHA
 				case 'ö':
-					return '\u044D'; // e
+					//return '\u044D'; // e
+					return '\u042D'; // E
 				case 'Ä':
-					return '\u0427'; // CHE
+					//return '\u0447'; // che
+					return '\u0429'; // SHCHA
 				case 'ä':
-					return '\u0447'; // che
+					return '\u0427'; // CHE
 				default:
 					return key;
 			}

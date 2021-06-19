@@ -76,7 +76,7 @@ namespace WinTlx
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.ConnectStatusLbl = new System.Windows.Forms.Label();
 			this.ReceiveStatusLbl = new System.Windows.Forms.Label();
-			this.ToSendStatusLbl = new System.Windows.Forms.Label();
+			this.SendBufferStatusLbl = new System.Windows.Forms.Label();
 			this.panel2.SuspendLayout();
 			this.panel4.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.TerminalPb)).BeginInit();
@@ -546,13 +546,13 @@ namespace WinTlx
 			// 
 			// ToSendStatusLbl
 			// 
-			this.ToSendStatusLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.ToSendStatusLbl.AutoSize = true;
-			this.ToSendStatusLbl.Location = new System.Drawing.Point(171, 506);
-			this.ToSendStatusLbl.Name = "ToSendStatusLbl";
-			this.ToSendStatusLbl.Size = new System.Drawing.Size(48, 13);
-			this.ToSendStatusLbl.TabIndex = 80;
-			this.ToSendStatusLbl.Text = "ToSend:";
+			this.SendBufferStatusLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.SendBufferStatusLbl.AutoSize = true;
+			this.SendBufferStatusLbl.Location = new System.Drawing.Point(171, 506);
+			this.SendBufferStatusLbl.Name = "ToSendStatusLbl";
+			this.SendBufferStatusLbl.Size = new System.Drawing.Size(48, 13);
+			this.SendBufferStatusLbl.TabIndex = 80;
+			this.SendBufferStatusLbl.Text = "ToSend:";
 			// 
 			// MainForm
 			// 
@@ -560,7 +560,7 @@ namespace WinTlx
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
 			this.ClientSize = new System.Drawing.Size(804, 525);
-			this.Controls.Add(this.ToSendStatusLbl);
+			this.Controls.Add(this.SendBufferStatusLbl);
 			this.Controls.Add(this.ReceiveStatusLbl);
 			this.Controls.Add(this.ConnectStatusLbl);
 			this.Controls.Add(this.panel1);
@@ -658,7 +658,7 @@ namespace WinTlx
 		private System.Windows.Forms.Panel panel1;
 		private System.Windows.Forms.Label ConnectStatusLbl;
 		private System.Windows.Forms.Label ReceiveStatusLbl;
-		private System.Windows.Forms.Label ToSendStatusLbl;
+		private System.Windows.Forms.Label SendBufferStatusLbl;
 	}
 }
 

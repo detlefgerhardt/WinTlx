@@ -65,11 +65,11 @@ namespace WinTlx.Debugging
 
 			if (itxPkt.CommandType == ItelexCommands.Ack && !_debugForm.ShowAck) return;
 
-			string debugStr = CmdToString(itxPkt, transCnt);
+			string debugStr = CmdToString(itxPkt, transCnt, mode);
 			Write(debugStr + "\r\n", mode);
 		}
 
-		private string CmdToString(ItelexPacket itxPkt, int? transCnt)
+		private string CmdToString(ItelexPacket itxPkt, int? transCnt, Modes mode)
 		{
 			string cmdStr;
 			switch (itxPkt.CommandType)
@@ -127,8 +127,23 @@ namespace WinTlx.Debugging
 						else
 						{
 							int ackCnt = itxPkt.Data[0];
-							int remoteCnt = ((transCnt.Value + 256) - ackCnt) % 256;
-							return $"{cmdStr} {ackCnt}-{transCnt}:{remoteCnt} [{itxPkt.GetDebugPacket()}]";
+							int bufCnt = transCnt.Value - ackCnt;
+							if (bufCnt < -128)
+							{
+								bufCnt = -(bufCnt + 256); // bufCnt is negative!!!
+							}
+							else if (bufCnt < 0)
+							{
+								bufCnt += 256;
+							}
+							if (mode == Modes.Recv)
+							{
+								return $"{cmdStr} ack={ackCnt} sent={transCnt} buf={bufCnt} [{itxPkt.GetDebugPacket()}]";
+							}
+							else
+							{
+								return $"{cmdStr} ack={ackCnt} recv={transCnt} buf={bufCnt} [{itxPkt.GetDebugPacket()}]";
+							}
 						}
 					}
 				case ItelexCommands.ProtocolVersion:
@@ -203,6 +218,15 @@ namespace WinTlx.Debugging
 						break;
 					case CodeManager.ASC_NUL:
 						convChr = "<NUL>";
+						break;
+					case CodeManager.ASC_SHIFTF:
+						convChr = "<F>";
+						break;
+					case CodeManager.ASC_SHIFTG:
+						convChr = "<G>";
+						break;
+					case CodeManager.ASC_SHIFTH:
+						convChr = "<H>";
 						break;
 					default:
 						if (str[i] < 0x20 || str[i] > 0x7F)

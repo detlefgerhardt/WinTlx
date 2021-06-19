@@ -334,16 +334,25 @@ namespace WinTlx.TextEditor
 			string newText = "";
 			foreach (string line in lines)
 			{
-				newText += BlockSatz(line, CharWidth);
+				newText += BlockSatz(line, CharWidth, "\n", false);
 			}
 			Text = newText;
 		}
 
-		private string BlockSatz(string textLine, int len)
+		/// <summary>
+		/// block align one line. if line is longer than len then the last part is not aligned.
+		/// with force=true also the last part is aligned
+		/// </summary>
+		/// <param name="textLine"></param>
+		/// <param name="len"></param>
+		/// <param name="nl"></param>
+		/// <param name="force"></param>
+		/// <returns></returns>
+		public string BlockSatz(string textLine, int len, string nl, bool force)
 		{
-			if (string.IsNullOrWhiteSpace(textLine))
+			if (string.IsNullOrWhiteSpace(textLine) || textLine.Length == len)
 			{
-				return textLine + '\n';
+				return textLine + nl;
 			}
 
 			string newLine = "";
@@ -355,9 +364,9 @@ namespace WinTlx.TextEditor
 
 				string[] words = textLines[l].Split(' ');
 
-				if (l < textLines.Count - 1)
+				if (force || l < textLines.Count - 1)
 				{
-					while (diff > 0)
+					while (diff > 0 && words.Length > 1)
 					{
 						for (int w = 0; w < words.Length - 1; w++)
 						{
@@ -372,7 +381,7 @@ namespace WinTlx.TextEditor
 				newLine += line + " ";
 			}
 
-			return newLine.Trim(' ') + '\n';
+			return newLine.Trim(' ') + nl;
 		}
 
 		public void AlignLeft(string[] lines)
@@ -434,7 +443,7 @@ namespace WinTlx.TextEditor
 		/// <param name="line"></param>
 		/// <param name="len"></param>
 		/// <returns></returns>
-		private List<string> WrapWords(string line, int len)
+		public List<string> WrapWords(string line, int len)
 		{
 			List<AlignItem> words = SplitItems(line);
 			List<string> newLines = new List<string>();

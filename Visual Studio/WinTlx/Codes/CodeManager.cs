@@ -76,8 +76,8 @@ namespace WinTlx.Codes
 					if (hasThirdLevel)
 					{
 						keyStates.ShiftState = ShiftStates.Third;
-						if (debug) asciiStr += ASC_NUL;
 					}
+					if (debug) asciiStr += ASC_NUL;
 				}
 				else
 				{
@@ -207,12 +207,6 @@ namespace WinTlx.Codes
 				foreach (AsciiConvItem convItem in codeTab.AsciiTab)
 				{
 					string ascii = convItem.GetCodeInRange(asciiData[i]);
-
-					if (ascii != null)
-					{
-						ascii = convItem.GetCodeInRange(asciiData[i]);
-					}
-
 					if (!string.IsNullOrEmpty(ascii)) telexData += ascii;
 				}
 			}
