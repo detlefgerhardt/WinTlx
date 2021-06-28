@@ -25,7 +25,8 @@ namespace WinTlx.Languages
 				{ LngKeys.MainForm_Address, "Adresse" },
 				{ LngKeys.MainForm_Port, "Port" },
 				{ LngKeys.MainForm_Extension, "Extension" },
-				{ LngKeys.MainForm_PeerType,
+				{ LngKeys.MainForm_PeerType, "Peer Type" },
+				{ LngKeys.MainForm_PeerTypeHelp,
 					"0 - gelöscht\r\n" + 
 					"1 - texting baudot / Hostname\r\n" +
 					"2 - texting baudot / feste IP\r\n" +
@@ -34,11 +35,15 @@ namespace WinTlx.Languages
 					"5 - texting baudot / dyn. IP\r\n" +
 					"6 - Emailadresse"
 				},
-				//{ LngKeys.MainForm_Itelex, "i-Telex" },
-				//{ LngKeys.MainForm_ASCII, "ASCII" },
+				{ LngKeys.MainForm_PeerType0, "gelöscht" },
+				{ LngKeys.MainForm_PeerType1, "texting baudot / Hostname" },
+				{ LngKeys.MainForm_PeerType2, "texting baudot / feste IP" },
+				{ LngKeys.MainForm_PeerType3, "ascii texting / Hostname" },
+				{ LngKeys.MainForm_PeerType4, "ascii texting / feste IP" },
+				{ LngKeys.MainForm_PeerType5, "texting baudot / dyn. IP" },
+				{ LngKeys.MainForm_PeerType6, "Emailadresse" },
 				{ LngKeys.MainForm_ConnectButton, "Verbinden" },
 				{ LngKeys.MainForm_DisconnectButton, "Trennen" },
-				//{ LngKeys.MainForm_Favorites, "Favoriten" },
 				{ LngKeys.MainForm_SendWruButton, "WRU" },
 				{ LngKeys.MainForm_SendHereisButton, "Hier ist" },
 				{ LngKeys.MainForm_SendLettersButton, "Bu" },
@@ -88,6 +93,8 @@ namespace WinTlx.Languages
 				{ LngKeys.Setup_IdleTimeout, "Inaktivitäts-Timeout (s)" },
 				{ LngKeys.Setup_OutputSpeed, "Ausgabegeschw. (Baud)" },
 				{ LngKeys.Setup_CodeSet, "Zeichensatz" },
+				{ LngKeys.Setup_DefaultProtocolOut, "Standard-Protokoll (ausgehend)" },
+
 				{ LngKeys.Setup_SubscribeServer, "Teilnehmer-Server" },
 				{ LngKeys.Setup_SubscribeServerAddress, "Tln-Server-Adresse" },
 				{ LngKeys.Setup_SubscribeServerPort, "Tln-Server-Port" },

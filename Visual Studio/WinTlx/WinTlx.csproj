@@ -111,6 +111,7 @@
     </Compile>
     <Compile Include="Config\ConfigManager.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="PeerTypeItem.cs" />
     <Compile Include="Tools\Helper.cs" />
     <Compile Include="ItelexPacket.cs" />
     <Compile Include="ItelexProtocol.cs" />

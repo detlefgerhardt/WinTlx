@@ -47,7 +47,6 @@ namespace WinTlx
 			this.SendCarriageReturnBtn = new System.Windows.Forms.Button();
 			this.SendLineFeedBtn = new System.Windows.Forms.Button();
 			this.SearchLbl = new System.Windows.Forms.Label();
-			this.SearchTb = new System.Windows.Forms.TextBox();
 			this.QueryBtn = new System.Windows.Forms.Button();
 			this.TlnExtensionLbl = new System.Windows.Forms.Label();
 			this.TlnExtensionTb = new System.Windows.Forms.TextBox();
@@ -56,8 +55,9 @@ namespace WinTlx
 			this.SendFBtn = new System.Windows.Forms.Button();
 			this.SendNullBtn = new System.Windows.Forms.Button();
 			this.panel2 = new System.Windows.Forms.Panel();
-			this.TlnTypeLbl = new System.Windows.Forms.Label();
-			this.TlnTypeTb = new System.Windows.Forms.TextBox();
+			this.TlnTypeCb = new System.Windows.Forms.ComboBox();
+			this.SearchCb = new System.Windows.Forms.ComboBox();
+			this.TlnPeerTypeLbl = new System.Windows.Forms.Label();
 			this.AnswerbackLbl = new System.Windows.Forms.Label();
 			this.AnswerbackTb = new System.Windows.Forms.TextBox();
 			this.panel4 = new System.Windows.Forms.Panel();
@@ -159,16 +159,16 @@ namespace WinTlx
 			// 
 			this.TlnNameCb.DropDownWidth = 200;
 			this.TlnNameCb.FormattingEnabled = true;
-			this.TlnNameCb.Location = new System.Drawing.Point(200, 23);
+			this.TlnNameCb.Location = new System.Drawing.Point(212, 23);
 			this.TlnNameCb.Name = "TlnNameCb";
 			this.TlnNameCb.Size = new System.Drawing.Size(230, 21);
 			this.TlnNameCb.TabIndex = 3;
-			this.TlnNameCb.SelectedIndexChanged += new System.EventHandler(this.PhoneEntryCb_SelectedIndexChanged);
+			this.TlnNameCb.SelectedIndexChanged += new System.EventHandler(this.TlnNameCb_SelectedIndexChanged);
 			// 
 			// TlnPortTb
 			// 
 			this.TlnPortTb.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.TlnPortTb.Location = new System.Drawing.Point(384, 65);
+			this.TlnPortTb.Location = new System.Drawing.Point(396, 65);
 			this.TlnPortTb.Name = "TlnPortTb";
 			this.TlnPortTb.Size = new System.Drawing.Size(46, 22);
 			this.TlnPortTb.TabIndex = 5;
@@ -177,7 +177,7 @@ namespace WinTlx
 			// TlnAddressTb
 			// 
 			this.TlnAddressTb.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.TlnAddressTb.Location = new System.Drawing.Point(200, 65);
+			this.TlnAddressTb.Location = new System.Drawing.Point(212, 65);
 			this.TlnAddressTb.Name = "TlnAddressTb";
 			this.TlnAddressTb.Size = new System.Drawing.Size(178, 22);
 			this.TlnAddressTb.TabIndex = 4;
@@ -186,7 +186,7 @@ namespace WinTlx
 			// TlnMemberLbl
 			// 
 			this.TlnMemberLbl.AutoSize = true;
-			this.TlnMemberLbl.Location = new System.Drawing.Point(198, 7);
+			this.TlnMemberLbl.Location = new System.Drawing.Point(210, 7);
 			this.TlnMemberLbl.Name = "TlnMemberLbl";
 			this.TlnMemberLbl.Size = new System.Drawing.Size(146, 13);
 			this.TlnMemberLbl.TabIndex = 0;
@@ -195,7 +195,7 @@ namespace WinTlx
 			// TlnAddressLbl
 			// 
 			this.TlnAddressLbl.AutoSize = true;
-			this.TlnAddressLbl.Location = new System.Drawing.Point(198, 49);
+			this.TlnAddressLbl.Location = new System.Drawing.Point(210, 49);
 			this.TlnAddressLbl.Name = "TlnAddressLbl";
 			this.TlnAddressLbl.Size = new System.Drawing.Size(45, 13);
 			this.TlnAddressLbl.TabIndex = 0;
@@ -204,7 +204,7 @@ namespace WinTlx
 			// TlnPortLbl
 			// 
 			this.TlnPortLbl.AutoSize = true;
-			this.TlnPortLbl.Location = new System.Drawing.Point(381, 49);
+			this.TlnPortLbl.Location = new System.Drawing.Point(393, 49);
 			this.TlnPortLbl.Name = "TlnPortLbl";
 			this.TlnPortLbl.Size = new System.Drawing.Size(26, 13);
 			this.TlnPortLbl.TabIndex = 0;
@@ -241,18 +241,9 @@ namespace WinTlx
 			this.SearchLbl.TabIndex = 0;
 			this.SearchLbl.Text = "Search text";
 			// 
-			// SearchTb
-			// 
-			this.SearchTb.Location = new System.Drawing.Point(8, 23);
-			this.SearchTb.Name = "SearchTb";
-			this.SearchTb.Size = new System.Drawing.Size(128, 20);
-			this.SearchTb.TabIndex = 1;
-			this.SearchTb.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SearchTb_KeyPress);
-			this.SearchTb.Validated += new System.EventHandler(this.SearchTb_Validated);
-			// 
 			// QueryBtn
 			// 
-			this.QueryBtn.Location = new System.Drawing.Point(142, 22);
+			this.QueryBtn.Location = new System.Drawing.Point(154, 22);
 			this.QueryBtn.Name = "QueryBtn";
 			this.QueryBtn.Size = new System.Drawing.Size(52, 23);
 			this.QueryBtn.TabIndex = 2;
@@ -263,7 +254,7 @@ namespace WinTlx
 			// TlnExtensionLbl
 			// 
 			this.TlnExtensionLbl.AutoSize = true;
-			this.TlnExtensionLbl.Location = new System.Drawing.Point(433, 49);
+			this.TlnExtensionLbl.Location = new System.Drawing.Point(445, 49);
 			this.TlnExtensionLbl.Name = "TlnExtensionLbl";
 			this.TlnExtensionLbl.Size = new System.Drawing.Size(53, 13);
 			this.TlnExtensionLbl.TabIndex = 0;
@@ -272,7 +263,7 @@ namespace WinTlx
 			// TlnExtensionTb
 			// 
 			this.TlnExtensionTb.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.TlnExtensionTb.Location = new System.Drawing.Point(436, 65);
+			this.TlnExtensionTb.Location = new System.Drawing.Point(448, 65);
 			this.TlnExtensionTb.Name = "TlnExtensionTb";
 			this.TlnExtensionTb.Size = new System.Drawing.Size(46, 22);
 			this.TlnExtensionTb.TabIndex = 6;
@@ -320,8 +311,9 @@ namespace WinTlx
 			// panel2
 			// 
 			this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.panel2.Controls.Add(this.TlnTypeLbl);
-			this.panel2.Controls.Add(this.TlnTypeTb);
+			this.panel2.Controls.Add(this.TlnTypeCb);
+			this.panel2.Controls.Add(this.SearchCb);
+			this.panel2.Controls.Add(this.TlnPeerTypeLbl);
 			this.panel2.Controls.Add(this.AnswerbackLbl);
 			this.panel2.Controls.Add(this.AnswerbackTb);
 			this.panel2.Controls.Add(this.TlnNameCb);
@@ -332,7 +324,6 @@ namespace WinTlx
 			this.panel2.Controls.Add(this.TlnMemberLbl);
 			this.panel2.Controls.Add(this.QueryBtn);
 			this.panel2.Controls.Add(this.TlnAddressLbl);
-			this.panel2.Controls.Add(this.SearchTb);
 			this.panel2.Controls.Add(this.TlnPortLbl);
 			this.panel2.Controls.Add(this.SearchLbl);
 			this.panel2.Location = new System.Drawing.Point(12, 26);
@@ -340,24 +331,32 @@ namespace WinTlx
 			this.panel2.Size = new System.Drawing.Size(567, 100);
 			this.panel2.TabIndex = 0;
 			// 
-			// TlnTypeLbl
+			// TlnTypeCb
 			// 
-			this.TlnTypeLbl.AutoSize = true;
-			this.TlnTypeLbl.Location = new System.Drawing.Point(433, 7);
-			this.TlnTypeLbl.Name = "TlnTypeLbl";
-			this.TlnTypeLbl.Size = new System.Drawing.Size(31, 13);
-			this.TlnTypeLbl.TabIndex = 10;
-			this.TlnTypeLbl.Text = "Type";
+			this.TlnTypeCb.FormattingEnabled = true;
+			this.TlnTypeCb.Location = new System.Drawing.Point(448, 23);
+			this.TlnTypeCb.Name = "TlnTypeCb";
+			this.TlnTypeCb.Size = new System.Drawing.Size(112, 21);
+			this.TlnTypeCb.TabIndex = 82;
+			this.TlnTypeCb.MouseHover += new System.EventHandler(this.TlnTypeCb_MouseHover);
 			// 
-			// TlnTypeTb
+			// SearchCb
 			// 
-			this.TlnTypeTb.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.TlnTypeTb.Location = new System.Drawing.Point(436, 23);
-			this.TlnTypeTb.Name = "TlnTypeTb";
-			this.TlnTypeTb.ReadOnly = true;
-			this.TlnTypeTb.Size = new System.Drawing.Size(46, 22);
-			this.TlnTypeTb.TabIndex = 9;
-			this.TlnTypeTb.MouseHover += new System.EventHandler(this.TlnTypeTb_MouseHover);
+			this.SearchCb.FormattingEnabled = true;
+			this.SearchCb.Location = new System.Drawing.Point(8, 23);
+			this.SearchCb.Name = "SearchCb";
+			this.SearchCb.Size = new System.Drawing.Size(140, 21);
+			this.SearchCb.TabIndex = 81;
+			this.SearchCb.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SearchCb_KeyPress);
+			// 
+			// TlnPeerTypeLbl
+			// 
+			this.TlnPeerTypeLbl.AutoSize = true;
+			this.TlnPeerTypeLbl.Location = new System.Drawing.Point(445, 7);
+			this.TlnPeerTypeLbl.Name = "TlnPeerTypeLbl";
+			this.TlnPeerTypeLbl.Size = new System.Drawing.Size(56, 13);
+			this.TlnPeerTypeLbl.TabIndex = 10;
+			this.TlnPeerTypeLbl.Text = "Peer Type";
 			// 
 			// AnswerbackLbl
 			// 
@@ -375,7 +374,7 @@ namespace WinTlx
 			this.AnswerbackTb.Multiline = true;
 			this.AnswerbackTb.Name = "AnswerbackTb";
 			this.AnswerbackTb.ReadOnly = true;
-			this.AnswerbackTb.Size = new System.Drawing.Size(186, 22);
+			this.AnswerbackTb.Size = new System.Drawing.Size(198, 22);
 			this.AnswerbackTb.TabIndex = 0;
 			this.AnswerbackTb.TabStop = false;
 			// 
@@ -544,12 +543,12 @@ namespace WinTlx
 			this.ReceiveStatusLbl.Text = "Receive Off";
 			this.ReceiveStatusLbl.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// ToSendStatusLbl
+			// SendBufferStatusLbl
 			// 
 			this.SendBufferStatusLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.SendBufferStatusLbl.AutoSize = true;
 			this.SendBufferStatusLbl.Location = new System.Drawing.Point(171, 506);
-			this.SendBufferStatusLbl.Name = "ToSendStatusLbl";
+			this.SendBufferStatusLbl.Name = "SendBufferStatusLbl";
 			this.SendBufferStatusLbl.Size = new System.Drawing.Size(48, 13);
 			this.SendBufferStatusLbl.TabIndex = 80;
 			this.SendBufferStatusLbl.Text = "ToSend:";
@@ -629,7 +628,6 @@ namespace WinTlx
 		private System.Windows.Forms.Button SendCarriageReturnBtn;
 		private System.Windows.Forms.Button SendLineFeedBtn;
 		private System.Windows.Forms.Label SearchLbl;
-		private System.Windows.Forms.TextBox SearchTb;
 		private System.Windows.Forms.Button QueryBtn;
 		private System.Windows.Forms.Label TlnExtensionLbl;
 		private System.Windows.Forms.TextBox TlnExtensionTb;
@@ -646,8 +644,7 @@ namespace WinTlx
 		private System.Windows.Forms.Button ScrollUpBtn;
 		private System.Windows.Forms.Button ScrollEndBtn;
 		private System.Windows.Forms.Button ScrollDownBtn;
-		private System.Windows.Forms.TextBox TlnTypeTb;
-		private System.Windows.Forms.Label TlnTypeLbl;
+		private System.Windows.Forms.Label TlnPeerTypeLbl;
 		private System.Windows.Forms.Button SendFBtn;
 		private System.Windows.Forms.Button SendHBtn;
 		private System.Windows.Forms.Button SendGBtn;
@@ -659,6 +656,8 @@ namespace WinTlx
 		private System.Windows.Forms.Label ConnectStatusLbl;
 		private System.Windows.Forms.Label ReceiveStatusLbl;
 		private System.Windows.Forms.Label SendBufferStatusLbl;
+		private System.Windows.Forms.ComboBox SearchCb;
+		private System.Windows.Forms.ComboBox TlnTypeCb;
 	}
 }
 

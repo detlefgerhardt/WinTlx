@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Media;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,6 +63,8 @@ namespace WinTlx
 
 		private readonly TextEditorManager _textEditorManager;
 
+		private List<string> _searchHistory;
+
 		private TestPatternForm _testPatternForm;
 
 		private SchedulerForm _schedulerForm;
@@ -74,6 +77,8 @@ namespace WinTlx
 
 		private bool _recvOn;
 
+		private PeerTypeItem[] _tlnTypes;
+		
 		public MainForm()
 		{
 			InitializeComponent();
@@ -156,6 +161,8 @@ namespace WinTlx
 			_favoritesManager = FavoritesManager.Instance;
 			_favoritesManager.DialFavorite += FavoritesManager_DialFavorite;
 
+			LoadSearchHistory();
+
 			LanguageManager.Instance.LanguageChanged += LanguageChanged;
 			LanguageManager.Instance.ChangeLanguage(_configData.Language);
 
@@ -179,6 +186,7 @@ namespace WinTlx
 			AnswerbackLbl.Text = LngText(LngKeys.MainForm_Answerback);
 			Helper.SetToolTip(AnswerbackLbl, LngText(LngKeys.MainForm_Answerback_ToolTip));
 
+			TlnPeerTypeLbl.Text = LngText(LngKeys.MainForm_PeerType);
 			TlnAddressLbl.Text = LngText(LngKeys.MainForm_Address);
 			TlnPortLbl.Text = LngText(LngKeys.MainForm_Port);
 			TlnExtensionLbl.Text = LngText(LngKeys.MainForm_Extension);
@@ -200,6 +208,7 @@ namespace WinTlx
 			ShowScreen();
 			UpdateHandler();
 			SetNullBtnText();
+			SetPeerTypes();
 		}
 
 		private void SetNullBtnText()
@@ -229,6 +238,7 @@ namespace WinTlx
 		private void MainForm_Load(object sender, EventArgs e)
 		{
 			MainForm_Resize(null, null);
+			SetTlnData();
 
 #if !DEBUG
 			string text = $"{Helper.GetVersion()}\r\r" + "by *dg* Detlef Gerhardt\r\r" + LngText(LngKeys.Start_Text);
@@ -397,7 +407,7 @@ namespace WinTlx
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
 			// check for controls without special input handling
-			//if (SearchTb.Focused || MemberCb.Focused || AddressTb.Focused || PortTb.Focused || ExtensionTb.Focused)
+			//if (SearchCb.Focused || MemberCb.Focused || AddressTb.Focused || PortTb.Focused || ExtensionTb.Focused)
 			if (!TerminalPb.Focused)
 			{
 				return base.ProcessCmdKey(ref msg, keyData);
@@ -476,7 +486,7 @@ namespace WinTlx
 		private void MainForm_KeyPress(object sender, KeyPressEventArgs e)
 		{
 			// check for controls without special input handling
-			if (SearchTb.Focused || TlnNameCb.Focused || TlnAddressTb.Focused || TlnPortTb.Focused || TlnExtensionTb.Focused)
+			if (SearchCb.Focused || TlnNameCb.Focused || TlnAddressTb.Focused || TlnPortTb.Focused || TlnExtensionTb.Focused)
 			{
 				return;
 			}
@@ -589,7 +599,7 @@ namespace WinTlx
 
 		private void FocusTimer_Elapsed(object sender, ElapsedEventArgs e)
 		{
-			//bool focus = !SearchTb.Focused && !MemberCb.Focused && !AddressTb.Focused && !PortTb.Focused && ExtensionTb.Focused;
+			//bool focus = !SearchCb.Focused && !MemberCb.Focused && !AddressTb.Focused && !PortTb.Focused && ExtensionTb.Focused;
 		}
 
 #endregion
@@ -623,19 +633,31 @@ namespace WinTlx
 
 #endregion
 
-		private void PhoneEntryCb_SelectedIndexChanged(object sender, EventArgs e)
+		private void TlnNameCb_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			SetTlnData();
+		}
+
+		private void SetTlnData()
 		{
 			PeerQueryData entry = (PeerQueryData)TlnNameCb.SelectedItem;
 			if (entry == null)
 			{
+				TlnNameCb.Text = "";
+				TlnAddressTb.Text = "";
+				TlnPortTb.Text = "";
+				TlnExtensionTb.Text = "";
+				TlnTypeCb.Text = "";
 				return;
 			}
+
 			_currentTlnNumber = entry.Number;
 			_currentTlnName = entry.LongName;
 			TlnAddressTb.Text = entry.Address;
 			TlnPortTb.Text = entry.PortNumber != 0 ? entry.PortNumber.ToString() : "";
 			TlnExtensionTb.Text = entry.ExtensionNumber != 0 ? entry.ExtensionNumber.ToString() : "";
-			TlnTypeTb.Text = entry.PeerType.ToString();
+			TlnTypeCb.SelectedIndex = entry.PeerType;
+			//TlnTypeCb.Text = entry.PeerType.ToString();
 		}
 
 		private void AddressTb_Leave(object sender, EventArgs e)
@@ -650,22 +672,9 @@ namespace WinTlx
 			UpdateHandler();
 		}
 
-		/// <summary>
-		/// Use Validated event instead of Leave event, because Leave event fires twice
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void SearchTb_Validated(object sender, EventArgs e)
+		private async void SearchCb_KeyPress(object sender, KeyPressEventArgs e)
 		{
-			//if (!string.IsNullOrWhiteSpace(SearchTb.Text))
-			//{
-			//	await ActiveQuery();
-			//}
-		}
-
-		private async void SearchTb_KeyPress(object sender, KeyPressEventArgs e)
-		{
-			if (e.KeyChar=='\r')
+			if (e.KeyChar == '\r')
 			{
 				await ActiveQuery();
 				//QueryBtn.Focus();
@@ -686,14 +695,14 @@ namespace WinTlx
 				return;
 			}
 
-			SearchTb.Enabled = false;
+			SearchCb.Enabled = false;
 			QueryBtn.Enabled = false;
 
 			_queryActive = true;
 			await Query();
 			_queryActive = false;
 
-			SearchTb.Enabled = true;
+			SearchCb.Enabled = true;
 			QueryBtn.Enabled = true;
 		}
 
@@ -702,30 +711,37 @@ namespace WinTlx
 			SetFocus();
 
 			TlnNameCb.DataSource = null;
+			SetTlnData();
+			/*
 			TlnNameCb.Text = "";
 			TlnAddressTb.Text = "";
 			TlnPortTb.Text = "";
 			TlnExtensionTb.Text = "";
-			TlnTypeTb.Text = "";
+			TlnTypeCb.Text = "";
+			*/
 
-			SearchTb.Text = SearchTb.Text.Trim();
-			if (string.IsNullOrWhiteSpace(SearchTb.Text))
+			SearchCb.Text = SearchCb.Text.Trim();
+			if (string.IsNullOrWhiteSpace(SearchCb.Text))
 			{
 				return;
 			}
 
-			Logging.Instance.Log(LogTypes.Info, TAG, nameof(QueryBtn_Click), $"SearchText='{SearchTb.Text}'");
+			string searchStr = SearchCb.Text;
+
+			AddToSearchHistory(searchStr);
+
+			Logging.Instance.Log(LogTypes.Info, TAG, nameof(QueryBtn_Click), $"SearchText='{searchStr}'");
 
 			if (!_configData.SubscribeServerAddressExists || _configData.SubscribeServerPort == 0)
 			{
-				SubcribeServerMessageHandler(LngText(LngKeys.Message_InvalidSubscribeServerData));
+				ShowLocalMessage(LngText(LngKeys.Message_InvalidSubscribeServerData));
 				Logging.Instance.Error(TAG, "QueryBtn_Click", "no valid subscribe server data");
 				return;
 			}
 
 			PeerQueryData[] list = null;
 
-			if (!uint.TryParse(SearchTb.Text, out uint num))
+			if (!uint.TryParse(searchStr, out uint num))
 			{
 				num = 0;
 			}
@@ -738,7 +754,7 @@ namespace WinTlx
 						_configData.SubscribeServerAddresses, _configData.SubscribeServerPort, num.ToString());
 					if (!queryReply.Valid)
 					{
-						SubcribeServerMessageHandler(queryReply.Error);
+						ShowLocalMessage(queryReply.Error);
 						return;
 					}
 					if (queryReply.Data != null)
@@ -754,20 +770,23 @@ namespace WinTlx
 				{
 					// search member
 					PeerSearchReply searchReply = _subscriberServer.DoPeerSearch(
-						_configData.SubscribeServerAddresses, _configData.SubscribeServerPort, SearchTb.Text);
+						_configData.SubscribeServerAddresses, _configData.SubscribeServerPort, searchStr);
 					if (!searchReply.Valid)
 					{
-						SubcribeServerMessageHandler(searchReply.Error);
+						ShowLocalMessage(searchReply.Error);
 						return;
 					}
 					list = searchReply.List;
 				}
 			});
 
-			SubcribeServerMessageHandler($"{list?.Length} {LngText(LngKeys.Message_QueryResult)}");
+			ShowLocalMessage($"{list?.Length} {LngText(LngKeys.Message_QueryResult)}");
 
 			TlnNameCb.DataSource = list;
 			TlnNameCb.DisplayMember = "Display";
+			//if (list.Length>0) TlnNameCb.SelectedIndex = 0;
+
+			/*
 			if (list == null)
 			{
 			}
@@ -777,14 +796,14 @@ namespace WinTlx
 				TlnAddressTb.Text = "";
 				TlnPortTb.Text = "";
 				TlnExtensionTb.Text = "";
-				TlnTypeTb.Text = "";
+				TlnTypeCb.Text = "";
 			}
 			else
 			{
 				TlnNameCb.SelectedIndex = 0;
 			}
-
-			//SetConnectState();
+			*/
+			SetTlnData();
 			UpdateHandler();
 		}
 
@@ -1324,7 +1343,31 @@ namespace WinTlx
 				extension = null;
 			}
 
-			bool success = await _itelex.ConnectOut(TlnAddressTb.Text, port.Value, extension, false);
+			PeerTypeItem peerTypeItem = (PeerTypeItem)TlnTypeCb.SelectedItem;
+			bool asciiMode;
+			if (peerTypeItem != null)
+			{
+				int peerType = peerTypeItem.PeerCode;
+				if (peerType == 1 || peerType == 2 || peerType == 5)
+				{
+					asciiMode = false;
+				}
+				else if (peerType == 3 || peerType == 4)
+				{
+					asciiMode = true;
+				}
+				else
+				{
+					ShowLocalMessage($"invalid peer-type {peerType}");
+					return false;
+				}
+			}
+			else
+			{
+				asciiMode = false;
+			}
+
+			bool success = await _itelex.ConnectOut(TlnAddressTb.Text, port.Value, extension, asciiMode);
 			if (success)
 			{
 				_favoritesManager.CallHistoryAddCall(_currentTlnNumber, _currentTlnName, "ok");
@@ -1876,7 +1919,7 @@ namespace WinTlx
 			//ShowLocalMessage("wait here is ok");
 		}
 
-#endregion
+		#endregion
 
 		/*
 		private void WaitSend(int millis)
@@ -1929,7 +1972,7 @@ namespace WinTlx
 		}
 		*/
 
-		private void TlnTypeTb_MouseHover(object sender, EventArgs e)
+		private void TlnTypeCb_MouseHover(object sender, EventArgs e)
 		{
 			ToolTip tt = new ToolTip
 			{
@@ -1937,7 +1980,7 @@ namespace WinTlx
 				InitialDelay = 0,
 				ShowAlways = true
 			};
-			tt.SetToolTip(TlnTypeTb, LngText(LngKeys.MainForm_PeerType));
+			tt.SetToolTip(TlnTypeCb, LngText(LngKeys.MainForm_PeerTypeHelp));
 		}
 
 		private void OpenFavorites()
@@ -2127,7 +2170,7 @@ namespace WinTlx
 					}
 				}
 
-				Helper.ControlInvokeRequired(SearchTb, () => SearchTb.Text = favItem.Number);
+				Helper.ControlInvokeRequired(SearchCb, () => SearchCb.Text = favItem.Number);
 				if (!string.IsNullOrEmpty(favItem.Address))
 				{
 					Helper.ControlInvokeRequired(TlnNameCb, () => TlnNameCb.Text = favItem.Name);
@@ -2149,6 +2192,67 @@ namespace WinTlx
 				*/
 			});
 			UpdateHandler();
+		}
+
+		private void LoadSearchHistory()
+		{
+			try
+			{
+				_searchHistory = File.ReadAllLines(Constants.SEARCH_HISTORY).ToList();
+			}
+			catch
+			{
+				_searchHistory = new List<string>();
+			}
+			UpdateSearchHistory();
+		}
+
+		private void SaveSearchHistory()
+		{
+			try
+			{
+				File.WriteAllLines(Constants.SEARCH_HISTORY, _searchHistory);
+			}
+			catch
+			{
+			}
+		}
+
+		private void AddToSearchHistory(string searchStr)
+		{
+			if (!string.IsNullOrWhiteSpace(searchStr))
+			{
+				if (_searchHistory.Count > 0 && _searchHistory[0] != searchStr)
+				{
+					_searchHistory.Insert(0, searchStr);
+				}
+			}
+
+			_searchHistory = _searchHistory.Take(Constants.SEARCH_HISTORY_LENGTH).ToList();
+			SaveSearchHistory();
+			UpdateSearchHistory();
+		}
+
+		private void UpdateSearchHistory()
+		{
+			SearchCb.DataSource = _searchHistory;
+		}
+
+		private void SetPeerTypes()
+		{
+			_tlnTypes = new PeerTypeItem[]
+			{
+				new PeerTypeItem(0, "0 deleted", LngText(LngKeys.MainForm_PeerType0)),
+				new PeerTypeItem(1, "1 baud hostname", LngText(LngKeys.MainForm_PeerType1)),
+				new PeerTypeItem(2, "2 baud fixed ip", LngText(LngKeys.MainForm_PeerType2)),
+				new PeerTypeItem(3, "3 ascii hostname", LngText(LngKeys.MainForm_PeerType3)),
+				new PeerTypeItem(4, "4 ascii fixed ip", LngText(LngKeys.MainForm_PeerType4)),
+				new PeerTypeItem(5, "5 baud dyn ip", LngText(LngKeys.MainForm_PeerType4)),
+				new PeerTypeItem(6, "6 email", LngText(LngKeys.MainForm_PeerType6)),
+			};
+
+			TlnTypeCb.DataSource = _tlnTypes;
+			TlnTypeCb.DisplayMember = "ShortDesc";
 		}
 
 	}

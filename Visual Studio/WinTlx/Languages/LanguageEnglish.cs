@@ -25,7 +25,8 @@ namespace WinTlx.Languages
 				{ LngKeys.MainForm_Address, "Address" },
 				{ LngKeys.MainForm_Port, "Port" },
 				{ LngKeys.MainForm_Extension, "Extension" },
-				{ LngKeys.MainForm_PeerType,
+				{ LngKeys.MainForm_PeerType, "Peer type" },
+				{ LngKeys.MainForm_PeerTypeHelp,
 					"0 - deleted\r\n" +
 					"1 - texting baudot / hostname\r\n" +
 					"2 - texting baudot / fixed ip\r\n" +
@@ -34,6 +35,13 @@ namespace WinTlx.Languages
 					"5 - texting baudot / dyn. ip\r\n" +
 					"6 - email address\r\n"
 				},
+				{ LngKeys.MainForm_PeerType0, "deleted" },
+				{ LngKeys.MainForm_PeerType1, "texting baudot / hostname" },
+				{ LngKeys.MainForm_PeerType2, "texting baudot / fixed ip" },
+				{ LngKeys.MainForm_PeerType3, "ascii texting / hostname" },
+				{ LngKeys.MainForm_PeerType4, "ascii texting / fixed ip" },
+				{ LngKeys.MainForm_PeerType5, "texting baudot / dyn. ip" },
+				{ LngKeys.MainForm_PeerType6, "email address" },
 				//{ LngKeys.MainForm_Itelex, "i-Telex" },
 				//{ LngKeys.MainForm_ASCII, "ASCII" },
 				{ LngKeys.MainForm_ConnectButton, "Connect" },
@@ -88,6 +96,7 @@ namespace WinTlx.Languages
 				{ LngKeys.Setup_IdleTimeout, "Idle timeout (s)" },
 				{ LngKeys.Setup_OutputSpeed, "Output speed (Baud)" },
 				{ LngKeys.Setup_CodeSet, "Code set" },
+				{ LngKeys.Setup_DefaultProtocolOut, "Default protocol (outgoing)" },
 				{ LngKeys.Setup_SubscribeServer, "Subscribe server" },
 				{ LngKeys.Setup_SubscribeServerAddress, "Subscribe server addr" },
 				{ LngKeys.Setup_SubscribeServerPort, "Subscribe server port" },

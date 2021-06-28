@@ -67,6 +67,9 @@
 			this.SubscribeServerAddress2Tb = new System.Windows.Forms.TextBox();
 			this.SubscribeServerAddress2Lbl = new System.Windows.Forms.Label();
 			this.ItelexGb = new System.Windows.Forms.GroupBox();
+			this.DefaultProtocolOutAsciiRb = new System.Windows.Forms.RadioButton();
+			this.DefaultProtocolOutItelexRb = new System.Windows.Forms.RadioButton();
+			this.DefaultProtocolOutLbl = new System.Windows.Forms.Label();
 			this.LimitedClientGb = new System.Windows.Forms.GroupBox();
 			this.RemoteServerPortTb = new System.Windows.Forms.TextBox();
 			this.RemoteServerPortLbl = new System.Windows.Forms.Label();
@@ -92,7 +95,7 @@
 			// 
 			this.AnswerbackTb.Location = new System.Drawing.Point(141, 16);
 			this.AnswerbackTb.Name = "AnswerbackTb";
-			this.AnswerbackTb.Size = new System.Drawing.Size(136, 20);
+			this.AnswerbackTb.Size = new System.Drawing.Size(157, 20);
 			this.AnswerbackTb.TabIndex = 1;
 			// 
 			// IncommingLocalPortTb
@@ -106,7 +109,7 @@
 			// 
 			this.SubscribeServerAddress1Tb.Location = new System.Drawing.Point(141, 21);
 			this.SubscribeServerAddress1Tb.Name = "SubscribeServerAddress1Tb";
-			this.SubscribeServerAddress1Tb.Size = new System.Drawing.Size(136, 20);
+			this.SubscribeServerAddress1Tb.Size = new System.Drawing.Size(157, 20);
 			this.SubscribeServerAddress1Tb.TabIndex = 5;
 			// 
 			// SubscribeServerPortTb
@@ -146,7 +149,7 @@
 			// SaveBtn
 			// 
 			this.SaveBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.SaveBtn.Location = new System.Drawing.Point(506, 342);
+			this.SaveBtn.Location = new System.Drawing.Point(501, 372);
 			this.SaveBtn.Name = "SaveBtn";
 			this.SaveBtn.Size = new System.Drawing.Size(75, 23);
 			this.SaveBtn.TabIndex = 12;
@@ -157,7 +160,7 @@
 			// CancelBtn
 			// 
 			this.CancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.CancelBtn.Location = new System.Drawing.Point(423, 342);
+			this.CancelBtn.Location = new System.Drawing.Point(418, 372);
 			this.CancelBtn.Name = "CancelBtn";
 			this.CancelBtn.Size = new System.Drawing.Size(75, 23);
 			this.CancelBtn.TabIndex = 13;
@@ -169,7 +172,7 @@
 			// 
 			this.OwnNumberTb.Location = new System.Drawing.Point(125, 45);
 			this.OwnNumberTb.Name = "OwnNumberTb";
-			this.OwnNumberTb.Size = new System.Drawing.Size(152, 20);
+			this.OwnNumberTb.Size = new System.Drawing.Size(120, 20);
 			this.OwnNumberTb.TabIndex = 8;
 			// 
 			// OwnNumberLbl
@@ -257,9 +260,9 @@
 			this.IncomingGb.Controls.Add(this.IncomingPublicPortLbl);
 			this.IncomingGb.Controls.Add(this.SubscribeServerUpdatePinTb);
 			this.IncomingGb.Controls.Add(this.IncomingPublicPortTb);
-			this.IncomingGb.Location = new System.Drawing.Point(301, 12);
+			this.IncomingGb.Location = new System.Drawing.Point(325, 12);
 			this.IncomingGb.Name = "IncomingGb";
-			this.IncomingGb.Size = new System.Drawing.Size(283, 153);
+			this.IncomingGb.Size = new System.Drawing.Size(255, 153);
 			this.IncomingGb.TabIndex = 20;
 			this.IncomingGb.TabStop = false;
 			this.IncomingGb.Text = "Incoming connection";
@@ -305,7 +308,7 @@
 			this.GeneralGb.Controls.Add(this.LanguageCb);
 			this.GeneralGb.Location = new System.Drawing.Point(12, 12);
 			this.GeneralGb.Name = "GeneralGb";
-			this.GeneralGb.Size = new System.Drawing.Size(283, 84);
+			this.GeneralGb.Size = new System.Drawing.Size(307, 84);
 			this.GeneralGb.TabIndex = 21;
 			this.GeneralGb.TabStop = false;
 			this.GeneralGb.Text = "General";
@@ -314,7 +317,7 @@
 			// 
 			this.LogFilePathTb.Location = new System.Drawing.Point(83, 47);
 			this.LogFilePathTb.Name = "LogFilePathTb";
-			this.LogFilePathTb.Size = new System.Drawing.Size(194, 20);
+			this.LogFilePathTb.Size = new System.Drawing.Size(215, 20);
 			this.LogFilePathTb.TabIndex = 25;
 			// 
 			// LogfilePathLbl
@@ -344,7 +347,7 @@
             "US-TTY"});
 			this.LanguageCb.Location = new System.Drawing.Point(141, 20);
 			this.LanguageCb.Name = "LanguageCb";
-			this.LanguageCb.Size = new System.Drawing.Size(136, 21);
+			this.LanguageCb.Size = new System.Drawing.Size(73, 21);
 			this.LanguageCb.TabIndex = 22;
 			// 
 			// CodeSetCb
@@ -378,9 +381,9 @@
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortLbl);
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerAddress1Lbl);
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortTb);
-			this.SubscribeServerGb.Location = new System.Drawing.Point(12, 235);
+			this.SubscribeServerGb.Location = new System.Drawing.Point(12, 262);
 			this.SubscribeServerGb.Name = "SubscribeServerGb";
-			this.SubscribeServerGb.Size = new System.Drawing.Size(283, 128);
+			this.SubscribeServerGb.Size = new System.Drawing.Size(307, 128);
 			this.SubscribeServerGb.TabIndex = 22;
 			this.SubscribeServerGb.TabStop = false;
 			this.SubscribeServerGb.Text = "Subscribe server";
@@ -389,7 +392,7 @@
 			// 
 			this.SubscribeServerAddress3Tb.Location = new System.Drawing.Point(141, 73);
 			this.SubscribeServerAddress3Tb.Name = "SubscribeServerAddress3Tb";
-			this.SubscribeServerAddress3Tb.Size = new System.Drawing.Size(136, 20);
+			this.SubscribeServerAddress3Tb.Size = new System.Drawing.Size(157, 20);
 			this.SubscribeServerAddress3Tb.TabIndex = 10;
 			// 
 			// SubscribeServerAddress3Lbl
@@ -405,7 +408,7 @@
 			// 
 			this.SubscribeServerAddress2Tb.Location = new System.Drawing.Point(141, 47);
 			this.SubscribeServerAddress2Tb.Name = "SubscribeServerAddress2Tb";
-			this.SubscribeServerAddress2Tb.Size = new System.Drawing.Size(136, 20);
+			this.SubscribeServerAddress2Tb.Size = new System.Drawing.Size(157, 20);
 			this.SubscribeServerAddress2Tb.TabIndex = 8;
 			// 
 			// SubscribeServerAddress2Lbl
@@ -419,6 +422,9 @@
 			// 
 			// ItelexGb
 			// 
+			this.ItelexGb.Controls.Add(this.DefaultProtocolOutAsciiRb);
+			this.ItelexGb.Controls.Add(this.DefaultProtocolOutItelexRb);
+			this.ItelexGb.Controls.Add(this.DefaultProtocolOutLbl);
 			this.ItelexGb.Controls.Add(this.AnswerbackTb);
 			this.ItelexGb.Controls.Add(this.AnswerbackLbl);
 			this.ItelexGb.Controls.Add(this.CodeSetLbl);
@@ -429,10 +435,43 @@
 			this.ItelexGb.Controls.Add(this.OutputSpeedLbl);
 			this.ItelexGb.Location = new System.Drawing.Point(12, 102);
 			this.ItelexGb.Name = "ItelexGb";
-			this.ItelexGb.Size = new System.Drawing.Size(283, 127);
+			this.ItelexGb.Size = new System.Drawing.Size(307, 154);
 			this.ItelexGb.TabIndex = 23;
 			this.ItelexGb.TabStop = false;
 			this.ItelexGb.Text = "i-Telex";
+			// 
+			// DefaultProtocolOutAsciiRb
+			// 
+			this.DefaultProtocolOutAsciiRb.AutoSize = true;
+			this.DefaultProtocolOutAsciiRb.Location = new System.Drawing.Point(241, 125);
+			this.DefaultProtocolOutAsciiRb.Name = "DefaultProtocolOutAsciiRb";
+			this.DefaultProtocolOutAsciiRb.Size = new System.Drawing.Size(52, 17);
+			this.DefaultProtocolOutAsciiRb.TabIndex = 24;
+			this.DefaultProtocolOutAsciiRb.TabStop = true;
+			this.DefaultProtocolOutAsciiRb.Text = "ASCII";
+			this.DefaultProtocolOutAsciiRb.UseVisualStyleBackColor = true;
+			this.DefaultProtocolOutAsciiRb.Click += new System.EventHandler(this.DefaultProtocolAsciiRb_Click);
+			// 
+			// DefaultProtocolOutItelexRb
+			// 
+			this.DefaultProtocolOutItelexRb.AutoSize = true;
+			this.DefaultProtocolOutItelexRb.Location = new System.Drawing.Point(179, 125);
+			this.DefaultProtocolOutItelexRb.Name = "DefaultProtocolOutItelexRb";
+			this.DefaultProtocolOutItelexRb.Size = new System.Drawing.Size(56, 17);
+			this.DefaultProtocolOutItelexRb.TabIndex = 23;
+			this.DefaultProtocolOutItelexRb.TabStop = true;
+			this.DefaultProtocolOutItelexRb.Text = "i-Telex";
+			this.DefaultProtocolOutItelexRb.UseVisualStyleBackColor = true;
+			this.DefaultProtocolOutItelexRb.Click += new System.EventHandler(this.DefaultProtocolItelexRb_Click);
+			// 
+			// DefaultProtocolOutLbl
+			// 
+			this.DefaultProtocolOutLbl.AutoSize = true;
+			this.DefaultProtocolOutLbl.Location = new System.Drawing.Point(10, 127);
+			this.DefaultProtocolOutLbl.Name = "DefaultProtocolOutLbl";
+			this.DefaultProtocolOutLbl.Size = new System.Drawing.Size(135, 13);
+			this.DefaultProtocolOutLbl.TabIndex = 22;
+			this.DefaultProtocolOutLbl.Text = "Default Protocol (Outgoing)";
 			// 
 			// LimitedClientGb
 			// 
@@ -442,9 +481,9 @@
 			this.LimitedClientGb.Controls.Add(this.RemoteServerAddressLbl);
 			this.LimitedClientGb.Controls.Add(this.LimitedClientCb);
 			this.LimitedClientGb.Controls.Add(this.LimitedClientLbl);
-			this.LimitedClientGb.Location = new System.Drawing.Point(301, 171);
+			this.LimitedClientGb.Location = new System.Drawing.Point(325, 171);
 			this.LimitedClientGb.Name = "LimitedClientGb";
-			this.LimitedClientGb.Size = new System.Drawing.Size(283, 105);
+			this.LimitedClientGb.Size = new System.Drawing.Size(255, 105);
 			this.LimitedClientGb.TabIndex = 24;
 			this.LimitedClientGb.TabStop = false;
 			this.LimitedClientGb.Text = "Limited client";
@@ -469,7 +508,7 @@
 			// 
 			this.RemoteServerAddressTb.Location = new System.Drawing.Point(125, 46);
 			this.RemoteServerAddressTb.Name = "RemoteServerAddressTb";
-			this.RemoteServerAddressTb.Size = new System.Drawing.Size(136, 20);
+			this.RemoteServerAddressTb.Size = new System.Drawing.Size(120, 20);
 			this.RemoteServerAddressTb.TabIndex = 9;
 			// 
 			// RemoteServerAddressLbl
@@ -485,7 +524,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(595, 373);
+			this.ClientSize = new System.Drawing.Size(590, 403);
 			this.Controls.Add(this.LimitedClientGb);
 			this.Controls.Add(this.ItelexGb);
 			this.Controls.Add(this.SubscribeServerGb);
@@ -557,5 +596,8 @@
 		private System.Windows.Forms.Label RemoteServerPortLbl;
 		private System.Windows.Forms.TextBox SubscribeServerAddress3Tb;
 		private System.Windows.Forms.Label SubscribeServerAddress3Lbl;
+		private System.Windows.Forms.Label DefaultProtocolOutLbl;
+		private System.Windows.Forms.RadioButton DefaultProtocolOutItelexRb;
+		private System.Windows.Forms.RadioButton DefaultProtocolOutAsciiRb;
 	}
 }

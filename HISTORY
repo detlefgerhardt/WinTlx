@@ -107,3 +107,9 @@ Version history
 2.0.0.1   Fix: Problem with protocol-version-packet with some i-Telex firmware-versions
           Fix: Cyrillic characters can now be entered via the keyboard when PYC is active
 2.0.0.2   Fix: Improved test-pattern sender
+2.0.0.3   New: Search history
+          New: Selectable peer type on outgoing connection (baudot/ascii texting)
+          New: Configurable default fallback for texting mode
+          New: Considers peer type from subscribe server in ASCII texting mode
+          New: Sends extension in *#* format in ASCII texting mode
+          Fix: Leading spaces were not sent by the text editor 

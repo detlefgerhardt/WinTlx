@@ -725,7 +725,7 @@ namespace WinTlx.TextEditor
 					foreach (string nl in newLines)
 					{
 						if (_stopScript) return;
-						await SendTextLine(nl.Trim() + "\r\n");
+						await SendTextLine(nl.TrimEnd() + "\r\n");
 					}
 				}
 				else

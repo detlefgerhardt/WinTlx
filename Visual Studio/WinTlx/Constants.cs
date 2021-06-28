@@ -7,6 +7,8 @@
 		public const string CONSOLE_LOG = "wintlx_console.log";
 		public const string DEBUG_LOG = "wintlx_debug.log";
 		public const string BINARY_LOG = "wintlx_console.bin";
+		public const string SEARCH_HISTORY = "wintlx_search.txt";
+		public const int SEARCH_HISTORY_LENGTH = 20;
 
 		public const string DEFAULT_LANGUAGE = "EN";
 

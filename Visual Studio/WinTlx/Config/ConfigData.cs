@@ -38,6 +38,9 @@ namespace WinTlx.Config
 		public CodeSets CodeSet { get; set; }
 
 		[DataMember]
+		public bool DefaultProtocolAscii { get; set; } 
+
+		[DataMember]
 		public int IdleTimeout { get; set; }
 
 		[DataMember]

@@ -412,7 +412,8 @@ namespace WinTlx
 			{
 				try
 				{
-					_debugManager.Write($"connect to {host}:{port} ext={extensionNumber}\r\n", DebugManager.Modes.Message);
+					string asciiMsg = asciiMode ? "(ascii)" : "";
+					_debugManager.Write($"connect to {host}:{port} ext={extensionNumber} {asciiMsg}\r\n", DebugManager.Modes.Message);
 
 					_tcpClientWithTimeout = new TcpClientWithTimeout(host, port, 5000);
 					_client = _tcpClientWithTimeout.Connect();
@@ -429,6 +430,7 @@ namespace WinTlx
 					return false;
 				}
 
+				Message?.Invoke("connect");
 				Logging.Instance.Info(TAG, nameof(ConnectOut), $"outgoing connection {host}:{port}");
 				ConnectInit();
 				ConnectionState = ConnectionStates.TcpConnected;
@@ -439,11 +441,14 @@ namespace WinTlx
 				if (!asciiMode)
 				{
 					return await ConnectOutItelex(extensionNumber);
+					if (Texting == Textings.Ascii)
+					{
+						return await ConnectOutAscii(extensionNumber);
+					}
 				}
 				else
 				{
-					return false;
-					//return await ConnectOutAscii(extensionNumber);
+					return await ConnectOutAscii(extensionNumber);
 				}
 			});
 			return status;
@@ -451,12 +456,8 @@ namespace WinTlx
 
 		private async Task<bool> ConnectOutItelex(int? extensionNumber)
 		{
-			Debug.WriteLine($"ConnectOutItelex");
+			// wait 2 seconds for ascii code (ascii texting)
 
-			//byte[] data = Encoding.ASCII.GetBytes("@");
-			//_client.Client.BeginSend(data, 0, data.Length, SocketFlags.None, EndSend, null);
-
-			// wait 2 seconds for ascii code
 			TickTimer timer = new TickTimer();
 			while (timer.ElapsedMilliseconds < 2000)
 			{
@@ -465,21 +466,15 @@ namespace WinTlx
 				await Task.Delay(100);
 			}
 			Logging.Instance.Debug(TAG, nameof(ConnectOutItelex), $"ConnectionState={ConnectionState} Texting={Texting} ElapsedMilliseconds={timer.ElapsedMilliseconds}ms");
-			if (ConnectionState == ConnectionStates.Disconnected) return false;
-
-			if (Texting == Textings.Ascii)
-			{
-				Message?.Invoke($"ascii texting");
-				Logging.Instance.Info(TAG, nameof(ConnectOut), $"ascii texting");
-				return true;
-			}
 
 			if (ConnectionState == ConnectionStates.Disconnected) return false;
+			if (Texting == Textings.Ascii) return true;
  
 			Message?.Invoke($"send version cmd {VersionCode} {Helper.GetVersionStr()}");
 			SendVersionCodeCmd();
 
 			// wait 5 seconds for version cmd and extension cmd from remote
+
 			timer.Start();
 			while (timer.ElapsedMilliseconds < 5000)
 			{
@@ -499,10 +494,35 @@ namespace WinTlx
 			}
 
 			if (ConnectionState == ConnectionStates.Disconnected) return false;
+			if (Texting == Textings.Unknown)
+			{
+				Texting = _config.DefaultProtocolAscii ? Textings.Ascii : Textings.Itelex;
+				_debugManager.Write($"set protocol to default {Texting}\r\n", DebugManager.Modes.Message);
+			}
+
+			if (Texting == Textings.Ascii) return true;
 
 			Message?.Invoke($"send direct dial cmd {extensionNumber}");
 			SendDirectDialCmd(extensionNumber.GetValueOrDefault());
 
+			ConnectionState = ConnectionStates.Connected;
+			Update?.Invoke();
+			return true;
+		}
+
+		public async Task<bool> ConnectOutAscii(int? extensionNumber)
+		{
+			await Task.Delay(1000);
+
+			Texting = Textings.Ascii;
+			Message?.Invoke($"ascii texting");
+			Logging.Instance.Info(TAG, nameof(ConnectOut), $"ascii texting");
+			int ext = extensionNumber.GetValueOrDefault();
+			if (extensionNumber.GetValueOrDefault() != 0)
+			{
+				SendAsciiText($"*{ext}*");
+			}
+			SendAsciiText("\r\n");
 			ConnectionState = ConnectionStates.Connected;
 			Update?.Invoke();
 			return true;
@@ -874,6 +894,31 @@ namespace WinTlx
 					Disconnect();
 					return;
 				}
+
+				/*
+				string conv = "";
+				foreach(char c in asciiStr)
+				{
+					if (c>='a' && c<='z')
+					{
+						conv += (char)(((int)c) - 96);
+					}
+					else
+					{
+						conv += c;
+					}
+				}
+				asciiStr = conv;
+				*/
+
+				asciiStr = asciiStr.Replace("\x05", "@\x17");
+				//asciiStr = asciiStr.Replace("\x05", "\x17");
+				//asciiStr = asciiStr.Replace("\x05", "\x05");
+				asciiStr = asciiStr.Replace(CodeManager.ASC_LTRS.ToString(), "");
+				asciiStr = asciiStr.Replace(CodeManager.ASC_FIGS.ToString(), "");
+
+				//asciiStr = asciiStr.Replace(CodeManager.ASC_BEL, '\x07');
+
 				byte[] data = Encoding.ASCII.GetBytes(asciiStr);
 				_client.Client.BeginSend(data, 0, data.Length, SocketFlags.None, EndSend, null);
 				//Debug.WriteLine($"BeginnSend {data.Length}");
@@ -1179,11 +1224,13 @@ namespace WinTlx
 			{
 				if (newData[0] <= 0x09 || newData[0] >= 0x10 && newData[0] < 0x1F)
 				{
+					_debugManager.Write($"Recv char {newData[0]:X02} -> i-Telex\r\n", DebugManager.Modes.Recv);
 					Debug.WriteLine($"recv ${newData[0]:X02}: i-telex");
 					Texting = Textings.Itelex;
 				}
 				else
 				{
+					_debugManager.Write($"Recv char {newData[0]:X02} -> ASCII\r\n", DebugManager.Modes.Recv);
 					Debug.WriteLine($"recv ${newData[0]:X02}: ascii");
 					Texting = Textings.Ascii;
 				}

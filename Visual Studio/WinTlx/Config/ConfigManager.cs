@@ -32,6 +32,7 @@ namespace WinTlx.Config
 				IdleTimeout = Constants.DEFAULT_IDLE_TIMEOUT,
 				OutputSpeed = 50,
 				CodeSet = CodeSets.ITA2,
+				DefaultProtocolAscii = false,
 				IncomingLocalPort = Constants.DEFAULT_INCOMING_PORT,
 				IncomingPublicPort = Constants.DEFAULT_INCOMING_PORT,
 				IncomingExtensionNumber = 0,

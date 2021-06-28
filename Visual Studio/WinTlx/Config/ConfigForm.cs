@@ -60,6 +60,7 @@ namespace WinTlx.Config
 			IdleTimeoutLbl.Text = LngText(LngKeys.Setup_IdleTimeout);
 			OutputSpeedLbl.Text = LngText(LngKeys.Setup_OutputSpeed);
 			CodeSetLbl.Text = LngText(LngKeys.Setup_CodeSet);
+			DefaultProtocolOutLbl.Text = LngText(LngKeys.Setup_DefaultProtocolOut);
 
 			SubscribeServerGb.Text = LngText(LngKeys.Setup_SubscribeServer);
 			SubscribeServerAddress1Lbl.Text = LngText(LngKeys.Setup_SubscribeServerAddress) + " 1";
@@ -98,6 +99,8 @@ namespace WinTlx.Config
 			AnswerbackTb.Text = _config.Answerback;
 			IdleTimeoutTb.Text = IntToStr(_config.IdleTimeout);
 			CodeSetCb.SelectedItem = ConfigData.CodeSetToString(_config.CodeSet);
+			DefaultProtocolOutAsciiRb.Checked = _config.DefaultProtocolAscii;
+			DefaultProtocolOutItelexRb.Checked = !_config.DefaultProtocolAscii;
 			OutputSpeedTb.Text = IntToStr(_config.OutputSpeed);
 			SubscribeServerAddress1Tb.Text = _config.SubscribeServerAddress;
 			SubscribeServerAddress2Tb.Text = _config.SubscribeServerAddress2;
@@ -119,6 +122,7 @@ namespace WinTlx.Config
 			_config.Answerback = AnswerbackTb.Text.Trim().ToLower();
 			_config.IdleTimeout = StrToInt(IdleTimeoutTb.Text);
 			_config.CodeSet = ConfigData.StringToCodeSet((string)CodeSetCb.SelectedItem);
+			_config.DefaultProtocolAscii = DefaultProtocolOutAsciiRb.Checked;
 			_config.OutputSpeed = StrToInt(OutputSpeedTb.Text);
 			_config.SubscribeServerAddress = SubscribeServerAddress1Tb.Text.Trim();
 			_config.SubscribeServerAddress2 = SubscribeServerAddress2Tb.Text.Trim();
@@ -179,5 +183,21 @@ namespace WinTlx.Config
 				GetData();
 			}
 		}
+
+		private void DefaultProtocolItelexRb_Click(object sender, EventArgs e)
+		{
+			SetDefaultProtocol();
+		}
+
+		private void DefaultProtocolAsciiRb_Click(object sender, EventArgs e)
+		{
+			SetDefaultProtocol();
+		}
+
+		private void SetDefaultProtocol()
+		{
+
+		}
+
 	}
 }
