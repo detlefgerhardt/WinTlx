@@ -113,3 +113,6 @@ Version history
           New: Considers peer type from subscribe server in ASCII texting mode
           New: Sends extension in *#* format in ASCII texting mode
           Fix: Leading spaces were not sent by the text editor 
+2.0.0.4   Fix: Wordwraping in text editor had problems with '-'
+          Fix: Problems switching to Cyrillic mode
+          Chg: Some minor improvements

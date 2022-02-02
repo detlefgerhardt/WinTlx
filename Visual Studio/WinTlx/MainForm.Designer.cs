@@ -77,6 +77,7 @@ namespace WinTlx
 			this.ConnectStatusLbl = new System.Windows.Forms.Label();
 			this.ReceiveStatusLbl = new System.Windows.Forms.Label();
 			this.SendBufferStatusLbl = new System.Windows.Forms.Label();
+			this.CharSetLbl = new System.Windows.Forms.Label();
 			this.panel2.SuspendLayout();
 			this.panel4.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.TerminalPb)).BeginInit();
@@ -553,12 +554,24 @@ namespace WinTlx
 			this.SendBufferStatusLbl.TabIndex = 80;
 			this.SendBufferStatusLbl.Text = "ToSend:";
 			// 
+			// CharSetLbl
+			// 
+			this.CharSetLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.CharSetLbl.AutoSize = true;
+			this.CharSetLbl.Location = new System.Drawing.Point(678, 506);
+			this.CharSetLbl.Name = "CharSetLbl";
+			this.CharSetLbl.Size = new System.Drawing.Size(45, 13);
+			this.CharSetLbl.TabIndex = 81;
+			this.CharSetLbl.Text = "CharSet";
+			this.CharSetLbl.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
 			this.ClientSize = new System.Drawing.Size(804, 525);
+			this.Controls.Add(this.CharSetLbl);
 			this.Controls.Add(this.SendBufferStatusLbl);
 			this.Controls.Add(this.ReceiveStatusLbl);
 			this.Controls.Add(this.ConnectStatusLbl);
@@ -658,6 +671,7 @@ namespace WinTlx
 		private System.Windows.Forms.Label SendBufferStatusLbl;
 		private System.Windows.Forms.ComboBox SearchCb;
 		private System.Windows.Forms.ComboBox TlnTypeCb;
+		private System.Windows.Forms.Label CharSetLbl;
 	}
 }
 

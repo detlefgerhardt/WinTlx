@@ -77,6 +77,7 @@ namespace WinTlx.Languages
 		Setup_LogfilePath,
 		Setup_Language,
 		Setup_Answerback,
+		Setup_Answerback_Tooltip,
 		Setup_IdleTimeout,
 		Setup_OutputSpeed,
 		Setup_CodeSet,

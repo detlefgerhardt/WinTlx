@@ -90,6 +90,7 @@ namespace WinTlx.Languages
 				{ LngKeys.Setup_Language, "Sprache / Language" },
 				{ LngKeys.Setup_LogfilePath, "Logfile-Pfad" },
 				{ LngKeys.Setup_Answerback, "Kennungsgeber" },
+				{ LngKeys.Setup_Answerback_Tooltip, "Beispiel: '\\r\\n12345 name d'" },
 				{ LngKeys.Setup_IdleTimeout, "Inaktivitäts-Timeout (s)" },
 				{ LngKeys.Setup_OutputSpeed, "Ausgabegeschw. (Baud)" },
 				{ LngKeys.Setup_CodeSet, "Zeichensatz" },

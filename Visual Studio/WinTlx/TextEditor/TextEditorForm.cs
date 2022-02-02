@@ -228,7 +228,7 @@ namespace WinTlx.TextEditor
 		{
 			if (int.TryParse(CharWidthTb.Text, out int width))
 			{
-				_tem.CharWidth = width;
+				_tem.LineWidth = width;
 				SetCharWidth();
 			}
 			else
@@ -259,7 +259,7 @@ namespace WinTlx.TextEditor
 
 		private void LinealPnl_Paint(object sender, PaintEventArgs e)
 		{
-			Helper.PaintRuler(e.Graphics, _tem.CharWidth, 8.98F);
+			Helper.PaintRuler(e.Graphics, _tem.LineWidth, 8.98F);
 		}
 
 		private void AlignBlockBtn_Click(object sender, EventArgs e)
@@ -288,7 +288,7 @@ namespace WinTlx.TextEditor
 		private void SetCharWidth()
 		{
 			LinealPnl.Refresh();
-			EditorRtb.RightMargin = (int)(3 + 8.98F * _tem.CharWidth);
+			EditorRtb.RightMargin = (int)(3 + 8.98F * _tem.LineWidth);
 		}
 
 		private void ShowFilename()

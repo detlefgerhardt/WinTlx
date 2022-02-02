@@ -173,6 +173,7 @@
     <Compile Include="Tools\TickTimer.cs" />
     <EmbeddedResource Include="Config\ConfigForm.resx">
       <DependentUpon>ConfigForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Favorites\FavoritesForm.resx">
       <DependentUpon>FavoritesForm.cs</DependentUpon>
@@ -231,7 +232,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Costura.Fody">
-      <Version>5.3.0</Version>
+      <Version>5.4.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

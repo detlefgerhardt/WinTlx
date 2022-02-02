@@ -57,6 +57,7 @@ namespace WinTlx.Config
 			LogfilePathLbl.Text = LngText(LngKeys.Setup_LogfilePath);
 			LanguageCb.Text = LngText(LngKeys.Setup_Language);
 			AnswerbackLbl.Text = LngText(LngKeys.Setup_Answerback);
+			Helper.SetToolTip(AnswerbackTb, LngText(LngKeys.Setup_Answerback_Tooltip));
 			IdleTimeoutLbl.Text = LngText(LngKeys.Setup_IdleTimeout);
 			OutputSpeedLbl.Text = LngText(LngKeys.Setup_OutputSpeed);
 			CodeSetLbl.Text = LngText(LngKeys.Setup_CodeSet);
@@ -166,6 +167,7 @@ namespace WinTlx.Config
 
 		private void SaveBtn_Click(object sender, EventArgs e)
 		{
+			ConfigManager.Instance.ChanceConfig();
 			Close();
 			Canceled = false;
 		}

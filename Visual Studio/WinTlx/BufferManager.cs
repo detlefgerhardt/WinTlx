@@ -217,6 +217,14 @@ namespace WinTlx
 			}
 		}
 
+		//public int LocalOutputBufferFree
+		//{
+		//	get
+		//	{
+		//		return _localOutputBuffer.Count;
+		//	}
+		//}
+
 		private void LocalOutputTimer_Elapsed(object sender, ElapsedEventArgs e)
 		{
 			if (_localOutputBuffer.Count > 0)

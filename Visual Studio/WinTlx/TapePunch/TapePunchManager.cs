@@ -34,10 +34,13 @@ namespace WinTlx.TapePunch
 		public int BufferSize => _buffer.Count;
 
 		public delegate void PunchedEventHandler();
-		public event PunchedEventHandler Punched;
+		public event PunchedEventHandler PunchedEvt;
 
 		public delegate void ChangedEventHandler();
-		public event ChangedEventHandler Changed;
+		public event ChangedEventHandler ChangedEvt;
+
+		public delegate void ShowBufferEventHandler(string asciiText);
+		public event ShowBufferEventHandler ShowBufferEvt;
 
 		private ConfigData _config => ConfigManager.Instance.Config;
 
@@ -456,7 +459,7 @@ namespace WinTlx.TapePunch
 		{
 			if (_updateActive)
 			{
-				Changed?.Invoke();
+				ChangedEvt?.Invoke();
 			}
 		}
 
@@ -464,9 +467,21 @@ namespace WinTlx.TapePunch
 		{
 			if (_updateActive)
 			{
-				Punched?.Invoke();
+				PunchedEvt?.Invoke();
 			}
 		}
 
+		public void ShowBuffer()
+		{
+			string asciiText = "";
+			KeyStates keyStates = new KeyStates(ShiftStates.Unknown, ConfigManager.Instance.Config.CodeSet);
+
+			for (int i = 0; i < _buffer.Count; i++)
+			{
+				string asciiStr = CodeManager.BaudotStringToAscii(new byte[] { _buffer[i].Code }, keyStates, CodeManager.SendRecv.Send, false);
+				asciiText += asciiStr;
+			}
+			ShowBufferEvt?.Invoke(asciiText);
+		}
 	}
 }

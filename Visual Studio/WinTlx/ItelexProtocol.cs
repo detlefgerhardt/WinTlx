@@ -318,7 +318,14 @@ namespace WinTlx
 			_centralexReconnectTimer = new System.Timers.Timer();
 			_centralexReconnectTimer.Elapsed += CentralexReconnectTimer_Elapsed;
 
+			ConfigManager.Instance.ConfigChanged += Instance_ConfigChanged;
+
 			_keyStates = new KeyStates(ShiftStates.Unknown, _config.CodeSet);
+		}
+
+		private void Instance_ConfigChanged()
+		{
+			_keyStates = new KeyStates(_keyStates.ShiftState, _config.CodeSet);
 		}
 
 		public bool SetRecvOn(int port)
@@ -381,7 +388,20 @@ namespace WinTlx
 					IPAddress remoteAddr = ((IPEndPoint)_client.Client.RemoteEndPoint).Address;
 					Message?.Invoke($"{LngText(LngKeys.Message_IncomingConnection)} {remoteAddr}");
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"incoming connection from {remoteAddr}");
+
 					Update?.Invoke();
+
+					TickTimer timer = new TickTimer();
+					while (timer.ElapsedMilliseconds < 2000)
+					{
+						if (Texting != Textings.Unknown) break;
+						if (ConnectionState == ConnectionStates.Disconnected) break;
+						Thread.Sleep(100);
+					}
+					if (Texting == Textings.Unknown) Texting = Textings.Ascii;
+					Logging.Instance.Debug(TAG, nameof(ConnectOutItelex), $"ConnectionState={ConnectionState} Texting={Texting} ElapsedMilliseconds={timer.ElapsedMilliseconds}ms");
+					//_debugManager.Write($"Texting = {Texting}\r\n", DebugManager.Modes.Message);
+					ConnectionState = ConnectionStates.Connected;
 
 					while (true)
 					{
@@ -517,6 +537,7 @@ namespace WinTlx
 			Texting = Textings.Ascii;
 			Message?.Invoke($"ascii texting");
 			Logging.Instance.Info(TAG, nameof(ConnectOut), $"ascii texting");
+			_debugManager.Write($"ConnectionState1 = {ConnectionState}", DebugManager.Modes.Recv);
 			int ext = extensionNumber.GetValueOrDefault();
 			if (extensionNumber.GetValueOrDefault() != 0)
 			{
@@ -682,9 +703,6 @@ namespace WinTlx
 			_debugManager.InitConnection();
 
 			Update?.Invoke();
-			//Connected?.Invoke();
-
-			//Debug.WriteLine($"{nameof(ConnectInit)} end");
 		}
 
 		private bool _disconnecting = false;
@@ -709,8 +727,6 @@ namespace WinTlx
 
 			_client?.Close();
 
-			//Local = false;
-
 			Logging.Instance.Log(LogTypes.Info, TAG, nameof(Disconnect), $"connection dropped");
 
 			Dropped?.Invoke();
@@ -726,10 +742,8 @@ namespace WinTlx
 
 		private void SendTimer_Elapsed(object sender, ElapsedEventArgs e)
 		{
-			//Debug.WriteLine("SendTimer_Elapsed");
 			if (!IsConnected || _ackTimerActive || _sendTimerActive)
 			{
-				//Debug.WriteLine($"SendTimer_Elapsed: !IsConnected || _ackSendTimerActive || _sendTimerActive");
 				return;
 			}
 
@@ -737,7 +751,6 @@ namespace WinTlx
 			{
 				_sendTimerActive = true;
 
-				//Debug.WriteLine($"SendTimer_Elapsed");
 				if (_client != null && !_client.Connected)
 				{
 					Logging.Instance.Info(TAG, nameof(SendTimer_Elapsed), $"!_client.Connected");
@@ -760,7 +773,6 @@ namespace WinTlx
 		{
 			//Debug.WriteLine($"SendTimer: {_sendBuffer.Count} {_itelixSendCount} {CharsAckCount} {_n_trans}/{_n_ack}={CharsAckCount}");
 			//Logging.Instance.Log(LogTypes.Info, TAG, nameof(SendTimer), $"SendTimer: {_sendBuffer.Count} {_itelixSendCount} {CharsAckCount} {_n_trans}/{_n_ack}");
-			//Debug.WriteLine($"{CharsAckCount}");
 			lock (_sendLock)
 			{
 				int ackCount = RemoteBufferCount;
@@ -773,32 +785,20 @@ namespace WinTlx
 					}
 
 					_itelixSendBuffer[_itelixSendCount++] = baudotCode;
-					///Debug.WriteLine($"dequeue {asciiChr}");
-					//Logging.Instance.Debug(TAG, nameof(SendTimer), $"dequeue baudotCode={baudotCode:X02}, _itelixSendCount={_itelixSendCount}, ackCount={ackCount}");
 					ackCount++;
 				}
 			}
 
-			//Debug.WriteLine($"_itelixSendCount={_itelixSendCount}");
-
 			if (_itelixSendCount == 0)
 			{
-				//Debug.WriteLine($"#2 _itelixSendCount={_itelixSendCount}");
-				//Logging.Instance.Log(LogTypes.Info, TAG, nameof(SendTimer), $"#2 {_itelixSendCount} == 0");
 				return;
 			}
 
-			// if character count in itelex send buffer is < ITELIX_SENDBUFFER_SIZE wait for WAIT_BEFORE_SEND_MSEC before sending them
 			if (_itelixSendCount < Constants.ITELIX_SENDBUFFER_SIZE &&
 				Helper.GetTicksMs() - _lastSentMs < Constants.WAIT_BEFORE_SEND_MSEC)
 			{
-				//Debug.WriteLine($"#1 {_itelixSendCount} < {Constants.ITELIX_SENDBUFFER_SIZE} && {Helper.GetTicksMs() - _lastSentMs} < {Constants.WAIT_BEFORE_SEND_MSEC}");
-				//Logging.Instance.Log(LogTypes.Info, TAG, nameof(SendTimer), $"#1 {_itelixSendCount} < {Constants.ITELIX_SENDBUFFER_SIZE} && {Helper.GetTicksMs() - _lastSentMs} < {Constants.WAIT_BEFORE_SEND_MSEC}");
-				//Debug.WriteLine($"lastsend={Helper.GetTicksMs() - _lastSentMs}");
 				return;
 			}
-
-			//Debug.WriteLine($"_itelixSendCount={_itelixSendCount}");
 
 			byte[] baudotData = new byte[_itelixSendCount];
 			Buffer.BlockCopy(_itelixSendBuffer, 0, baudotData, 0, _itelixSendCount);
@@ -806,7 +806,6 @@ namespace WinTlx
 			_itelixSendCount = 0;
 			_lastSentMs = Helper.GetTicksMs();
 			_lastSendRecvIdleMs = Helper.GetTicksMs();
-			//Debug.WriteLine($"_lastSendRecvIdleMs={_lastSendRecvIdleMs}");
 		}
 
 		private void AckTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -860,7 +859,6 @@ namespace WinTlx
 				_lastRecvAckValue = _ackTransRemote;
 			}
 
-			//Debug.WriteLine($"_n_recv {_n_recv}");
 			SendAckCmd(_ackReceive);
 
 			_ackTimerActive = false;
@@ -916,17 +914,10 @@ namespace WinTlx
 				//asciiStr = asciiStr.Replace("\x05", "\x05");
 				asciiStr = asciiStr.Replace(CodeManager.ASC_LTRS.ToString(), "");
 				asciiStr = asciiStr.Replace(CodeManager.ASC_FIGS.ToString(), "");
-
 				//asciiStr = asciiStr.Replace(CodeManager.ASC_BEL, '\x07');
 
 				byte[] data = Encoding.ASCII.GetBytes(asciiStr);
 				_client.Client.BeginSend(data, 0, data.Length, SocketFlags.None, EndSend, null);
-				//Debug.WriteLine($"BeginnSend {data.Length}");
-				//List<string> dump = Helper.DumpByteArray(data, 0);
-				//foreach(string line in dump)
-				//{
-				//	Debug.WriteLine(line);
-				//}
 			}
 			else
 			{
@@ -954,7 +945,6 @@ namespace WinTlx
 
 		public void SendAckCmd(int ackVal)
 		{
-			//Debug.WriteLine($"Send Ack {ackVal}");
 			byte[] data = new byte[] { (byte)ackVal };
 			SendCmd(ItelexCommands.Ack, data);
 		}
@@ -976,15 +966,12 @@ namespace WinTlx
 			string version = Helper.GetVersionStr();
 			//string version = "867";
 			List<byte> data = new List<byte>();
-			//byte[] data = new byte[version.Length + 2];
 			data.Add(VersionCode);
 			for (int i=0; i<version.Length; i++)
 			{
 				if (char.IsDigit(version[i])) data.Add((byte)version[i]);
-				//data[i + 1] = (byte)version[i];
 			}
 			data.Add(0x00);
-			//data[data.Length - 1] = 0;
 
 			SendCmd(ItelexCommands.ProtocolVersion, data.ToArray());
 		}
@@ -1054,7 +1041,7 @@ namespace WinTlx
 		{
 			string asciiStr = CodeManager.BaudotStringToAscii(new byte[] { code }, _keyStates, CodeManager.SendRecv.Send, false);
 			Send?.Invoke(asciiStr);
-			if (!IsConnected /*|| Local*/)
+			if (!IsConnected)
 			{
 				return;
 			}
@@ -1176,7 +1163,6 @@ namespace WinTlx
 			}
 			catch(Exception)
 			{
-				//Debug.WriteLine(ex);
 			}
 		}
 
@@ -1212,13 +1198,6 @@ namespace WinTlx
 
 			byte[] byteData = ar.AsyncState as byte[];
 			byte[] newData = byteData.Take(dataReadCount).ToArray();
-
-			//Debug.WriteLine($"newData {dataReadCount}");
-			//List<string> dump = Helper.DumpByteArray(newData, 0);
-			//foreach(string line in dump)
-			//{
-			//	Debug.WriteLine(line);
-			//}
 
 			if (ConnectionState == ConnectionStates.TcpConnected)
 			{
@@ -1309,20 +1288,6 @@ namespace WinTlx
 
 		private void DecodePacket(ItelexPacket packet)
 		{
-			/*
-			if (packet.CommandType != ItelexCommands.Ack)
-			{
-				//Logging.Instance.Log(LogTypes.Debug, TAG, nameof(DecodePacket),
-				//		$"Recv packet {packet.CommandType} {packet.Command:X02} {packet.GetDebugData()}");
-				Logging.Instance.Debug(TAG, nameof(DecodePacket),
-					$"Recv packet {packet.CommandType} {packet.GetDebugPacket()}");
-			}
-			if (packet.CommandType != ItelexCommands.Heartbeat && packet.CommandType != ItelexCommands.Ack)
-			{
-				Debug.WriteLine($"Recv packet {packet.CommandType} {packet.GetDebugPacket()}");
-			}
-			*/
-
 			_debugManager.WriteCmd(packet, DebugManager.Modes.Recv, _ackTransLocal);
 
 			// check for empty packet

@@ -1,4 +1,5 @@
 ﻿using System;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -6,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WinTlx.Codes;
+using WinTlx.Config;
 using WinTlx.Languages;
 
 namespace WinTlx.TapePunch
@@ -53,8 +55,8 @@ namespace WinTlx.TapePunch
 			_itelex = ItelexProtocol.Instance;
 
 			_tapePunch = TapePunchManager.Instance;
-			_tapePunch.Punched += TapePunch_Punched;
-			_tapePunch.Changed += TapePunch_Changed;
+			_tapePunch.PunchedEvt += TapePunch_Punched;
+			_tapePunch.ChangedEvt += TapePunch_Changed;
 			_tapePunch.SetPuncherLinesHorizontal(PunchedTapePb.Width);
 			RecvCbSet(_tapePunch.PuncherOn);
 
@@ -265,11 +267,12 @@ namespace WinTlx.TapePunch
 					}
 					_itelex.SendBaudotCode(buffer[i]);
 					_tapePunch.ScrollLeft(1);
+
 					//PunchedTapePb.Refresh();
 					//UpdateScrollbar();
 
 #if DEBUG
-					Thread.Sleep(_sendSpeed);
+					//Thread.Sleep(_sendSpeed);
 #endif
 				}
 			});
@@ -477,6 +480,11 @@ namespace WinTlx.TapePunch
 		{
 			_tapePunch.MirrorBuffer();
 			TapePunch_Changed();
+		}
+
+		private void EditShowBtn_Click(object sender, EventArgs e)
+		{
+			_tapePunch.ShowBuffer();
 		}
 	}
 }

@@ -38,16 +38,16 @@ namespace WinTlx.TextEditor
 		private const string DELIMITER = " -?()";
 		private readonly List<DelimiterItem> _delimiters = new List<DelimiterItem>()
 		{
-			new DelimiterItem(' ', true),
-			new DelimiterItem('-', true),
-			new DelimiterItem('+', true),
-			new DelimiterItem('(', true),
-			new DelimiterItem('.', false),
-			new DelimiterItem(',', false),
-			new DelimiterItem(':', false),
-			new DelimiterItem('?', false),
-			new DelimiterItem(')', false),
-			new DelimiterItem('=', false),
+			new DelimiterItem(' ', WrapMode.Before),
+			new DelimiterItem('-', WrapMode.Both), // WarpMode depends on space before (space before: before, no space before: after)
+			new DelimiterItem('+', WrapMode.Before),
+			new DelimiterItem('(', WrapMode.Before),
+			new DelimiterItem('.', WrapMode.After),
+			new DelimiterItem(',', WrapMode.After),
+			new DelimiterItem(':', WrapMode.After),
+			new DelimiterItem('?', WrapMode.After),
+			new DelimiterItem(')', WrapMode.After),
+			new DelimiterItem('=', WrapMode.After),
 		};
 
 		private readonly ConfigManager _configManager;
@@ -101,7 +101,7 @@ namespace WinTlx.TextEditor
 			}
 		}
 
-		public int CharWidth { get; set; }
+		public int LineWidth { get; set; }
 
 		public List<string> UndoStack;
 		private int _undoPtr;
@@ -146,7 +146,7 @@ namespace WinTlx.TextEditor
 			_itelex.Dropped += Itelex_Dropped;
 
 			ResetUndo();
-			CharWidth = DEFAULT_LINE_LENGTH;
+			LineWidth = DEFAULT_LINE_LENGTH;
 			Text = "";
 			Saved = true;
 			Filename = null;
@@ -334,7 +334,7 @@ namespace WinTlx.TextEditor
 			string newText = "";
 			foreach (string line in lines)
 			{
-				newText += BlockSatz(line, CharWidth, "\n", false);
+				newText += BlockSatz(line, LineWidth, "\n", false);
 			}
 			Text = newText;
 		}
@@ -400,7 +400,7 @@ namespace WinTlx.TextEditor
 			List<string> newLines = new List<string>();
 			foreach (string line in lines)
 			{
-				newLines.AddRange(WrapLine(line, CharWidth));
+				newLines.AddRange(WrapLine(line, LineWidth));
 			}
 
 			for (int i = 0; i < newLines.Count; i++)
@@ -419,19 +419,17 @@ namespace WinTlx.TextEditor
 			List<string> newLines = new List<string>();
 			foreach (string line in lines)
 			{
-				newLines.AddRange(WrapLine(line, CharWidth));
+				newLines.AddRange(WrapLine(line, LineWidth));
 			}
 
 			for (int i = 0; i < newLines.Count; i++)
 			{
-				if (string.IsNullOrEmpty(newLines[i]))
-				{
-					continue;
-				}
+				if (string.IsNullOrEmpty(newLines[i])) continue;
+
 				newLines[i] = " " + newLines[i];
-				if (newLines[i].Length > CharWidth)
+				if (newLines[i].Length > LineWidth)
 				{
-					newLines[i] = newLines[i].Substring(0, CharWidth);
+					newLines[i] = newLines[i].Substring(0, LineWidth);
 				}
 			}
 			return newLines.ToArray();
@@ -457,10 +455,7 @@ namespace WinTlx.TextEditor
 				}
 
 				// line is full
-				if (newLine != "")
-				{
-					newLines.Add(newLine.Trim());
-				}
+				if (newLine != "") newLines.Add(newLine.Trim());
 				newLine = words[i].TextWithDelim;
 				while (newLine.Length > len)
 				{
@@ -468,10 +463,7 @@ namespace WinTlx.TextEditor
 					newLine = newLine.Substring(Math.Min(newLine.Length, len));
 				}
 			}
-			if (newLine != "")
-			{
-				newLines.Add(newLine.Trim());
-			}
+			if (newLine != "") newLines.Add(newLine.Trim());
 
 			return newLines;
 		}
@@ -490,34 +482,40 @@ namespace WinTlx.TextEditor
 			}
 
 			List<string> newLines = new List<string>();
+			char lastChar = '\0';
 			while (line.Length >= len)
 			{
 				int pos = -1;
 				for (int i = len - 1; i > 0; i--)
 				{
-					//Debug.WriteLine(line[i]);
 					DelimiterItem delim = _delimiters.Find(d => d.Char == line[i]);
 					if (delim != null)
 					{
-						pos = delim.WrapBefore ? i : i + 1;
-						//Debug.WriteLine($"delim {line[i]}, pos={pos}");
+						WrapMode wrapMode = delim.WrapMode;
+						if (wrapMode == WrapMode.Both)
+						{
+							char charBefore = line[i - 1];
+							wrapMode = charBefore == ' ' ? WrapMode.Before : WrapMode.After;
+						}
+						pos = wrapMode == WrapMode.Before ? i : i + 1;
 						break;
 					}
 				}
-				if (pos == -1)
-				{
-					pos = len - 1;
+				if (pos == -1) pos = len - 1;
+
+				if (newLines.Count==0)
+				{   // keep the indentation in the first line
+					line = line.TrimEnd();
 				}
-				//Debug.WriteLine($"newline '{line}'");
-				//Debug.WriteLine($"pos={pos}, sub='{line.Substring(0, pos)}'");
+				else
+				{
+					// no indentation in wrapped lines
+					line = line.Trim();
+				}
 				newLines.Add(line.Substring(0, pos));
-				line = line.Substring(pos);
-				//Debug.WriteLine($"line='{line}'");
+				line = line.Substring(pos).Trim();
 			}
-			if (line.Length > 0)
-			{
-				newLines.Add(line);
-			}
+			if (line.Length > 0) newLines.Add(line);
 
 			return newLines;
 		}
@@ -525,20 +523,14 @@ namespace WinTlx.TextEditor
 		private List<AlignItem> SplitItems(string line)
 		{
 			List<AlignItem> items = new List<AlignItem>();
-			//bool skipSpace = false;
 			string word = "";
 			AlignItem item;
 			for (int i = 0; i < line.Length; i++)
 			{
 				char chr = line[i];
-				//if (chr == ' ' && skipSpace)
-				//{
-				//	continue;
-				//}
 				if (!DELIMITER.Contains(chr))
 				{
 					word += chr;
-					//skipSpace = false;
 					continue;
 				}
 
@@ -546,10 +538,7 @@ namespace WinTlx.TextEditor
 
 				if (word == "" && items.Count > 0 && items.Last().Delimiter == chr)
 				{
-					if (chr != ' ')
-					{
-						items.Last().Text += chr;
-					}
+					if (chr != ' ') items.Last().Text += chr;
 				}
 				else
 				{
@@ -557,7 +546,6 @@ namespace WinTlx.TextEditor
 					items.Add(item);
 				}
 				word = "";
-				//skipSpace = chr == ' ';
 			}
 			if (word != "")
 			{
@@ -721,11 +709,27 @@ namespace WinTlx.TextEditor
 
 				if (!script)
 				{
-					List<string> newLines = WrapLine(line, CharWidth);
-					foreach (string nl in newLines)
+					List<string> newLines = WrapLine(line, LineWidth);
+					/*
+					for (int i=0; i<newLines.Count; i++)
 					{
 						if (_stopScript) return;
-						await SendTextLine(nl.TrimEnd() + "\r\n");
+						//await SendTextLine(nl.TrimEnd() + "\r\n");
+						if (i==0)
+						{
+							newLines[i] = newLines[i].Trim();
+						}
+						else
+						{
+							newLines[i] = newLines[i].TrimEnd();
+						}
+						await SendTextLine(newLines[i].Trim() + "\r\n");
+					}
+					*/
+					foreach(string nl in newLines)
+					{
+						if (_stopScript) return;
+						await SendTextLine(nl + "\r\n");
 					}
 				}
 				else
@@ -955,10 +959,7 @@ namespace WinTlx.TextEditor
 				}
 				prm += chr;
 			}
-			if (!string.IsNullOrWhiteSpace(prm))
-			{
-				prms.Add(prm.Trim());
-			}
+			if (!string.IsNullOrWhiteSpace(prm)) prms.Add(prm.Trim());
 			return prms;
 		}
 
@@ -1053,7 +1054,7 @@ namespace WinTlx.TextEditor
 
 			foreach (string line in lines)
 			{
-				List<string> wrappedLines = WrapLine(line, CharWidth);
+				List<string> wrappedLines = WrapLine(line, LineWidth);
 				foreach (string wrappedLine in wrappedLines)
 				{
 					if (_stopScript) return false;
@@ -1078,14 +1079,10 @@ namespace WinTlx.TextEditor
 				while (true)
 				{
 					await Task.Delay(100);
-					if (sw.ElapsedMilliseconds > 10 * 1000)
-					{
-						return false;
-					}
+					if (sw.ElapsedMilliseconds > 10 * 1000) return false;
 					if (_itelex.ConnectionState == ItelexProtocol.ConnectionStates.Connected)
 					{
 						await Task.Delay(waitSec * 1000);
-						//await _bufferManager.WaitLocalOutpuBufferEmpty();
 						return true;
 					}
 				}
@@ -1129,10 +1126,7 @@ namespace WinTlx.TextEditor
 		{
 			//SendDebugText(asciiText, DebugForm.Modes.Input);
 
-			if (_recvString != null)
-			{
-				_recvString += asciiText;
-			}
+			if (_recvString != null) _recvString += asciiText;
 		}
 
 		private void Itelex_Dropped()

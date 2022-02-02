@@ -6,16 +6,19 @@ using System.Threading.Tasks;
 
 namespace WinTlx.TextEditor
 {
+	public enum WrapMode { Before, After, Both };
+
 	class DelimiterItem
 	{
 		public char Char { get; set; }
 
-		public bool WrapBefore { get; set; }
+		public WrapMode WrapMode { get; set; }
+		// true = before
 
-		public DelimiterItem(char chr, bool wrapBefore)
+		public DelimiterItem(char chr, WrapMode wrapMode)
 		{
 			Char = chr;
-			WrapBefore = wrapBefore;
+			WrapMode = wrapMode;
 		}
 	}
 }

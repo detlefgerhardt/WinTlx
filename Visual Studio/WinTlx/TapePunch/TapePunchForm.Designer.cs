@@ -54,6 +54,7 @@
 			this.SlowerBtn = new System.Windows.Forms.Button();
 			this.FasterBtn = new System.Windows.Forms.Button();
 			this.MirrorCodeBtn = new System.Windows.Forms.Button();
+			this.EditShowBtn = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.PunchedTapePb)).BeginInit();
 			this.EditPl.SuspendLayout();
 			this.SuspendLayout();
@@ -208,9 +209,9 @@
 			// 
 			// EditDeleteBtn
 			// 
-			this.EditDeleteBtn.Location = new System.Drawing.Point(51, 2);
+			this.EditDeleteBtn.Location = new System.Drawing.Point(56, 2);
 			this.EditDeleteBtn.Name = "EditDeleteBtn";
-			this.EditDeleteBtn.Size = new System.Drawing.Size(40, 22);
+			this.EditDeleteBtn.Size = new System.Drawing.Size(45, 22);
 			this.EditDeleteBtn.TabIndex = 18;
 			this.EditDeleteBtn.Text = "Del";
 			this.EditDeleteBtn.UseVisualStyleBackColor = true;
@@ -221,7 +222,7 @@
 			this.EditInsertCb.Appearance = System.Windows.Forms.Appearance.Button;
 			this.EditInsertCb.Location = new System.Drawing.Point(5, 2);
 			this.EditInsertCb.Name = "EditInsertCb";
-			this.EditInsertCb.Size = new System.Drawing.Size(40, 22);
+			this.EditInsertCb.Size = new System.Drawing.Size(45, 22);
 			this.EditInsertCb.TabIndex = 19;
 			this.EditInsertCb.Text = "Ins";
 			this.EditInsertCb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -230,9 +231,9 @@
 			// 
 			// CropStartBtn
 			// 
-			this.CropStartBtn.Location = new System.Drawing.Point(97, 2);
+			this.CropStartBtn.Location = new System.Drawing.Point(107, 3);
 			this.CropStartBtn.Name = "CropStartBtn";
-			this.CropStartBtn.Size = new System.Drawing.Size(40, 22);
+			this.CropStartBtn.Size = new System.Drawing.Size(45, 22);
 			this.CropStartBtn.TabIndex = 20;
 			this.CropStartBtn.Text = "<Del";
 			this.CropStartBtn.UseVisualStyleBackColor = true;
@@ -240,9 +241,9 @@
 			// 
 			// CropEndBtn
 			// 
-			this.CropEndBtn.Location = new System.Drawing.Point(143, 2);
+			this.CropEndBtn.Location = new System.Drawing.Point(158, 3);
 			this.CropEndBtn.Name = "CropEndBtn";
-			this.CropEndBtn.Size = new System.Drawing.Size(40, 22);
+			this.CropEndBtn.Size = new System.Drawing.Size(45, 22);
 			this.CropEndBtn.TabIndex = 21;
 			this.CropEndBtn.Text = "Del>";
 			this.CropEndBtn.UseVisualStyleBackColor = true;
@@ -250,6 +251,8 @@
 			// 
 			// EditPl
 			// 
+			this.EditPl.Controls.Add(this.EditShowBtn);
+			this.EditPl.Controls.Add(this.MirrorCodeBtn);
 			this.EditPl.Controls.Add(this.EditUndoBtn);
 			this.EditPl.Controls.Add(this.EditInsertCb);
 			this.EditPl.Controls.Add(this.CropEndBtn);
@@ -257,15 +260,15 @@
 			this.EditPl.Controls.Add(this.CropStartBtn);
 			this.EditPl.Location = new System.Drawing.Point(159, 225);
 			this.EditPl.Name = "EditPl";
-			this.EditPl.Size = new System.Drawing.Size(232, 26);
+			this.EditPl.Size = new System.Drawing.Size(232, 54);
 			this.EditPl.TabIndex = 22;
 			// 
 			// EditUndoBtn
 			// 
 			this.EditUndoBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.EditUndoBtn.Location = new System.Drawing.Point(189, 2);
+			this.EditUndoBtn.Location = new System.Drawing.Point(158, 29);
 			this.EditUndoBtn.Name = "EditUndoBtn";
-			this.EditUndoBtn.Size = new System.Drawing.Size(40, 22);
+			this.EditUndoBtn.Size = new System.Drawing.Size(45, 22);
 			this.EditUndoBtn.TabIndex = 22;
 			this.EditUndoBtn.Text = "Undo";
 			this.EditUndoBtn.UseVisualStyleBackColor = true;
@@ -316,20 +319,29 @@
 			// 
 			// MirrorCodeBtn
 			// 
-			this.MirrorCodeBtn.Location = new System.Drawing.Point(323, 13);
+			this.MirrorCodeBtn.Location = new System.Drawing.Point(107, 28);
 			this.MirrorCodeBtn.Name = "MirrorCodeBtn";
-			this.MirrorCodeBtn.Size = new System.Drawing.Size(65, 23);
+			this.MirrorCodeBtn.Size = new System.Drawing.Size(45, 23);
 			this.MirrorCodeBtn.TabIndex = 27;
 			this.MirrorCodeBtn.Text = "Mirror";
 			this.MirrorCodeBtn.UseVisualStyleBackColor = true;
 			this.MirrorCodeBtn.Click += new System.EventHandler(this.MirrorCodeBtn_Click);
 			// 
+			// EditShowBtn
+			// 
+			this.EditShowBtn.Location = new System.Drawing.Point(5, 28);
+			this.EditShowBtn.Name = "EditShowBtn";
+			this.EditShowBtn.Size = new System.Drawing.Size(45, 22);
+			this.EditShowBtn.TabIndex = 28;
+			this.EditShowBtn.Text = "Show";
+			this.EditShowBtn.UseVisualStyleBackColor = true;
+			this.EditShowBtn.Click += new System.EventHandler(this.EditShowBtn_Click);
+			// 
 			// TapePunchForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(504, 262);
-			this.Controls.Add(this.MirrorCodeBtn);
+			this.ClientSize = new System.Drawing.Size(504, 291);
 			this.Controls.Add(this.FasterBtn);
 			this.Controls.Add(this.SlowerBtn);
 			this.Controls.Add(this.StopBtn);
@@ -390,5 +402,6 @@
 		private System.Windows.Forms.Button SlowerBtn;
 		private System.Windows.Forms.Button FasterBtn;
 		private System.Windows.Forms.Button MirrorCodeBtn;
+		private System.Windows.Forms.Button EditShowBtn;
 	}
 }

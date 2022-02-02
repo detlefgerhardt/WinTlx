@@ -10,6 +10,9 @@ namespace WinTlx.Config
 
 		private const string CONFIG_NAME = Constants.PROGRAM_NAME + ".cfg";
 
+		public delegate void ConfigChangedEventHandler();
+		public event ConfigChangedEventHandler ConfigChanged;
+
 		/// <summary>
 		/// singleton pattern
 		/// </summary>
@@ -80,6 +83,11 @@ namespace WinTlx.Config
 				Logging.Instance.Error(TAG, nameof(SaveConfig), "Error writing config file", ex);
 				return false;
 			}
+		}
+
+		public void ChanceConfig()
+		{
+			ConfigChanged?.Invoke();
 		}
 	}
 }

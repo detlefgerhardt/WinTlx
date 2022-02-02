@@ -85,6 +85,8 @@ namespace WinTlx
 
 			_fixedWidth = this.Width;
 
+			TlnTypeCb.Enabled = false;
+
 			_specialCharacters.Init(CHAR_WIDTH, CHAR_HEIGHT);
 
 			//string x = "✠";
@@ -153,6 +155,7 @@ namespace WinTlx
 			_bufferManager.Output += BufferManager_Output;
 
 			_tapePunch = TapePunchManager.Instance;
+			_tapePunch.ShowBufferEvt += TapePunch_ShowBufferEvt;
 
 			_schedulerManager = SchedulerManager.Instance;
 			_schedulerManager.Schedule += SchedulerManager_Schedule;
@@ -656,7 +659,11 @@ namespace WinTlx
 			TlnAddressTb.Text = entry.Address;
 			TlnPortTb.Text = entry.PortNumber != 0 ? entry.PortNumber.ToString() : "";
 			TlnExtensionTb.Text = entry.ExtensionNumber != 0 ? entry.ExtensionNumber.ToString() : "";
+
+			TlnTypeCb.SelectedIndex = 0;
+			TlnTypeCb.Refresh();
 			TlnTypeCb.SelectedIndex = entry.PeerType;
+			TlnTypeCb.Refresh();
 			//TlnTypeCb.Text = entry.PeerType.ToString();
 		}
 
@@ -1064,7 +1071,6 @@ namespace WinTlx
 			SendClientUpdate(_configData.OwnNumber, _configData.SubscribeServerUpdatePin, _configData.IncomingPublicPort);
 		}
 
-
 		private void OpenTapePunch()
 		{
 			if (_tapePunchForm == null)
@@ -1271,6 +1277,11 @@ namespace WinTlx
 				ReceiveStatusLbl.ForeColor = _recvOn ? Color.Green : Color.Black;
 			});
 
+			Helper.ControlInvokeRequired(CharSetLbl, () =>
+			{
+				CharSetLbl.Text = _configData.CodeSet.ToString();
+			});
+
 			Helper.ControlInvokeRequired(AnswerbackTb, () => AnswerbackTb.Text = _configData.AnswerbackWinTlx);
 
 			Helper.ControlInvokeRequired(SendLettersBtn, () =>
@@ -1308,6 +1319,7 @@ namespace WinTlx
 					SendNullBtn.ForeColor = Color.Green;
 				}
 			});
+
 		}
 
 		private async Task<bool> ConnectOut()
@@ -1431,6 +1443,13 @@ namespace WinTlx
 			UpdateHandler();
 		}
 
+		private void TapePunch_ShowBufferEvt(string asciiText)
+		{
+			ClearScreen();
+			OutputText(asciiText, CharAttributes.Recv);
+			ShowScreen();
+		}
+
 		private void ClearScreen()
 		{
 			_bufferManager.LocalOutputBufferClear();
@@ -1464,7 +1483,14 @@ namespace WinTlx
 
 		private void BufferManager_Output(ScreenChar screenChar)
 		{
-			OutputText(screenChar.Char.ToString(), screenChar.Attr);
+			if (screenChar != null)
+			{
+				OutputText(screenChar.Char.ToString(), screenChar.Attr);
+			}
+			else
+			{
+				Debug.Write("");
+			}
 		}
 
 		private void ShowLocalMessage(string message)

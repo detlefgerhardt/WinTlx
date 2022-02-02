@@ -23,5 +23,10 @@ namespace WinTlx.Codes
 			ShiftState = shiftState;
 			CodeSet = codeSet;
 		}
+
+		public override string ToString()
+		{
+			return $"{ShiftState} {CodeSet}";
+		}
 	}
 }
