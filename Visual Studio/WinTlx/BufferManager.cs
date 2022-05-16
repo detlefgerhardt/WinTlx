@@ -18,13 +18,16 @@ namespace WinTlx
 
 		private readonly ItelexProtocol _itelex;
 
-		private readonly ConfigData _configManager;
+		private readonly ConfigData _configData;
 
 		public delegate void UpdateSendEventHandler();
 		public event UpdateSendEventHandler UpdateSend;
 
 		public delegate void OutputEventHandler(ScreenChar screenChar);
 		public event OutputEventHandler Output;
+
+		public delegate void SendSpeedTriggerEventHandler();
+		public event SendSpeedTriggerEventHandler SendCharTrigger;
 
 		/// <summary>
 		/// Timer for send buffer
@@ -53,7 +56,7 @@ namespace WinTlx
 		{
 			_itelex = ItelexProtocol.Instance;
 
-			_configManager = ConfigManager.Instance.Config;
+			_configData = ConfigManager.Instance.Config;
 
 			//_textEditorManager = TextEditorManager.Instance;
 			//_textEditorManager.Send += TextEditor_Send;
@@ -89,7 +92,7 @@ namespace WinTlx
 
 		public void SendBufferEnqueueString(string asciiStr)
 		{
-			asciiStr = CodeManager.AsciiStringToTelex(asciiStr, _configManager.CodeSet);
+			asciiStr = CodeManager.AsciiStringToTelex(asciiStr, _configData.CodeSet);
 			foreach (char chr in asciiStr)
 			{
 				_sendBuffer.Enqueue(chr);
@@ -135,9 +138,20 @@ namespace WinTlx
 					return;
 				}
 				//Debug.WriteLine(_itelex.GetSendBufferCount());
-				while (_itelex.GetSendBufferCount() < 5 && _sendBuffer.Count > 0)
+				if (_configData.OutputSpeed == 0)
+				{   // max. speed
+					while (_itelex.GetSendBufferCount() < 5 && _sendBuffer.Count > 0)
+					{
+						_itelex.SendAsciiChar(_sendBuffer.Dequeue());
+					}
+				}
+				else
 				{
-					_itelex.SendAsciiChar(_sendBuffer.Dequeue());
+					// send one character
+					if (_itelex.GetSendBufferCount() < 5 && _sendBuffer.Count > 0)
+					{
+						_itelex.SendAsciiChar(_sendBuffer.Dequeue());
+					}
 				}
 				UpdateSend?.Invoke();
 			}
@@ -151,17 +165,21 @@ namespace WinTlx
 		{
 			_localOutputSpeed = charSec;
 			_localOutputTimer.Stop();
+			_sendTimer.Stop();
 			if (charSec > 0)
 			{
 				// 5 data bits + 1 start bit + 1.5 stop bits = 7.5
 				_localOutputTimer.Interval = 1000D / charSec * 7.5D;
+				_sendTimer.Interval = 1000D / charSec * 7.5D;
 			}
 			else
 			{
 				// default speed: 10 ms
-				_localOutputTimer.Interval = 10;
+				_localOutputTimer.Interval = 10; // default output speed = 10 ms
+				_sendTimer.Interval = 100;
 			}
 			_localOutputTimer.Start();
+			_sendTimer.Start();
 		}
 
 		public void LocalOutputBufferClear()
@@ -230,6 +248,10 @@ namespace WinTlx
 			if (_localOutputBuffer.Count > 0)
 			{
 				Output?.Invoke(_localOutputBuffer.Dequeue());
+			}
+			if (_configData.OutputSpeed > 0)
+			{
+				SendCharTrigger?.Invoke();
 			}
 		}
 

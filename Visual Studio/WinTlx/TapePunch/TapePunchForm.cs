@@ -1,5 +1,4 @@
 ﻿using System;
-using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -107,8 +106,11 @@ namespace WinTlx.TapePunch
 			SaveBtn.Text = LngText(LngKeys.TapePunch_SaveButton);
 			Helper.SetToolTip(SaveBtn, LngText(LngKeys.TapePunch_SaveButton_ToolTip));
 
-			MirrorCodeBtn.Text = LngText(LngKeys.TapePunch_ReverseButton);
-			Helper.SetToolTip(MirrorCodeBtn, LngText(LngKeys.TapePunch_ReverseButton_ToolTip));
+			MirrorBufferBtn.Text = LngText(LngKeys.TapePunch_MirrorBufferButton);
+			Helper.SetToolTip(MirrorBufferBtn, LngText(LngKeys.TapePunch_MirrorBufferButton_ToolTip));
+
+			MirrorCodeBtn.Text = LngText(LngKeys.TapePunch_MirrorCodeButton);
+			Helper.SetToolTip(MirrorCodeBtn, LngText(LngKeys.TapePunch_MirrorCodeButton_ToolTip));
 
 			RecvCb.Text = LngText(LngKeys.TapePunch_RecvButton);
 			Helper.SetToolTip(RecvCb, LngText(LngKeys.TapePunch_RecvButton_ToolTip));
@@ -478,6 +480,12 @@ namespace WinTlx.TapePunch
 
 		private void MirrorCodeBtn_Click(object sender, EventArgs e)
 		{
+			_tapePunch.MirrorCode();
+			TapePunch_Changed();
+		}
+
+		private void MirrorLsBtn_Click(object sender, EventArgs e)
+		{
 			_tapePunch.MirrorBuffer();
 			TapePunch_Changed();
 		}
@@ -486,5 +494,6 @@ namespace WinTlx.TapePunch
 		{
 			_tapePunch.ShowBuffer();
 		}
+
 	}
 }

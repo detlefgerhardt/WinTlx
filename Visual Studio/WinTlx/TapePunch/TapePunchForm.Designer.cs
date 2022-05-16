@@ -48,13 +48,14 @@
 			this.CropStartBtn = new System.Windows.Forms.Button();
 			this.CropEndBtn = new System.Windows.Forms.Button();
 			this.EditPl = new System.Windows.Forms.Panel();
+			this.EditShowBtn = new System.Windows.Forms.Button();
+			this.MirrorCodeBtn = new System.Windows.Forms.Button();
 			this.EditUndoBtn = new System.Windows.Forms.Button();
 			this.StepBtn = new System.Windows.Forms.Button();
 			this.StopBtn = new System.Windows.Forms.Button();
 			this.SlowerBtn = new System.Windows.Forms.Button();
 			this.FasterBtn = new System.Windows.Forms.Button();
-			this.MirrorCodeBtn = new System.Windows.Forms.Button();
-			this.EditShowBtn = new System.Windows.Forms.Button();
+			this.MirrorBufferBtn = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.PunchedTapePb)).BeginInit();
 			this.EditPl.SuspendLayout();
 			this.SuspendLayout();
@@ -251,6 +252,7 @@
 			// 
 			// EditPl
 			// 
+			this.EditPl.Controls.Add(this.MirrorBufferBtn);
 			this.EditPl.Controls.Add(this.EditShowBtn);
 			this.EditPl.Controls.Add(this.MirrorCodeBtn);
 			this.EditPl.Controls.Add(this.EditUndoBtn);
@@ -263,10 +265,31 @@
 			this.EditPl.Size = new System.Drawing.Size(232, 54);
 			this.EditPl.TabIndex = 22;
 			// 
+			// EditShowBtn
+			// 
+			this.EditShowBtn.Location = new System.Drawing.Point(5, 28);
+			this.EditShowBtn.Name = "EditShowBtn";
+			this.EditShowBtn.Size = new System.Drawing.Size(45, 22);
+			this.EditShowBtn.TabIndex = 28;
+			this.EditShowBtn.Text = "Show";
+			this.EditShowBtn.UseVisualStyleBackColor = true;
+			this.EditShowBtn.Click += new System.EventHandler(this.EditShowBtn_Click);
+			// 
+			// MirrorCodeBtn
+			// 
+			this.MirrorCodeBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F);
+			this.MirrorCodeBtn.Location = new System.Drawing.Point(107, 28);
+			this.MirrorCodeBtn.Name = "MirrorCodeBtn";
+			this.MirrorCodeBtn.Size = new System.Drawing.Size(45, 22);
+			this.MirrorCodeBtn.TabIndex = 27;
+			this.MirrorCodeBtn.Text = "Mir Cod";
+			this.MirrorCodeBtn.UseVisualStyleBackColor = true;
+			this.MirrorCodeBtn.Click += new System.EventHandler(this.MirrorCodeBtn_Click);
+			// 
 			// EditUndoBtn
 			// 
 			this.EditUndoBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.EditUndoBtn.Location = new System.Drawing.Point(158, 29);
+			this.EditUndoBtn.Location = new System.Drawing.Point(158, 28);
 			this.EditUndoBtn.Name = "EditUndoBtn";
 			this.EditUndoBtn.Size = new System.Drawing.Size(45, 22);
 			this.EditUndoBtn.TabIndex = 22;
@@ -317,25 +340,16 @@
 			this.FasterBtn.UseVisualStyleBackColor = true;
 			this.FasterBtn.Click += new System.EventHandler(this.FasterBtn_Click);
 			// 
-			// MirrorCodeBtn
+			// MirrorLsBtn
 			// 
-			this.MirrorCodeBtn.Location = new System.Drawing.Point(107, 28);
-			this.MirrorCodeBtn.Name = "MirrorCodeBtn";
-			this.MirrorCodeBtn.Size = new System.Drawing.Size(45, 23);
-			this.MirrorCodeBtn.TabIndex = 27;
-			this.MirrorCodeBtn.Text = "Mirror";
-			this.MirrorCodeBtn.UseVisualStyleBackColor = true;
-			this.MirrorCodeBtn.Click += new System.EventHandler(this.MirrorCodeBtn_Click);
-			// 
-			// EditShowBtn
-			// 
-			this.EditShowBtn.Location = new System.Drawing.Point(5, 28);
-			this.EditShowBtn.Name = "EditShowBtn";
-			this.EditShowBtn.Size = new System.Drawing.Size(45, 22);
-			this.EditShowBtn.TabIndex = 28;
-			this.EditShowBtn.Text = "Show";
-			this.EditShowBtn.UseVisualStyleBackColor = true;
-			this.EditShowBtn.Click += new System.EventHandler(this.EditShowBtn_Click);
+			this.MirrorBufferBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F);
+			this.MirrorBufferBtn.Location = new System.Drawing.Point(56, 28);
+			this.MirrorBufferBtn.Name = "MirrorLsBtn";
+			this.MirrorBufferBtn.Size = new System.Drawing.Size(45, 22);
+			this.MirrorBufferBtn.TabIndex = 29;
+			this.MirrorBufferBtn.Text = "Mir LS";
+			this.MirrorBufferBtn.UseVisualStyleBackColor = true;
+			this.MirrorBufferBtn.Click += new System.EventHandler(this.MirrorLsBtn_Click);
 			// 
 			// TapePunchForm
 			// 
@@ -403,5 +417,6 @@
 		private System.Windows.Forms.Button FasterBtn;
 		private System.Windows.Forms.Button MirrorCodeBtn;
 		private System.Windows.Forms.Button EditShowBtn;
+		private System.Windows.Forms.Button MirrorBufferBtn;
 	}
 }

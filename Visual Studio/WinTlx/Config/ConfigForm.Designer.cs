@@ -59,14 +59,16 @@
 			this.LogfilePathLbl = new System.Windows.Forms.Label();
 			this.LanguageLbl = new System.Windows.Forms.Label();
 			this.LanguageCb = new System.Windows.Forms.ComboBox();
-			this.CodeSetCb = new System.Windows.Forms.ComboBox();
 			this.CodeSetLbl = new System.Windows.Forms.Label();
+			this.CodeSetCb = new System.Windows.Forms.ComboBox();
 			this.SubscribeServerGb = new System.Windows.Forms.GroupBox();
 			this.SubscribeServerAddress3Tb = new System.Windows.Forms.TextBox();
 			this.SubscribeServerAddress3Lbl = new System.Windows.Forms.Label();
 			this.SubscribeServerAddress2Tb = new System.Windows.Forms.TextBox();
 			this.SubscribeServerAddress2Lbl = new System.Windows.Forms.Label();
 			this.ItelexGb = new System.Windows.Forms.GroupBox();
+			this.RemoteBufferSizeTb = new System.Windows.Forms.TextBox();
+			this.RemoteBufferSizeLbl = new System.Windows.Forms.Label();
 			this.DefaultProtocolOutAsciiRb = new System.Windows.Forms.RadioButton();
 			this.DefaultProtocolOutItelexRb = new System.Windows.Forms.RadioButton();
 			this.DefaultProtocolOutLbl = new System.Windows.Forms.Label();
@@ -75,6 +77,7 @@
 			this.RemoteServerPortLbl = new System.Windows.Forms.Label();
 			this.RemoteServerAddressTb = new System.Windows.Forms.TextBox();
 			this.RemoteServerAddressLbl = new System.Windows.Forms.Label();
+			this.ServerDataHintLbl = new System.Windows.Forms.Label();
 			this.IncomingGb.SuspendLayout();
 			this.GeneralGb.SuspendLayout();
 			this.SubscribeServerGb.SuspendLayout();
@@ -85,7 +88,7 @@
 			// AnswerbackLbl
 			// 
 			this.AnswerbackLbl.AutoSize = true;
-			this.AnswerbackLbl.Location = new System.Drawing.Point(10, 19);
+			this.AnswerbackLbl.Location = new System.Drawing.Point(10, 76);
 			this.AnswerbackLbl.Name = "AnswerbackLbl";
 			this.AnswerbackLbl.Size = new System.Drawing.Size(82, 13);
 			this.AnswerbackLbl.TabIndex = 0;
@@ -93,10 +96,12 @@
 			// 
 			// AnswerbackTb
 			// 
-			this.AnswerbackTb.Location = new System.Drawing.Point(141, 16);
+			this.AnswerbackTb.Location = new System.Drawing.Point(141, 73);
 			this.AnswerbackTb.Name = "AnswerbackTb";
 			this.AnswerbackTb.Size = new System.Drawing.Size(157, 20);
 			this.AnswerbackTb.TabIndex = 1;
+			this.AnswerbackTb.Enter += new System.EventHandler(this.AnswerbackTb_Enter);
+			this.AnswerbackTb.Leave += new System.EventHandler(this.AnswerbackTb_Leave);
 			// 
 			// IncommingLocalPortTb
 			// 
@@ -149,7 +154,7 @@
 			// SaveBtn
 			// 
 			this.SaveBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.SaveBtn.Location = new System.Drawing.Point(501, 372);
+			this.SaveBtn.Location = new System.Drawing.Point(501, 397);
 			this.SaveBtn.Name = "SaveBtn";
 			this.SaveBtn.Size = new System.Drawing.Size(75, 23);
 			this.SaveBtn.TabIndex = 12;
@@ -160,7 +165,7 @@
 			// CancelBtn
 			// 
 			this.CancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.CancelBtn.Location = new System.Drawing.Point(418, 372);
+			this.CancelBtn.Location = new System.Drawing.Point(418, 397);
 			this.CancelBtn.Name = "CancelBtn";
 			this.CancelBtn.Size = new System.Drawing.Size(75, 23);
 			this.CancelBtn.TabIndex = 13;
@@ -190,6 +195,8 @@
 			this.SubscribeServerUpdatePinTb.Name = "SubscribeServerUpdatePinTb";
 			this.SubscribeServerUpdatePinTb.Size = new System.Drawing.Size(54, 20);
 			this.SubscribeServerUpdatePinTb.TabIndex = 7;
+			this.SubscribeServerUpdatePinTb.Enter += new System.EventHandler(this.SubscribeServerUpdatePinTb_Enter);
+			this.SubscribeServerUpdatePinTb.Leave += new System.EventHandler(this.SubscribeServerUpdatePinTb_Leave);
 			// 
 			// SubscribeServerUpdatePinLbl
 			// 
@@ -218,7 +225,7 @@
 			// 
 			// IdleTimeoutTb
 			// 
-			this.IdleTimeoutTb.Location = new System.Drawing.Point(141, 69);
+			this.IdleTimeoutTb.Location = new System.Drawing.Point(184, 41);
 			this.IdleTimeoutTb.Name = "IdleTimeoutTb";
 			this.IdleTimeoutTb.Size = new System.Drawing.Size(54, 20);
 			this.IdleTimeoutTb.TabIndex = 2;
@@ -226,7 +233,7 @@
 			// IdleTimeoutLbl
 			// 
 			this.IdleTimeoutLbl.AutoSize = true;
-			this.IdleTimeoutLbl.Location = new System.Drawing.Point(10, 72);
+			this.IdleTimeoutLbl.Location = new System.Drawing.Point(10, 44);
 			this.IdleTimeoutLbl.Name = "IdleTimeoutLbl";
 			this.IdleTimeoutLbl.Size = new System.Drawing.Size(87, 13);
 			this.IdleTimeoutLbl.TabIndex = 17;
@@ -235,7 +242,7 @@
 			// OutputSpeedLbl
 			// 
 			this.OutputSpeedLbl.AutoSize = true;
-			this.OutputSpeedLbl.Location = new System.Drawing.Point(10, 98);
+			this.OutputSpeedLbl.Location = new System.Drawing.Point(10, 70);
 			this.OutputSpeedLbl.Name = "OutputSpeedLbl";
 			this.OutputSpeedLbl.Size = new System.Drawing.Size(105, 13);
 			this.OutputSpeedLbl.TabIndex = 18;
@@ -243,7 +250,7 @@
 			// 
 			// OutputSpeedTb
 			// 
-			this.OutputSpeedTb.Location = new System.Drawing.Point(141, 95);
+			this.OutputSpeedTb.Location = new System.Drawing.Point(184, 67);
 			this.OutputSpeedTb.Name = "OutputSpeedTb";
 			this.OutputSpeedTb.Size = new System.Drawing.Size(54, 20);
 			this.OutputSpeedTb.TabIndex = 3;
@@ -262,7 +269,7 @@
 			this.IncomingGb.Controls.Add(this.IncomingPublicPortTb);
 			this.IncomingGb.Location = new System.Drawing.Point(325, 12);
 			this.IncomingGb.Name = "IncomingGb";
-			this.IncomingGb.Size = new System.Drawing.Size(255, 153);
+			this.IncomingGb.Size = new System.Drawing.Size(255, 155);
 			this.IncomingGb.TabIndex = 20;
 			this.IncomingGb.TabStop = false;
 			this.IncomingGb.Text = "Incoming connection";
@@ -305,10 +312,14 @@
 			this.GeneralGb.Controls.Add(this.LogFilePathTb);
 			this.GeneralGb.Controls.Add(this.LogfilePathLbl);
 			this.GeneralGb.Controls.Add(this.LanguageLbl);
+			this.GeneralGb.Controls.Add(this.AnswerbackTb);
+			this.GeneralGb.Controls.Add(this.AnswerbackLbl);
 			this.GeneralGb.Controls.Add(this.LanguageCb);
+			this.GeneralGb.Controls.Add(this.CodeSetLbl);
+			this.GeneralGb.Controls.Add(this.CodeSetCb);
 			this.GeneralGb.Location = new System.Drawing.Point(12, 12);
 			this.GeneralGb.Name = "GeneralGb";
-			this.GeneralGb.Size = new System.Drawing.Size(307, 84);
+			this.GeneralGb.Size = new System.Drawing.Size(307, 133);
 			this.GeneralGb.TabIndex = 21;
 			this.GeneralGb.TabStop = false;
 			this.GeneralGb.Text = "General";
@@ -349,6 +360,16 @@
 			this.LanguageCb.Name = "LanguageCb";
 			this.LanguageCb.Size = new System.Drawing.Size(73, 21);
 			this.LanguageCb.TabIndex = 22;
+			this.LanguageCb.Click += new System.EventHandler(this.LanguageCb_Click);
+			// 
+			// CodeSetLbl
+			// 
+			this.CodeSetLbl.AutoSize = true;
+			this.CodeSetLbl.Location = new System.Drawing.Point(10, 102);
+			this.CodeSetLbl.Name = "CodeSetLbl";
+			this.CodeSetLbl.Size = new System.Drawing.Size(49, 13);
+			this.CodeSetLbl.TabIndex = 20;
+			this.CodeSetLbl.Text = "Code set";
 			// 
 			// CodeSetCb
 			// 
@@ -357,19 +378,10 @@
 			this.CodeSetCb.Items.AddRange(new object[] {
             "ITA-2",
             "US-TTY"});
-			this.CodeSetCb.Location = new System.Drawing.Point(141, 42);
+			this.CodeSetCb.Location = new System.Drawing.Point(141, 99);
 			this.CodeSetCb.Name = "CodeSetCb";
 			this.CodeSetCb.Size = new System.Drawing.Size(73, 21);
 			this.CodeSetCb.TabIndex = 21;
-			// 
-			// CodeSetLbl
-			// 
-			this.CodeSetLbl.AutoSize = true;
-			this.CodeSetLbl.Location = new System.Drawing.Point(10, 45);
-			this.CodeSetLbl.Name = "CodeSetLbl";
-			this.CodeSetLbl.Size = new System.Drawing.Size(49, 13);
-			this.CodeSetLbl.TabIndex = 20;
-			this.CodeSetLbl.Text = "Code set";
 			// 
 			// SubscribeServerGb
 			// 
@@ -381,7 +393,7 @@
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortLbl);
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerAddress1Lbl);
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortTb);
-			this.SubscribeServerGb.Location = new System.Drawing.Point(12, 262);
+			this.SubscribeServerGb.Location = new System.Drawing.Point(12, 285);
 			this.SubscribeServerGb.Name = "SubscribeServerGb";
 			this.SubscribeServerGb.Size = new System.Drawing.Size(307, 128);
 			this.SubscribeServerGb.TabIndex = 22;
@@ -422,28 +434,42 @@
 			// 
 			// ItelexGb
 			// 
+			this.ItelexGb.Controls.Add(this.RemoteBufferSizeTb);
+			this.ItelexGb.Controls.Add(this.RemoteBufferSizeLbl);
 			this.ItelexGb.Controls.Add(this.DefaultProtocolOutAsciiRb);
 			this.ItelexGb.Controls.Add(this.DefaultProtocolOutItelexRb);
 			this.ItelexGb.Controls.Add(this.DefaultProtocolOutLbl);
-			this.ItelexGb.Controls.Add(this.AnswerbackTb);
-			this.ItelexGb.Controls.Add(this.AnswerbackLbl);
-			this.ItelexGb.Controls.Add(this.CodeSetLbl);
-			this.ItelexGb.Controls.Add(this.CodeSetCb);
-			this.ItelexGb.Controls.Add(this.OutputSpeedTb);
 			this.ItelexGb.Controls.Add(this.IdleTimeoutTb);
 			this.ItelexGb.Controls.Add(this.IdleTimeoutLbl);
+			this.ItelexGb.Controls.Add(this.OutputSpeedTb);
 			this.ItelexGb.Controls.Add(this.OutputSpeedLbl);
-			this.ItelexGb.Location = new System.Drawing.Point(12, 102);
+			this.ItelexGb.Location = new System.Drawing.Point(12, 151);
 			this.ItelexGb.Name = "ItelexGb";
-			this.ItelexGb.Size = new System.Drawing.Size(307, 154);
+			this.ItelexGb.Size = new System.Drawing.Size(307, 128);
 			this.ItelexGb.TabIndex = 23;
 			this.ItelexGb.TabStop = false;
 			this.ItelexGb.Text = "i-Telex";
 			// 
+			// RemoteBufferSizeTb
+			// 
+			this.RemoteBufferSizeTb.Location = new System.Drawing.Point(184, 93);
+			this.RemoteBufferSizeTb.Name = "RemoteBufferSizeTb";
+			this.RemoteBufferSizeTb.Size = new System.Drawing.Size(54, 20);
+			this.RemoteBufferSizeTb.TabIndex = 26;
+			// 
+			// RemoteBufferSizeLbl
+			// 
+			this.RemoteBufferSizeLbl.AutoSize = true;
+			this.RemoteBufferSizeLbl.Location = new System.Drawing.Point(10, 96);
+			this.RemoteBufferSizeLbl.Name = "RemoteBufferSizeLbl";
+			this.RemoteBufferSizeLbl.Size = new System.Drawing.Size(146, 13);
+			this.RemoteBufferSizeLbl.TabIndex = 25;
+			this.RemoteBufferSizeLbl.Text = "Max. remote buffer size (Byte)";
+			// 
 			// DefaultProtocolOutAsciiRb
 			// 
 			this.DefaultProtocolOutAsciiRb.AutoSize = true;
-			this.DefaultProtocolOutAsciiRb.Location = new System.Drawing.Point(241, 125);
+			this.DefaultProtocolOutAsciiRb.Location = new System.Drawing.Point(246, 19);
 			this.DefaultProtocolOutAsciiRb.Name = "DefaultProtocolOutAsciiRb";
 			this.DefaultProtocolOutAsciiRb.Size = new System.Drawing.Size(52, 17);
 			this.DefaultProtocolOutAsciiRb.TabIndex = 24;
@@ -455,7 +481,7 @@
 			// DefaultProtocolOutItelexRb
 			// 
 			this.DefaultProtocolOutItelexRb.AutoSize = true;
-			this.DefaultProtocolOutItelexRb.Location = new System.Drawing.Point(179, 125);
+			this.DefaultProtocolOutItelexRb.Location = new System.Drawing.Point(184, 19);
 			this.DefaultProtocolOutItelexRb.Name = "DefaultProtocolOutItelexRb";
 			this.DefaultProtocolOutItelexRb.Size = new System.Drawing.Size(56, 17);
 			this.DefaultProtocolOutItelexRb.TabIndex = 23;
@@ -467,7 +493,7 @@
 			// DefaultProtocolOutLbl
 			// 
 			this.DefaultProtocolOutLbl.AutoSize = true;
-			this.DefaultProtocolOutLbl.Location = new System.Drawing.Point(10, 127);
+			this.DefaultProtocolOutLbl.Location = new System.Drawing.Point(10, 21);
 			this.DefaultProtocolOutLbl.Name = "DefaultProtocolOutLbl";
 			this.DefaultProtocolOutLbl.Size = new System.Drawing.Size(135, 13);
 			this.DefaultProtocolOutLbl.TabIndex = 22;
@@ -481,7 +507,7 @@
 			this.LimitedClientGb.Controls.Add(this.RemoteServerAddressLbl);
 			this.LimitedClientGb.Controls.Add(this.LimitedClientCb);
 			this.LimitedClientGb.Controls.Add(this.LimitedClientLbl);
-			this.LimitedClientGb.Location = new System.Drawing.Point(325, 171);
+			this.LimitedClientGb.Location = new System.Drawing.Point(325, 174);
 			this.LimitedClientGb.Name = "LimitedClientGb";
 			this.LimitedClientGb.Size = new System.Drawing.Size(255, 105);
 			this.LimitedClientGb.TabIndex = 24;
@@ -520,11 +546,20 @@
 			this.RemoteServerAddressLbl.TabIndex = 9;
 			this.RemoteServerAddressLbl.Text = "Remote server addr";
 			// 
+			// ServerDataHintLbl
+			// 
+			this.ServerDataHintLbl.Location = new System.Drawing.Point(325, 296);
+			this.ServerDataHintLbl.Name = "ServerDataHintLbl";
+			this.ServerDataHintLbl.Size = new System.Drawing.Size(255, 52);
+			this.ServerDataHintLbl.TabIndex = 22;
+			this.ServerDataHintLbl.Text = "* This data must match the data stored on the subscribe server.";
+			// 
 			// ConfigForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(590, 403);
+			this.ClientSize = new System.Drawing.Size(590, 428);
+			this.Controls.Add(this.ServerDataHintLbl);
 			this.Controls.Add(this.LimitedClientGb);
 			this.Controls.Add(this.ItelexGb);
 			this.Controls.Add(this.SubscribeServerGb);
@@ -599,5 +634,8 @@
 		private System.Windows.Forms.Label DefaultProtocolOutLbl;
 		private System.Windows.Forms.RadioButton DefaultProtocolOutItelexRb;
 		private System.Windows.Forms.RadioButton DefaultProtocolOutAsciiRb;
+		private System.Windows.Forms.TextBox RemoteBufferSizeTb;
+		private System.Windows.Forms.Label RemoteBufferSizeLbl;
+		private System.Windows.Forms.Label ServerDataHintLbl;
 	}
 }

@@ -44,6 +44,9 @@ namespace WinTlx.Config
 		public int IdleTimeout { get; set; }
 
 		[DataMember]
+		public int RemoteBufferSize { get; set; }
+
+		[DataMember]
 		public int OwnNumber { get; set; }
 
 		[DataMember]
@@ -76,6 +79,10 @@ namespace WinTlx.Config
 			if (string.IsNullOrWhiteSpace(Answerback))
 			{
 				Answerback = @"\r\n" + Constants.DEFAULT_ANSWERBACK;
+			}
+			if (RemoteBufferSize == 0)
+			{
+				RemoteBufferSize = Constants.DEFAULT_REMOTE_BUFFER_SIZE;
 			}
 			if (string.IsNullOrEmpty(Language))
 			{

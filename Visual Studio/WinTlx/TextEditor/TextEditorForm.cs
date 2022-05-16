@@ -50,12 +50,21 @@ namespace WinTlx.TextEditor
 		{
 			Point pos = Helper.CenterForm(this, _parentWindowsPosition);
 			SetBounds(pos.X, pos.Y, Bounds.Width, Bounds.Height);
+			DrawRightBorder();
 		}
 
 		private void TextEditorForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
 			_tem.Text = EditorRtb.Text;
 			CloseEditor?.Invoke();
+		}
+
+		private void DrawRightBorder()
+		{
+			Graphics g = EditorRtb.CreateGraphics();
+			Pen pen = new Pen(Color.LightGray, 1);
+			int border = TextEditorManager.DEFAULT_LINE_LENGTH * 5;
+			g.DrawLine(pen, border, 0, border, EditorRtb.Height);
 		}
 
 		private void SetTitle()
@@ -289,10 +298,6 @@ namespace WinTlx.TextEditor
 		{
 			LinealPnl.Refresh();
 			EditorRtb.RightMargin = (int)(3 + 8.98F * _tem.LineWidth);
-		}
-
-		private void ShowFilename()
-		{
 		}
 
 	}

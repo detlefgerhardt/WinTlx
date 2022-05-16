@@ -123,7 +123,23 @@ namespace WinTlx.TapePunch
 			return buffer;
 		}
 
+		/// <summary>
+		/// Mirror buffer (first code -> last code)
+		/// </summary>
 		public void MirrorBuffer()
+		{
+			byte[] newBuffer = new byte[_buffer.Count];
+			for (int i = 0; i < _buffer.Count; i++)
+			{
+				newBuffer[i] = CodeManager.MirrorCode(_buffer[_buffer.Count - 1 - i].Code);
+			}
+			SetBuffer(newBuffer);
+		}
+
+		/// <summary>
+		/// Reverse code in buffer (bit 1..5 -> bit 5..1)
+		/// </summary>
+		public void MirrorCode()
 		{
 			byte[] newBuffer = new byte[_buffer.Count];
 			for (int i = 0; i < _buffer.Count; i++)

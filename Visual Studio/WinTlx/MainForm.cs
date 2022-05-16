@@ -85,7 +85,7 @@ namespace WinTlx
 
 			_fixedWidth = this.Width;
 
-			TlnTypeCb.Enabled = false;
+			TlnTypeCb.Enabled = true;
 
 			_specialCharacters.Init(CHAR_WIDTH, CHAR_HEIGHT);
 
@@ -244,6 +244,7 @@ namespace WinTlx
 			SetTlnData();
 
 #if !DEBUG
+			/*
 			string text = $"{Helper.GetVersion()}\r\r" + "by *dg* Detlef Gerhardt\r\r" + LngText(LngKeys.Start_Text);
 			MessageBox.Show(
 				text,
@@ -251,6 +252,7 @@ namespace WinTlx
 				MessageBoxButtons.OK,
 				MessageBoxIcon.Information,
 				MessageBoxDefaultButton.Button1);
+			*/
 #endif
 		}
 
@@ -1270,6 +1272,11 @@ namespace WinTlx
 				SendBufferStatusLbl.Text = $"{LngText(LngKeys.MainForm_SendBufferStatus)}: {valueStr}";
 			});
 
+			Helper.ControlInvokeRequired(RemoteBufferStatusLbl, () =>
+			{
+				string valueStr = _itelex.IsConnected ? $"{_itelex. SendBufferCount}" : "-";
+				RemoteBufferStatusLbl.Text = $"{LngText(LngKeys.MainForm_SendBufferStatus)}: {valueStr}";
+			});
 
 			Helper.ControlInvokeRequired(ReceiveStatusLbl, () =>
 			{

@@ -461,10 +461,10 @@ namespace WinTlx
 				if (!asciiMode)
 				{
 					return await ConnectOutItelex(extensionNumber);
-					if (Texting == Textings.Ascii)
-					{
-						return await ConnectOutAscii(extensionNumber);
-					}
+					//if (Texting == Textings.Ascii)
+					//{
+					//	return await ConnectOutAscii(extensionNumber);
+					//}
 				}
 				else
 				{
@@ -690,8 +690,6 @@ namespace WinTlx
 			_keyStates = new KeyStates(ShiftStates.Unknown, _config.CodeSet);
 			_lastSendRecvIdleMs = Helper.GetTicksMs();
 
-			//Local = false;
-
 			RejectReason = null;
 			RemoteVersion = null;
 
@@ -776,7 +774,8 @@ namespace WinTlx
 			lock (_sendLock)
 			{
 				int ackCount = RemoteBufferCount;
-				for (int i = 0; !_sendBuffer.IsEmpty && _itelixSendCount < Constants.ITELIX_SENDBUFFER_SIZE && ackCount < Constants.ITELIX_REMOTEBUFFER_SIZE;
+				for (int i = 0;
+					!_sendBuffer.IsEmpty && _itelixSendCount < Constants.ITELIX_SENDBUFFER_SIZE && ackCount < _config.RemoteBufferSize;
 					i++)
 				{
 					if (!_sendBuffer.TryDequeue(out byte baudotCode))

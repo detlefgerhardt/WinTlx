@@ -78,6 +78,7 @@ namespace WinTlx
 			this.ReceiveStatusLbl = new System.Windows.Forms.Label();
 			this.SendBufferStatusLbl = new System.Windows.Forms.Label();
 			this.CharSetLbl = new System.Windows.Forms.Label();
+			this.RemoteBufferStatusLbl = new System.Windows.Forms.Label();
 			this.panel2.SuspendLayout();
 			this.panel4.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.TerminalPb)).BeginInit();
@@ -496,7 +497,7 @@ namespace WinTlx
 			// 
 			this.ConnTimeLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ConnTimeLbl.AutoSize = true;
-			this.ConnTimeLbl.Location = new System.Drawing.Point(299, 506);
+			this.ConnTimeLbl.Location = new System.Drawing.Point(330, 506);
 			this.ConnTimeLbl.Name = "ConnTimeLbl";
 			this.ConnTimeLbl.Size = new System.Drawing.Size(61, 13);
 			this.ConnTimeLbl.TabIndex = 73;
@@ -506,7 +507,7 @@ namespace WinTlx
 			// 
 			this.TimeoutLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.TimeoutLbl.AutoSize = true;
-			this.TimeoutLbl.Location = new System.Drawing.Point(402, 506);
+			this.TimeoutLbl.Location = new System.Drawing.Point(432, 506);
 			this.TimeoutLbl.Name = "TimeoutLbl";
 			this.TimeoutLbl.Size = new System.Drawing.Size(48, 13);
 			this.TimeoutLbl.TabIndex = 75;
@@ -548,7 +549,7 @@ namespace WinTlx
 			// 
 			this.SendBufferStatusLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.SendBufferStatusLbl.AutoSize = true;
-			this.SendBufferStatusLbl.Location = new System.Drawing.Point(171, 506);
+			this.SendBufferStatusLbl.Location = new System.Drawing.Point(150, 506);
 			this.SendBufferStatusLbl.Name = "SendBufferStatusLbl";
 			this.SendBufferStatusLbl.Size = new System.Drawing.Size(48, 13);
 			this.SendBufferStatusLbl.TabIndex = 80;
@@ -565,12 +566,23 @@ namespace WinTlx
 			this.CharSetLbl.Text = "CharSet";
 			this.CharSetLbl.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
+			// RemoteBufferStatusLbl
+			// 
+			this.RemoteBufferStatusLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.RemoteBufferStatusLbl.AutoSize = true;
+			this.RemoteBufferStatusLbl.Location = new System.Drawing.Point(237, 506);
+			this.RemoteBufferStatusLbl.Name = "RemoteBufferStatusLbl";
+			this.RemoteBufferStatusLbl.Size = new System.Drawing.Size(48, 13);
+			this.RemoteBufferStatusLbl.TabIndex = 82;
+			this.RemoteBufferStatusLbl.Text = "RemBuf:";
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
 			this.ClientSize = new System.Drawing.Size(804, 525);
+			this.Controls.Add(this.RemoteBufferStatusLbl);
 			this.Controls.Add(this.CharSetLbl);
 			this.Controls.Add(this.SendBufferStatusLbl);
 			this.Controls.Add(this.ReceiveStatusLbl);
@@ -672,6 +684,7 @@ namespace WinTlx
 		private System.Windows.Forms.ComboBox SearchCb;
 		private System.Windows.Forms.ComboBox TlnTypeCb;
 		private System.Windows.Forms.Label CharSetLbl;
+		private System.Windows.Forms.Label RemoteBufferStatusLbl;
 	}
 }
 

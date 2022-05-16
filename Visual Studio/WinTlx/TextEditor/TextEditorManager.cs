@@ -482,7 +482,7 @@ namespace WinTlx.TextEditor
 			}
 
 			List<string> newLines = new List<string>();
-			char lastChar = '\0';
+			// char lastChar = '\0';
 			while (line.Length >= len)
 			{
 				int pos = -1;

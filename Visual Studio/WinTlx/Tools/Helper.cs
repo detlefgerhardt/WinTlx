@@ -149,7 +149,12 @@ namespace WinTlx
 		{
 			if (c.InvokeRequired)
 			{
-				c.Invoke(new MethodInvoker(delegate { a(); }));
+				try
+				{
+					c.Invoke(new MethodInvoker(delegate { a(); }));
+				}
+				// supress error when object is no longer available on closing the application
+				catch { };
 			}
 			else
 			{

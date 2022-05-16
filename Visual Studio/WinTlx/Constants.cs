@@ -16,9 +16,11 @@
 
 		public const string DEFAULT_ANSWERBACK = "wintlx";
 		public const int DEFAULT_IDLE_TIMEOUT = 120; // disconnect after 2 minutes without communication
+		public const int DEFAULT_REMOTE_BUFFER_SIZE = 16; // byte
+		public const int DEFAULT_OUTPUT_SPEED = 50; // baud
 		public const int DEFAULT_INCOMING_PORT = 134;
 
-		public const int ITELIX_REMOTEBUFFER_SIZE = 32; // 16 characters
+		//public const int ITELIX_REMOTEBUFFER_SIZE = 16; // 16 characters
 		public const int ITELIX_SENDBUFFER_SIZE = 16; // 16 characters
 
 		public const int WAIT_BEFORE_SEND_MSEC = 100; // 0.1 seconds

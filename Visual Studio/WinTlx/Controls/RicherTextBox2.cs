@@ -46,7 +46,6 @@ namespace WinTlx.Controls
 
 			if (ctrlV || shiftIns)
 			{
-				//Debug.WriteLine("paste");
 				_pasteOccured = true;
 			}
 		}
