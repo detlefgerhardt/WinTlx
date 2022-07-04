@@ -26,7 +26,7 @@ Requires .NET Frame 4.5 or higher.
  
 ## Links
 
-[i-Telex community homepage](https://https://www.i-telex.net).
+[i-Telex community homepage](https://www.i-telex.net).
 
 An [i-Telex-Library](https://sourceforge.net/projects/itelex) for Arduino/Atmel by Fred Sonnenrein.
 
