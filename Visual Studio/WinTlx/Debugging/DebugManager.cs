@@ -57,7 +57,12 @@ namespace WinTlx.Debugging
 			_debugForm.ClearDebugText();
 		}
 
-		public void WriteCmd(ItelexPacket itxPkt, Modes mode, int? transCnt=null)
+		public void WriteCmd(ItelexPacket itxPkt, Modes mode)
+		{
+			WriteCmd(itxPkt, mode, null);
+		}
+
+		public void WriteCmd(ItelexPacket itxPkt, Modes mode, Acknowledge ack)
 		{
 			if (_debugForm == null) return;
 
@@ -65,11 +70,11 @@ namespace WinTlx.Debugging
 
 			if (itxPkt.CommandType == ItelexCommands.Ack && !_debugForm.ShowAck) return;
 
-			string debugStr = CmdToString(itxPkt, transCnt, mode);
+			string debugStr = CmdToString(itxPkt, mode, ack);
 			Write(debugStr + "\r\n", mode);
 		}
 
-		private string CmdToString(ItelexPacket itxPkt, int? transCnt, Modes mode)
+		private string CmdToString(ItelexPacket itxPkt, Modes mode, Acknowledge ack)
 		{
 			string cmdStr;
 			switch (itxPkt.CommandType)
@@ -96,7 +101,7 @@ namespace WinTlx.Debugging
 					{
 						string asciiStr = CodeManager.BaudotStringToAscii(itxPkt.Data, _keyStates, CodeManager.SendRecv.Recv, true);
 						asciiStr = ConvDebugText(asciiStr);
-						return $"{cmdStr} {asciiStr} [{itxPkt.GetDebugPacket()}]";
+						return $"{cmdStr} {asciiStr} [{itxPkt.GetDebugPacket()}] {ack.LocalBufferCount}";
 					}
 				case ItelexCommands.End:
 					return $"End {itxPkt.GetDebugData()}";
@@ -120,29 +125,20 @@ namespace WinTlx.Debugging
 					}
 					else
 					{
-						if (transCnt == null)
+						if (ack == null)
 						{
 							return $"{cmdStr} [{itxPkt.GetDebugPacket()}]";
 						}
 						else
 						{
 							int ackCnt = itxPkt.Data[0];
-							int bufCnt = transCnt.Value - ackCnt;
-							if (bufCnt < -128)
-							{
-								bufCnt = -(bufCnt + 256); // bufCnt is negative!!!
-							}
-							else if (bufCnt < 0)
-							{
-								bufCnt += 256;
-							}
 							if (mode == Modes.Recv)
 							{
-								return $"{cmdStr} ack={ackCnt} sent={transCnt} buf={bufCnt} [{itxPkt.GetDebugPacket()}]";
+								return $"{cmdStr} ack={ackCnt} sent={ack.SendCnt}/{ack.SendAckCnt} buf={ack.RemoteBufferCount} [{itxPkt.GetDebugPacket()}]";
 							}
 							else
 							{
-								return $"{cmdStr} ack={ackCnt} recv={transCnt} buf={bufCnt} [{itxPkt.GetDebugPacket()}]";
+								return $"{cmdStr} ack={ackCnt} recv={ack.ReceivedCnt}/{ack.ReceivedAckCnt} buf={ack.LocalBufferCount} [{itxPkt.GetDebugPacket()}]";
 							}
 						}
 					}
@@ -179,6 +175,11 @@ namespace WinTlx.Debugging
 		private int remoteBufferCount(int ack, int trans)
 		{
 			return ((trans + 256) - ack) % 256;
+		}
+
+		private int localBufferCount(int ack, int print)
+		{
+			return ((print + 256) - ack) % 256;
 		}
 
 		public void Write(string text, Modes mode)

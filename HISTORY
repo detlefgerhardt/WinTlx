@@ -116,3 +116,9 @@ Version history
 2.0.0.4   Fix: Wordwraping in text editor had problems with '-'
           Fix: Problems switching to Cyrillic mode
           Chg: Some minor improvements
+2.0.0.5   Fix: Peertype selection is no longer deactivated
+          Chg: Some internal chances, refactoring
+2.1.0     Chg: New version number scheme
+          Fix: Improved buffer and acknowledge handling
+          Fix: Many minor changes and fixes
+

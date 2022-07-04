@@ -79,6 +79,7 @@ namespace WinTlx
 			this.SendBufferStatusLbl = new System.Windows.Forms.Label();
 			this.CharSetLbl = new System.Windows.Forms.Label();
 			this.RemoteBufferStatusLbl = new System.Windows.Forms.Label();
+			this.LocalBufferStatusLbl = new System.Windows.Forms.Label();
 			this.panel2.SuspendLayout();
 			this.panel4.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.TerminalPb)).BeginInit();
@@ -373,12 +374,12 @@ namespace WinTlx
 			// 
 			this.AnswerbackTb.Font = new System.Drawing.Font("Consolas", 9F);
 			this.AnswerbackTb.Location = new System.Drawing.Point(8, 65);
-			this.AnswerbackTb.Multiline = true;
 			this.AnswerbackTb.Name = "AnswerbackTb";
 			this.AnswerbackTb.ReadOnly = true;
 			this.AnswerbackTb.Size = new System.Drawing.Size(198, 22);
 			this.AnswerbackTb.TabIndex = 0;
 			this.AnswerbackTb.TabStop = false;
+			this.AnswerbackTb.WordWrap = false;
 			// 
 			// panel4
 			// 
@@ -497,7 +498,7 @@ namespace WinTlx
 			// 
 			this.ConnTimeLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ConnTimeLbl.AutoSize = true;
-			this.ConnTimeLbl.Location = new System.Drawing.Point(330, 506);
+			this.ConnTimeLbl.Location = new System.Drawing.Point(372, 506);
 			this.ConnTimeLbl.Name = "ConnTimeLbl";
 			this.ConnTimeLbl.Size = new System.Drawing.Size(61, 13);
 			this.ConnTimeLbl.TabIndex = 73;
@@ -507,7 +508,7 @@ namespace WinTlx
 			// 
 			this.TimeoutLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.TimeoutLbl.AutoSize = true;
-			this.TimeoutLbl.Location = new System.Drawing.Point(432, 506);
+			this.TimeoutLbl.Location = new System.Drawing.Point(474, 506);
 			this.TimeoutLbl.Name = "TimeoutLbl";
 			this.TimeoutLbl.Size = new System.Drawing.Size(48, 13);
 			this.TimeoutLbl.TabIndex = 75;
@@ -527,7 +528,7 @@ namespace WinTlx
 			// 
 			this.ConnectStatusLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ConnectStatusLbl.AutoSize = true;
-			this.ConnectStatusLbl.Location = new System.Drawing.Point(609, 506);
+			this.ConnectStatusLbl.Location = new System.Drawing.Point(651, 506);
 			this.ConnectStatusLbl.Name = "ConnectStatusLbl";
 			this.ConnectStatusLbl.Size = new System.Drawing.Size(37, 13);
 			this.ConnectStatusLbl.TabIndex = 78;
@@ -538,7 +539,7 @@ namespace WinTlx
 			// 
 			this.ReceiveStatusLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ReceiveStatusLbl.AutoSize = true;
-			this.ReceiveStatusLbl.Location = new System.Drawing.Point(533, 506);
+			this.ReceiveStatusLbl.Location = new System.Drawing.Point(575, 506);
 			this.ReceiveStatusLbl.Name = "ReceiveStatusLbl";
 			this.ReceiveStatusLbl.Size = new System.Drawing.Size(64, 13);
 			this.ReceiveStatusLbl.TabIndex = 79;
@@ -559,7 +560,7 @@ namespace WinTlx
 			// 
 			this.CharSetLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.CharSetLbl.AutoSize = true;
-			this.CharSetLbl.Location = new System.Drawing.Point(678, 506);
+			this.CharSetLbl.Location = new System.Drawing.Point(720, 506);
 			this.CharSetLbl.Name = "CharSetLbl";
 			this.CharSetLbl.Size = new System.Drawing.Size(45, 13);
 			this.CharSetLbl.TabIndex = 81;
@@ -570,11 +571,21 @@ namespace WinTlx
 			// 
 			this.RemoteBufferStatusLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.RemoteBufferStatusLbl.AutoSize = true;
-			this.RemoteBufferStatusLbl.Location = new System.Drawing.Point(237, 506);
+			this.RemoteBufferStatusLbl.Location = new System.Drawing.Point(226, 506);
 			this.RemoteBufferStatusLbl.Name = "RemoteBufferStatusLbl";
 			this.RemoteBufferStatusLbl.Size = new System.Drawing.Size(48, 13);
 			this.RemoteBufferStatusLbl.TabIndex = 82;
 			this.RemoteBufferStatusLbl.Text = "RemBuf:";
+			// 
+			// LocalBufferStatusLbl
+			// 
+			this.LocalBufferStatusLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.LocalBufferStatusLbl.AutoSize = true;
+			this.LocalBufferStatusLbl.Location = new System.Drawing.Point(297, 506);
+			this.LocalBufferStatusLbl.Name = "LocalBufferStatusLbl";
+			this.LocalBufferStatusLbl.Size = new System.Drawing.Size(44, 13);
+			this.LocalBufferStatusLbl.TabIndex = 83;
+			this.LocalBufferStatusLbl.Text = "LocBuf:";
 			// 
 			// MainForm
 			// 
@@ -582,6 +593,7 @@ namespace WinTlx
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
 			this.ClientSize = new System.Drawing.Size(804, 525);
+			this.Controls.Add(this.LocalBufferStatusLbl);
 			this.Controls.Add(this.RemoteBufferStatusLbl);
 			this.Controls.Add(this.CharSetLbl);
 			this.Controls.Add(this.SendBufferStatusLbl);
@@ -685,6 +697,7 @@ namespace WinTlx
 		private System.Windows.Forms.ComboBox TlnTypeCb;
 		private System.Windows.Forms.Label CharSetLbl;
 		private System.Windows.Forms.Label RemoteBufferStatusLbl;
+		private System.Windows.Forms.Label LocalBufferStatusLbl;
 	}
 }
 

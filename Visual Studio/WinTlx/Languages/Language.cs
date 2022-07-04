@@ -49,6 +49,8 @@ namespace WinTlx.Languages
 		MainForm_ReceiveStatusOn,
 		MainForm_ReceiveStatusOff,
 		MainForm_SendBufferStatus,
+		MainForm_RemoteBufferStatus,
+		MainForm_LocalBufferStatus,
 
 		MainMenu_FileMenu,
 		MainMenu_SaveBufferAsText,

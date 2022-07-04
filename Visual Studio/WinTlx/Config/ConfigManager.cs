@@ -43,6 +43,7 @@ namespace WinTlx.Config
 				LimitedClient = false,
 				//RemoteServerPort = Constants.CENTRALEX_PORT,
 				RemoteServerPort = 0,
+				Options = ""
 			};
 		}
 

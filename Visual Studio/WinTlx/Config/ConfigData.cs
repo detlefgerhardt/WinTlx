@@ -67,6 +67,27 @@ namespace WinTlx.Config
 		[DataMember]
 		public int RemoteServerPort { get; set; }
 
+		private string _optionsStr;
+
+		[DataMember]
+		public string Options {
+			get
+			{
+				return _optionsStr;
+			}
+			set
+			{
+				string optionsStr = value.Trim();
+				_optionsStr = optionsStr;
+				ParseOptions(optionsStr);
+			}
+		}
+
+		public string OptionVersion { get; set; }
+
+		public bool OptionHide { get; set; }
+
+
 		/// <summary>
 		/// Set default values for empty fields
 		/// </summary>
@@ -76,10 +97,10 @@ namespace WinTlx.Config
 			{
 				Language = Constants.DEFAULT_LANGUAGE;
 			}
-			if (string.IsNullOrWhiteSpace(Answerback))
-			{
-				Answerback = @"\r\n" + Constants.DEFAULT_ANSWERBACK;
-			}
+			//if (string.IsNullOrWhiteSpace(Answerback))
+			//{
+			//	Answerback = @"\r\n" + Constants.DEFAULT_ANSWERBACK;
+			//}
 			if (RemoteBufferSize == 0)
 			{
 				RemoteBufferSize = Constants.DEFAULT_REMOTE_BUFFER_SIZE;
@@ -119,62 +140,21 @@ namespace WinTlx.Config
 			}
 		}
 
-		/*
-		public string AnswerbackPlain
-		{
-			get
-			{
-				if (string.IsNullOrWhiteSpace(Answerback))
-				{
-					return Answerback;
-				}
-				else
-				{
-					int len = Answerback.Length;
-					if (Answerback[len-1]=='-')
-					{
-						return Answerback.Substring(0, len - 1);
-					}
-					else
-					{
-						return Answerback;
-					}
-				}
-			}
-		}
-
-		public bool AnswerbackTweak
-		{
-			get
-			{
-				return !string.IsNullOrWhiteSpace(Answerback) && Answerback[Answerback.Length - 1] == '-';
-			}
-		}
-		*/
-
 		public string AnswerbackWinTlx
 		{
 			get
 			{
-				if (string.IsNullOrWhiteSpace(Answerback))
+				if (!OptionHide && string.IsNullOrWhiteSpace(Answerback))
 				{
-					// add "wintlx" as default for empty answerback
-					return "wintlx";
+					return Constants.DEFAULT_ANSWERBACK;
 				}
-				else if (Answerback[Answerback.Length - 1] == '-')
+				else if (OptionHide || Answerback.Contains(Constants.DEFAULT_ANSWERBACK))
 				{
-					// answerback ends with '-': tweak to prohibit "wintlx"
-					return Answerback.Substring(0, Answerback.Length - 1);
-				}
-				else if (Answerback.Contains("wintlx"))
-				{
-					// answerback contains "wintlx", no need to add "wintlx"
 					return Answerback;
 				}
 				else
 				{
-					// add "wintlx"
-					return Answerback + " (wintlx)";
+					return Answerback + $" ({Constants.DEFAULT_ANSWERBACK})";
 				}
 			}
 		}
@@ -220,5 +200,30 @@ namespace WinTlx.Config
 			return path;
 		}
 
+		private void ParseOptions(string optionsStr)
+		{
+			// defaults
+			OptionVersion = null;
+			OptionHide = false;
+
+			if (string.IsNullOrEmpty(optionsStr)) return;
+
+			string[] options = optionsStr.Split(new char[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries);
+			if (options.Length == 0) return;
+			foreach (string option in options)
+			{
+				string key = option.Substring(0, 1).ToLower();
+				string param = option.Length > 1 ? option.Substring(1) : null;
+				switch (key)
+				{
+					case "v": // version
+						OptionVersion = param;
+						break;
+					case "h": // hide
+						OptionHide = true;
+						break;
+				}
+			}
+		}
 	}
 }

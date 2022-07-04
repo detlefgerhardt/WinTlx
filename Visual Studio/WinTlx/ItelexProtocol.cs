@@ -83,10 +83,10 @@ namespace WinTlx
 		//public delegate void ConnectEventHandler();
 		//public event ConnectEventHandler Connected;
 
-		public delegate void DroppedEventHandler();
+		public delegate void DroppedEventHandler(string rejectReason);
 		public event DroppedEventHandler Dropped;
 
-		public delegate void ReceivedEventHandler(string asciiText);
+		public delegate void ReceivedEventHandler(string asciiChrs);
 		public event ReceivedEventHandler Received;
 
 		public delegate void UpdateEventHandler();
@@ -188,6 +188,8 @@ namespace WinTlx
 		private readonly EyeballChar _eyeballChar;
 		public bool EyeballCharActive { get; set; }
 
+		public string OwnVersion { get; set; }
+
 		private KeyStates _keyStates { get; set; } = new KeyStates();
 
 		public ShiftStates ShiftState
@@ -196,9 +198,8 @@ namespace WinTlx
 			set { _keyStates.ShiftState = value; }
 		}
 
-		private int _ackReceive; // n_recv
-		private int _ackTransLocal; // n_trans
-		private int _ackTransRemote; // n_ack
+		private Acknowledge _ack;
+
 		private ConcurrentQueue<byte> _sendBuffer;
 		private readonly object _sendLock = new object();
 
@@ -207,20 +208,6 @@ namespace WinTlx
 			get
 			{
 				return _sendBuffer != null ? _sendBuffer.Count : 0;
-			}
-		}
-
-		public int RemoteBufferCount
-		{
-			get
-			{
-				lock (_sendLock)
-				{
-					int transLocal = _ackTransLocal;
-					if (_ackTransRemote > transLocal)
-						transLocal += 256;
-					return transLocal - _ackTransRemote;
-				}
 			}
 		}
 
@@ -309,6 +296,8 @@ namespace WinTlx
 
 			_debugManager = DebugManager.Instance;
 
+			_ack = new Acknowledge();
+
 			_ackTimer = new System.Timers.Timer();
 			_ackTimer.Elapsed += AckTimer_Elapsed;
 
@@ -321,6 +310,7 @@ namespace WinTlx
 			ConfigManager.Instance.ConfigChanged += Instance_ConfigChanged;
 
 			_keyStates = new KeyStates(ShiftStates.Unknown, _config.CodeSet);
+
 		}
 
 		private void Instance_ConfigChanged()
@@ -490,18 +480,18 @@ namespace WinTlx
 			if (ConnectionState == ConnectionStates.Disconnected) return false;
 			if (Texting == Textings.Ascii) return true;
  
-			Message?.Invoke($"send version cmd {VersionCode} {Helper.GetVersionStr()}");
 			SendVersionCodeCmd();
 
 			// wait 5 seconds for version cmd and extension cmd from remote
 
 			timer.Start();
-			while (timer.ElapsedMilliseconds < 5000)
+			while (timer.ElapsedMilliseconds < 4000)
 			{
 				if (RemoteVersion != null) break;
 				if (ConnectionState == ConnectionStates.Disconnected) return false;
 				await Task.Delay(100);
 			}
+
 			if (RemoteVersion == null)
 			{
 				Logging.Instance.Info(TAG, nameof(ConnectOut), $"Timeout waiting for version response");
@@ -527,6 +517,15 @@ namespace WinTlx
 
 			ConnectionState = ConnectionStates.Connected;
 			Update?.Invoke();
+
+			// wait for reject command
+			timer.Start();
+			while (timer.ElapsedMilliseconds < 2000)
+			{
+				if (ConnectionState == ConnectionStates.Disconnected) return false;
+				await Task.Delay(100);
+			}
+
 			return true;
 		}
 
@@ -668,16 +667,14 @@ namespace WinTlx
 
 		private void ConnectInit()
 		{
-			//Debug.WriteLine($"{nameof(ConnectInit)} start");
+			_ack.Reset();
 
-			_ackReceive = 0;
-			_ackTransLocal = 0;
-			_ackTransRemote = 0;
 			_sendBuffer = new ConcurrentQueue<byte>();
 			_ackRecvFlag = false;
 			_ackTimerActive = false;
 			_ackTimer.Stop();
-			_ackTimer.Interval = 2000;
+			SetAckTimerInterval(0); // set _ackTimer to default interval
+			_ackTimer.Interval = 1000;
 			_ackTimer.Start();
 
 			_sendTimerActive = false;
@@ -703,6 +700,14 @@ namespace WinTlx
 			Update?.Invoke();
 		}
 
+		public void SetAckTimerInterval(int ms)
+		{
+			if (ms == 0) ms = 2000; // default is 2 sec.
+			_ackTimer.Stop();
+			_ackTimer.Interval = ms;
+			_ackTimer.Start();
+		}
+
 		private bool _disconnecting = false;
 		public void Disconnect()
 		{
@@ -721,13 +726,12 @@ namespace WinTlx
 			_sendTimer?.Stop();
 
 			ConnectionState = ConnectionStates.Disconnected;
-			Debug.WriteLine($"Disconnect() ConnectionState={ConnectionState}");
 
 			_client?.Close();
 
 			Logging.Instance.Log(LogTypes.Info, TAG, nameof(Disconnect), $"connection dropped");
 
-			Dropped?.Invoke();
+			Dropped?.Invoke(RejectReason);
 			Update?.Invoke();
 
 			if (CentralexState == CentralexStates.CentralexConnected)
@@ -769,11 +773,9 @@ namespace WinTlx
 
 		private void SendTimer()
 		{
-			//Debug.WriteLine($"SendTimer: {_sendBuffer.Count} {_itelixSendCount} {CharsAckCount} {_n_trans}/{_n_ack}={CharsAckCount}");
-			//Logging.Instance.Log(LogTypes.Info, TAG, nameof(SendTimer), $"SendTimer: {_sendBuffer.Count} {_itelixSendCount} {CharsAckCount} {_n_trans}/{_n_ack}");
 			lock (_sendLock)
 			{
-				int ackCount = RemoteBufferCount;
+				int ackCount = _ack.RemoteBufferCount;
 				for (int i = 0;
 					!_sendBuffer.IsEmpty && _itelixSendCount < Constants.ITELIX_SENDBUFFER_SIZE && ackCount < _config.RemoteBufferSize;
 					i++)
@@ -802,6 +804,7 @@ namespace WinTlx
 			byte[] baudotData = new byte[_itelixSendCount];
 			Buffer.BlockCopy(_itelixSendBuffer, 0, baudotData, 0, _itelixSendCount);
 			SendCmd(ItelexCommands.BaudotData, baudotData);
+			Debug.WriteLine($"send: {CodeManager.DumpBaudotArrayToString(baudotData)}");
 			_itelixSendCount = 0;
 			_lastSentMs = Helper.GetTicksMs();
 			_lastSendRecvIdleMs = Helper.GetTicksMs();
@@ -832,12 +835,10 @@ namespace WinTlx
 
 			lock (_sendLock)
 			{
-				//Debug.WriteLine(CharsAckCount);
-				//Debug.WriteLine($"ackTrans {_ackTransRemote} {_ackTransLocal}");
-				if (RemoteBufferCount > 0)
+				if (_ack.RemoteBufferCount > 0)
 				{
 					string timeout = null;
-					if (_ackRecvFlag && _lastRecvAckValue == _ackTransRemote)
+					if (_ackRecvFlag && _lastRecvAckValue == _ack.SendAckCnt)
 					{
 						// if ack was received and ack didn't change since the last AckTimer_Elapsed (2 sec)
 						Logging.Instance.Warn(TAG, nameof(AckTimer_Elapsed), $"recv ack value changed timeout");
@@ -852,13 +853,13 @@ namespace WinTlx
 					}
 					if (timeout != null)
 					{
-						_ackTransLocal = _ackTransRemote;
+						_ack.SendCnt = _ack.SendAckCnt;
 					}
 				}
-				_lastRecvAckValue = _ackTransRemote;
+				_lastRecvAckValue = _ack.SendCnt;
 			}
 
-			SendAckCmd(_ackReceive);
+			SendAckCmd(_ack.ReceivedAckCnt);
 
 			_ackTimerActive = false;
 		}
@@ -891,22 +892,6 @@ namespace WinTlx
 					Disconnect();
 					return;
 				}
-
-				/*
-				string conv = "";
-				foreach(char c in asciiStr)
-				{
-					if (c>='a' && c<='z')
-					{
-						conv += (char)(((int)c) - 96);
-					}
-					else
-					{
-						conv += c;
-					}
-				}
-				asciiStr = conv;
-				*/
 
 				asciiStr = asciiStr.Replace("\x05", "@\x17");
 				//asciiStr = asciiStr.Replace("\x05", "\x17");
@@ -962,8 +947,8 @@ namespace WinTlx
 
 		public void SendVersionCodeCmd()
 		{
-			string version = Helper.GetVersionStr();
-			//string version = "867";
+			string version = !string.IsNullOrEmpty(OwnVersion) ? OwnVersion : Helper.GetItelexVersion(Constants.APP_CODE);
+			Message?.Invoke($"send version cmd {VersionCode} '{version}'");
 			List<byte> data = new List<byte>();
 			data.Add(VersionCode);
 			for (int i=0; i<version.Length; i++)
@@ -1103,12 +1088,12 @@ namespace WinTlx
 			switch ((ItelexCommands)packet.Command)
 			{
 				case ItelexCommands.BaudotData:
-					AddTransCharCount(data.Length);
+					_ack.AddTransCharCount(data.Length);
 					Logging.Instance.AppendBinary(packet.Data, Logging.BinaryModes.Send);
 					break;
 			}
 
-			_debugManager.WriteCmd(packet, DebugManager.Modes.Send, _ackReceive);
+			_debugManager.WriteCmd(packet, DebugManager.Modes.Send, _ack);
 
 			try
 			{
@@ -1167,10 +1152,8 @@ namespace WinTlx
 
 		private void DataReceived(IAsyncResult ar)
 		{
-			if (ConnectionState == ConnectionStates.Disconnected && CentralexState == CentralexStates.None)
-			{
-				return;
-			}
+			if (ConnectionState == ConnectionStates.Disconnected && CentralexState == CentralexStates.None) return;
+
 			if (_client.Client == null)
 			{
 				Disconnect();
@@ -1203,13 +1186,15 @@ namespace WinTlx
 				if (newData[0] <= 0x09 || newData[0] >= 0x10 && newData[0] < 0x1F)
 				{
 					_debugManager.Write($"Recv char {newData[0]:X02} -> i-Telex\r\n", DebugManager.Modes.Recv);
-					Debug.WriteLine($"recv ${newData[0]:X02}: i-telex");
+					List<string> dmp = Helper.DumpByteArray(newData, 0);
+					_debugManager.Write($"Recv dump {dmp[0]}", DebugManager.Modes.Recv);
+					Debug.WriteLine($"Recv dump {dmp[0]}");
 					Texting = Textings.Itelex;
 				}
 				else
 				{
 					_debugManager.Write($"Recv char {newData[0]:X02} -> ASCII\r\n", DebugManager.Modes.Recv);
-					Debug.WriteLine($"recv ${newData[0]:X02}: ascii");
+					//Debug.WriteLine($"recv ${newData[0]:X02}: ascii");
 					Texting = Textings.Ascii;
 				}
 			}
@@ -1228,7 +1213,6 @@ namespace WinTlx
 					int dataPos = 0;
 					while (dataPos + 2 <= newData.Length)
 					{
-						//Debug.WriteLine($"datapos={dataPos} cmd={newData[dataPos]:X02}");
 						int packetLen = newData[dataPos + 1] + 2;
 						if (dataPos + packetLen > newData.Length)
 						{
@@ -1243,7 +1227,6 @@ namespace WinTlx
 						if (packetData.Length >= 2 && packetData.Length >= packetData[1] + 2)
 						{
 							ItelexPacket packet = new ItelexPacket(packetData);
-							//Debug.WriteLine($"packet={packet}");
 							DecodePacket(packet);
 						}
 					}
@@ -1287,7 +1270,7 @@ namespace WinTlx
 
 		private void DecodePacket(ItelexPacket packet)
 		{
-			_debugManager.WriteCmd(packet, DebugManager.Modes.Recv, _ackTransLocal);
+			_debugManager.WriteCmd(packet, DebugManager.Modes.Recv, _ack);
 
 			// check for empty packet
 			switch (packet.CommandType)
@@ -1314,7 +1297,6 @@ namespace WinTlx
 					Logging.Instance.Info(TAG, nameof(DecodePacket), $"recv direct dial cmd  {packet.GetDebugPacket()}, number={packet.Data[0]}");
 					int directDial = packet.Data[0];
 					Message?.Invoke($"received direct dial cmd {directDial}");
-					Debug.WriteLine($"received direct dial cmd {directDial}");
 					if (directDial == _config.IncomingExtensionNumber)
 					{
 						ConnectInit();
@@ -1330,14 +1312,16 @@ namespace WinTlx
 
 				case ItelexCommands.BaudotData:
 					Logging.Instance.AppendBinary(packet.Data, Logging.BinaryModes.Recv);
-					string asciiStr = CodeManager.BaudotStringToAscii(packet.Data, _keyStates, CodeManager.SendRecv.Recv, false);
-					Logging.Instance.Debug(TAG, nameof(DecodePacket),
-						$"recv baudot data {packet.Len} \"{CodeManager.AsciiToDebugStr(asciiStr)}\"");
-					Debug.WriteLine($"recv data {packet.Len} \"{CodeManager.AsciiToDebugStr(asciiStr)}\"");
-					AddReceivedCharCount(packet.Data.Length);
-					Debug.WriteLine($"ack = {_ackReceive}");
+					string asciiStr = "";
+					foreach (byte code in packet.Data)
+					{	// decode byte by byte to preserve ack-count
+						string chrs = CodeManager.BaudotStringToAscii(new byte[] { code }, _keyStates, CodeManager.SendRecv.Recv, false);
+						asciiStr += chrs;
+						Received?.Invoke(chrs);
+					}
+					Logging.Instance.Debug(TAG, nameof(DecodePacket), $"recv baudot data {packet.Len} \"{CodeManager.AsciiToDebugStr(asciiStr)}\"");
+					_ack.AddReceivedCharCount(packet.Len);
 					_lastSendRecvIdleMs = Helper.GetTicksMs();
-					Received?.Invoke(asciiStr);
 					BaudotSendRecv?.Invoke(packet.Data);
 					Update?.Invoke();
 					break;
@@ -1365,12 +1349,12 @@ namespace WinTlx
 				case ItelexCommands.Ack:
 					lock (_sendLock)
 					{
-						_ackTransRemote = packet.Data[0];
+						_ack.SendAckCnt = packet.Data[0];
 						_ackRecvFlag = true;
 						_lastAckReceived = Helper.GetTicksMs();
 					}
 					//Debug.WriteLine($"recv ack cmd {_n_ack} ({CharsAckCount})");
-					Logging.Instance.Debug(TAG, nameof(DecodePacket), $"recv ack cmd  {packet.GetDebugPacket()} ack={_ackTransRemote} ({RemoteBufferCount})");
+					Logging.Instance.Debug(TAG, nameof(DecodePacket), $"recv ack cmd  {packet.GetDebugPacket()} ack={_ack.SendAckCnt} ({_ack.RemoteBufferCount})");
 					Update?.Invoke();
 					break;
 
@@ -1384,7 +1368,6 @@ namespace WinTlx
 					}
 					RemoteVersion = $"{ packet.Data[0]:X2} '{versionStr}'";
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(DecodePacket), $"recv protocol version cmd  {packet.GetDebugPacket()}, version={RemoteVersion}");
-					Debug.WriteLine($"recv protocol version {RemoteVersion}");
 					if (_connectionDirection == ConnectionDirections.In)
 					{
 						// answer with own version
@@ -1425,14 +1408,15 @@ namespace WinTlx
 			}
 		}
 
-		private void AddReceivedCharCount(int n)
+		public void AddPrintedCharCount(int n)
 		{
-			_ackReceive = (_ackReceive + n) % 256;
+			Debug.WriteLine($"add printed data {n}");
+			_ack.AddPrintedCharCount(n);
 		}
 
-		private void AddTransCharCount(int n)
+		public int GetRemoteBufferCount()
 		{
-			_ackTransLocal = (_ackTransLocal + n) % 256;
+			return _ack.RemoteBufferCount;
 		}
 
 		private string ReasonToString(string reason)
@@ -1464,5 +1448,61 @@ namespace WinTlx
 			Disconnect();
 		}
 
+	}
+
+	public class Acknowledge
+	{
+		public int ReceivedCnt { get; set; } // characters received from remote
+
+		public int ReceivedAckCnt { get; set; } // n_recv, characters received/printed locally
+
+		public int SendCnt { get; set; } // n_trans, characters send to remote
+
+		public int SendAckCnt { get; set; } // n_ack, characters printed by remote
+
+		public void Reset()
+		{
+			ReceivedCnt = 0;
+			ReceivedAckCnt = 0;
+			SendCnt = 0;
+			SendAckCnt = 0;
+		}
+
+		public void AddReceivedCharCount(int n)
+		{
+			ReceivedCnt = (ReceivedCnt + n) % 256;
+		}
+
+		public void AddPrintedCharCount(int n)
+		{
+			ReceivedAckCnt = (ReceivedAckCnt + n) % 256;
+		}
+
+		public void AddTransCharCount(int n)
+		{
+			SendCnt = (SendCnt + n) % 256;
+		}
+
+		public int RemoteBufferCount
+		{
+			get
+			{
+				int send = SendCnt;
+				if (SendAckCnt > send)
+					send += 256;
+				return send - SendAckCnt;
+			}
+		}
+
+		public int LocalBufferCount
+		{
+			get
+			{
+				int recv = ReceivedCnt;
+				if (ReceivedAckCnt > recv)
+					recv += 256;
+				return recv - ReceivedAckCnt;
+			}
+		}
 	}
 }

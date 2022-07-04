@@ -65,7 +65,7 @@ namespace WinTlx.Debugging
 
 		private void Itelex_Update()
 		{
-			Helper.ControlInvokeRequired(SendAckTb, () => SendAckTb.Text = $"Itelex LB:{_itelex.SendBufferCount:D03} RB:{_itelex.RemoteBufferCount:D03}");
+			Helper.ControlInvokeRequired(SendAckTb, () => SendAckTb.Text = $"Itelex LB:{_itelex.SendBufferCount:D03} RB:{_itelex.GetRemoteBufferCount():D03}");
 			Helper.ControlInvokeRequired(RecvBufTb, () => RecvBufTb.Text = $"Buf L:{_bufferManager.LocalOutputBufferCount} S:{_bufferManager.SendBufferCount}");
 
 			Helper.ControlInvokeRequired(ConnectionStateTb, () =>

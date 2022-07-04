@@ -131,12 +131,11 @@ namespace WinTlx
 			_recvOn = false;
 
 			_itelex = ItelexProtocol.Instance;
-			_itelex.Received += ReceivedHandler;
 			_itelex.Send += SendHandler;
 			//_itelex.Connected += ConnectedHandler;
-			_itelex.Dropped += DroppedHandler;
-			_itelex.Update += UpdateHandler;
-			_itelex.Message += MessageHandler;
+			_itelex.Dropped += Itelex_DroppedHandler;
+			_itelex.Update += Itelex_UpdateHandler;
+			//_itelex.Message += MessageHandler;
 
 			_subscriberServer = new SubscriberServer();
 			_subscriberServer.Message += SubcribeServerMessageHandler;
@@ -171,7 +170,7 @@ namespace WinTlx
 
 			UpdateMainMenu();
 
-			UpdateHandler();
+			Itelex_UpdateHandler();
 		}
 
 		private void LanguageChanged()
@@ -209,7 +208,7 @@ namespace WinTlx
 
 			UpdateMainMenu();
 			ShowScreen();
-			UpdateHandler();
+			Itelex_UpdateHandler();
 			SetNullBtnText();
 			SetPeerTypes();
 		}
@@ -609,7 +608,7 @@ namespace WinTlx
 
 #endregion
 
-#region TerminalPb-Events
+		#region TerminalPb-Events
 
 		private void TerminalPb_Paint(object sender, PaintEventArgs e)
 		{
@@ -672,13 +671,13 @@ namespace WinTlx
 		private void AddressTb_Leave(object sender, EventArgs e)
 		{
 			//SetConnectState();
-			UpdateHandler();
+			Itelex_UpdateHandler();
 		}
 
 		private void PortTb_Leave(object sender, EventArgs e)
 		{
 			//SetConnectState();
-			UpdateHandler();
+			Itelex_UpdateHandler();
 		}
 
 		private async void SearchCb_KeyPress(object sender, KeyPressEventArgs e)
@@ -813,7 +812,7 @@ namespace WinTlx
 			}
 			*/
 			SetTlnData();
-			UpdateHandler();
+			Itelex_UpdateHandler();
 		}
 
 		private async void ConnectBtn_Click(object sender, EventArgs e)
@@ -828,14 +827,14 @@ namespace WinTlx
 			await ConnectOut();
 			//ConnectBtn.Enabled = true;
 			//SetConnectState();
-			UpdateHandler();
+			Itelex_UpdateHandler();
 		}
 
 		private void DisconnectBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
 			Disconnect();
-			_bufferManager.LocalOutputBufferClear();
+			_bufferManager.LocalOutputBufferClear(false);
 		}
 
 		private void SendWruBtn_Click(object sender, EventArgs e)
@@ -1064,7 +1063,7 @@ namespace WinTlx
 				_recvOn = false;
 				_mainMenu.SetChecked(MainStripMenu.MenuTypes.ReceiveOnOff, false);
 			}
-			UpdateHandler();
+			Itelex_UpdateHandler();
 		}
 
 		private void UpdateIpAddress()
@@ -1127,7 +1126,7 @@ namespace WinTlx
 				ConfigManager.Instance.SaveConfig();
 				_bufferManager.SetLocalOutputSpeed(_configData.OutputSpeed);
 				Logging.Instance.LogfilePath = _configData.LogfilePath;
-				UpdateHandler();
+				Itelex_UpdateHandler();
 			}
 		}
 
@@ -1145,29 +1144,6 @@ namespace WinTlx
 				MessageBoxButtons.OK,
 				MessageBoxIcon.Information,
 				MessageBoxDefaultButton.Button1);
-		}
-
-		private void ReceivedHandler(string asciiText)
-		{
-			Debug.WriteLine(asciiText);
-			for (int i = 0; i < asciiText.Length; i++)
-			{
-				switch (asciiText[i])
-				{
-					case CodeManager.ASC_BEL:
-						SystemSounds.Beep.Play();
-						//AddText(asciiText, CharAttributes.Recv);
-						_bufferManager.LocalOutputRecv(asciiText.ToString());
-						return;
-					case CodeManager.ASC_WRU:
-						SendHereIs();
-						//AddText(asciiText, CharAttributes.Recv);
-						_bufferManager.LocalOutputRecv(asciiText.ToString());
-						return;
-				}
-				//AddText(asciiText[i].ToString(), CharAttributes.Recv);
-				_bufferManager.LocalOutputRecv(asciiText[i].ToString());
-			}
 		}
 
 		private void SendHandler(string asciiText)
@@ -1189,8 +1165,6 @@ namespace WinTlx
 				}
 				dispText += c;
 			}
-			//Debug.WriteLine(dispText);
-			//AddText(dispText, CharAttributes.Send);
 			_bufferManager.LocalOutputSend(dispText);
 		}
 
@@ -1199,31 +1173,18 @@ namespace WinTlx
 			ShowLocalMessage(message);
 		}
 
-		/*
-		private void ConnectedHandler()
+		private void Itelex_DroppedHandler(string rejectReason)
 		{
-			ShowLocalMessage($"{LngText(LngKeys.Message_Connected)} {_currentTlnNumber}");
-			UpdateHandler();
-		}
-		*/
-
-		private void DroppedHandler()
-		{
-			//Debug.WriteLine($"DroppedHandler() ConnectionState={_itelex.ConnectionState}");
-
-			_bufferManager.LocalOutputBufferClear();
+			_bufferManager.LocalOutputBufferClear(false);
 			ShowLocalMessage(LngText(LngKeys.Message_Disconnected));
-			UpdateHandler();
+			Itelex_UpdateHandler();
 		}
 
-		private void BufferManager_UpdateSend()
-		{
-			UpdateHandler();
-		}
-
-		private void UpdateHandler()
+		private void Itelex_UpdateHandler()
 		{
 			SetNullBtnText();
+
+			_itelex.OwnVersion = _configData.OptionVersion;
 
 			Helper.ControlInvokeRequired(ConnectBtn, () =>
 			{
@@ -1274,8 +1235,14 @@ namespace WinTlx
 
 			Helper.ControlInvokeRequired(RemoteBufferStatusLbl, () =>
 			{
-				string valueStr = _itelex.IsConnected ? $"{_itelex. SendBufferCount}" : "-";
-				RemoteBufferStatusLbl.Text = $"{LngText(LngKeys.MainForm_SendBufferStatus)}: {valueStr}";
+				string valueStr = _itelex.IsConnected ? $"{_itelex.SendBufferCount}" : "-";
+				RemoteBufferStatusLbl.Text = $"{LngText(LngKeys.MainForm_RemoteBufferStatus)}: {valueStr}";
+			});
+
+			Helper.ControlInvokeRequired(LocalBufferStatusLbl, () =>
+			{
+				string valueStr = _itelex.IsConnected ? $"{_bufferManager.LocalOutputBufferCount}" : "-";
+				LocalBufferStatusLbl.Text = $"{LngText(LngKeys.MainForm_LocalBufferStatus)}: {valueStr}";
 			});
 
 			Helper.ControlInvokeRequired(ReceiveStatusLbl, () =>
@@ -1327,6 +1294,11 @@ namespace WinTlx
 				}
 			});
 
+		}
+
+		private void BufferManager_UpdateSend()
+		{
+			Itelex_UpdateHandler();
 		}
 
 		private async Task<bool> ConnectOut()
@@ -1393,14 +1365,16 @@ namespace WinTlx
 			}
 			else
 			{
+				/*
 				string reason = _itelex.RejectReason;
-				if (string.IsNullOrEmpty(reason))
+				if (!string.IsNullOrEmpty(reason))
 				{
 					string msg = LngText(LngKeys.Message_ConnectionError);
 					reason = "no conn";
 					ShowLocalMessage($"{msg} {reason}");
 				}
-				_favoritesManager.CallHistoryAddCall(_currentTlnNumber, _currentTlnName, reason);
+				*/
+				_favoritesManager.CallHistoryAddCall(_currentTlnNumber, _currentTlnName, _itelex.RejectReason);
 				return false;
 			}
 
@@ -1447,7 +1421,7 @@ namespace WinTlx
 		private void SendAsciiChar(char chr)
 		{
 			_bufferManager.SendBufferEnqueueChr(chr);
-			UpdateHandler();
+			Itelex_UpdateHandler();
 		}
 
 		private void TapePunch_ShowBufferEvt(string asciiText)
@@ -1459,7 +1433,7 @@ namespace WinTlx
 
 		private void ClearScreen()
 		{
-			_bufferManager.LocalOutputBufferClear();
+			_bufferManager.LocalOutputBufferClear(true);
 			_screen.Clear();
 			_screenX = 0;
 			_screenY = 0;
@@ -1490,26 +1464,32 @@ namespace WinTlx
 
 		private void BufferManager_Output(ScreenChar screenChar)
 		{
-			if (screenChar != null)
+			if (screenChar == null) return;
+
+			OutputText(screenChar.Char.ToString(), screenChar.Attr);
+
+			switch (screenChar.Char)
 			{
-				OutputText(screenChar.Char.ToString(), screenChar.Attr);
-			}
-			else
-			{
-				Debug.Write("");
+				case CodeManager.ASC_BEL:
+					SystemSounds.Beep.Play();
+					break;
+				case CodeManager.ASC_WRU:
+					SendHereIs();
+					break;
 			}
 		}
 
 		private void ShowLocalMessage(string message)
 		{
-			if (_screenX > 0)
-			{
-				//AddText("\r\n", CharAttributes.Message, true);
-				_bufferManager.LocalOutputMsg("\r\n");
-			}
+			//Debug.WriteLine(message);
+			//if (_screenX > 0)
+			//{
+			//	//AddText("\r\n", CharAttributes.Message, true);
+			//	_bufferManager.LocalOutputMsg("\r\n");
+			//}
 			//AddText($"{message.ToUpper()}\r\n", CharAttributes.Message, true);
 			_bufferManager.LocalOutputMsg(message);
-			_bufferManager.LocalOutputMsg("\r\n");
+			//_bufferManager.LocalOutputMsg("\r\n");
 		}
 
 		private void OutputText(string asciiText, CharAttributes attr)
@@ -1521,6 +1501,8 @@ namespace WinTlx
 
 			for (int i = 0; i < asciiText.Length; i++)
 			{
+				_bufferManager.UpdateLastLocalOutputChars(asciiText[i]);
+
 				switch (asciiText[i])
 				{
 					case '\n':
@@ -1658,10 +1640,10 @@ namespace WinTlx
 			}
 		}
 
-		private void MessageHandler(string asciiText)
-		{
-			ShowLocalMessage(asciiText);
-		}
+		//private void MessageHandler(string asciiText)
+		//{
+		//	ShowLocalMessage(asciiText);
+		//}
 
 		private void MainForm_LocationChanged(object sender, EventArgs e)
 		{
@@ -1730,9 +1712,10 @@ namespace WinTlx
 
 		private void TerminalDrawChar(Graphics g, Font font, int x, int y, ScreenChar scrChr)
 		{
-			for (int c = 0; c < scrChr.Chars.Count; c++)
+			//for (int c = 0; c < scrChr.Chars.Count; c++)
 			{
-				char chr = scrChr.Chars[c];
+				//char chr = scrChr.Chars[c];
+				char chr = scrChr.Char;
 				if (chr != ' ' && chr != 0x00)
 				{
 					Point p = new Point(x * CHAR_WIDTH, y * CHAR_HEIGHT);
@@ -1765,7 +1748,7 @@ namespace WinTlx
 			}
 		}
 
-#region Scheduler
+		#region Scheduler
 
 		private void SchedulerManager_Schedule(ScheduleEventArgs args)
 		{
@@ -1870,18 +1853,18 @@ namespace WinTlx
 			{
 				// wait 30 seconds for greeting message to finish
 				//WaitRecv(5000);
-				await _bufferManager.WaitSendBufferEmpty();
+				await _bufferManager.WaitSendBufferEmptyAsync();
 				//ShowLocalMessage("wait greeting ok");
 
 				SendAsciiText("\r\n");
 				//WaitSend(5000);
-				await _bufferManager.WaitSendBufferEmpty();
+				await _bufferManager.WaitSendBufferEmptyAsync();
 
 				await ScheduleWru();
 
 				SendAsciiText("\r\n");
 				//WaitSend(5000);
-				await _bufferManager.WaitSendBufferEmpty();
+				await _bufferManager.WaitSendBufferEmptyAsync();
 
 				foreach (string line in fileData)
 				{
@@ -1902,12 +1885,12 @@ namespace WinTlx
 					}
 					SendAsciiText("\r\n");
 					//WaitSend(5000);
-					await _bufferManager.WaitSendBufferEmpty();
+					await _bufferManager.WaitSendBufferEmptyAsync();
 				}
 
 				SendAsciiText("\r\n");
 				//WaitSend(5000);
-				await _bufferManager.WaitSendBufferEmpty();
+				await _bufferManager.WaitSendBufferEmptyAsync();
 
 				//ShowLocalMessage("wait text ok");
 
@@ -1915,7 +1898,7 @@ namespace WinTlx
 
 				SendAsciiText("\r\n\r\n\r\n\r\n");
 				//WaitSend(5000);
-				await _bufferManager.WaitSendBufferEmpty();
+				await _bufferManager.WaitSendBufferEmptyAsync();
 
 				Logging.Instance.Debug(TAG, nameof(DoSchedule), $"Success");
 				scheduleItem.Success = true;
@@ -1940,14 +1923,14 @@ namespace WinTlx
 		private async Task ScheduleWru()
 		{
 			SendAsciiChar(CodeManager.ASC_WRU);
-			await _bufferManager.WaitSendBufferEmpty();
+			await _bufferManager.WaitSendBufferEmptyAsync();
 			await _bufferManager.WaitLocalOutpuBufferEmpty();
 			//WaitSend(5000);
 			//WaitRecv(5000);
 			//ShowLocalMessage("wait WRU ok");
 
 			SendAsciiText($"\r\n{AnswerbackTb.Text}\r\n");
-			await _bufferManager.WaitSendBufferEmpty();
+			await _bufferManager.WaitSendBufferEmptyAsync();
 			//WaitSend(5000);
 			//ShowLocalMessage("wait here is ok");
 		}
@@ -2170,12 +2153,12 @@ namespace WinTlx
 					ShowLocalMessage(LngText(LngKeys.Message_ConnectionError));
 				}
 			});
-			UpdateHandler();
+			Itelex_UpdateHandler();
 		}
 
 		private void FavoritesManager_DialFavorite(FavoriteItem favItem)
 		{
-			Debug.WriteLine($"DialFavorite {favItem}");
+			//Debug.WriteLine($"DialFavorite {favItem}");
 			_currentTlnNumber = favItem.Number;
 			_currentTlnName = favItem.Name;
 
@@ -2224,7 +2207,7 @@ namespace WinTlx
 				}
 				*/
 			});
-			UpdateHandler();
+			Itelex_UpdateHandler();
 		}
 
 		private void LoadSearchHistory()

@@ -59,6 +59,7 @@ namespace WinTlx.Codes
 			{
 				case ShiftStates.Ltr:
 				case ShiftStates.Both:
+				case ShiftStates.Unknown:
 					chr = CharLtr;
 					break;
 				case ShiftStates.Figs:
@@ -68,7 +69,6 @@ namespace WinTlx.Codes
 					chr = Char3rd;
 					break;
 				default:
-				case ShiftStates.Unknown:
 					chr = null;
 					break;
 			}

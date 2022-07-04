@@ -36,9 +36,20 @@ namespace WinTlx
 			return $"{Constants.PROGRAM_NAME}  V{Application.ProductVersion}  (Build={buildTime})";
 		}
 
-		public static string GetVersionStr()
+		public static string GetVersionString()
 		{
 			return Application.ProductVersion;
+		}
+
+		public static string GetItelexVersion(string appStr)
+		{
+			string versionCode = GetVersionString();
+			string verStr = "";
+			foreach (char ch in versionCode)
+			{
+				if (char.IsDigit(ch)) verStr += ch;
+			}
+			return appStr + verStr;
 		}
 
 		public static string GetExePath()

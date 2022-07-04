@@ -746,7 +746,7 @@ namespace WinTlx.TextEditor
 
 		private async Task SendTextLine(string line)
 		{
-			Debug.WriteLine($"SendTextLine {line}");
+			//Debug.WriteLine($"SendTextLine {line}");
 			while (true)
 			{
 				if (_stopScript) return;
@@ -770,7 +770,7 @@ namespace WinTlx.TextEditor
 				//await _bufferManager.WaitLocalOutpuBufferEmpty();
 				string cmd = line2.Substring(0, pos2);
 				await DoScriptCmd(cmd);
-				await _bufferManager.WaitSendBufferEmpty();
+				await _bufferManager.WaitSendBufferEmptyAsync();
 				line = line2.Substring(pos2 + 1);
 			}
 		}
@@ -779,7 +779,7 @@ namespace WinTlx.TextEditor
 		{
 			if (string.IsNullOrWhiteSpace(cmdStr))
 			{
-				Debug.Write("");
+				//Debug.Write("");
 				return;
 			}
 
@@ -817,7 +817,7 @@ namespace WinTlx.TextEditor
 
 			if (cmdItem == null) return;
 
-			Debug.WriteLine($"Cmd {cmdItem.Name} {cmdStr}");
+			//Debug.WriteLine($"Cmd {cmdItem.Name} {cmdStr}");
 
 			bool result = true;
 			switch (cmdItem.Type)
@@ -849,9 +849,9 @@ namespace WinTlx.TextEditor
 					break;
 			}
 			//SendDebugText("{1}", TextDebugForm.Modes.Command);
-			Debug.WriteLine("wait start");
+			//Debug.WriteLine("wait start");
 			//await _bufferManager.WaitSendBufferEmpty();
-			Debug.WriteLine("wait stop");
+			//Debug.WriteLine("wait stop");
 			//SendDebugText("{2}", TextDebugForm.Modes.Command);
 
 			if (!result)
@@ -1060,7 +1060,7 @@ namespace WinTlx.TextEditor
 					if (_stopScript) return false;
 					string convLine = ConvertText(wrappedLine, codeSet).Trim();
 					await SendTextLine(convLine + "\r\n");
-					Debug.WriteLine($"SendBufferCount={_bufferManager.SendBufferCount}");
+					//Debug.WriteLine($"SendBufferCount={_bufferManager.SendBufferCount}");
 				}
 			}
 			return true;
@@ -1094,7 +1094,7 @@ namespace WinTlx.TextEditor
 		{
 			//SendDebugText("{WRU}", DebugForm.Modes.Output);
 
-			await _bufferManager.WaitSendBufferEmpty();
+			await _bufferManager.WaitSendBufferEmptyAsync();
 			await SendLocalAndText(CodeManager.ASC_FIGS.ToString());
 			await SendLocalAndText(CodeManager.ASC_WRU.ToString());
 			await Task.Delay(10000);
@@ -1129,7 +1129,7 @@ namespace WinTlx.TextEditor
 			if (_recvString != null) _recvString += asciiText;
 		}
 
-		private void Itelex_Dropped()
+		private void Itelex_Dropped(string rejectReason)
 		{
 			_stopScript = true;
 		}

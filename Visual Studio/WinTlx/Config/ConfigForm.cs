@@ -48,8 +48,10 @@ namespace WinTlx.Config
 			LanguageCb.SelectedIndexChanged += LanguageCb_SelectedIndexChanged;
 
 			SetData();
-			AnswerbackTb.Text = AnswerBackToStr(_config.Answerback, false);
+			AnswerbackTb.Text = _config.Answerback;
 			SubscribeServerUpdatePinTb.UseSystemPasswordChar = true;
+			//OptionsTb.UseSystemPasswordChar = false;
+			OptionsTb.PasswordChar = ' ';
 		}
 
 		private void LanguageChanged()
@@ -102,7 +104,7 @@ namespace WinTlx.Config
 		{
 			LanguageCb.SelectedItem = _config.Language;
 			LogFilePathTb.Text = _config.LogfilePath;
-			//AnswerbackTb.Text = _config.Answerback;
+			AnswerbackTb.Text = _config.Answerback;
 			IdleTimeoutTb.Text = IntToStr(_config.IdleTimeout);
 			CodeSetCb.SelectedItem = ConfigData.CodeSetToString(_config.CodeSet);
 			DefaultProtocolOutAsciiRb.Checked = _config.DefaultProtocolAscii;
@@ -121,12 +123,13 @@ namespace WinTlx.Config
 			LimitedClientCb.Checked = _config.LimitedClient;
 			RemoteServerAddressTb.Text = _config.RemoteServerAddress;
 			RemoteServerPortTb.Text = IntToStr(_config.RemoteServerPort);
+			OptionsTb.Text = _config.Options;
 		}
 
 		public void GetData()
 		{
 			_config.LogfilePath = ConfigData.FormatLogPath(LogFilePathTb.Text.Trim());
-			//_config.Answerback = AnswerbackTb.Text.Trim().ToLower();
+			_config.Answerback = AnswerbackTb.Text.Trim().ToLower();
 			_config.IdleTimeout = StrToInt(IdleTimeoutTb.Text);
 			_config.CodeSet = ConfigData.StringToCodeSet((string)CodeSetCb.SelectedItem);
 			_config.DefaultProtocolAscii = DefaultProtocolOutAsciiRb.Checked;
@@ -144,6 +147,7 @@ namespace WinTlx.Config
 			_config.LimitedClient = LimitedClientCb.Checked;
 			_config.RemoteServerAddress = RemoteServerAddressTb.Text.Trim();
 			_config.RemoteServerPort = StrToInt(RemoteServerPortTb.Text);
+			_config.Options = OptionsTb.Text.Trim();
 			Language newLng = (Language)LanguageCb.SelectedItem;
 			_config.Language = newLng.Key;
 			_config.SetDefaults();
@@ -176,6 +180,7 @@ namespace WinTlx.Config
 			}
 		}
 
+		/*
 		private string AnswerBackToStr(string kg, bool show)
 		{
 			if (!show && kg.EndsWith("-"))
@@ -184,6 +189,7 @@ namespace WinTlx.Config
 			}
 			return kg;
 		}
+		*/
 
 		private void SaveBtn_Click(object sender, EventArgs e)
 		{
@@ -221,17 +227,6 @@ namespace WinTlx.Config
 
 		}
 
-		private void AnswerbackTb_Enter(object sender, EventArgs e)
-		{
-			AnswerbackTb.Text = AnswerBackToStr(_config.Answerback, true);
-		}
-
-		private void AnswerbackTb_Leave(object sender, EventArgs e)
-		{
-			_config.Answerback = AnswerbackTb.Text.Trim().ToLower();
-			AnswerbackTb.Text = AnswerBackToStr(_config.Answerback, false);
-		}
-
 		private void SubscribeServerUpdatePinTb_Enter(object sender, EventArgs e)
 		{
 			SubscribeServerUpdatePinTb.UseSystemPasswordChar = false;
@@ -240,6 +235,16 @@ namespace WinTlx.Config
 		private void SubscribeServerUpdatePinTb_Leave(object sender, EventArgs e)
 		{
 			SubscribeServerUpdatePinTb.UseSystemPasswordChar = true;
+		}
+
+		private void OptionsTb_Enter(object sender, EventArgs e)
+		{
+			OptionsTb.PasswordChar = '\x00';
+		}
+
+		private void OptionsTb_Leave(object sender, EventArgs e)
+		{
+			OptionsTb.PasswordChar = ' ';
 		}
 
 		private void LanguageCb_SelectedIndexChanged(object sender, EventArgs e)

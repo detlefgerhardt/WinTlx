@@ -78,6 +78,8 @@
 			this.RemoteServerAddressTb = new System.Windows.Forms.TextBox();
 			this.RemoteServerAddressLbl = new System.Windows.Forms.Label();
 			this.ServerDataHintLbl = new System.Windows.Forms.Label();
+			this.OptionsLbl = new System.Windows.Forms.Label();
+			this.OptionsTb = new System.Windows.Forms.TextBox();
 			this.IncomingGb.SuspendLayout();
 			this.GeneralGb.SuspendLayout();
 			this.SubscribeServerGb.SuspendLayout();
@@ -100,8 +102,6 @@
 			this.AnswerbackTb.Name = "AnswerbackTb";
 			this.AnswerbackTb.Size = new System.Drawing.Size(157, 20);
 			this.AnswerbackTb.TabIndex = 1;
-			this.AnswerbackTb.Enter += new System.EventHandler(this.AnswerbackTb_Enter);
-			this.AnswerbackTb.Leave += new System.EventHandler(this.AnswerbackTb_Leave);
 			// 
 			// IncommingLocalPortTb
 			// 
@@ -548,17 +548,37 @@
 			// 
 			// ServerDataHintLbl
 			// 
-			this.ServerDataHintLbl.Location = new System.Drawing.Point(325, 296);
+			this.ServerDataHintLbl.Location = new System.Drawing.Point(325, 358);
 			this.ServerDataHintLbl.Name = "ServerDataHintLbl";
-			this.ServerDataHintLbl.Size = new System.Drawing.Size(255, 52);
+			this.ServerDataHintLbl.Size = new System.Drawing.Size(255, 31);
 			this.ServerDataHintLbl.TabIndex = 22;
 			this.ServerDataHintLbl.Text = "* This data must match the data stored on the subscribe server.";
+			// 
+			// OptionsLbl
+			// 
+			this.OptionsLbl.AutoSize = true;
+			this.OptionsLbl.Location = new System.Drawing.Point(335, 309);
+			this.OptionsLbl.Name = "OptionsLbl";
+			this.OptionsLbl.Size = new System.Drawing.Size(43, 13);
+			this.OptionsLbl.TabIndex = 22;
+			this.OptionsLbl.Text = "Options";
+			// 
+			// OptionsTb
+			// 
+			this.OptionsTb.Location = new System.Drawing.Point(384, 306);
+			this.OptionsTb.Name = "OptionsTb";
+			this.OptionsTb.Size = new System.Drawing.Size(186, 20);
+			this.OptionsTb.TabIndex = 22;
+			this.OptionsTb.Enter += new System.EventHandler(this.OptionsTb_Enter);
+			this.OptionsTb.Leave += new System.EventHandler(this.OptionsTb_Leave);
 			// 
 			// ConfigForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(590, 428);
+			this.Controls.Add(this.OptionsTb);
+			this.Controls.Add(this.OptionsLbl);
 			this.Controls.Add(this.ServerDataHintLbl);
 			this.Controls.Add(this.LimitedClientGb);
 			this.Controls.Add(this.ItelexGb);
@@ -583,6 +603,7 @@
 			this.LimitedClientGb.ResumeLayout(false);
 			this.LimitedClientGb.PerformLayout();
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 
@@ -637,5 +658,7 @@
 		private System.Windows.Forms.TextBox RemoteBufferSizeTb;
 		private System.Windows.Forms.Label RemoteBufferSizeLbl;
 		private System.Windows.Forms.Label ServerDataHintLbl;
+		private System.Windows.Forms.Label OptionsLbl;
+		private System.Windows.Forms.TextBox OptionsTb;
 	}
 }

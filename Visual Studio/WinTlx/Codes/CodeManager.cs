@@ -638,6 +638,24 @@ namespace WinTlx.Codes
 			return null;
 		}
 
+		private const string DumpBaudotChrs = ".E.A.SIU.DRJNFCKTZLWHYPQOBG.MXV.";
+		private const string DumpBaudotFigs = ".3.-.'87..4.,.:(5+)2.6019?.../: ";
+
+		public static string DumpBaudotArrayToString(byte[] buffer)
+		{
+			string str1 = "";
+			string str2 = "";
+			for (int i = 0; i < buffer.Length; i++)
+			{
+				if (str1 != "") str1 += ",";
+				str1 += $"{buffer[i]:D2}";
+				str2 += DumpBaudotChrs[buffer[i]];
+			}
+			return str1 + " " + str2;
+		}
+
+
+
 		/*
 		private static readonly CodeItem[] _codeTab = new CodeItem[32]
 		{
@@ -862,7 +880,7 @@ namespace WinTlx.Codes
 		};
 		*/
 
-#region Keyboard handling
+		#region Keyboard handling
 
 		/// <summary>
 		/// all characters that are to be recognized as input in the terminal windows must be explicitly
