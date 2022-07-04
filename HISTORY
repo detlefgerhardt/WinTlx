@@ -121,4 +121,5 @@ Version history
 2.1.0     Chg: New version number scheme
           Fix: Improved buffer and acknowledge handling
           Fix: Many minor changes and fixes
+2.1.1     Fix: Bugfix version
 

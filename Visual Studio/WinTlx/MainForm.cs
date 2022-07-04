@@ -824,6 +824,7 @@ namespace WinTlx
 			}
 
 			ConnectBtn.Enabled = false;
+			_bufferManager.LocalOutputBufferClear(true);
 			await ConnectOut();
 			//ConnectBtn.Enabled = true;
 			//SetConnectState();
@@ -1474,7 +1475,7 @@ namespace WinTlx
 					SystemSounds.Beep.Play();
 					break;
 				case CodeManager.ASC_WRU:
-					SendHereIs();
+					if (screenChar.Attr == CharAttributes.Recv) SendHereIs();
 					break;
 			}
 		}

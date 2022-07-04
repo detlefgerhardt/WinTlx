@@ -117,9 +117,8 @@ namespace WinTlx
 
 		private readonly System.Timers.Timer _ackTimer;
 		private bool _ackTimerActive;
-		private long _lastAckReceived;
-		private int _lastRecvAckValue;
-		private bool _ackRecvFlag;
+		//private int _lastRecvAckValue;
+		//private bool _ackRecvFlag;
 
 		private long _lastSendRecvIdleMs;
 		private long _lastSentMs;
@@ -670,7 +669,8 @@ namespace WinTlx
 			_ack.Reset();
 
 			_sendBuffer = new ConcurrentQueue<byte>();
-			_ackRecvFlag = false;
+
+			//_ackRecvFlag = false;
 			_ackTimerActive = false;
 			_ackTimer.Stop();
 			SetAckTimerInterval(0); // set _ackTimer to default interval
@@ -773,21 +773,18 @@ namespace WinTlx
 
 		private void SendTimer()
 		{
-			lock (_sendLock)
+			int ackCount = _ack.RemoteBufferCount;
+			for (int i = 0;
+				!_sendBuffer.IsEmpty && _itelixSendCount < Constants.ITELIX_SENDBUFFER_SIZE && ackCount < _config.RemoteBufferSize;
+				i++)
 			{
-				int ackCount = _ack.RemoteBufferCount;
-				for (int i = 0;
-					!_sendBuffer.IsEmpty && _itelixSendCount < Constants.ITELIX_SENDBUFFER_SIZE && ackCount < _config.RemoteBufferSize;
-					i++)
+				if (!_sendBuffer.TryDequeue(out byte baudotCode))
 				{
-					if (!_sendBuffer.TryDequeue(out byte baudotCode))
-					{
-						break;
-					}
-
-					_itelixSendBuffer[_itelixSendCount++] = baudotCode;
-					ackCount++;
+					break;
 				}
+
+				_itelixSendBuffer[_itelixSendCount++] = baudotCode;
+				ackCount++;
 			}
 
 			if (_itelixSendCount == 0)
@@ -804,7 +801,9 @@ namespace WinTlx
 			byte[] baudotData = new byte[_itelixSendCount];
 			Buffer.BlockCopy(_itelixSendBuffer, 0, baudotData, 0, _itelixSendCount);
 			SendCmd(ItelexCommands.BaudotData, baudotData);
-			Debug.WriteLine($"send: {CodeManager.DumpBaudotArrayToString(baudotData)}");
+			_ack.AddTransCharCount(_itelixSendCount);
+			Debug.WriteLine($"send: {CodeManager.DumpBaudotArrayToString(baudotData)} {_itelixSendCount}");
+			Logging.Instance.AppendBinary(baudotData, Logging.BinaryModes.Send);
 			_itelixSendCount = 0;
 			_lastSentMs = Helper.GetTicksMs();
 			_lastSendRecvIdleMs = Helper.GetTicksMs();
@@ -833,30 +832,27 @@ namespace WinTlx
 
 			// check received acks
 
-			lock (_sendLock)
+			if (_ack.RemoteBufferCount > 0)
 			{
-				if (_ack.RemoteBufferCount > 0)
+				string timeout = null;
+				if (_ack.IsLastAckCntTimeout())
 				{
-					string timeout = null;
-					if (_ackRecvFlag && _lastRecvAckValue == _ack.SendAckCnt)
-					{
-						// if ack was received and ack didn't change since the last AckTimer_Elapsed (2 sec)
-						Logging.Instance.Warn(TAG, nameof(AckTimer_Elapsed), $"recv ack value changed timeout");
-						timeout = "nochange";
-					}
-					_ackRecvFlag = false;
-
-					if (Helper.GetTicksMs() - _lastAckReceived > 5000)
-					{
-						Logging.Instance.Warn(TAG, nameof(AckTimer_Elapsed), $"ack recv timeout");
-						timeout = "timeout";
-					}
-					if (timeout != null)
-					{
-						_ack.SendCnt = _ack.SendAckCnt;
-					}
+					// if ack was received and ack didn't change since the last AckTimer_Elapsed (2 sec)
+					Logging.Instance.Warn(TAG, nameof(AckTimer_Elapsed), $"recv ack value changed timeout");
+					timeout = "nochange timeout";
 				}
-				_lastRecvAckValue = _ack.SendCnt;
+				//_ackRecvFlag = false;
+
+				if (_ack.LastAckReceived.IsElapsedSeconds(10))
+				{
+					Logging.Instance.Warn(TAG, nameof(AckTimer_Elapsed), $"ack recv timeout");
+					timeout = "ack timeout";
+				}
+				if (timeout != null)
+				{
+					_debugManager.Write($"{timeout} {_ack.LastAckChanged.ElapsedMilliseconds}", DebugManager.Modes.Message);
+					//_ack.SendCnt = _ack.SendAckCnt;
+				}
 			}
 
 			SendAckCmd(_ack.ReceivedAckCnt);
@@ -1036,12 +1032,9 @@ namespace WinTlx
 
 		private void EnqueueSend(byte[] codes)
 		{
-			lock (_sendLock)
+			for (int i = 0; i < codes.Length; i++)
 			{
-				for (int i = 0; i < codes.Length; i++)
-				{
-					_sendBuffer.Enqueue(codes[i]);
-				}
+				_sendBuffer.Enqueue(codes[i]);
 			}
 		}
 
@@ -1083,14 +1076,6 @@ namespace WinTlx
 			{
 				Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendCmd),
 						$"Send packet {packet.CommandType} {packet.GetDebugPacket()}");
-			}
-
-			switch ((ItelexCommands)packet.Command)
-			{
-				case ItelexCommands.BaudotData:
-					_ack.AddTransCharCount(data.Length);
-					Logging.Instance.AppendBinary(packet.Data, Logging.BinaryModes.Send);
-					break;
 			}
 
 			_debugManager.WriteCmd(packet, DebugManager.Modes.Send, _ack);
@@ -1347,12 +1332,8 @@ namespace WinTlx
 					break;
 
 				case ItelexCommands.Ack:
-					lock (_sendLock)
-					{
-						_ack.SendAckCnt = packet.Data[0];
-						_ackRecvFlag = true;
-						_lastAckReceived = Helper.GetTicksMs();
-					}
+					_ack.SendAckCnt = packet.Data[0];
+					//_ackRecvFlag = true;
 					//Debug.WriteLine($"recv ack cmd {_n_ack} ({CharsAckCount})");
 					Logging.Instance.Debug(TAG, nameof(DecodePacket), $"recv ack cmd  {packet.GetDebugPacket()} ack={_ack.SendAckCnt} ({_ack.RemoteBufferCount})");
 					Update?.Invoke();
@@ -1458,14 +1439,34 @@ namespace WinTlx
 
 		public int SendCnt { get; set; } // n_trans, characters send to remote
 
-		public int SendAckCnt { get; set; } // n_ack, characters printed by remote
+		// n_ack, characters printed by remote
+		private int _sendAckCnt;
+		public int SendAckCnt
+		{
+			get
+			{
+				return _sendAckCnt;
+			}
+			set
+			{
+				if (value != _sendAckCnt) LastAckChanged.Start();
+				_sendAckCnt = value;
+			}
+		}
+
+		public TickTimer LastAckChanged { get; set; }
+
+		public TickTimer LastAckReceived { get; set; }
 
 		public void Reset()
 		{
 			ReceivedCnt = 0;
 			ReceivedAckCnt = 0;
 			SendCnt = 0;
-			SendAckCnt = 0;
+			//SendAckCnt = 0;
+			_sendAckCnt = 0;
+			LastAckChanged = new TickTimer(false);
+			LastAckReceived = new TickTimer(false);
 		}
 
 		public void AddReceivedCharCount(int n)
@@ -1481,6 +1482,16 @@ namespace WinTlx
 		public void AddTransCharCount(int n)
 		{
 			SendCnt = (SendCnt + n) % 256;
+			Debug.WriteLine($"AddTransCharCount n={n} SendCnt={SendCnt}");
+		}
+
+		public bool IsLastAckCntTimeout()
+		{
+			if (RemoteBufferCount > 0 && LastAckChanged.IsElapsedSeconds(5))
+			{
+				Debug.Write("");
+			}
+			return RemoteBufferCount > 0 && LastAckChanged.IsElapsedSeconds(5);
 		}
 
 		public int RemoteBufferCount
