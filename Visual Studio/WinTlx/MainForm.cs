@@ -102,7 +102,9 @@ namespace WinTlx
 			_textEditorManager.Disconnect += TextEditorManager_Disconnect;
 			_textEditorManager.Dial += TextEditorManager_Dial;
 
-			Logging.Instance.Info(TAG, nameof(MainForm), $"---------- Start {Helper.GetVersion()} ----------");
+			string logStartStr = $"---------- Start {Helper.GetVersion()} ----------";
+			Logging.Instance.Info(TAG, nameof(MainForm), logStartStr);
+			CommLog(logStartStr + "\r\n");
 
 			this.Text = Helper.GetVersion();
 			this.KeyPreview = true;
@@ -1047,6 +1049,10 @@ namespace WinTlx
 					{
 						_recvOn = true;
 						_mainMenu.SetChecked(MainStripMenu.MenuTypes.ReceiveOnOff, true);
+						SubscriberServer subSrv = new SubscriberServer();
+						PeerQueryReply reply = subSrv.DoPeerQuery(_configData.SubscribeServerAddresses, _configData.SubscribeServerPort,
+							_configData.OwnNumber.ToString());
+						ShowLocalMessage($"server-data: {reply.Data.Address}:{reply.Data.PortNumber} {reply.Data.ExtensionNumber}");
 					}
 				}
 			}

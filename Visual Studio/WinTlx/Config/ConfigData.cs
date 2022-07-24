@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Runtime.Serialization;
 using WinTlx.Codes;
 
@@ -187,17 +188,26 @@ namespace WinTlx.Config
 			}
 		}
 
-		public static string FormatLogPath(string path)
+		public static string CheckLogPath(string path)
 		{
-			if (string.IsNullOrWhiteSpace(path))
+			if (string.IsNullOrWhiteSpace(path)) return "";
+
+			if (!path.EndsWith("\\")) path += "\\";
+			path = Path.GetDirectoryName(path);
+			if (!path.EndsWith("\\")) path += "\\";
+
+			try
 			{
+				string testName = Path.Combine(path, "test");
+				File.WriteAllText(testName, "test");
+				File.Delete(testName);
+				return path;
+			}
+			catch (Exception)
+			{
+				// error writing log-file
 				return "";
 			}
-			if (!path.EndsWith("\\"))
-			{
-				path += "\\";
-			};
-			return path;
 		}
 
 		private void ParseOptions(string optionsStr)

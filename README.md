@@ -3,13 +3,13 @@ A Windows test und diagnostic tool for the i-Telex network
 
 ## Features
 - No i-telex hardware needed (direct TCP/IP connection)
-- Outgoing and incoming connections
+- Outgoing and incoming connections (with Centralex support)
 - Subscribe server query
 - Automatic ITA-2 (Baudot-Murray) code conversion
 - Resizable and scrollable terminal window
 - Copy and paste function
 - Text editor for messages
-- Logging all communication to a text file
+- Logging of all communication to a text file
 - Virtual tape punch with tape editor and eyeball characters (Bildlocher)
 - Send and receive of binary ITA-2 files (via tape punch function)
 - ITA-2, US-TTY and support for cyrillic codes

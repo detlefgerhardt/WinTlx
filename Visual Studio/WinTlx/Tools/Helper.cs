@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -42,7 +43,7 @@ namespace WinTlx
 		}
 
 		public static string GetItelexVersion(string appStr)
-		{
+		{	
 			string versionCode = GetVersionString();
 			string verStr = "";
 			foreach (char ch in versionCode)
@@ -69,7 +70,16 @@ namespace WinTlx
 			return dt;
 		}
 
-		public static List<string> DumpByteArray(byte[] buffer, int pos, int len = -1)
+		public static void DumpByteArray(byte[] buffer, int pos, int len = -1)
+		{
+			List<string> lines = DumpByteArrayStr(buffer, pos, len);
+			for (int i = 0; i < lines.Count; i++)
+			{
+				Debug.WriteLine($"{i + 1:D02} {lines[i]}");
+			}
+		}
+
+		public static List<string> DumpByteArrayStr(byte[] buffer, int pos, int len = -1)
 		{
 			if (len == -1)
 				len = buffer.Length;

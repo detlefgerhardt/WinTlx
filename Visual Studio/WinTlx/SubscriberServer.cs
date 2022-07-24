@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using WinTlx.Languages;
@@ -470,6 +471,31 @@ namespace WinTlx
 			reply.Error = "ok";
 
 			return reply;
+		}
+
+		public static string SelectIp4Addr(string host)
+		{
+			IPHostEntry hostEntry = Dns.GetHostEntry(host);
+			if (hostEntry.AddressList == null || hostEntry.AddressList.Length == 0)
+			{
+				Logging.Instance.Warn(TAG, nameof(SelectIp4Addr), $"ip address error {host}, dns request failed");
+				return null;
+			}
+
+			string ipv4Str = null;
+			for (int i = 0; i < hostEntry.AddressList.Length; i++)
+			{
+				IPAddress ipAddr = hostEntry.AddressList[i];
+				if (ipv4Str == null && ipAddr.AddressFamily.ToString() == ProtocolFamily.InterNetwork.ToString())
+				{
+					// ipv4 address
+					ipv4Str = ipAddr.ToString();
+				}
+				Logging.Instance.Debug(TAG, nameof(SelectIp4Addr),
+					$"{i + 1}: ipAddr={ipAddr} mapToIPv4={ipAddr.MapToIPv4()} addressFamily={ipAddr.AddressFamily}");
+			}
+			Logging.Instance.Debug(TAG, nameof(SelectIp4Addr), $"ipv4addr = {ipv4Str}");
+			return ipv4Str;
 		}
 
 		private string LngText(LngKeys key)

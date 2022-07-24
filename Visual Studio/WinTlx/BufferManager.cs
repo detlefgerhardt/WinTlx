@@ -271,35 +271,47 @@ namespace WinTlx
 		 */
 		public void LocalOutputBufferClear(bool clearMessages)
 		{
-			lock(_localOutputBufferLock)
+			var timeout = TimeSpan.FromMilliseconds(1000);
+			bool lockTaken = false;
+
+			try
 			{
-				if (clearMessages)
+				//lock(_localOutputBufferLock)
+				Monitor.TryEnter(_localOutputBufferLock, timeout, ref lockTaken);
+				if (lockTaken)
 				{
+					if (clearMessages)
+					{
+						while (!_localOutputBuffer.IsEmpty)
+						{
+							_localOutputBuffer.TryDequeue(out _);
+						}
+						return;
+					}
+
+					List<ScreenChar> tmpBuf = new List<ScreenChar>();
+					while (_localOutputBuffer.Count > 0)
+					{
+						if (_localOutputBuffer.TryDequeue(out ScreenChar scrChr))
+						{
+							if (scrChr.Attr == CharAttributes.Message) tmpBuf.Add(scrChr);
+						}
+					}
+
 					while (!_localOutputBuffer.IsEmpty)
 					{
 						_localOutputBuffer.TryDequeue(out _);
 					}
-					return;
-				}
 
-				List<ScreenChar> tmpBuf = new List<ScreenChar>();
-				while (_localOutputBuffer.Count > 0)
-				{
-					if (_localOutputBuffer.TryDequeue(out ScreenChar scrChr))
+					foreach (ScreenChar scrChr in tmpBuf)
 					{
-						if (scrChr.Attr == CharAttributes.Message) tmpBuf.Add(scrChr);
+						_localOutputBuffer.Enqueue(scrChr);
 					}
 				}
-
-				while (!_localOutputBuffer.IsEmpty)
-				{
-					_localOutputBuffer.TryDequeue(out _);
-				}
-
-				foreach (ScreenChar scrChr in tmpBuf)
-				{
-					_localOutputBuffer.Enqueue(scrChr);
-				}
+			}
+			finally
+			{
+				if (lockTaken) Monitor.Exit(_localOutputBufferLock);
 			}
 		}
 
@@ -392,14 +404,11 @@ namespace WinTlx
 
 		public void LocalOutputEnqueue(char chr, CharAttributes attr, int ackCount)
 		{
-			lock (_localOutputBufferLock)
-			{ 
-				_localOutputBuffer.Enqueue(new ScreenChar(chr, attr, ackCount));
-				if (attr == CharAttributes.Recv)
-				{
-					Debug.WriteLine($"ScreenChar: {chr} {ackCount}");
-				}
-			}
+			_localOutputBuffer.Enqueue(new ScreenChar(chr, attr, ackCount));
+			//if (attr == CharAttributes.Recv)
+			//{
+			//	Debug.WriteLine($"ScreenChar: {chr} {ackCount}");
+			//}
 		}
 
 		//public int LocalOutputBufferFree
@@ -415,12 +424,16 @@ namespace WinTlx
 			if (_localOutputTimerActive) return;
 			_localOutputTimerActive = true;
 
+			var timeout = TimeSpan.FromMilliseconds(1000);
+			bool lockTaken = false;
+
 			try
 			{
 				//Debug.WriteLine($"_localOutputBuffer.Count={_localOutputBuffer.Count}");
 				if (_localOutputBuffer.Count > 0)
 				{
-					lock (_localOutputBufferLock)
+					Monitor.TryEnter(_localOutputBufferLock, timeout, ref lockTaken);
+					if (lockTaken)
 					{
 						ScreenChar peek;
 						do
@@ -442,6 +455,7 @@ namespace WinTlx
 			}
 			finally
 			{
+				if (lockTaken) Monitor.Exit(_localOutputBufferLock);
 				_localOutputTimerActive = false;
 			}
 		}

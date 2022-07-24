@@ -66,7 +66,7 @@ namespace WinTlx.Debugging
 		{
 			if (_debugForm == null) return;
 
-			if (itxPkt.CommandType == ItelexCommands.Heartbeat) return;
+			if (itxPkt.CommandType == ItelexCommands.Heartbeat && !_debugForm.ShowHeartbeat) return;
 
 			if (itxPkt.CommandType == ItelexCommands.Ack && !_debugForm.ShowAck) return;
 

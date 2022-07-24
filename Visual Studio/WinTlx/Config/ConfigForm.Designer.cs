@@ -101,28 +101,28 @@
 			this.AnswerbackTb.Location = new System.Drawing.Point(141, 73);
 			this.AnswerbackTb.Name = "AnswerbackTb";
 			this.AnswerbackTb.Size = new System.Drawing.Size(157, 20);
-			this.AnswerbackTb.TabIndex = 1;
+			this.AnswerbackTb.TabIndex = 4;
 			// 
 			// IncommingLocalPortTb
 			// 
 			this.IncommingLocalPortTb.Location = new System.Drawing.Point(125, 97);
 			this.IncommingLocalPortTb.Name = "IncommingLocalPortTb";
 			this.IncommingLocalPortTb.Size = new System.Drawing.Size(54, 20);
-			this.IncommingLocalPortTb.TabIndex = 10;
+			this.IncommingLocalPortTb.TabIndex = 21;
 			// 
 			// SubscribeServerAddress1Tb
 			// 
 			this.SubscribeServerAddress1Tb.Location = new System.Drawing.Point(141, 21);
 			this.SubscribeServerAddress1Tb.Name = "SubscribeServerAddress1Tb";
 			this.SubscribeServerAddress1Tb.Size = new System.Drawing.Size(157, 20);
-			this.SubscribeServerAddress1Tb.TabIndex = 5;
+			this.SubscribeServerAddress1Tb.TabIndex = 13;
 			// 
 			// SubscribeServerPortTb
 			// 
 			this.SubscribeServerPortTb.Location = new System.Drawing.Point(141, 99);
 			this.SubscribeServerPortTb.Name = "SubscribeServerPortTb";
 			this.SubscribeServerPortTb.Size = new System.Drawing.Size(54, 20);
-			this.SubscribeServerPortTb.TabIndex = 6;
+			this.SubscribeServerPortTb.TabIndex = 16;
 			// 
 			// IncomingLocalPortLbl
 			// 
@@ -157,7 +157,7 @@
 			this.SaveBtn.Location = new System.Drawing.Point(501, 397);
 			this.SaveBtn.Name = "SaveBtn";
 			this.SaveBtn.Size = new System.Drawing.Size(75, 23);
-			this.SaveBtn.TabIndex = 12;
+			this.SaveBtn.TabIndex = 29;
 			this.SaveBtn.Text = "Save";
 			this.SaveBtn.UseVisualStyleBackColor = true;
 			this.SaveBtn.Click += new System.EventHandler(this.SaveBtn_Click);
@@ -168,22 +168,22 @@
 			this.CancelBtn.Location = new System.Drawing.Point(418, 397);
 			this.CancelBtn.Name = "CancelBtn";
 			this.CancelBtn.Size = new System.Drawing.Size(75, 23);
-			this.CancelBtn.TabIndex = 13;
+			this.CancelBtn.TabIndex = 28;
 			this.CancelBtn.Text = "Cancel";
 			this.CancelBtn.UseVisualStyleBackColor = true;
 			this.CancelBtn.Click += new System.EventHandler(this.CancelBtn_Click);
 			// 
 			// OwnNumberTb
 			// 
-			this.OwnNumberTb.Location = new System.Drawing.Point(125, 45);
+			this.OwnNumberTb.Location = new System.Drawing.Point(125, 16);
 			this.OwnNumberTb.Name = "OwnNumberTb";
 			this.OwnNumberTb.Size = new System.Drawing.Size(120, 20);
-			this.OwnNumberTb.TabIndex = 8;
+			this.OwnNumberTb.TabIndex = 18;
 			// 
 			// OwnNumberLbl
 			// 
 			this.OwnNumberLbl.AutoSize = true;
-			this.OwnNumberLbl.Location = new System.Drawing.Point(9, 48);
+			this.OwnNumberLbl.Location = new System.Drawing.Point(9, 19);
 			this.OwnNumberLbl.Name = "OwnNumberLbl";
 			this.OwnNumberLbl.Size = new System.Drawing.Size(67, 13);
 			this.OwnNumberLbl.TabIndex = 11;
@@ -191,17 +191,17 @@
 			// 
 			// SubscribeServerUpdatePinTb
 			// 
-			this.SubscribeServerUpdatePinTb.Location = new System.Drawing.Point(125, 19);
+			this.SubscribeServerUpdatePinTb.Location = new System.Drawing.Point(125, 43);
 			this.SubscribeServerUpdatePinTb.Name = "SubscribeServerUpdatePinTb";
 			this.SubscribeServerUpdatePinTb.Size = new System.Drawing.Size(54, 20);
-			this.SubscribeServerUpdatePinTb.TabIndex = 7;
+			this.SubscribeServerUpdatePinTb.TabIndex = 19;
 			this.SubscribeServerUpdatePinTb.Enter += new System.EventHandler(this.SubscribeServerUpdatePinTb_Enter);
 			this.SubscribeServerUpdatePinTb.Leave += new System.EventHandler(this.SubscribeServerUpdatePinTb_Leave);
 			// 
 			// SubscribeServerUpdatePinLbl
 			// 
 			this.SubscribeServerUpdatePinLbl.AutoSize = true;
-			this.SubscribeServerUpdatePinLbl.Location = new System.Drawing.Point(9, 22);
+			this.SubscribeServerUpdatePinLbl.Location = new System.Drawing.Point(9, 46);
 			this.SubscribeServerUpdatePinLbl.Name = "SubscribeServerUpdatePinLbl";
 			this.SubscribeServerUpdatePinLbl.Size = new System.Drawing.Size(103, 13);
 			this.SubscribeServerUpdatePinLbl.TabIndex = 13;
@@ -212,7 +212,7 @@
 			this.IncomingPublicPortTb.Location = new System.Drawing.Point(125, 123);
 			this.IncomingPublicPortTb.Name = "IncomingPublicPortTb";
 			this.IncomingPublicPortTb.Size = new System.Drawing.Size(54, 20);
-			this.IncomingPublicPortTb.TabIndex = 11;
+			this.IncomingPublicPortTb.TabIndex = 22;
 			// 
 			// IncomingPublicPortLbl
 			// 
@@ -228,7 +228,7 @@
 			this.IdleTimeoutTb.Location = new System.Drawing.Point(184, 41);
 			this.IdleTimeoutTb.Name = "IdleTimeoutTb";
 			this.IdleTimeoutTb.Size = new System.Drawing.Size(54, 20);
-			this.IdleTimeoutTb.TabIndex = 2;
+			this.IdleTimeoutTb.TabIndex = 9;
 			// 
 			// IdleTimeoutLbl
 			// 
@@ -253,7 +253,7 @@
 			this.OutputSpeedTb.Location = new System.Drawing.Point(184, 67);
 			this.OutputSpeedTb.Name = "OutputSpeedTb";
 			this.OutputSpeedTb.Size = new System.Drawing.Size(54, 20);
-			this.OutputSpeedTb.TabIndex = 3;
+			this.OutputSpeedTb.TabIndex = 10;
 			// 
 			// IncomingGb
 			// 
@@ -270,7 +270,7 @@
 			this.IncomingGb.Location = new System.Drawing.Point(325, 12);
 			this.IncomingGb.Name = "IncomingGb";
 			this.IncomingGb.Size = new System.Drawing.Size(255, 155);
-			this.IncomingGb.TabIndex = 20;
+			this.IncomingGb.TabIndex = 17;
 			this.IncomingGb.TabStop = false;
 			this.IncomingGb.Text = "Incoming connection";
 			// 
@@ -288,14 +288,14 @@
 			this.ExtensionNumberTb.Location = new System.Drawing.Point(125, 71);
 			this.ExtensionNumberTb.Name = "ExtensionNumberTb";
 			this.ExtensionNumberTb.Size = new System.Drawing.Size(54, 20);
-			this.ExtensionNumberTb.TabIndex = 9;
+			this.ExtensionNumberTb.TabIndex = 20;
 			// 
 			// LimitedClientCb
 			// 
 			this.LimitedClientCb.Location = new System.Drawing.Point(125, 23);
 			this.LimitedClientCb.Name = "LimitedClientCb";
 			this.LimitedClientCb.Size = new System.Drawing.Size(15, 14);
-			this.LimitedClientCb.TabIndex = 19;
+			this.LimitedClientCb.TabIndex = 24;
 			this.LimitedClientCb.UseVisualStyleBackColor = true;
 			// 
 			// LimitedClientLbl
@@ -320,7 +320,7 @@
 			this.GeneralGb.Location = new System.Drawing.Point(12, 12);
 			this.GeneralGb.Name = "GeneralGb";
 			this.GeneralGb.Size = new System.Drawing.Size(307, 133);
-			this.GeneralGb.TabIndex = 21;
+			this.GeneralGb.TabIndex = 1;
 			this.GeneralGb.TabStop = false;
 			this.GeneralGb.Text = "General";
 			// 
@@ -329,7 +329,8 @@
 			this.LogFilePathTb.Location = new System.Drawing.Point(83, 47);
 			this.LogFilePathTb.Name = "LogFilePathTb";
 			this.LogFilePathTb.Size = new System.Drawing.Size(215, 20);
-			this.LogFilePathTb.TabIndex = 25;
+			this.LogFilePathTb.TabIndex = 3;
+			this.LogFilePathTb.Leave += new System.EventHandler(this.LogFilePathTb_Leave);
 			// 
 			// LogfilePathLbl
 			// 
@@ -359,7 +360,7 @@
 			this.LanguageCb.Location = new System.Drawing.Point(141, 20);
 			this.LanguageCb.Name = "LanguageCb";
 			this.LanguageCb.Size = new System.Drawing.Size(73, 21);
-			this.LanguageCb.TabIndex = 22;
+			this.LanguageCb.TabIndex = 2;
 			this.LanguageCb.Click += new System.EventHandler(this.LanguageCb_Click);
 			// 
 			// CodeSetLbl
@@ -381,7 +382,7 @@
 			this.CodeSetCb.Location = new System.Drawing.Point(141, 99);
 			this.CodeSetCb.Name = "CodeSetCb";
 			this.CodeSetCb.Size = new System.Drawing.Size(73, 21);
-			this.CodeSetCb.TabIndex = 21;
+			this.CodeSetCb.TabIndex = 5;
 			// 
 			// SubscribeServerGb
 			// 
@@ -396,7 +397,7 @@
 			this.SubscribeServerGb.Location = new System.Drawing.Point(12, 285);
 			this.SubscribeServerGb.Name = "SubscribeServerGb";
 			this.SubscribeServerGb.Size = new System.Drawing.Size(307, 128);
-			this.SubscribeServerGb.TabIndex = 22;
+			this.SubscribeServerGb.TabIndex = 12;
 			this.SubscribeServerGb.TabStop = false;
 			this.SubscribeServerGb.Text = "Subscribe server";
 			// 
@@ -405,7 +406,7 @@
 			this.SubscribeServerAddress3Tb.Location = new System.Drawing.Point(141, 73);
 			this.SubscribeServerAddress3Tb.Name = "SubscribeServerAddress3Tb";
 			this.SubscribeServerAddress3Tb.Size = new System.Drawing.Size(157, 20);
-			this.SubscribeServerAddress3Tb.TabIndex = 10;
+			this.SubscribeServerAddress3Tb.TabIndex = 15;
 			// 
 			// SubscribeServerAddress3Lbl
 			// 
@@ -421,7 +422,7 @@
 			this.SubscribeServerAddress2Tb.Location = new System.Drawing.Point(141, 47);
 			this.SubscribeServerAddress2Tb.Name = "SubscribeServerAddress2Tb";
 			this.SubscribeServerAddress2Tb.Size = new System.Drawing.Size(157, 20);
-			this.SubscribeServerAddress2Tb.TabIndex = 8;
+			this.SubscribeServerAddress2Tb.TabIndex = 14;
 			// 
 			// SubscribeServerAddress2Lbl
 			// 
@@ -446,7 +447,7 @@
 			this.ItelexGb.Location = new System.Drawing.Point(12, 151);
 			this.ItelexGb.Name = "ItelexGb";
 			this.ItelexGb.Size = new System.Drawing.Size(307, 128);
-			this.ItelexGb.TabIndex = 23;
+			this.ItelexGb.TabIndex = 6;
 			this.ItelexGb.TabStop = false;
 			this.ItelexGb.Text = "i-Telex";
 			// 
@@ -455,7 +456,7 @@
 			this.RemoteBufferSizeTb.Location = new System.Drawing.Point(184, 93);
 			this.RemoteBufferSizeTb.Name = "RemoteBufferSizeTb";
 			this.RemoteBufferSizeTb.Size = new System.Drawing.Size(54, 20);
-			this.RemoteBufferSizeTb.TabIndex = 26;
+			this.RemoteBufferSizeTb.TabIndex = 11;
 			// 
 			// RemoteBufferSizeLbl
 			// 
@@ -472,7 +473,7 @@
 			this.DefaultProtocolOutAsciiRb.Location = new System.Drawing.Point(246, 19);
 			this.DefaultProtocolOutAsciiRb.Name = "DefaultProtocolOutAsciiRb";
 			this.DefaultProtocolOutAsciiRb.Size = new System.Drawing.Size(52, 17);
-			this.DefaultProtocolOutAsciiRb.TabIndex = 24;
+			this.DefaultProtocolOutAsciiRb.TabIndex = 8;
 			this.DefaultProtocolOutAsciiRb.TabStop = true;
 			this.DefaultProtocolOutAsciiRb.Text = "ASCII";
 			this.DefaultProtocolOutAsciiRb.UseVisualStyleBackColor = true;
@@ -484,7 +485,7 @@
 			this.DefaultProtocolOutItelexRb.Location = new System.Drawing.Point(184, 19);
 			this.DefaultProtocolOutItelexRb.Name = "DefaultProtocolOutItelexRb";
 			this.DefaultProtocolOutItelexRb.Size = new System.Drawing.Size(56, 17);
-			this.DefaultProtocolOutItelexRb.TabIndex = 23;
+			this.DefaultProtocolOutItelexRb.TabIndex = 7;
 			this.DefaultProtocolOutItelexRb.TabStop = true;
 			this.DefaultProtocolOutItelexRb.Text = "i-Telex";
 			this.DefaultProtocolOutItelexRb.UseVisualStyleBackColor = true;
@@ -510,7 +511,7 @@
 			this.LimitedClientGb.Location = new System.Drawing.Point(325, 174);
 			this.LimitedClientGb.Name = "LimitedClientGb";
 			this.LimitedClientGb.Size = new System.Drawing.Size(255, 105);
-			this.LimitedClientGb.TabIndex = 24;
+			this.LimitedClientGb.TabIndex = 23;
 			this.LimitedClientGb.TabStop = false;
 			this.LimitedClientGb.Text = "Limited client";
 			// 
@@ -519,7 +520,7 @@
 			this.RemoteServerPortTb.Location = new System.Drawing.Point(125, 72);
 			this.RemoteServerPortTb.Name = "RemoteServerPortTb";
 			this.RemoteServerPortTb.Size = new System.Drawing.Size(54, 20);
-			this.RemoteServerPortTb.TabIndex = 21;
+			this.RemoteServerPortTb.TabIndex = 26;
 			// 
 			// RemoteServerPortLbl
 			// 
@@ -535,7 +536,7 @@
 			this.RemoteServerAddressTb.Location = new System.Drawing.Point(125, 46);
 			this.RemoteServerAddressTb.Name = "RemoteServerAddressTb";
 			this.RemoteServerAddressTb.Size = new System.Drawing.Size(120, 20);
-			this.RemoteServerAddressTb.TabIndex = 9;
+			this.RemoteServerAddressTb.TabIndex = 25;
 			// 
 			// RemoteServerAddressLbl
 			// 
@@ -568,7 +569,7 @@
 			this.OptionsTb.Location = new System.Drawing.Point(384, 306);
 			this.OptionsTb.Name = "OptionsTb";
 			this.OptionsTb.Size = new System.Drawing.Size(186, 20);
-			this.OptionsTb.TabIndex = 22;
+			this.OptionsTb.TabIndex = 27;
 			this.OptionsTb.Enter += new System.EventHandler(this.OptionsTb_Enter);
 			this.OptionsTb.Leave += new System.EventHandler(this.OptionsTb_Leave);
 			// 

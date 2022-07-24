@@ -159,9 +159,9 @@ namespace WinTlx.Languages
 				{ LngKeys.TapePunch_CodeFigures, "FIG" },
 				{ LngKeys.TapePunch_CodeCarriageReturn, "<" },
 				{ LngKeys.TapePunch_CodeLinefeed, "\u2261" },
-				{ LngKeys.TapePunch_MirrorBufferButton, "Mir LS" },
+				{ LngKeys.TapePunch_MirrorBufferButton, "⇔" },
 				{ LngKeys.TapePunch_MirrorBufferButton_ToolTip, "Mirror buffer" },
-				{ LngKeys.TapePunch_MirrorCodeButton, "Mir Cod" },
+				{ LngKeys.TapePunch_MirrorCodeButton, "⇕" },
 				{ LngKeys.TapePunch_MirrorCodeButton_ToolTip, "Mirror bit code" },
 
 				{ LngKeys.Scheduler_Scheduler, "Scheduler" },

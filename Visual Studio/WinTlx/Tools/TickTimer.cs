@@ -28,27 +28,30 @@ namespace WinTlx.Tools
 
 		public void Start()
 		{
-			_msTicks = MilliTicks();
+			_msTicks = GetTicksMs();
 			IsStarted = true;
 		}
 
-		private long MilliTicks()
+		public void Stop()
 		{
-			return DateTime.Now.Ticks / 10000;
+			IsStarted = false;
 		}
 
 		public bool IsElapsedSeconds(int seconds)
 		{
+			if (!IsStarted) return false;
 			return IsElapsedMilliseconds(seconds * 1000);
 		}
 
 		public bool IsElapsedMinutes(int minutes)
 		{
+			if (!IsStarted) return false;
 			return IsElapsedMilliseconds(minutes * 1000 * 60);
 		}
 
 		public bool IsElapsedHours(int hours)
 		{
+			if (!IsStarted) return false;
 			return IsElapsedMilliseconds(hours * 1000 * 60 * 60);
 		}
 
@@ -62,6 +65,7 @@ namespace WinTlx.Tools
 		{
 			get
 			{
+				if (!IsStarted) return 0;
 				return (int)(ElapsedMilliseconds / 1000);
 			}
 		}
@@ -71,7 +75,7 @@ namespace WinTlx.Tools
 			get
 			{
 				if (!IsStarted) return 0;
-				return MilliTicks() - _msTicks;
+				return GetTicksMs() - _msTicks;
 			}
 		}
 
@@ -79,6 +83,7 @@ namespace WinTlx.Tools
 		{
 			get
 			{
+				if (!IsStarted) return 0;
 				return _msTicks;
 			}
 		}
@@ -90,5 +95,10 @@ namespace WinTlx.Tools
 		{
 			return DateTime.Now.Ticks / 10000;
 		}
+
+		//private long MilliTicks()
+		//{
+		//	return DateTime.Now.Ticks / 10000;
+		//}
 	}
 }

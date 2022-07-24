@@ -52,6 +52,8 @@ namespace WinTlx.Config
 			SubscribeServerUpdatePinTb.UseSystemPasswordChar = true;
 			//OptionsTb.UseSystemPasswordChar = false;
 			OptionsTb.PasswordChar = ' ';
+
+			CheckLogPath();
 		}
 
 		private void LanguageChanged()
@@ -128,7 +130,7 @@ namespace WinTlx.Config
 
 		public void GetData()
 		{
-			_config.LogfilePath = ConfigData.FormatLogPath(LogFilePathTb.Text.Trim());
+			_config.LogfilePath = ConfigData.CheckLogPath(LogFilePathTb.Text.Trim());
 			_config.Answerback = AnswerbackTb.Text.Trim().ToLower();
 			_config.IdleTimeout = StrToInt(IdleTimeoutTb.Text);
 			_config.CodeSet = ConfigData.StringToCodeSet((string)CodeSetCb.SelectedItem);
@@ -260,6 +262,28 @@ namespace WinTlx.Config
 
 		private void LanguageCb_Click(object sender, EventArgs e)
 		{
+		}
+
+		private void LogFilePathTb_Leave(object sender, EventArgs e)
+		{
+			CheckLogPath();
+		}
+
+		private void CheckLogPath()
+		{
+			LogFilePathTb.ForeColor = Color.Black;
+			if (string.IsNullOrEmpty(LogFilePathTb.Text)) return;
+			if (!LogFilePathTb.Text.EndsWith("\\")) LogFilePathTb.Text += "\\";
+
+			string path = ConfigData.CheckLogPath(LogFilePathTb.Text);
+			if (string.IsNullOrEmpty(path))
+			{
+				LogFilePathTb.ForeColor = Color.Red;
+			}
+			else
+			{
+				LogFilePathTb.Text = path;
+			}
 		}
 	}
 }

@@ -156,9 +156,9 @@ namespace WinTlx.Languages
 				{ LngKeys.TapePunch_CodeFigures, "ZI" },
 				{ LngKeys.TapePunch_CodeCarriageReturn, "<" },
 				{ LngKeys.TapePunch_CodeLinefeed, "\u2261" },
-				{ LngKeys.TapePunch_MirrorBufferButton, "Sp LS" },
+				{ LngKeys.TapePunch_MirrorBufferButton, "⇔" },
 				{ LngKeys.TapePunch_MirrorBufferButton_ToolTip, "Puffer spiegeln" },
-				{ LngKeys.TapePunch_MirrorCodeButton, "Sp Cod" },
+				{ LngKeys.TapePunch_MirrorCodeButton, "⇕" },
 				{ LngKeys.TapePunch_MirrorCodeButton_ToolTip, "Bitcode spiegeln" },
 
 				{ LngKeys.Scheduler_Scheduler, "Zeitplaner" },

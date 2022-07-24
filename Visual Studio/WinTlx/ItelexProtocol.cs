@@ -360,48 +360,8 @@ namespace WinTlx
 
 					// wait for connection
 					_client = _tcpListener.AcceptTcpClient();
-					if (_config.IncomingExtensionNumber != 0)
-					{
-						// set to connected and wait for direct dial command
-						//ConnectionState = ConnectionStates.TcpConnected;
-					}
-					else
-					{
-						// no direct dial command neccessary
-						ConnectInit();
-					}
-					ConnectionState = ConnectionStates.TcpConnected;
-					_connectionDirection = ConnectionDirections.In;
-					StartReceive();
 
-					IPAddress remoteAddr = ((IPEndPoint)_client.Client.RemoteEndPoint).Address;
-					Message?.Invoke($"{LngText(LngKeys.Message_IncomingConnection)} {remoteAddr}");
-					Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"incoming connection from {remoteAddr}");
-
-					Update?.Invoke();
-
-					TickTimer timer = new TickTimer();
-					while (timer.ElapsedMilliseconds < 2000)
-					{
-						if (Texting != Textings.Unknown) break;
-						if (ConnectionState == ConnectionStates.Disconnected) break;
-						Thread.Sleep(100);
-					}
-					if (Texting == Textings.Unknown) Texting = Textings.Ascii;
-					Logging.Instance.Debug(TAG, nameof(ConnectOutItelex), $"ConnectionState={ConnectionState} Texting={Texting} ElapsedMilliseconds={timer.ElapsedMilliseconds}ms");
-					//_debugManager.Write($"Texting = {Texting}\r\n", DebugManager.Modes.Message);
-					ConnectionState = ConnectionStates.Connected;
-
-					while (true)
-					{
-						if (_client == null)
-							return;
-						if (!_client.Connected)
-							break;
-					}
-
-					Disconnect();
-					_connectionDirection = ConnectionDirections.Out;
+					ConnectIn();
 				}
 				catch (Exception ex)
 				{
@@ -414,6 +374,53 @@ namespace WinTlx
 			}
 		}
 
+		private void ConnectIn()
+		{
+			if (_config.IncomingExtensionNumber != 0)
+			{
+				// set to connected and wait for direct dial command
+				//ConnectionState = ConnectionStates.TcpConnected;
+			}
+			else
+			{
+				// no direct dial command neccessary
+				ConnectInit();
+			}
+			ConnectionState = ConnectionStates.TcpConnected;
+			_connectionDirection = ConnectionDirections.In;
+			StartReceive();
+
+			IPAddress remoteAddr = ((IPEndPoint)_client.Client.RemoteEndPoint).Address;
+			Message?.Invoke($"{LngText(LngKeys.Message_IncomingConnection)} {remoteAddr}");
+			Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"incoming connection from {remoteAddr}");
+
+			Update?.Invoke();
+
+			TickTimer timer = new TickTimer();
+			while (timer.ElapsedMilliseconds < 2000)
+			{
+				if (Texting != Textings.Unknown) break;
+				if (ConnectionState == ConnectionStates.Disconnected) break;
+				Thread.Sleep(100);
+			}
+			if (Texting == Textings.Unknown) Texting = Textings.Ascii;
+			Logging.Instance.Debug(TAG, nameof(Listener), $"ConnectionState={ConnectionState} Texting={Texting} ElapsedMilliseconds={timer.ElapsedMilliseconds}ms");
+			//_debugManager.Write($"Texting = {Texting}\r\n", DebugManager.Modes.Message);
+			ConnectionState = ConnectionStates.Connected;
+
+			while (true)
+			{
+				if (_client == null)
+					return;
+				if (!_client.Connected)
+					break;
+			}
+
+			Disconnect();
+			_connectionDirection = ConnectionDirections.Out;
+
+		}
+
 		public async Task<bool> ConnectOut(string host, int port, int? extensionNumber, bool asciiMode = false)
 		{
 			RejectReason = null;
@@ -421,26 +428,38 @@ namespace WinTlx
 			{
 				try
 				{
-					string asciiMsg = asciiMode ? "(ascii)" : "";
-					_debugManager.Write($"connect to {host}:{port} ext={extensionNumber} {asciiMsg}\r\n", DebugManager.Modes.Message);
+					string ipv4Str = SubscriberServer.SelectIp4Addr(host);
+					if (string.IsNullOrEmpty(ipv4Str))
+					{
+						Message?.Invoke("ip address error");
+						Logging.Instance.Warn(TAG, nameof(ConnectOut), $"ip address error { host}:{port}, dns request failed");
+						return false;
+					}
 
-					_tcpClientWithTimeout = new TcpClientWithTimeout(host, port, 5000);
+					Logging.Instance.Info(TAG, nameof(ConnectOut), $"outgoing connection to host={host}:{port} ipv4={ipv4Str}:{port}");
+
+					string asciiMsg = asciiMode ? "(ascii)" : "";
+					_debugManager.Write($"connect to {host}:{port} ext={extensionNumber} {asciiMsg} ipv4={ipv4Str}\r\n", DebugManager.Modes.Message);
+
+					_tcpClientWithTimeout = new TcpClientWithTimeout(ipv4Str, port, 5000);
 					_client = _tcpClientWithTimeout.Connect();
 					if (_client == null || !_client.Connected)
 					{
-						Logging.Instance.Log(LogTypes.Info, TAG, nameof(ConnectOut), $"outgoing connection {host}:{port} failed");
+						Message?.Invoke("connect failed");
+						Logging.Instance.Info(TAG, nameof(ConnectOut), $"outgoing connection {ipv4Str}:{port} failed (host={host})");
 						return false;
 					}
 				}
 				catch (Exception ex)
 				{
+					Message?.Invoke("connect timeout");
 					Logging.Instance.Error(TAG, nameof(ConnectOut), "", ex);
 					_debugManager.Write($"error {ex.Message}\r\n", DebugManager.Modes.Message);
 					return false;
 				}
 
 				Message?.Invoke("connect");
-				Logging.Instance.Info(TAG, nameof(ConnectOut), $"outgoing connection {host}:{port}");
+				Logging.Instance.Info(TAG, nameof(ConnectOut), $"connect to {host}:{port}");
 				ConnectInit();
 				ConnectionState = ConnectionStates.TcpConnected;
 				_connectionDirection = ConnectionDirections.Out;
@@ -484,13 +503,14 @@ namespace WinTlx
 			// wait 5 seconds for version cmd and extension cmd from remote
 
 			timer.Start();
-			while (timer.ElapsedMilliseconds < 4000)
+			while (!timer.IsElapsedMilliseconds(4000))
 			{
 				if (RemoteVersion != null) break;
 				if (ConnectionState == ConnectionStates.Disconnected) return false;
 				await Task.Delay(100);
 			}
 
+			Debug.WriteLine($"Check RemoteVersion = {RemoteVersion} {timer.ElapsedMilliseconds}");
 			if (RemoteVersion == null)
 			{
 				Logging.Instance.Info(TAG, nameof(ConnectOut), $"Timeout waiting for version response");
@@ -711,15 +731,9 @@ namespace WinTlx
 		private bool _disconnecting = false;
 		public void Disconnect()
 		{
-			if (ConnectionState == ConnectionStates.Disconnected)
-			{
-				return;
-			}
+			if (ConnectionState == ConnectionStates.Disconnected) return;
+			if (_disconnecting) return;
 
-			if (_disconnecting)
-			{
-				return;
-			}
 			_disconnecting = true;
 
 			_ackTimer?.Stop();
@@ -744,15 +758,11 @@ namespace WinTlx
 
 		private void SendTimer_Elapsed(object sender, ElapsedEventArgs e)
 		{
-			if (!IsConnected || _ackTimerActive || _sendTimerActive)
-			{
-				return;
-			}
+			if (!IsConnected || _ackTimerActive || _sendTimerActive) return;
 
 			try
 			{
 				_sendTimerActive = true;
-
 				if (_client != null && !_client.Connected)
 				{
 					Logging.Instance.Info(TAG, nameof(SendTimer_Elapsed), $"!_client.Connected");
@@ -771,27 +781,27 @@ namespace WinTlx
 			}
 		}
 
+		/**
+		 * send baudot data from _sendBuffer, use settings for max send buffer size and max remote buffer size
+		 * send after WAIT_BEFORE_SEND_MSEC, when buffer is not full
+		 */
 		private void SendTimer()
 		{
-			int ackCount = _ack.RemoteBufferCount;
+			Debug.WriteLine($"{_sendBuffer.Count}");
+
+			int remoteBufferCount = _ack.RemoteBufferCount;
 			for (int i = 0;
-				!_sendBuffer.IsEmpty && _itelixSendCount < Constants.ITELIX_SENDBUFFER_SIZE && ackCount < _config.RemoteBufferSize;
+				!_sendBuffer.IsEmpty && _itelixSendCount < Constants.ITELIX_SENDBUFFER_SIZE && remoteBufferCount < _config.RemoteBufferSize;
 				i++)
 			{
-				if (!_sendBuffer.TryDequeue(out byte baudotCode))
-				{
-					break;
-				}
-
+				if (!_sendBuffer.TryDequeue(out byte baudotCode)) break;
 				_itelixSendBuffer[_itelixSendCount++] = baudotCode;
-				ackCount++;
+				remoteBufferCount++;
 			}
 
-			if (_itelixSendCount == 0)
-			{
-				return;
-			}
+			if (_itelixSendCount == 0) return;
 
+			// wait, if buffer not full
 			if (_itelixSendCount < Constants.ITELIX_SENDBUFFER_SIZE &&
 				Helper.GetTicksMs() - _lastSentMs < Constants.WAIT_BEFORE_SEND_MSEC)
 			{
@@ -800,7 +810,7 @@ namespace WinTlx
 
 			byte[] baudotData = new byte[_itelixSendCount];
 			Buffer.BlockCopy(_itelixSendBuffer, 0, baudotData, 0, _itelixSendCount);
-			SendCmd(ItelexCommands.BaudotData, baudotData);
+			SendBaudotCmd(baudotData);
 			_ack.AddTransCharCount(_itelixSendCount);
 			Debug.WriteLine($"send: {CodeManager.DumpBaudotArrayToString(baudotData)} {_itelixSendCount}");
 			Logging.Instance.AppendBinary(baudotData, Logging.BinaryModes.Send);
@@ -811,53 +821,52 @@ namespace WinTlx
 
 		private void AckTimer_Elapsed(object sender, ElapsedEventArgs e)
 		{
-			if (_ackTimerActive)
-			{
-				return;
-			}
-			_ackTimerActive = true;
+			if (_ackTimerActive) return;
 
-			if (CentralexState == CentralexStates.CentralexConnected && !IsConnected)
+			try
 			{
-				SendHeartbeatCmd();
+				_ackTimerActive = true;
+
+				if (CentralexState == CentralexStates.CentralexConnected && !IsConnected)
+				{
+					Debug.WriteLine($"ConnectionState={ConnectionState}");
+					SendHeartbeatCmd();
+					return;
+				}
+
+				if (ConnectionState != ConnectionStates.Connected || Texting == Textings.Ascii) return;
+
+				// check received acks
+
+				if (_ack.RemoteBufferCount > 0)
+				{
+					string timeout = null;
+					if (_ack.IsLastAckCntTimeout())
+					{
+						// if ack was received and ack didn't change since the last AckTimer_Elapsed (2 sec)
+						Logging.Instance.Warn(TAG, nameof(AckTimer_Elapsed), $"recv ack value changed timeout");
+						timeout = "nochange timeout";
+					}
+					//_ackRecvFlag = false;
+
+					if (_ack.LastAckReceived.IsElapsedSeconds(10))
+					{
+						Logging.Instance.Warn(TAG, nameof(AckTimer_Elapsed), $"ack recv timeout");
+						timeout = "ack timeout";
+					}
+					if (timeout != null)
+					{
+						_debugManager.Write($"{timeout} {_ack.LastAckChanged.ElapsedMilliseconds}", DebugManager.Modes.Message);
+						//_ack.SendCnt = _ack.SendAckCnt;
+					}
+				}
+
+				SendAckCmd(_ack.ReceivedAckCnt);
+			}
+			finally
+			{
 				_ackTimerActive = false;
-				return;
 			}
-
-			if (ConnectionState != ConnectionStates.Connected || Texting == Textings.Ascii)
-			{
-				_ackTimerActive = false;
-				return;
-			}
-
-			// check received acks
-
-			if (_ack.RemoteBufferCount > 0)
-			{
-				string timeout = null;
-				if (_ack.IsLastAckCntTimeout())
-				{
-					// if ack was received and ack didn't change since the last AckTimer_Elapsed (2 sec)
-					Logging.Instance.Warn(TAG, nameof(AckTimer_Elapsed), $"recv ack value changed timeout");
-					timeout = "nochange timeout";
-				}
-				//_ackRecvFlag = false;
-
-				if (_ack.LastAckReceived.IsElapsedSeconds(10))
-				{
-					Logging.Instance.Warn(TAG, nameof(AckTimer_Elapsed), $"ack recv timeout");
-					timeout = "ack timeout";
-				}
-				if (timeout != null)
-				{
-					_debugManager.Write($"{timeout} {_ack.LastAckChanged.ElapsedMilliseconds}", DebugManager.Modes.Message);
-					//_ack.SendCnt = _ack.SendAckCnt;
-				}
-			}
-
-			SendAckCmd(_ack.ReceivedAckCnt);
-
-			_ackTimerActive = false;
 		}
 
 		public int GetSendBufferCount()
@@ -916,6 +925,14 @@ namespace WinTlx
 			}
 		}
 
+		public void SendBaudotCmd(byte[] data)
+		{
+			Debug.WriteLine("SendBaudotCmd:");
+			Helper.DumpByteArray(data, 0);
+
+			SendCmd(ItelexCommands.BaudotData, data);
+		}
+
 		public void SendDirectDialCmd(int code)
 		{
 			Logging.Instance.Info(TAG, nameof(SendDirectDialCmd), $"send direct dial command extension={code}");
@@ -931,7 +948,7 @@ namespace WinTlx
 
 		public void SendHeartbeatCmd()
 		{
-			SendCmd(ItelexCommands.Heartbeat, new byte[0]);
+			SendCmd(ItelexCommands.Heartbeat);
 		}
 
 		public void SendRejectCmd(string reason)
@@ -949,7 +966,8 @@ namespace WinTlx
 			data.Add(VersionCode);
 			for (int i=0; i<version.Length; i++)
 			{
-				if (char.IsDigit(version[i])) data.Add((byte)version[i]);
+				//if (char.IsDigit(version[i])) data.Add((byte)version[i]);
+				data.Add((byte)version[i]);
 			}
 			data.Add(0x00);
 
@@ -974,7 +992,7 @@ namespace WinTlx
 
 		public void SendAcceptCallRemoteCmd()
 		{
-			if (CentralexState==CentralexStates.CentralexConnected)
+			if (CentralexState == CentralexStates.CentralexConnected)
 			{
 				SendCmd(ItelexCommands.AcceptCallRemote);
 			}
@@ -1045,10 +1063,8 @@ namespace WinTlx
 
 		public void SendCmd(int cmdCode, byte[] data = null)
 		{
-			if (ConnectionState == ConnectionStates.Disconnected && CentralexState==CentralexStates.None)
-			{
-				return;
-			}
+			if (ConnectionState == ConnectionStates.Disconnected && CentralexState == CentralexStates.None) return;
+
 			if (_client.Client == null)
 			{
 				Disconnect();
@@ -1093,10 +1109,8 @@ namespace WinTlx
 
 		private void StartReceive()
 		{
-			if (ConnectionState == ConnectionStates.Disconnected && CentralexState == CentralexStates.None)
-			{
-				return;
-			}
+			if (ConnectionState == ConnectionStates.Disconnected && CentralexState == CentralexStates.None) return;
+
 			if (_client.Client==null)
 			{
 				Disconnect();
@@ -1116,10 +1130,8 @@ namespace WinTlx
 
 		private void EndSend(IAsyncResult ar)
 		{
-			if (ConnectionState == ConnectionStates.Disconnected && CentralexState == CentralexStates.None)
-			{
-				return;
-			}
+			if (ConnectionState == ConnectionStates.Disconnected && CentralexState == CentralexStates.None) return;
+
 			if (_client.Client == null)
 			{
 				Disconnect();
@@ -1171,7 +1183,7 @@ namespace WinTlx
 				if (newData[0] <= 0x09 || newData[0] >= 0x10 && newData[0] < 0x1F)
 				{
 					_debugManager.Write($"Recv char {newData[0]:X02} -> i-Telex\r\n", DebugManager.Modes.Recv);
-					List<string> dmp = Helper.DumpByteArray(newData, 0);
+					List<string> dmp = Helper.DumpByteArrayStr(newData, 0);
 					_debugManager.Write($"Recv dump {dmp[0]}", DebugManager.Modes.Recv);
 					Debug.WriteLine($"Recv dump {dmp[0]}");
 					Texting = Textings.Itelex;
@@ -1348,6 +1360,7 @@ namespace WinTlx
 						versionStr = versionStr.TrimEnd('\x00'); // remove 00-byte suffix
 					}
 					RemoteVersion = $"{ packet.Data[0]:X2} '{versionStr}'";
+					Debug.WriteLine($"RemoteVersion = {RemoteVersion}");
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(DecodePacket), $"recv protocol version cmd  {packet.GetDebugPacket()}, version={RemoteVersion}");
 					if (_connectionDirection == ConnectionDirections.In)
 					{
@@ -1370,8 +1383,14 @@ namespace WinTlx
 
 				case ItelexCommands.RemoteCall:
 					SendAcceptCallRemoteCmd();
+					/*
 					ConnectInit();
 					_connectionDirection = ConnectionDirections.In;
+					*/
+					Message?.Invoke($"{LngText(LngKeys.Message_IncomingConnection)} centralex");
+					Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"incoming connection from centralex");
+					ConnectIn();
+					/*
 					if (_config.IncomingExtensionNumber != 0)
 					{
 						// set to connected and wait for direct dial command
@@ -1380,10 +1399,10 @@ namespace WinTlx
 					else
 					{
 						// no direct dial command neccessary
-						ConnectInit();
+						ConnectionState = ConnectionStates.TcpConnected;
+						//ConnectInit();
 					}
-					Message?.Invoke($"{LngText(LngKeys.Message_IncomingConnection)} centralex");
-					Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"incoming connection from centralex");
+					*/
 					Update?.Invoke();
 					break;
 			}
@@ -1391,7 +1410,6 @@ namespace WinTlx
 
 		public void AddPrintedCharCount(int n)
 		{
-			Debug.WriteLine($"add printed data {n}");
 			_ack.AddPrintedCharCount(n);
 		}
 
@@ -1482,14 +1500,14 @@ namespace WinTlx
 		public void AddTransCharCount(int n)
 		{
 			SendCnt = (SendCnt + n) % 256;
-			Debug.WriteLine($"AddTransCharCount n={n} SendCnt={SendCnt}");
+			//Debug.WriteLine($"AddTransCharCount n={n} SendCnt={SendCnt}");
 		}
 
 		public bool IsLastAckCntTimeout()
 		{
 			if (RemoteBufferCount > 0 && LastAckChanged.IsElapsedSeconds(5))
 			{
-				Debug.Write("");
+				Debug.WriteLine($"Ackchange timeout {RemoteBufferCount} {LastAckChanged.ElapsedMilliseconds}");
 			}
 			return RemoteBufferCount > 0 && LastAckChanged.IsElapsedSeconds(5);
 		}

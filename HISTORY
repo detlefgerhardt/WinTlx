@@ -122,4 +122,6 @@ Version history
           Fix: Improved buffer and acknowledge handling
           Fix: Many minor changes and fixes
 2.1.1     Fix: Bugfix version
-
+2.1.4     Fix: Limited client support (Centralex)
+          Fix: No connection in some cases when the PC has an IPV6 and IPV4 address.
+          New: Check if logfile path is valid.
