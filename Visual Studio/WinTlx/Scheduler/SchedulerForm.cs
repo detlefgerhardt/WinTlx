@@ -387,7 +387,6 @@ namespace WinTlx.Scheduler
 
 		private void SchedulerView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
 		{
-			//Debug.WriteLine("end edit");
 			_manager.SaveScheduler();
 		}
 

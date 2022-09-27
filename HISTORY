@@ -123,5 +123,9 @@ Version history
           Fix: Many minor changes and fixes
 2.1.1     Fix: Bugfix version
 2.1.4     Fix: Limited client support (Centralex)
-          Fix: No connection in some cases when the PC has an IPV6 and IPV4 address.
+          Fix: No connection in some cases when the PC has an IPv6 and IPv4 address.
           New: Check if logfile path is valid.
+2.1.5     Fix: Some more IP problems
+          Fix: Translation
+          Chg: Technical message in the console can be turned off
+          

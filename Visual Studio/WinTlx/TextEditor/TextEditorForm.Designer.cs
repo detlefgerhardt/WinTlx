@@ -48,6 +48,7 @@
 			this.CharWidthLbl = new System.Windows.Forms.Label();
 			this.RedoBtn = new System.Windows.Forms.Button();
 			this.ConvertToBaudotBtn = new System.Windows.Forms.Button();
+			this.SaveAsLsNtm = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// EditorRtb
@@ -244,11 +245,22 @@
 			this.ConvertToBaudotBtn.UseVisualStyleBackColor = true;
 			this.ConvertToBaudotBtn.Click += new System.EventHandler(this.ConvertToBaudotBtn_Click);
 			// 
+			// SaveAsLsNtm
+			// 
+			this.SaveAsLsNtm.Location = new System.Drawing.Point(535, 41);
+			this.SaveAsLsNtm.Name = "SaveAsLsNtm";
+			this.SaveAsLsNtm.Size = new System.Drawing.Size(65, 23);
+			this.SaveAsLsNtm.TabIndex = 19;
+			this.SaveAsLsNtm.Text = "Save LS";
+			this.SaveAsLsNtm.UseVisualStyleBackColor = true;
+			this.SaveAsLsNtm.Click += new System.EventHandler(this.SaveAsLsNtm_Click);
+			// 
 			// TextEditorForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(684, 462);
+			this.Controls.Add(this.SaveAsLsNtm);
 			this.Controls.Add(this.ConvertToBaudotBtn);
 			this.Controls.Add(this.RedoBtn);
 			this.Controls.Add(this.CharWidthLbl);
@@ -300,5 +312,6 @@
 		private System.Windows.Forms.Label CharWidthLbl;
 		private System.Windows.Forms.Button RedoBtn;
 		private System.Windows.Forms.Button ConvertToBaudotBtn;
+		private System.Windows.Forms.Button SaveAsLsNtm;
 	}
 }

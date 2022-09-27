@@ -80,6 +80,8 @@
 			this.ServerDataHintLbl = new System.Windows.Forms.Label();
 			this.OptionsLbl = new System.Windows.Forms.Label();
 			this.OptionsTb = new System.Windows.Forms.TextBox();
+			this.ShowTechnicalMessagesLbl = new System.Windows.Forms.Label();
+			this.ShowTechnicalMessagesCb = new System.Windows.Forms.CheckBox();
 			this.IncomingGb.SuspendLayout();
 			this.GeneralGb.SuspendLayout();
 			this.SubscribeServerGb.SuspendLayout();
@@ -154,7 +156,7 @@
 			// SaveBtn
 			// 
 			this.SaveBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.SaveBtn.Location = new System.Drawing.Point(501, 397);
+			this.SaveBtn.Location = new System.Drawing.Point(501, 415);
 			this.SaveBtn.Name = "SaveBtn";
 			this.SaveBtn.Size = new System.Drawing.Size(75, 23);
 			this.SaveBtn.TabIndex = 29;
@@ -165,7 +167,7 @@
 			// CancelBtn
 			// 
 			this.CancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.CancelBtn.Location = new System.Drawing.Point(418, 397);
+			this.CancelBtn.Location = new System.Drawing.Point(418, 415);
 			this.CancelBtn.Name = "CancelBtn";
 			this.CancelBtn.Size = new System.Drawing.Size(75, 23);
 			this.CancelBtn.TabIndex = 28;
@@ -394,7 +396,7 @@
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortLbl);
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerAddress1Lbl);
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortTb);
-			this.SubscribeServerGb.Location = new System.Drawing.Point(12, 285);
+			this.SubscribeServerGb.Location = new System.Drawing.Point(12, 306);
 			this.SubscribeServerGb.Name = "SubscribeServerGb";
 			this.SubscribeServerGb.Size = new System.Drawing.Size(307, 128);
 			this.SubscribeServerGb.TabIndex = 12;
@@ -435,6 +437,8 @@
 			// 
 			// ItelexGb
 			// 
+			this.ItelexGb.Controls.Add(this.ShowTechnicalMessagesCb);
+			this.ItelexGb.Controls.Add(this.ShowTechnicalMessagesLbl);
 			this.ItelexGb.Controls.Add(this.RemoteBufferSizeTb);
 			this.ItelexGb.Controls.Add(this.RemoteBufferSizeLbl);
 			this.ItelexGb.Controls.Add(this.DefaultProtocolOutAsciiRb);
@@ -446,7 +450,7 @@
 			this.ItelexGb.Controls.Add(this.OutputSpeedLbl);
 			this.ItelexGb.Location = new System.Drawing.Point(12, 151);
 			this.ItelexGb.Name = "ItelexGb";
-			this.ItelexGb.Size = new System.Drawing.Size(307, 128);
+			this.ItelexGb.Size = new System.Drawing.Size(307, 149);
 			this.ItelexGb.TabIndex = 6;
 			this.ItelexGb.TabStop = false;
 			this.ItelexGb.Text = "i-Telex";
@@ -573,11 +577,28 @@
 			this.OptionsTb.Enter += new System.EventHandler(this.OptionsTb_Enter);
 			this.OptionsTb.Leave += new System.EventHandler(this.OptionsTb_Leave);
 			// 
+			// ShowTechnicalMessagesLbl
+			// 
+			this.ShowTechnicalMessagesLbl.AutoSize = true;
+			this.ShowTechnicalMessagesLbl.Location = new System.Drawing.Point(10, 120);
+			this.ShowTechnicalMessagesLbl.Name = "ShowTechnicalMessagesLbl";
+			this.ShowTechnicalMessagesLbl.Size = new System.Drawing.Size(130, 13);
+			this.ShowTechnicalMessagesLbl.TabIndex = 27;
+			this.ShowTechnicalMessagesLbl.Text = "Show technical messages";
+			// 
+			// ShowTechnicalMessagesCb
+			// 
+			this.ShowTechnicalMessagesCb.Location = new System.Drawing.Point(184, 119);
+			this.ShowTechnicalMessagesCb.Name = "ShowTechnicalMessagesCb";
+			this.ShowTechnicalMessagesCb.Size = new System.Drawing.Size(15, 14);
+			this.ShowTechnicalMessagesCb.TabIndex = 27;
+			this.ShowTechnicalMessagesCb.UseVisualStyleBackColor = true;
+			// 
 			// ConfigForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(590, 428);
+			this.ClientSize = new System.Drawing.Size(590, 446);
 			this.Controls.Add(this.OptionsTb);
 			this.Controls.Add(this.OptionsLbl);
 			this.Controls.Add(this.ServerDataHintLbl);
@@ -661,5 +682,7 @@
 		private System.Windows.Forms.Label ServerDataHintLbl;
 		private System.Windows.Forms.Label OptionsLbl;
 		private System.Windows.Forms.TextBox OptionsTb;
+		private System.Windows.Forms.CheckBox ShowTechnicalMessagesCb;
+		private System.Windows.Forms.Label ShowTechnicalMessagesLbl;
 	}
 }

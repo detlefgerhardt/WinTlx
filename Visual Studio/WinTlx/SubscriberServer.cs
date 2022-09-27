@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using WinTlx.Debugging;
 using WinTlx.Languages;
 
 namespace WinTlx
 {
 	class SubscriberServer
 	{
-		public delegate void MessageEventHandler(string message);
+		public delegate void MessageEventHandler(string message, bool isTechMsg);
 		public event MessageEventHandler Message;
 
 		private const string TAG = nameof(SubscriberServer);
@@ -64,8 +65,8 @@ namespace WinTlx
 			catch(Exception ex)
 			{
 				string errStr = $"error connecting to subscribe server {address}:{port}";
+				DebugManager.Instance.Write("{errStr}\r\n", DebugManager.Modes.Message);
 				Logging.Instance.Error(TAG, nameof(Connect), errStr, ex);
-				Message?.Invoke(errStr);
 				stream?.Close();
 				client?.Close();
 				client = null;
@@ -295,7 +296,8 @@ namespace WinTlx
 			}
 			catch(Exception ex)
 			{
-				Message?.Invoke(LngText(LngKeys.Message_SubscribeServerError));
+				Message?.Invoke(LngText(LngKeys.Message_SubscribeServerError), false);
+				DebugManager.Instance.Write("error sending data to subscribe server", DebugManager.Modes.Message);
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error sending data to subscribe server", ex);
 				reply.Valid = false;
 				reply.Error = "reply server error";
@@ -475,11 +477,23 @@ namespace WinTlx
 
 		public static string SelectIp4Addr(string host)
 		{
-			IPHostEntry hostEntry = Dns.GetHostEntry(host);
+			IPHostEntry hostEntry = null;
+			if (IPAddress.TryParse(host, out _) == true) return host;
+
+			try
+			{
+				hostEntry = Dns.GetHostEntry(host);
+			}
+			catch (Exception ex)
+			{
+				Logging.Instance.Warn(TAG, nameof(SelectIp4Addr), $"dns request failed, host={host} ex={ex}");
+				return host;
+			}
+
 			if (hostEntry.AddressList == null || hostEntry.AddressList.Length == 0)
 			{
-				Logging.Instance.Warn(TAG, nameof(SelectIp4Addr), $"ip address error {host}, dns request failed");
-				return null;
+				Logging.Instance.Warn(TAG, nameof(SelectIp4Addr), $"dns request failed, no hostEntry, host={host}");
+				return host;
 			}
 
 			string ipv4Str = null;

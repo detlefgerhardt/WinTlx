@@ -98,7 +98,7 @@ namespace WinTlx
 		public delegate void BaudotSendRecvEventHandler(byte[] code);
 		public event BaudotSendRecvEventHandler BaudotSendRecv;
 
-		public delegate void MessageEventHandler(string asciiText);
+		public delegate void MessageEventHandler(string asciiText, bool isTechMsg);
 		public event MessageEventHandler Message;
 
 		private const int RECV_BUFFERSIZE = 2048;
@@ -132,7 +132,6 @@ namespace WinTlx
 				}
 				else
 				{
-					//Debug.WriteLine($"IdleTimerMs {(int)(Helper.GetTicksMs() - _lastSendRecvIdleMs)}");
 					return (int)(Helper.GetTicksMs() - _lastSendRecvIdleMs);
 				}
 			}
@@ -391,7 +390,14 @@ namespace WinTlx
 			StartReceive();
 
 			IPAddress remoteAddr = ((IPEndPoint)_client.Client.RemoteEndPoint).Address;
-			Message?.Invoke($"{LngText(LngKeys.Message_IncomingConnection)} {remoteAddr}");
+			if (_config.ShowTechnicalMessages)
+			{
+				Message?.Invoke($"incomming connection {remoteAddr}", true);
+			}
+			else
+			{
+				Message?.Invoke($"{LngText(LngKeys.Message_IncomingConnection)}", false);
+			}
 			Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"incoming connection from {remoteAddr}");
 
 			Update?.Invoke();
@@ -426,40 +432,56 @@ namespace WinTlx
 			RejectReason = null;
 			bool status = await Task.Run(async () =>
 			{
+				string logMsg;
 				try
 				{
+					logMsg = $"connecting to host={host}:{port}";
 					string ipv4Str = SubscriberServer.SelectIp4Addr(host);
+					BufferManager.Instance.LocalOutputMessage(
+						LngText(LngKeys.Message_Connecting),
+						logMsg,
+						true, true);
+					Logging.Instance.Info(TAG, nameof(ConnectOut), logMsg);
+
+					logMsg = $"ipv4={ipv4Str}:{port}";
+					BufferManager.Instance.LocalOutputMessage(null, logMsg, true, true);
+					Logging.Instance.Info(TAG, nameof(ConnectOut), logMsg);
+
 					if (string.IsNullOrEmpty(ipv4Str))
 					{
-						Message?.Invoke("ip address error");
-						Logging.Instance.Warn(TAG, nameof(ConnectOut), $"ip address error { host}:{port}, dns request failed");
+						string dnsErrMsg = "dns request failed";
+						BufferManager.Instance.LocalOutputMessage(LngText(LngKeys.Message_ConnectionError), dnsErrMsg, true, true);
+						Logging.Instance.Warn(TAG, nameof(ConnectOut), dnsErrMsg);
 						return false;
 					}
-
-					Logging.Instance.Info(TAG, nameof(ConnectOut), $"outgoing connection to host={host}:{port} ipv4={ipv4Str}:{port}");
 
 					string asciiMsg = asciiMode ? "(ascii)" : "";
 					_debugManager.Write($"connect to {host}:{port} ext={extensionNumber} {asciiMsg} ipv4={ipv4Str}\r\n", DebugManager.Modes.Message);
 
-					_tcpClientWithTimeout = new TcpClientWithTimeout(ipv4Str, port, 5000);
+					_tcpClientWithTimeout = new TcpClientWithTimeout(ipv4Str, port, Constants.TCPCLIENT_TIMEOUT);
 					_client = _tcpClientWithTimeout.Connect();
 					if (_client == null || !_client.Connected)
 					{
-						Message?.Invoke("connect failed");
-						Logging.Instance.Info(TAG, nameof(ConnectOut), $"outgoing connection {ipv4Str}:{port} failed (host={host})");
+						logMsg = "connect failed, timeout";
+						BufferManager.Instance.LocalOutputMessage(LngText(LngKeys.Message_ConnectionError), logMsg, true, true);
+						Logging.Instance.Info(TAG, nameof(ConnectOut), logMsg);
 						return false;
 					}
 				}
 				catch (Exception ex)
 				{
-					Message?.Invoke("connect timeout");
-					Logging.Instance.Error(TAG, nameof(ConnectOut), "", ex);
-					_debugManager.Write($"error {ex.Message}\r\n", DebugManager.Modes.Message);
+					logMsg = "connect failed, timeout";
+					BufferManager.Instance.LocalOutputMessage(LngText(LngKeys.Message_ConnectionError), logMsg, true, true);
+					Logging.Instance.Info(TAG, nameof(ConnectOut), logMsg);
 					return false;
 				}
 
-				Message?.Invoke("connect");
-				Logging.Instance.Info(TAG, nameof(ConnectOut), $"connect to {host}:{port}");
+				// connected
+
+				logMsg = $"connected to {host}:{port}";
+				BufferManager.Instance.LocalOutputMessage(LngText(LngKeys.Message_Connected), logMsg, true, true);
+				Logging.Instance.Info(TAG, nameof(ConnectOut), $"logMsg");
+
 				ConnectInit();
 				ConnectionState = ConnectionStates.TcpConnected;
 				_connectionDirection = ConnectionDirections.Out;
@@ -500,25 +522,30 @@ namespace WinTlx
  
 			SendVersionCodeCmd();
 
-			// wait 5 seconds for version cmd and extension cmd from remote
+			// wait 4 seconds for version cmd and extension cmd from remote
 
 			timer.Start();
-			while (!timer.IsElapsedMilliseconds(4000))
+			while (!timer.IsElapsedMilliseconds(10000))
 			{
 				if (RemoteVersion != null) break;
 				if (ConnectionState == ConnectionStates.Disconnected) return false;
 				await Task.Delay(100);
 			}
 
-			Debug.WriteLine($"Check RemoteVersion = {RemoteVersion} {timer.ElapsedMilliseconds}");
 			if (RemoteVersion == null)
 			{
 				Logging.Instance.Info(TAG, nameof(ConnectOut), $"Timeout waiting for version response");
-				Message?.Invoke($"no version packet received");
+				if (_config.ShowTechnicalMessages)
+				{
+					Message?.Invoke($"no version packet received", true);
+				}
 			}
 			else
 			{
-				Message?.Invoke($"received version cmd {RemoteVersion}");
+				if (_config.ShowTechnicalMessages)
+				{
+					Message?.Invoke($"received version cmd {RemoteVersion}", true);
+				}
 				Logging.Instance.Info(TAG, nameof(ConnectOut), $"received version {RemoteVersion}");
 			}
 
@@ -531,7 +558,10 @@ namespace WinTlx
 
 			if (Texting == Textings.Ascii) return true;
 
-			Message?.Invoke($"send direct dial cmd {extensionNumber}");
+			if (_config.ShowTechnicalMessages)
+			{
+				Message?.Invoke($"send direct dial cmd {extensionNumber}", true);
+			}
 			SendDirectDialCmd(extensionNumber.GetValueOrDefault());
 
 			ConnectionState = ConnectionStates.Connected;
@@ -553,7 +583,10 @@ namespace WinTlx
 			await Task.Delay(1000);
 
 			Texting = Textings.Ascii;
-			Message?.Invoke($"ascii texting");
+			if (_config.ShowTechnicalMessages)
+			{
+				Message?.Invoke($"ascii texting", true);
+			}
 			Logging.Instance.Info(TAG, nameof(ConnectOut), $"ascii texting");
 			_debugManager.Write($"ConnectionState1 = {ConnectionState}", DebugManager.Modes.Recv);
 			int ext = extensionNumber.GetValueOrDefault();
@@ -574,42 +607,57 @@ namespace WinTlx
 
 			CentralexConnectResults result = await Task.Run(() => CentralexConnect());
 
-			bool status = false;
+			bool success = false;
+			string msg = "";
 			switch (result)
 			{
 				case CentralexConnectResults.Ok:
-					Logging.Instance.Info(TAG, nameof(CentralexConnectAsync), $"connected {host}:{port}");
-					Message?.Invoke($"connected to centralex {host}:{port}");
+					msg = $"connected to centralex {host}:{port}";
+					_debugManager.Write($"ConnectionState1 = {ConnectionState}", DebugManager.Modes.Recv);
 					RecvOn = true;
-					status = true;
+					success = true;
 					break;
 				case CentralexConnectResults.TcpError:
-					Logging.Instance.Info(TAG, nameof(CentralexConnectAsync), $"tcp connection failed {host}:{port}");
-					Message?.Invoke($"centralex tcp connection failed {host}:{port}");
-					status = false;
+					msg = $"tcp connection failed {host}:{port}";
+					success = false;
 					break;
 				case CentralexConnectResults.TimeoutError:
-					Logging.Instance.Info(TAG, nameof(CentralexConnectAsync), $"connection timeout {host}:{port}");
-					Message?.Invoke($"centralex connection timeout {host}:{port}");
-					status = false;
+					msg = $"centralex connection timeout {host}:{port}";
+					success = false;
 					break;
 				case CentralexConnectResults.AuthError:
-					Logging.Instance.Info(TAG, nameof(CentralexConnectAsync), $"authentication error {host}:{port}");
-					Message?.Invoke($"centralex authentication timeout {host}:{port}");
-					status = false;
+					msg = $"authentication error {host}:{port}";
+					success = false;
 					break;
 				case CentralexConnectResults.OtherError:
-					Logging.Instance.Info(TAG, nameof(CentralexConnectAsync), $"error {host}:{port}");
-					Message?.Invoke($"centralex error {host}:{port}");
-					status = false;
+					msg = $"centralex error {host}:{port}";
+					success = false;
 					break;
 				default:
-					status = false;
+					success = false;
 					break;
 			}
 
+			Logging.Instance.Info(TAG, nameof(CentralexConnectAsync), msg);
+			_debugManager.Write(msg, DebugManager.Modes.Message);
+			if (_config.ShowTechnicalMessages)
+			{
+				Message?.Invoke(msg, true);
+			}
+			else
+			{
+				if (success)
+				{
+					Message?.Invoke(LngText(LngKeys.Message_CentralexConnected), false);
+				}
+				else
+				{
+					Message?.Invoke(LngText(LngKeys.Message_CentralexError), false);
+				}
+			}
+
 			Update?.Invoke();
-			return status;
+			return success;
 		}
 
 		private CentralexConnectResults CentralexConnect()
@@ -743,7 +791,7 @@ namespace WinTlx
 
 			_client?.Close();
 
-			Logging.Instance.Log(LogTypes.Info, TAG, nameof(Disconnect), $"connection dropped");
+			Logging.Instance.Info(TAG, nameof(Disconnect), $"connection dropped");
 
 			Dropped?.Invoke(RejectReason);
 			Update?.Invoke();
@@ -787,8 +835,6 @@ namespace WinTlx
 		 */
 		private void SendTimer()
 		{
-			Debug.WriteLine($"{_sendBuffer.Count}");
-
 			int remoteBufferCount = _ack.RemoteBufferCount;
 			for (int i = 0;
 				!_sendBuffer.IsEmpty && _itelixSendCount < Constants.ITELIX_SENDBUFFER_SIZE && remoteBufferCount < _config.RemoteBufferSize;
@@ -812,7 +858,6 @@ namespace WinTlx
 			Buffer.BlockCopy(_itelixSendBuffer, 0, baudotData, 0, _itelixSendCount);
 			SendBaudotCmd(baudotData);
 			_ack.AddTransCharCount(_itelixSendCount);
-			Debug.WriteLine($"send: {CodeManager.DumpBaudotArrayToString(baudotData)} {_itelixSendCount}");
 			Logging.Instance.AppendBinary(baudotData, Logging.BinaryModes.Send);
 			_itelixSendCount = 0;
 			_lastSentMs = Helper.GetTicksMs();
@@ -829,7 +874,6 @@ namespace WinTlx
 
 				if (CentralexState == CentralexStates.CentralexConnected && !IsConnected)
 				{
-					Debug.WriteLine($"ConnectionState={ConnectionState}");
 					SendHeartbeatCmd();
 					return;
 				}
@@ -927,9 +971,6 @@ namespace WinTlx
 
 		public void SendBaudotCmd(byte[] data)
 		{
-			Debug.WriteLine("SendBaudotCmd:");
-			Helper.DumpByteArray(data, 0);
-
 			SendCmd(ItelexCommands.BaudotData, data);
 		}
 
@@ -961,7 +1002,10 @@ namespace WinTlx
 		public void SendVersionCodeCmd()
 		{
 			string version = !string.IsNullOrEmpty(OwnVersion) ? OwnVersion : Helper.GetItelexVersion(Constants.APP_CODE);
-			Message?.Invoke($"send version cmd {VersionCode} '{version}'");
+			if (_config.ShowTechnicalMessages)
+			{
+				Message?.Invoke($"send version cmd {VersionCode} '{version}'", true);
+			}
 			List<byte> data = new List<byte>();
 			data.Add(VersionCode);
 			for (int i=0; i<version.Length; i++)
@@ -1185,13 +1229,11 @@ namespace WinTlx
 					_debugManager.Write($"Recv char {newData[0]:X02} -> i-Telex\r\n", DebugManager.Modes.Recv);
 					List<string> dmp = Helper.DumpByteArrayStr(newData, 0);
 					_debugManager.Write($"Recv dump {dmp[0]}", DebugManager.Modes.Recv);
-					Debug.WriteLine($"Recv dump {dmp[0]}");
 					Texting = Textings.Itelex;
 				}
 				else
 				{
 					_debugManager.Write($"Recv char {newData[0]:X02} -> ASCII\r\n", DebugManager.Modes.Recv);
-					//Debug.WriteLine($"recv ${newData[0]:X02}: ascii");
 					Texting = Textings.Ascii;
 				}
 			}
@@ -1293,7 +1335,10 @@ namespace WinTlx
 				case ItelexCommands.DirectDial:
 					Logging.Instance.Info(TAG, nameof(DecodePacket), $"recv direct dial cmd  {packet.GetDebugPacket()}, number={packet.Data[0]}");
 					int directDial = packet.Data[0];
-					Message?.Invoke($"received direct dial cmd {directDial}");
+					if (_config.ShowTechnicalMessages)
+					{
+						Message?.Invoke($"received direct dial cmd {directDial}", true);
+					}
 					if (directDial == _config.IncomingExtensionNumber)
 					{
 						ConnectInit();
@@ -1302,7 +1347,10 @@ namespace WinTlx
 					{   // not connected
 						byte[] data = Encoding.ASCII.GetBytes("nc" + 0x00);
 						SendCmd(ItelexCommands.Reject, data);
-						Message?.Invoke($"send reject ncc");
+						if (_config.ShowTechnicalMessages)
+						{
+							Message?.Invoke($"send reject ncc", true);
+						}
 						Disconnect();
 					}
 					break;
@@ -1332,7 +1380,13 @@ namespace WinTlx
 					RejectReason = Encoding.ASCII.GetString(packet.Data, 0, packet.Data.Length);
 					RejectReason = RejectReason.TrimEnd('\x00');
 					Logging.Instance.Info(TAG, nameof(DecodePacket), $"recv reject cmd {packet.GetDebugPacket()}, reason={RejectReason}");
-					Message?.Invoke($"{LngText(LngKeys.Message_Reject)} {RejectReason.ToUpper()} ({ReasonToString(RejectReason).ToUpper()})");
+					Message?.Invoke($"reject {RejectReason.ToUpper()} ({ReasonToString(RejectReason).ToUpper()})", false);
+					/*
+					if (_config.ShowTechnicalMessages)
+					{
+						Message?.Invoke($"reject received {RejectReason.ToUpper()} ({ReasonToString(RejectReason).ToUpper()})", true);
+					}
+					*/
 					if (CentralexState == CentralexStates.CentralexConnect && RejectReason == "na")
 					{
 						CentralexState = CentralexStates.CentralexRejected;
@@ -1345,8 +1399,6 @@ namespace WinTlx
 
 				case ItelexCommands.Ack:
 					_ack.SendAckCnt = packet.Data[0];
-					//_ackRecvFlag = true;
-					//Debug.WriteLine($"recv ack cmd {_n_ack} ({CharsAckCount})");
 					Logging.Instance.Debug(TAG, nameof(DecodePacket), $"recv ack cmd  {packet.GetDebugPacket()} ack={_ack.SendAckCnt} ({_ack.RemoteBufferCount})");
 					Update?.Invoke();
 					break;
@@ -1359,8 +1411,7 @@ namespace WinTlx
 						versionStr = Encoding.ASCII.GetString(packet.Data, 1, packet.Data.Length - 1);
 						versionStr = versionStr.TrimEnd('\x00'); // remove 00-byte suffix
 					}
-					RemoteVersion = $"{ packet.Data[0]:X2} '{versionStr}'";
-					Debug.WriteLine($"RemoteVersion = {RemoteVersion}");
+					RemoteVersion = $"{packet.Data[0]} '{versionStr}'";
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(DecodePacket), $"recv protocol version cmd  {packet.GetDebugPacket()}, version={RemoteVersion}");
 					if (_connectionDirection == ConnectionDirections.In)
 					{
@@ -1387,7 +1438,7 @@ namespace WinTlx
 					ConnectInit();
 					_connectionDirection = ConnectionDirections.In;
 					*/
-					Message?.Invoke($"{LngText(LngKeys.Message_IncomingConnection)} centralex");
+					Message?.Invoke($"{LngText(LngKeys.Message_IncomingConnection)} centralex", true);
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"incoming connection from centralex");
 					ConnectIn();
 					/*
@@ -1500,7 +1551,6 @@ namespace WinTlx
 		public void AddTransCharCount(int n)
 		{
 			SendCnt = (SendCnt + n) % 256;
-			//Debug.WriteLine($"AddTransCharCount n={n} SendCnt={SendCnt}");
 		}
 
 		public bool IsLastAckCntTimeout()

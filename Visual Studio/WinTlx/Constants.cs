@@ -16,6 +16,8 @@
 
 		public const int CENTRALEX_PORT = 49491;
 
+		public const int TCPCLIENT_TIMEOUT = 5000;
+
 		public const string DEFAULT_ANSWERBACK = "wintlx";
 		public const int DEFAULT_IDLE_TIMEOUT = 120; // disconnect after 2 minutes without communication
 		public const int DEFAULT_REMOTE_BUFFER_SIZE = 16; // byte

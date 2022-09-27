@@ -15,6 +15,9 @@ namespace WinTlx.Config
 		public string LogfilePath { get; set; }
 
 		[DataMember]
+		public bool ShowTechnicalMessages { get; set; }
+
+		[DataMember]
 		public string SubscribeServerAddress { get; set; }
 
 		[DataMember]

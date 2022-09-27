@@ -209,9 +209,7 @@ namespace WinTlx.Favorites
 
 		private void FavList_CellEndEdit(object sender, DataGridViewCellEventArgs e)
 		{
-			//Debug.WriteLine("FavList_CellEndEdit");
 			List<FavoriteItem> favList = FavListGet(false);
-			//Debug.WriteLine($"changed={_favoritesManager.FavListCheckChanged(favList)}");
 			if (!_favoritesManager.FavListCheckChanged(favList)) return;
 
 			_favoritesManager.Favorites = favList;
@@ -361,7 +359,6 @@ namespace WinTlx.Favorites
 					Port = FavListGetInt(row.Cells[FAVLIST_PORT].Value),
 					DirectDial = FavListGetInt(row.Cells[FAVLIST_DIRECTDIAL].Value),
 				};
-				//Debug.WriteLine(favItem);
 				if ((!onlyValid || favItem.IsValid) && !favItem.IsEmpty)
 				{
 					favList.Add(favItem);

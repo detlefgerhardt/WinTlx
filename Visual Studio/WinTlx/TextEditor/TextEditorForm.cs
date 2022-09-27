@@ -178,6 +178,11 @@ namespace WinTlx.TextEditor
 			await _tem.SendTextAsync(EditorRtb.Lines);
 		}
 
+		private void SaveAsLsNtm_Click(object sender, EventArgs e)
+		{
+			_tem.SaveAsLs(EditorRtb.Lines);
+		}
+
 		private void CloseBtn_Click(object sender, EventArgs e)
 		{
 			Close();

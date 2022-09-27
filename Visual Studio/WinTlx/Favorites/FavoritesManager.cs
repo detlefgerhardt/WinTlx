@@ -57,7 +57,6 @@ namespace WinTlx.Favorites
 
 		public bool FavListSave()
 		{
-			//Debug.WriteLine("SaveFavorites");
 			try
 			{
 				string favoritesXml =  Helper.SerializeObject<SaveFavorites>(new SaveFavorites(Favorites));
@@ -112,7 +111,6 @@ namespace WinTlx.Favorites
 
 		public void FavListDial(FavoriteItem favItem)
 		{
-			//Debug.WriteLine($"Dial {favItem}");
 			DialFavorite?.Invoke(favItem);
 		}
 

@@ -301,7 +301,6 @@ namespace WinTlx.TapePunch
 		{
 			OpenFileDialog openFileDialog = new OpenFileDialog
 			{
-				//openFileDialog.InitialDirectory = "c:\\";
 				Filter = "ls files (*.ls)|*.ls|bin files (*.bin)|*.bin|All files (*.*)|*.*",
 				FilterIndex = 1,
 				RestoreDirectory = true

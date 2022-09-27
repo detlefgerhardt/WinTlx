@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace WinTlx
 {
-	public enum CharAttributes { Message, Send, Recv, RecvEmpty }
+	public enum CharAttributes { Message, TechMessage, Send, Recv, RecvEmpty }
 
 	class ScreenChar
 	{
@@ -47,6 +47,8 @@ namespace WinTlx
 					default:
 					case CharAttributes.Message:
 						return Color.Blue;
+					case CharAttributes.TechMessage:
+						return Color.Violet;
 					case CharAttributes.Send:
 						return Color.Red;
 					case CharAttributes.Recv:

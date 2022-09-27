@@ -154,7 +154,6 @@ namespace WinTlx.TextEditor
 
 		public void Undo(string text)
 		{
-			//Debug.WriteLine($"Undo: count={UndoStack.Count} _undoPtr={_undoPtr}");
 			if (UndoStack.Count > 0 && _undoPtr > 0)
 			{
 				if (UndoStack.Last() != text)
@@ -164,17 +163,14 @@ namespace WinTlx.TextEditor
 				_text = UndoStack[--_undoPtr];
 				UndoStack.Add(_text);
 			}
-			//Debug.WriteLine($"    count={UndoStack.Count} _undoPtr={_undoPtr}");
 		}
 
 		public void Redo()
 		{
-			//Debug.WriteLine($"Redo: count={UndoStack.Count} _undoPtr={_undoPtr}");
 			if (UndoStack.Count > 0 && _undoPtr < UndoStack.Count - 1)
 			{
 				_text = UndoStack[++_undoPtr];
 			}
-			//Debug.WriteLine($"    count={UndoStack.Count} _undoPtr={_undoPtr}");
 		}
 
 		private void ResetUndo()
@@ -709,7 +705,7 @@ namespace WinTlx.TextEditor
 
 				if (!script)
 				{
-					List<string> newLines = WrapLine(line, LineWidth);
+					List<string> wrappedLines = WrapLine(line, LineWidth);
 					/*
 					for (int i=0; i<newLines.Count; i++)
 					{
@@ -726,10 +722,10 @@ namespace WinTlx.TextEditor
 						await SendTextLine(newLines[i].Trim() + "\r\n");
 					}
 					*/
-					foreach(string nl in newLines)
+					foreach(string wrappedLine in wrappedLines)
 					{
 						if (_stopScript) return;
-						await SendTextLine(nl + "\r\n");
+						await SendTextLine(wrappedLine + "\r\n");
 					}
 				}
 				else
@@ -744,9 +740,49 @@ namespace WinTlx.TextEditor
 			}
 		}
 
+		public void SaveAsLs(string[] lines)
+		{
+			string fileName = null;
+			if (!string.IsNullOrEmpty(Filename))
+			{
+				fileName = Path.Combine(Path.GetDirectoryName(Filename), Path.GetFileNameWithoutExtension(Filename)) + ".ls";
+			}
+
+			SaveFileDialog saveFileDialog = new SaveFileDialog
+			{
+				Filter = "ls files (*.ls)|*.ls|bin files (*.bin)|*.bin|All files (*.*)|*.*",
+				FilterIndex = 1,
+				RestoreDirectory = true,
+				FileName = fileName
+			};
+
+			if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
+
+			List<byte> buffer = new List<byte>();
+			KeyStates keyState = new KeyStates();
+			foreach (string line in lines)
+			{
+				List<string> warppedLines = WrapLine(line, LineWidth);
+				foreach (string warppedLine in warppedLines)
+				{
+					byte[] codes = CodeManager.AsciiStringToBaudot(warppedLine + "\r\n", keyState);
+					buffer.AddRange(codes);
+				}
+			}
+
+			byte[] array = CodeManager.MirrorByteArray(buffer.ToArray());
+
+			try
+			{
+				File.WriteAllBytes(fileName, array);
+			}
+			catch(Exception ex)
+			{
+			}
+		}
+
 		private async Task SendTextLine(string line)
 		{
-			//Debug.WriteLine($"SendTextLine {line}");
 			while (true)
 			{
 				if (_stopScript) return;
@@ -777,11 +813,7 @@ namespace WinTlx.TextEditor
 
 		private async Task DoScriptCmd(string cmdStr)
 		{
-			if (string.IsNullOrWhiteSpace(cmdStr))
-			{
-				//Debug.Write("");
-				return;
-			}
+			if (string.IsNullOrWhiteSpace(cmdStr)) return;
 
 			cmdStr = cmdStr.Trim();
 			CmdItem cmdItem = null;
@@ -811,7 +843,7 @@ namespace WinTlx.TextEditor
 			}
 			else
 			{
-				await SendLocalMsg($"?{cmdStr}?");
+				await SendLocalMessage($"?{cmdStr}?", false);
 				return;
 			}
 
@@ -1110,14 +1142,14 @@ namespace WinTlx.TextEditor
 			});
 		}
 
-		private async Task SendLocalMsg(string asciiText)
+		private async Task SendLocalMessage(string asciiText, bool isTechMsg)
 		{
 			await Task.Run(async () =>
 			{
 				foreach (char chr in asciiText)
 				{
 					await _bufferManager.WaitLocalOutpuBufferEmpty();
-					_bufferManager.LocalOutputMsg(chr.ToString());
+					_bufferManager.LocalOutputMessage(chr.ToString(), isTechMsg);
 				}
 			});
 		}

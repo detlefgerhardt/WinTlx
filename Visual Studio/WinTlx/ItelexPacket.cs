@@ -29,18 +29,6 @@ namespace WinTlx
 			}
 		}
 
-		/*
-		public void Dump(string pre)
-		{
-			Debug.Write($"{pre}: cmd={CommandType} [{Len}]");
-			for (int i = 0; i < Len; i++)
-			{
-				Debug.Write($" {Data[i]:X2}");
-			}
-			Debug.WriteLine("");
-		}
-		*/
-
 		public string GetDebugData()
 		{
 			string debStr = "";

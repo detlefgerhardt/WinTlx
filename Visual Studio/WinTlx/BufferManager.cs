@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using WinTlx.Codes;
 using WinTlx.Config;
+using WinTlx.Debugging;
 using WinTlx.TextEditor;
 
 namespace WinTlx
@@ -18,6 +19,8 @@ namespace WinTlx
 		private const string TAG = nameof(BufferManager);
 
 		private readonly ItelexProtocol _itelex;
+
+		private readonly SubscriberServer _subscriberServer;
 
 		private readonly ConfigData _configData;
 
@@ -69,6 +72,8 @@ namespace WinTlx
 			//	ShowLocalMessage(asciiText);
 			//}
 
+			_subscriberServer = new SubscriberServer();
+			_subscriberServer.Message += Itelex_MessageHandler;
 
 			_configData = ConfigManager.Instance.Config;
 
@@ -123,27 +128,17 @@ namespace WinTlx
 			while (true)
 			{
 				Thread.Sleep(100);
-				if (_itelex.IdleTimerMs > 30 * 1000)
-				{
-					//Debug.WriteLine($"WaitSendBufferEmpty timeout {_itelex.IdleTimerMs}");
-					return;
-				}
+				if (_itelex.IdleTimerMs > 30 * 1000) return;
 				if (SendBufferCount == 0 && _itelex.SendBufferCount == 0 && _itelex.GetRemoteBufferCount() == 0) return;
 			}
 		}
 
 		public async Task WaitSendBufferEmptyAsync()
 		{
-			//Stopwatch sw = new Stopwatch();
-			//sw.Start();
 			while (true)
 			{
 				await Task.Delay(100);
-				if (_itelex.IdleTimerMs > 30 * 1000)
-				{
-					//Debug.WriteLine($"WaitSendBufferEmpty timeout {_itelex.IdleTimerMs}");
-					return;
-				}
+				if (_itelex.IdleTimerMs > 30 * 1000) return;
 				if (SendBufferCount == 0 && _itelex.SendBufferCount == 0 && _itelex.GetRemoteBufferCount() == 0) return;
 			}
 		}
@@ -294,7 +289,7 @@ namespace WinTlx
 					{
 						if (_localOutputBuffer.TryDequeue(out ScreenChar scrChr))
 						{
-							if (scrChr.Attr == CharAttributes.Message) tmpBuf.Add(scrChr);
+							if (scrChr.Attr == CharAttributes.Message || scrChr.Attr == CharAttributes.TechMessage) tmpBuf.Add(scrChr);
 						}
 					}
 
@@ -324,32 +319,14 @@ namespace WinTlx
 			}
 		}
 
-		private void Itelex_MessageHandler(string msg)
+		private void Itelex_MessageHandler(string msg, bool isTechMsg)
 		{
-			LocalOutputMsg(msg);
+			LocalOutputMessage(msg, isTechMsg);
 		}
 
 		private void Itelex_ReceivedHandler(string asciiText)
 		{
 			LocalOutputRecv(asciiText);
-			/*
-			//Debug.WriteLine(asciiText);
-			for (int i = 0; i < asciiText.Length; i++)
-			{
-				switch (asciiText[i])
-				{
-					case CodeManager.ASC_BEL:
-						SystemSounds.Beep.Play();
-						LocalOutputRecv(asciiText.ToString());
-						return;
-					case CodeManager.ASC_WRU:
-						//SendHereIs();
-						_bufferManager.LocalOutputRecv(asciiText.ToString());
-						return;
-				}
-				_bufferManager.LocalOutputRecv(asciiText[i].ToString());
-			}
-			*/
 		}
 
 		public void UpdateLastLocalOutputChars(char chr)
@@ -358,7 +335,28 @@ namespace WinTlx
 			_lastLocalOutputChars = _lastLocalOutputChars.Substring(_lastLocalOutputChars.Length - 2, 2);
 		}
 
-		public void LocalOutputMsg(string msg)
+		public void LocalOutputMessage(string msg, string techMsg, bool showMsgAllways, bool showDebug)
+		{
+			if (!_configData.ShowTechnicalMessages || showMsgAllways)
+			{
+				if (!string.IsNullOrEmpty(msg))
+				{
+					if (!string.IsNullOrEmpty(msg)) LocalOutputMessage(msg, false);
+				}
+			}
+
+			if (_configData.ShowTechnicalMessages)
+			{
+				if (!string.IsNullOrEmpty(techMsg))
+				{
+					LocalOutputMessage(techMsg, true);
+					if (showDebug) DebugManager.Instance.Write($"{techMsg}\r\n", DebugManager.Modes.Message);
+					if (!showMsgAllways) return;
+				}
+			}
+		}
+
+		public void LocalOutputMessage(string msg, bool isTechMsg)
 		{
 			LocalOutputBufferClear(false);
 
@@ -370,9 +368,7 @@ namespace WinTlx
 
 			foreach(char chr in msg)
 			{
-				LocalOutputEnqueue(char.ToUpper(chr), CharAttributes.Message, 0);
-				//ScreenChar screenChr = new ScreenChar(char.ToUpper(chr), CharAttributes.Message, 0);
-				//Output?.Invoke(screenChr);
+				LocalOutputEnqueue(char.ToUpper(chr), isTechMsg ? CharAttributes.TechMessage : CharAttributes.Message, 0);
 			}
 		}
 
@@ -405,19 +401,7 @@ namespace WinTlx
 		public void LocalOutputEnqueue(char chr, CharAttributes attr, int ackCount)
 		{
 			_localOutputBuffer.Enqueue(new ScreenChar(chr, attr, ackCount));
-			//if (attr == CharAttributes.Recv)
-			//{
-			//	Debug.WriteLine($"ScreenChar: {chr} {ackCount}");
-			//}
 		}
-
-		//public int LocalOutputBufferFree
-		//{
-		//	get
-		//	{
-		//		return _localOutputBuffer.Count;
-		//	}
-		//}
 
 		private void LocalOutputTimer_Elapsed(object sender, ElapsedEventArgs e)
 		{
@@ -429,7 +413,6 @@ namespace WinTlx
 
 			try
 			{
-				//Debug.WriteLine($"_localOutputBuffer.Count={_localOutputBuffer.Count}");
 				if (_localOutputBuffer.Count > 0)
 				{
 					Monitor.TryEnter(_localOutputBufferLock, timeout, ref lockTaken);
@@ -445,7 +428,8 @@ namespace WinTlx
 							}
 							_localOutputBuffer.TryPeek(out peek);
 						}
-						while (_localOutputBuffer.Count > 0 && peek.Attr == CharAttributes.Message);
+						while (_localOutputBuffer.Count > 0 &&
+							(peek.Attr == CharAttributes.Message || peek.Attr == CharAttributes.TechMessage));
 					}
 				}
 				if (_configData.OutputSpeed > 0)

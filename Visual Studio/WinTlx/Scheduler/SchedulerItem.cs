@@ -18,7 +18,6 @@ namespace WinTlx.Scheduler
 			{
 				_destination = value;
 				SetDestination(value);
-				//Debug.WriteLine($"Destination={value} DestAddress={DestAddress}");
 			}
 		}
 		private string _destination;

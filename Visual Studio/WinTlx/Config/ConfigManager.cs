@@ -35,6 +35,7 @@ namespace WinTlx.Config
 				IdleTimeout = Constants.DEFAULT_IDLE_TIMEOUT,
 				OutputSpeed = Constants.DEFAULT_OUTPUT_SPEED,
 				RemoteBufferSize = Constants.DEFAULT_REMOTE_BUFFER_SIZE,
+				ShowTechnicalMessages = true,
 				CodeSet = CodeSets.ITA2,
 				DefaultProtocolAscii = false,
 				IncomingLocalPort = Constants.DEFAULT_INCOMING_PORT,

@@ -69,6 +69,7 @@ namespace WinTlx.Config
 			IdleTimeoutLbl.Text = LngText(LngKeys.Setup_IdleTimeout);
 			OutputSpeedLbl.Text = LngText(LngKeys.Setup_OutputSpeed);
 			RemoteBufferSizeLbl.Text = LngText(LngKeys.Setup_RemoteBufferSize);
+			ShowTechnicalMessagesLbl.Text = LngText(LngKeys.Setup_ShowTechnicalMessages);
 			CodeSetLbl.Text = LngText(LngKeys.Setup_CodeSet);
 			DefaultProtocolOutLbl.Text = LngText(LngKeys.Setup_DefaultProtocolOut);
 
@@ -112,6 +113,7 @@ namespace WinTlx.Config
 			DefaultProtocolOutAsciiRb.Checked = _config.DefaultProtocolAscii;
 			DefaultProtocolOutItelexRb.Checked = !_config.DefaultProtocolAscii;
 			RemoteBufferSizeTb.Text = IntToStr(_config.RemoteBufferSize);
+			ShowTechnicalMessagesCb.Checked = _config.ShowTechnicalMessages;
 			OutputSpeedTb.Text = IntToStr(_config.OutputSpeed);
 			SubscribeServerAddress1Tb.Text = _config.SubscribeServerAddress;
 			SubscribeServerAddress2Tb.Text = _config.SubscribeServerAddress2;
@@ -136,6 +138,7 @@ namespace WinTlx.Config
 			_config.CodeSet = ConfigData.StringToCodeSet((string)CodeSetCb.SelectedItem);
 			_config.DefaultProtocolAscii = DefaultProtocolOutAsciiRb.Checked;
 			_config.RemoteBufferSize = StrToInt(RemoteBufferSizeTb.Text);
+			_config.ShowTechnicalMessages = ShowTechnicalMessagesCb.Checked;
 			_config.OutputSpeed = StrToInt(OutputSpeedTb.Text);
 			_config.SubscribeServerAddress = SubscribeServerAddress1Tb.Text.Trim();
 			_config.SubscribeServerAddress2 = SubscribeServerAddress2Tb.Text.Trim();

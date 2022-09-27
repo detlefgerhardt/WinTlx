@@ -59,6 +59,8 @@ namespace WinTlx
 
 		private readonly BufferManager _bufferManager;
 
+		private DebugManager _debugManager;
+
 		private readonly FavoritesManager _favoritesManager;
 
 		private readonly TextEditorManager _textEditorManager;
@@ -140,7 +142,6 @@ namespace WinTlx
 			//_itelex.Message += MessageHandler;
 
 			_subscriberServer = new SubscriberServer();
-			_subscriberServer.Message += SubcribeServerMessageHandler;
 
 			_clockTimer = new System.Timers.Timer(500);
 			_clockTimer.Elapsed += ClockTimer_Elapsed;
@@ -149,6 +150,8 @@ namespace WinTlx
 			_focusTimer = new System.Timers.Timer(100);
 			_focusTimer.Elapsed += FocusTimer_Elapsed;
 			_focusTimer.Start();
+
+			_debugManager = DebugManager.Instance;
 
 			_bufferManager = BufferManager.Instance;
 			_bufferManager.SetLocalOutputSpeed(_configData.OutputSpeed);
@@ -584,7 +587,7 @@ namespace WinTlx
 
 			if (_itelex.IsConnected && _configData.IdleTimeout>0 && IdleTimeout()==0)
 			{
-				ShowLocalMessage("inactivity timeout");
+				_bufferManager.LocalOutputMessage(LngText(LngKeys.Message_IdleTimeout), false);
 				_itelex.Disconnect();
 			}
 		}
@@ -614,7 +617,6 @@ namespace WinTlx
 
 		private void TerminalPb_Paint(object sender, PaintEventArgs e)
 		{
-			//Debug.WriteLine("TerminalPb_Paint");
 			Graphics g = e.Graphics;
 			TerminalDraw(g, TerminalPb.Focused);
 		}
@@ -744,7 +746,7 @@ namespace WinTlx
 
 			if (!_configData.SubscribeServerAddressExists || _configData.SubscribeServerPort == 0)
 			{
-				ShowLocalMessage(LngText(LngKeys.Message_InvalidSubscribeServerData));
+				_bufferManager.LocalOutputMessage(LngText(LngKeys.Message_SubscribeServerError), false);
 				Logging.Instance.Error(TAG, "QueryBtn_Click", "no valid subscribe server data");
 				return;
 			}
@@ -764,7 +766,7 @@ namespace WinTlx
 						_configData.SubscribeServerAddresses, _configData.SubscribeServerPort, num.ToString());
 					if (!queryReply.Valid)
 					{
-						ShowLocalMessage(queryReply.Error);
+						_bufferManager.LocalOutputMessage(queryReply.Error, true);
 						return;
 					}
 					if (queryReply.Data != null)
@@ -783,14 +785,14 @@ namespace WinTlx
 						_configData.SubscribeServerAddresses, _configData.SubscribeServerPort, searchStr);
 					if (!searchReply.Valid)
 					{
-						ShowLocalMessage(searchReply.Error);
+						_bufferManager.LocalOutputMessage(searchReply.Error, true);
 						return;
 					}
 					list = searchReply.List;
 				}
 			});
 
-			ShowLocalMessage($"{list?.Length} {LngText(LngKeys.Message_QueryResult)}");
+			_bufferManager.LocalOutputMessage($"{list?.Length} {LngText(LngKeys.Message_QueryResult)}", false);
 
 			TlnNameCb.DataSource = list;
 			TlnNameCb.DisplayMember = "Display";
@@ -820,10 +822,7 @@ namespace WinTlx
 		private async void ConnectBtn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			if (_itelex.IsConnected || string.IsNullOrEmpty(TlnPortTb.Text))
-			{
-				return;
-			}
+			if (_itelex.IsConnected) return;
 
 			ConnectBtn.Enabled = false;
 			_bufferManager.LocalOutputBufferClear(true);
@@ -1052,7 +1051,7 @@ namespace WinTlx
 						SubscriberServer subSrv = new SubscriberServer();
 						PeerQueryReply reply = subSrv.DoPeerQuery(_configData.SubscribeServerAddresses, _configData.SubscribeServerPort,
 							_configData.OwnNumber.ToString());
-						ShowLocalMessage($"server-data: {reply.Data.Address}:{reply.Data.PortNumber} {reply.Data.ExtensionNumber}");
+						_bufferManager.LocalOutputMessage($"server-data: {reply.Data.Address}:{reply.Data.PortNumber} {reply.Data.ExtensionNumber}", true);
 					}
 				}
 			}
@@ -1065,7 +1064,7 @@ namespace WinTlx
 				else
 				{
 					_itelex.CentralexDisconnect();
-					ShowLocalMessage("centralex end received");
+					_bufferManager.LocalOutputMessage("centralex end received", true);
 				}
 				_recvOn = false;
 				_mainMenu.SetChecked(MainStripMenu.MenuTypes.ReceiveOnOff, false);
@@ -1175,15 +1174,10 @@ namespace WinTlx
 			_bufferManager.LocalOutputSend(dispText);
 		}
 
-		private void SubcribeServerMessageHandler(string message)
-		{
-			ShowLocalMessage(message);
-		}
-
 		private void Itelex_DroppedHandler(string rejectReason)
 		{
 			_bufferManager.LocalOutputBufferClear(false);
-			ShowLocalMessage(LngText(LngKeys.Message_Disconnected));
+			_bufferManager.LocalOutputMessage(LngText(LngKeys.Message_Disconnected), false);
 			Itelex_UpdateHandler();
 		}
 
@@ -1195,29 +1189,12 @@ namespace WinTlx
 
 			Helper.ControlInvokeRequired(ConnectBtn, () =>
 			{
-				//Debug.WriteLine($"UpdateHandler() ConnectionState={_itelex.ConnectionState}");
-				if (!_itelex.IsConnected)
-				{
-					ConnectBtn.Enabled = true;
-					//ConnectBtn.ForeColor = Color.Black;
-				}
-				else
-				{
-					ConnectBtn.Enabled = false;
-					//ConnectBtn.ForeColor = Color.Green;
-				}
+				ConnectBtn.Enabled = !_itelex.IsConnected;
 			});
 
 			Helper.ControlInvokeRequired(DisconnectBtn, () =>
 			{
-				if (!_itelex.IsConnected)
-				{
-					DisconnectBtn.Enabled = false;
-				}
-				else
-				{
-					DisconnectBtn.Enabled = true;
-				}
+				DisconnectBtn.Enabled = _itelex.IsConnected;
 			});
 
 			Helper.ControlInvokeRequired(ConnectStatusLbl, () =>
@@ -1311,28 +1288,41 @@ namespace WinTlx
 		private async Task<bool> ConnectOut()
 		{
 			TlnAddressTb.Text = TlnAddressTb.Text.Trim();
+			TlnPortTb.Text = TlnPortTb.Text.Trim();
+			TlnExtensionTb.Text = TlnExtensionTb.Text.Trim();
+
+			Logging.Instance.Info(TAG,
+				nameof(ConnectOut), $"ip or host address={TlnAddressTb.Text},port number={TlnPortTb.Text},extension number={TlnExtensionTb.Text},peer type={TlnTypeCb.Text}");
+
 			if (string.IsNullOrWhiteSpace(TlnAddressTb.Text))
 			{
-				ShowLocalMessage(LngText(LngKeys.Message_ConnectNoAddress));
+				_bufferManager.LocalOutputMessage(
+					LngText(LngKeys.Message_InvalidConnectionData),
+					$"connection error, invalid ip address {TlnAddressTb.Text}",
+					true, true);
 				return false;
 			}
 
-			TlnPortTb.Text = TlnPortTb.Text.Trim();
 			int? port = Helper.ToInt(TlnPortTb.Text);
 			if (port == null)
 			{
-				ShowLocalMessage(LngText(LngKeys.Message_ConnectInvalidPort));
+				_bufferManager.LocalOutputMessage(
+					LngText(LngKeys.Message_InvalidConnectionData),
+					$"invalid port number {TlnPortTb.Text}",
+					true, true);
 				return false;
 			}
 
-			TlnExtensionTb.Text = TlnExtensionTb.Text.Trim();
 			int? extension;
 			if (!string.IsNullOrWhiteSpace(TlnExtensionTb.Text))
 			{
 				extension = Helper.ToInt(TlnExtensionTb.Text);
-				if (extension == null)
+				if (extension == null || extension < 0 || extension > 255)
 				{
-					ShowLocalMessage(LngText(LngKeys.Message_ConnectInvalidExtension));
+					_bufferManager.LocalOutputMessage(
+						LngText(LngKeys.Message_InvalidConnectionData),
+						$"invalid extension {TlnExtensionTb.Text}",
+						true, true);
 					return false;
 				}
 			}
@@ -1342,27 +1332,27 @@ namespace WinTlx
 			}
 
 			PeerTypeItem peerTypeItem = (PeerTypeItem)TlnTypeCb.SelectedItem;
-			bool asciiMode;
+			bool asciiMode = false;
 			if (peerTypeItem != null)
 			{
-				int peerType = peerTypeItem.PeerCode;
-				if (peerType == 1 || peerType == 2 || peerType == 5)
+				switch(peerTypeItem.PeerCode)
 				{
-					asciiMode = false;
+					case 1:
+					case 2:
+					case 5:
+						asciiMode = false;
+						break;
+					case 3:
+					case 4:
+						asciiMode = true;
+						break;
+					default:
+						_bufferManager.LocalOutputMessage(
+							LngText(LngKeys.Message_InvalidConnectionData),
+							$"invalid peer-type {peerTypeItem.PeerCode}",
+							true, true);
+						return false;
 				}
-				else if (peerType == 3 || peerType == 4)
-				{
-					asciiMode = true;
-				}
-				else
-				{
-					ShowLocalMessage($"invalid peer-type {peerType}");
-					return false;
-				}
-			}
-			else
-			{
-				asciiMode = false;
 			}
 
 			bool success = await _itelex.ConnectOut(TlnAddressTb.Text, port.Value, extension, asciiMode);
@@ -1372,15 +1362,6 @@ namespace WinTlx
 			}
 			else
 			{
-				/*
-				string reason = _itelex.RejectReason;
-				if (!string.IsNullOrEmpty(reason))
-				{
-					string msg = LngText(LngKeys.Message_ConnectionError);
-					reason = "no conn";
-					ShowLocalMessage($"{msg} {reason}");
-				}
-				*/
 				_favoritesManager.CallHistoryAddCall(_currentTlnNumber, _currentTlnName, _itelex.RejectReason);
 				return false;
 			}
@@ -1450,25 +1431,6 @@ namespace WinTlx
 			ShowScreen();
 		}
 
-		/*
-		private void AddText(string asciiText, CharAttributes attr, bool fast = false)
-		{
-			if (fast || _configData.OutputSpeed==0)
-			{
-				// output immediatly
-				OutputText(asciiText, attr);
-			}
-			else
-			{
-				// put into output queue
-				foreach(char chr in asciiText)
-				{
-					_bufferManager.OutputBufferEnqueue(new ScreenChar(chr, attr));
-				}
-			}
-		}
-		*/
-
 		private void BufferManager_Output(ScreenChar screenChar)
 		{
 			if (screenChar == null) return;
@@ -1484,19 +1446,6 @@ namespace WinTlx
 					if (screenChar.Attr == CharAttributes.Recv) SendHereIs();
 					break;
 			}
-		}
-
-		private void ShowLocalMessage(string message)
-		{
-			//Debug.WriteLine(message);
-			//if (_screenX > 0)
-			//{
-			//	//AddText("\r\n", CharAttributes.Message, true);
-			//	_bufferManager.LocalOutputMsg("\r\n");
-			//}
-			//AddText($"{message.ToUpper()}\r\n", CharAttributes.Message, true);
-			_bufferManager.LocalOutputMsg(message);
-			//_bufferManager.LocalOutputMsg("\r\n");
 		}
 
 		private void OutputText(string asciiText, CharAttributes attr)
@@ -1663,11 +1612,11 @@ namespace WinTlx
 				_configData.SubscribeServerAddresses, _configData.SubscribeServerPort, number, pin, publicPort);
 			if (reply.Success)
 			{
-				SubcribeServerMessageHandler($"update {number} ok / {reply.IpAddress}:{publicPort}");
+				_bufferManager.LocalOutputMessage($"update {number} ok / {reply.IpAddress}:{publicPort}", true);
 			}
 			else
 			{
-				SubcribeServerMessageHandler($"update {number} {reply.Error}");
+				_bufferManager.LocalOutputMessage($"update {number} {reply.Error}", true);
 			}
 		}
 
@@ -1690,8 +1639,6 @@ namespace WinTlx
 			{
 				g.Clear(Color.LightGray);
 			}
-
-			//Debug.WriteLine($"{_screen.Count} {_screenShowPos0} {_screenEditPos0} {_screenX} {_screenY}");
 
 			for (int y = 0; y < _screenHeight; y++)
 			{
@@ -1762,13 +1709,13 @@ namespace WinTlx
 			Task.Run(async () =>
 			{
 				SchedulerItem scheduleItem = args.Item;
-				ShowLocalMessage($"schedule {scheduleItem.Destination}");
+				_bufferManager.LocalOutputMessage($"schedule {scheduleItem.Destination}", true);
 				Logging.Instance.Warn(TAG, nameof(SchedulerManager_Schedule), $"Schedule {scheduleItem}");
 				bool success = await DoSchedule(scheduleItem);
 				if (!success)
 				{
 					Logging.Instance.Warn(TAG, nameof(SchedulerManager_Schedule), $"Schedule failed {scheduleItem}");
-					ShowLocalMessage($"schedule failed {scheduleItem.Destination}");
+					_bufferManager.LocalOutputMessage($"schedule failed {scheduleItem.Destination}", true);
 				}
 			});
 		}
@@ -1806,7 +1753,7 @@ namespace WinTlx
 				if (!queryReply.Valid || queryReply.Data == null)
 				{
 					Logging.Instance.Warn(TAG, nameof(DoSchedule), $"Subscribe server query failed");
-					SubcribeServerMessageHandler(queryReply.Error);
+					_bufferManager.LocalOutputMessage(queryReply.Error, true);
 					return false;
 				}
 				if (string.IsNullOrEmpty(queryReply.Data?.Address))
@@ -1837,7 +1784,7 @@ namespace WinTlx
 
 			// connect to destination
 
-			ShowLocalMessage($"schedule send to {scheduleItem.DestAddress}:{scheduleItem.DestPort} {scheduleItem.DestExtension}");
+			_bufferManager.LocalOutputMessage($"schedule send to {scheduleItem.DestAddress}:{scheduleItem.DestPort} {scheduleItem.DestExtension}", true);
 			Logging.Instance.Info(TAG, nameof(DoSchedule), $"Schedule send to {scheduleItem.DestAddress}:{scheduleItem.DestPort} {scheduleItem.DestExtension}");
 
 			Task<bool> task = _itelex.ConnectOut(scheduleItem.DestAddress, scheduleItem.DestPort, scheduleItem.DestExtension);
@@ -1913,7 +1860,7 @@ namespace WinTlx
 			catch (Exception ex)
 			{
 				Logging.Instance.Error(TAG, nameof(DoSchedule), $"Error sending text", ex);
-				ShowLocalMessage("recv timeout");
+				_bufferManager.LocalOutputMessage("recv timeout", true);
 				return false;
 			}
 			finally
@@ -1943,57 +1890,6 @@ namespace WinTlx
 		}
 
 		#endregion
-
-		/*
-		private void WaitSend(int millis)
-		{
-			WaitSendRecv(millis, () => { return _itelex.CharsToSendCount == 0 && _bufferManager.LocalOutputBufferCount == 0; });
-		}
-
-		private void WaitRecv(int millis)
-		{
-			WaitSendRecv(millis, () => { return _itelex.CharsAckCount == 0 && _bufferManager.LocalOutputBufferCount == 0; });
-		}
-
-		private void WaitSendRecv(int millis, Func<bool> chr0)
-		{
-			Thread.Sleep(2000);
-			int lastSendCnt = -1;
-			int lastSend0Cnt = 0;
-
-			long ticks = Helper.MilliTicks();
-			while (true)
-			{
-				Thread.Sleep(100);
-
-				bool lastSend0 = chr0();
-				if (lastSend0)
-				{
-					lastSend0Cnt++;
-					if (lastSend0Cnt > 10)
-					{
-						return;
-					};
-					continue;
-				}
-
-				if (_itelex.CharsToSendCount == lastSendCnt)
-				{
-					// no change
-					if (Helper.MilliTicks() - ticks > millis)
-					{
-						// timeout
-						throw new Exception("recv timeout");
-					}
-				}
-				else
-				{
-					lastSendCnt = _itelex.CharsAckCount;
-					ticks = Helper.MilliTicks();
-				}
-			}
-		}
-		*/
 
 		private void TlnTypeCb_MouseHover(object sender, EventArgs e)
 		{
@@ -2053,24 +1949,9 @@ namespace WinTlx
 			Disconnect();
 		}
 
-		/*
-		private void TextEditor_Send(string text)
-		{
-			SendAsciiText(text);
-		}
-
-		private void TextEditor_ShowMsg(string text)
-		{
-			ShowLocalMessage(text);
-		}
-		*/
-
 		private void SaveBufferAsText()
 		{
-			if (_screen.Count == 0)
-			{
-				return;
-			}
+			if (_screen.Count == 0) return;
 
 			SaveFileDialog saveFileDialog = new SaveFileDialog
 			{
@@ -2094,21 +1975,15 @@ namespace WinTlx
 
 		private void SaveBufferAsImage()
 		{
-			if (_screen.Count==0)
-			{
-				return;
-			}
+			if (_screen.Count == 0) return;
 
 			Bitmap image = new Bitmap(CHAR_WIDTH * 68, CHAR_HEIGHT * _screen.Count);
 			Graphics g = Graphics.FromImage(image);
-
 
 			Font font = new Font("Consolas", 12);
 			g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
 			g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
 			g.Clear(Color.White);
-
-			//Debug.WriteLine($"{_screen.Count} {_screenShowPos0} {_screenEditPos0} {_screenX} {_screenY}");
 
 			for (int y = 0; y < _screen.Count; y++)
 			{
@@ -2149,7 +2024,7 @@ namespace WinTlx
 					_configData.SubscribeServerAddresses, _configData.SubscribeServerPort, number);
 				if (!queryReply.Valid)
 				{
-					SubcribeServerMessageHandler(queryReply.Error);
+					_bufferManager.LocalOutputMessage(queryReply.Error, true);
 					return;
 				}
 
@@ -2157,7 +2032,7 @@ namespace WinTlx
 				bool success = await _itelex.ConnectOut(queryReply.Data.Address, queryReply.Data.PortNumber, extNum, false);
 				if (!success)
 				{
-					ShowLocalMessage(LngText(LngKeys.Message_ConnectionError));
+					_bufferManager.LocalOutputMessage(LngText(LngKeys.Message_ConnectionError), false);
 				}
 			});
 			Itelex_UpdateHandler();
@@ -2165,7 +2040,6 @@ namespace WinTlx
 
 		private void FavoritesManager_DialFavorite(FavoriteItem favItem)
 		{
-			//Debug.WriteLine($"DialFavorite {favItem}");
 			_currentTlnNumber = favItem.Number;
 			_currentTlnName = favItem.Name;
 
@@ -2177,7 +2051,7 @@ namespace WinTlx
 						_configData.SubscribeServerAddresses, _configData.SubscribeServerPort, favItem.Number);
 					if (!queryReply.Valid)
 					{
-						SubcribeServerMessageHandler(queryReply.Error);
+						_bufferManager.LocalOutputMessage(queryReply.Error, true);
 						return;
 					}
 					if (queryReply.Data != null)

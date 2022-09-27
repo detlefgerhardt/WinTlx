@@ -262,7 +262,6 @@ namespace WinTlx.TapePunch
 
 		public void CropStart()
 		{
-			//Debug.WriteLine($"CropStart {_buffer.Count} {DisplayPos} {_buffer.Count - DisplayPos}");
 			if (DisplayPos >= _buffer.Count - 1)
 			{
 				PushUndo();
