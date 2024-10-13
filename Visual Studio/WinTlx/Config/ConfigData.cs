@@ -42,6 +42,9 @@ namespace WinTlx.Config
 		public CodeSets CodeSet { get; set; }
 
 		[DataMember]
+		public bool UpperCaseChar { get; set; }
+
+		[DataMember]
 		public bool DefaultProtocolAscii { get; set; } 
 
 		[DataMember]
@@ -148,17 +151,34 @@ namespace WinTlx.Config
 		{
 			get
 			{
-				if (!OptionHide && string.IsNullOrWhiteSpace(Answerback))
+				string answerback;
+				string defaultAnswerback;
+				if (!UpperCaseChar)
 				{
-					return Constants.DEFAULT_ANSWERBACK;
-				}
-				else if (OptionHide || Answerback.Contains(Constants.DEFAULT_ANSWERBACK))
-				{
-					return Answerback;
+					answerback = Answerback.ToLower();
+					defaultAnswerback = Constants.DEFAULT_ANSWERBACK.ToLower();
 				}
 				else
 				{
-					return Answerback + $" ({Constants.DEFAULT_ANSWERBACK})";
+					answerback = Answerback.ToUpper();
+					answerback = answerback.Replace("\\R", "\\r");
+					answerback = answerback.Replace("\\N", "\\n");
+					defaultAnswerback = Constants.DEFAULT_ANSWERBACK.ToUpper();
+					defaultAnswerback = defaultAnswerback.Replace("\\R", "\\r");
+					defaultAnswerback = defaultAnswerback.Replace("\\N", "\\n");
+				}
+
+				if (!OptionHide && string.IsNullOrWhiteSpace(answerback))
+				{
+					return defaultAnswerback;
+				}
+				else if (OptionHide || answerback.Contains(defaultAnswerback))
+				{
+					return answerback;
+				}
+				else
+				{
+					return answerback + $" ({defaultAnswerback})";
 				}
 			}
 		}

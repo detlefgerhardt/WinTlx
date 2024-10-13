@@ -12,7 +12,7 @@ namespace WinTlx.Codes
 
 		public AsciiConvItem[] AsciiTab => new AsciiConvItem[]
 		{
-			new AsciiConvItem(0x00, CodeManager.ASC_NUL),
+			new AsciiConvItem(0x00, CodeManager.ASC_CODE32),
 			new AsciiConvItem(0x05, CodeManager.ASC_WRU),
 			new AsciiConvItem(0x07, CodeManager.ASC_BEL),
 			new AsciiConvItem(0x0A, CodeManager.ASC_LF),
@@ -24,6 +24,7 @@ namespace WinTlx.Codes
 			new AsciiConvItem(0x22, '"'), // "
 			new AsciiConvItem(0x23, '#'),
 			new AsciiConvItem(0x24, '$'),
+			new AsciiConvItem(0x25, "o/o"), // %
 			new AsciiConvItem(0x26, '&'),
 			new AsciiConvItem(0x27, '\''),
 			new AsciiConvItem(0x28, '('),
@@ -58,7 +59,7 @@ namespace WinTlx.Codes
 		{
 			new CodeItem(
 				0x00,
-				CodeManager.ASC_NUL, "NUL"
+				CodeManager.ASC_CODE32, "COD32"
 			),
 			new CodeItem(
 				0x01,

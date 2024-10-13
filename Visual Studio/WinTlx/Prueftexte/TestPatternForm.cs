@@ -32,6 +32,7 @@ namespace WinTlx.Prueftexte
 		LoremIpsum,
 		LoremIpsumBlock,
 		DaempferTest,
+		DoloremIpsum
 	}
 
 	public partial class TestPatternForm : Form
@@ -126,7 +127,7 @@ namespace WinTlx.Prueftexte
 				new TestPatternItem(TestPattern.DateTime, LngText(LngKeys.TestPattern_DateTime), ""),
 				new TestPatternItem(TestPattern.Numbers, "1234567890", CreatePattern("1234567890", 7).Substring(0,68)),
 				new TestPatternItem(TestPattern.LoremIpsum, "Lorem ipsum", CreateLoremIpsum()),
-				new TestPatternItem(TestPattern.LoremIpsumBlock, "Lorem ipsum block", CreateLoremIpsumBlock()),
+				new TestPatternItem(TestPattern.LoremIpsumBlock, "Lorem ipsum Block", CreateLoremIpsumBlock()),
 				new TestPatternItem(TestPattern.DaempferTest, LngText(LngKeys.TestPattern_DamperTest), CreateDaempferTest()),
 			};
 
@@ -194,8 +195,8 @@ namespace WinTlx.Prueftexte
 
 		private string CreateDaempferTest()
 		{
-			int[] tabs = new int[7] { 10, 20, 30, 40, 50, 60, 68 };
-			string pattern = "";
+			int[] tabs = new int[] { 10, 20, 30, 40, 50, 60, 68 };
+			string pattern = "\r\n\r\ndaempfertest wr + nl:\r\n";
 			for (int i = 0; i < tabs.Length; i++)
 			{
 				string line = "\r+" + new string(' ', tabs[i] - 2) + "+\r\n";
@@ -203,6 +204,15 @@ namespace WinTlx.Prueftexte
 				pattern += "+";
 				if (i < tabs.Length - 1) pattern += "\r\n";
 			}
+
+			pattern += "\r\n\r\ndaempfertest nur wr:\r\n";
+			for (int i = 0; i < tabs.Length; i++)
+			{
+				string line = "\r+" + new string(' ', tabs[i] - 2) + "+\r+";
+				pattern += line;
+				if (i < tabs.Length - 1) pattern += "\r\n";
+			}
+
 			return pattern;
 		}
 

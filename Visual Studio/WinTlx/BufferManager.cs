@@ -41,6 +41,8 @@ namespace WinTlx
 		private readonly ConcurrentQueue<char> _sendBuffer;
 		private object _sendBufferLock = new object();
 
+		private bool _clearLocalBufferFlag = false;
+
 		/// <summary>
 		/// Timer for screen output buffer
 		/// </summary>
@@ -67,6 +69,7 @@ namespace WinTlx
 			_itelex = ItelexProtocol.Instance;
 			_itelex.Message += Itelex_MessageHandler;
 			_itelex.Received += Itelex_ReceivedHandler;
+			_itelex.Dropped += Itelex_DroppedHandler;
 			//private void MessageHandler(string asciiText)
 			//{
 			//	ShowLocalMessage(asciiText);
@@ -204,9 +207,9 @@ namespace WinTlx
 			}
 			_localOutputTimer.Start();
 
-			if (charSec<= 50 || charSec == 0)
+			if (charSec <= 50 || charSec == 0)
 			{
-				_itelex.SetAckTimerInterval(0); // default
+				_itelex.SetAckTimerInterval(0); // set to default default
 			}
 			else
 			{
@@ -268,6 +271,7 @@ namespace WinTlx
 		{
 			var timeout = TimeSpan.FromMilliseconds(1000);
 			bool lockTaken = false;
+			_clearLocalBufferFlag = true;
 
 			try
 			{
@@ -307,6 +311,14 @@ namespace WinTlx
 			finally
 			{
 				if (lockTaken) Monitor.Exit(_localOutputBufferLock);
+				_clearLocalBufferFlag = false;
+			}
+		}
+
+		public void SendBufferClear()
+		{
+			while (_sendBuffer.TryDequeue(out _))
+			{
 			}
 		}
 
@@ -327,6 +339,12 @@ namespace WinTlx
 		private void Itelex_ReceivedHandler(string asciiText)
 		{
 			LocalOutputRecv(asciiText);
+		}
+
+		private void Itelex_DroppedHandler(string rejectReason)
+		{
+			SendBufferClear();
+			LocalOutputBufferClear(false);
 		}
 
 		public void UpdateLastLocalOutputChars(char chr)
@@ -358,7 +376,8 @@ namespace WinTlx
 
 		public void LocalOutputMessage(string msg, bool isTechMsg)
 		{
-			LocalOutputBufferClear(false);
+			//LocalOutputBufferClear(false);
+			if (_clearLocalBufferFlag && !isTechMsg) return;
 
 			if (_lastLocalOutputChars != "\r\n")
 			{
@@ -382,6 +401,15 @@ namespace WinTlx
 
 		public void LocalOutputRecv(string msg)
 		{
+			if (_itelex.Texting == ItelexProtocol.Textings.Ascii)
+			{
+				for (int i = 0; i < msg.Length; i++)
+				{
+					LocalOutputEnqueue(msg[i], CharAttributes.Recv, 0);
+				}
+				return;
+			}
+
 			if (string.IsNullOrEmpty(msg))
 			{
 				// empty char with ackCount = 1
@@ -400,12 +428,17 @@ namespace WinTlx
 
 		public void LocalOutputEnqueue(char chr, CharAttributes attr, int ackCount)
 		{
+			if (attr == CharAttributes.Recv || attr == CharAttributes.Send)
+			{
+				if (_configData.UpperCaseChar) chr = Char.ToUpper(chr);
+			}
+
 			_localOutputBuffer.Enqueue(new ScreenChar(chr, attr, ackCount));
 		}
 
 		private void LocalOutputTimer_Elapsed(object sender, ElapsedEventArgs e)
 		{
-			if (_localOutputTimerActive) return;
+			if (_localOutputTimerActive || _clearLocalBufferFlag) return;
 			_localOutputTimerActive = true;
 
 			var timeout = TimeSpan.FromMilliseconds(1000);
@@ -415,12 +448,14 @@ namespace WinTlx
 			{
 				if (_localOutputBuffer.Count > 0)
 				{
+					//Debug.WriteLine($"_localOutputBuffer.Count={_localOutputBuffer.Count}");
 					Monitor.TryEnter(_localOutputBufferLock, timeout, ref lockTaken);
 					if (lockTaken)
 					{
 						ScreenChar peek;
 						do
 						{
+							if (_clearLocalBufferFlag) break;
 							if (_localOutputBuffer.TryDequeue(out ScreenChar scrChr))
 							{
 								if (scrChr.Attr != CharAttributes.RecvEmpty) Output?.Invoke(scrChr);

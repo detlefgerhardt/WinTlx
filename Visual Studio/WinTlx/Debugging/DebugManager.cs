@@ -182,10 +182,26 @@ namespace WinTlx.Debugging
 			return ((print + 256) - ack) % 256;
 		}
 
+		public void WriteLine(string text, Modes mode)
+		{
+			Write(text + "\r\n", mode);
+		}
+
 		public void Write(string text, Modes mode)
 		{
 			if (_debugForm != null)
 			{
+				while(true)
+				{
+					if (text.Length >=4 && text.Substring(text.Length-4, 4) == "\r\n\r\n")
+					{
+						text = text.Substring(0, text.Length - 2);
+					}
+					else
+					{
+						break;
+					}
+				}
 				Color textColor = GetModeColor(mode);
 				_debugForm.ShowDebugText(text, textColor);
 			}
@@ -217,8 +233,8 @@ namespace WinTlx.Debugging
 					case CodeManager.ASC_FIGS:
 						convChr = "<ZI>";
 						break;
-					case CodeManager.ASC_NUL:
-						convChr = "<NUL>";
+					case CodeManager.ASC_CODE32:
+						convChr = "<COD32>";
 						break;
 					case CodeManager.ASC_SHIFTF:
 						convChr = "<F>";

@@ -71,6 +71,7 @@ namespace WinTlx.Config
 			RemoteBufferSizeLbl.Text = LngText(LngKeys.Setup_RemoteBufferSize);
 			ShowTechnicalMessagesLbl.Text = LngText(LngKeys.Setup_ShowTechnicalMessages);
 			CodeSetLbl.Text = LngText(LngKeys.Setup_CodeSet);
+			UpperCaseChrLbl.Text = LngText(LngKeys.Setup_UpperCaseChar);
 			DefaultProtocolOutLbl.Text = LngText(LngKeys.Setup_DefaultProtocolOut);
 
 			SubscribeServerGb.Text = LngText(LngKeys.Setup_SubscribeServer);
@@ -110,6 +111,7 @@ namespace WinTlx.Config
 			AnswerbackTb.Text = _config.Answerback;
 			IdleTimeoutTb.Text = IntToStr(_config.IdleTimeout);
 			CodeSetCb.SelectedItem = ConfigData.CodeSetToString(_config.CodeSet);
+			UpperCaseChrCb.Checked = _config.UpperCaseChar;
 			DefaultProtocolOutAsciiRb.Checked = _config.DefaultProtocolAscii;
 			DefaultProtocolOutItelexRb.Checked = !_config.DefaultProtocolAscii;
 			RemoteBufferSizeTb.Text = IntToStr(_config.RemoteBufferSize);
@@ -136,6 +138,7 @@ namespace WinTlx.Config
 			_config.Answerback = AnswerbackTb.Text.Trim().ToLower();
 			_config.IdleTimeout = StrToInt(IdleTimeoutTb.Text);
 			_config.CodeSet = ConfigData.StringToCodeSet((string)CodeSetCb.SelectedItem);
+			_config.UpperCaseChar = UpperCaseChrCb.Checked;
 			_config.DefaultProtocolAscii = DefaultProtocolOutAsciiRb.Checked;
 			_config.RemoteBufferSize = StrToInt(RemoteBufferSizeTb.Text);
 			_config.ShowTechnicalMessages = ShowTechnicalMessagesCb.Checked;
@@ -198,7 +201,7 @@ namespace WinTlx.Config
 
 		private void SaveBtn_Click(object sender, EventArgs e)
 		{
-			ConfigManager.Instance.ChanceConfig();
+			ConfigManager.Instance.ChangeConfig();
 			Close();
 			Canceled = false;
 		}

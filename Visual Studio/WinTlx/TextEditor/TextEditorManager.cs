@@ -128,6 +128,8 @@ namespace WinTlx.TextEditor
 			}
 		}
 
+		private bool _connectState;
+
 		/// <summary>
 		/// singleton pattern
 		/// </summary>
@@ -145,11 +147,16 @@ namespace WinTlx.TextEditor
 			_itelex.Received += Itelex_Received;
 			_itelex.Dropped += Itelex_Dropped;
 
-			ResetUndo();
 			LineWidth = DEFAULT_LINE_LENGTH;
+			New();
+		}
+
+		public void New()
+		{
+			ResetUndo();
 			Text = "";
-			Saved = true;
 			Filename = null;
+			Saved = true;
 		}
 
 		public void Undo(string text)
@@ -173,7 +180,7 @@ namespace WinTlx.TextEditor
 			}
 		}
 
-		private void ResetUndo()
+		public void ResetUndo()
 		{
 			UndoStack = new List<string>();
 			_undoPtr = -1;
@@ -690,8 +697,12 @@ namespace WinTlx.TextEditor
 			_stopScript = false;
 			bool script = false;
 
+			_connectState = _itelex.IsConnected;
+
 			foreach (string line in lines)
 			{
+				if (ConnectStateChanged()) return;
+
 				if (line.StartsWith("{script}"))
 				{
 					script = true;
@@ -776,7 +787,7 @@ namespace WinTlx.TextEditor
 			{
 				File.WriteAllBytes(fileName, array);
 			}
-			catch(Exception ex)
+			catch(Exception)
 			{
 			}
 		}
@@ -1012,7 +1023,7 @@ namespace WinTlx.TextEditor
 				case '1':
 					return CodeManager.ASC_FIGS;
 				case '0':
-					return CodeManager.ASC_NUL;
+					return CodeManager.ASC_CODE32;
 				default:
 					return chr;
 			}
@@ -1138,7 +1149,12 @@ namespace WinTlx.TextEditor
 
 			await Task.Run(() =>
 			{
-				_bufferManager.SendBufferEnqueueString(asciiText);
+				foreach (char chr in asciiText)
+				{
+					if (ConnectStateChanged()) return;
+					_bufferManager.SendBufferEnqueueChr(chr);
+				}
+				//_bufferManager.SendBufferEnqueueString(asciiText);
 			});
 		}
 
@@ -1152,6 +1168,11 @@ namespace WinTlx.TextEditor
 					_bufferManager.LocalOutputMessage(chr.ToString(), isTechMsg);
 				}
 			});
+		}
+
+		private bool ConnectStateChanged()
+		{
+			return _itelex.IsConnected != _connectState;
 		}
 
 		private void Itelex_Received(string asciiText)

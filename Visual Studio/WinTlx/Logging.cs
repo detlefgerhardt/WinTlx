@@ -18,9 +18,9 @@ namespace WinTlx
 
 		public string LogfilePath { get; set; }
 
-		private static Logging instance;
-
 		private object _lock = new object();
+
+		private static Logging instance;
 
 		public static Logging Instance
 		{

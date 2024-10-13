@@ -31,7 +31,7 @@
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TextEditorForm));
 			this.EditorRtb = new WinTlx.Controls.RicherTextBox2();
 			this.LinealPnl = new System.Windows.Forms.Panel();
-			this.ClearBtn = new System.Windows.Forms.Button();
+			this.NewBtn = new System.Windows.Forms.Button();
 			this.SendBtn = new System.Windows.Forms.Button();
 			this.CloseBtn = new System.Windows.Forms.Button();
 			this.LoadBtn = new System.Windows.Forms.Button();
@@ -77,15 +77,15 @@
 			this.LinealPnl.TabIndex = 1;
 			this.LinealPnl.Paint += new System.Windows.Forms.PaintEventHandler(this.LinealPnl_Paint);
 			// 
-			// ClearBtn
+			// NewBtn
 			// 
-			this.ClearBtn.Location = new System.Drawing.Point(13, 12);
-			this.ClearBtn.Name = "ClearBtn";
-			this.ClearBtn.Size = new System.Drawing.Size(65, 23);
-			this.ClearBtn.TabIndex = 2;
-			this.ClearBtn.Text = "Clear";
-			this.ClearBtn.UseVisualStyleBackColor = true;
-			this.ClearBtn.Click += new System.EventHandler(this.ClearBtn_Click);
+			this.NewBtn.Location = new System.Drawing.Point(13, 12);
+			this.NewBtn.Name = "NewBtn";
+			this.NewBtn.Size = new System.Drawing.Size(65, 23);
+			this.NewBtn.TabIndex = 2;
+			this.NewBtn.Text = "New";
+			this.NewBtn.UseVisualStyleBackColor = true;
+			this.NewBtn.Click += new System.EventHandler(this.NewBtn_Click);
 			// 
 			// SendBtn
 			// 
@@ -277,7 +277,7 @@
 			this.Controls.Add(this.LoadBtn);
 			this.Controls.Add(this.CloseBtn);
 			this.Controls.Add(this.SendBtn);
-			this.Controls.Add(this.ClearBtn);
+			this.Controls.Add(this.NewBtn);
 			this.Controls.Add(this.LinealPnl);
 			this.Controls.Add(this.EditorRtb);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -295,7 +295,7 @@
 
 		private Controls.RicherTextBox2 EditorRtb;
 		private System.Windows.Forms.Panel LinealPnl;
-		private System.Windows.Forms.Button ClearBtn;
+		private System.Windows.Forms.Button NewBtn;
 		private System.Windows.Forms.Button SendBtn;
 		private System.Windows.Forms.Button CloseBtn;
 		private System.Windows.Forms.Button LoadBtn;

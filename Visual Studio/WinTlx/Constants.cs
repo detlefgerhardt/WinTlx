@@ -4,6 +4,8 @@
 	{
 		public const string PROGRAM_NAME = "WinTlx";
 
+		public const bool BETA = true;
+
 		public const string APP_CODE = "wt";
 
 		public const string CONSOLE_LOG = "wintlx_console.log";

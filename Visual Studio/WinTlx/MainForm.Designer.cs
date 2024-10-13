@@ -53,7 +53,7 @@ namespace WinTlx
 			this.SendHBtn = new System.Windows.Forms.Button();
 			this.SendGBtn = new System.Windows.Forms.Button();
 			this.SendFBtn = new System.Windows.Forms.Button();
-			this.SendNullBtn = new System.Windows.Forms.Button();
+			this.SendCod32Btn = new System.Windows.Forms.Button();
 			this.panel2 = new System.Windows.Forms.Panel();
 			this.TlnTypeCb = new System.Windows.Forms.ComboBox();
 			this.SearchCb = new System.Windows.Forms.ComboBox();
@@ -80,6 +80,7 @@ namespace WinTlx
 			this.CharSetLbl = new System.Windows.Forms.Label();
 			this.RemoteBufferStatusLbl = new System.Windows.Forms.Label();
 			this.LocalBufferStatusLbl = new System.Windows.Forms.Label();
+			this.DeactivateAnswerbackBtn = new System.Windows.Forms.Button();
 			this.panel2.SuspendLayout();
 			this.panel4.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.TerminalPb)).BeginInit();
@@ -108,7 +109,7 @@ namespace WinTlx
 			// 
 			// SendHereIsBtn
 			// 
-			this.SendHereIsBtn.Location = new System.Drawing.Point(688, 166);
+			this.SendHereIsBtn.Location = new System.Drawing.Point(688, 193);
 			this.SendHereIsBtn.Name = "SendHereIsBtn";
 			this.SendHereIsBtn.Size = new System.Drawing.Size(97, 23);
 			this.SendHereIsBtn.TabIndex = 13;
@@ -118,7 +119,7 @@ namespace WinTlx
 			// 
 			// SendWruBtn
 			// 
-			this.SendWruBtn.Location = new System.Drawing.Point(688, 137);
+			this.SendWruBtn.Location = new System.Drawing.Point(688, 164);
 			this.SendWruBtn.Name = "SendWruBtn";
 			this.SendWruBtn.Size = new System.Drawing.Size(97, 23);
 			this.SendWruBtn.TabIndex = 12;
@@ -128,7 +129,7 @@ namespace WinTlx
 			// 
 			// SendBellBtn
 			// 
-			this.SendBellBtn.Location = new System.Drawing.Point(688, 358);
+			this.SendBellBtn.Location = new System.Drawing.Point(688, 385);
 			this.SendBellBtn.Name = "SendBellBtn";
 			this.SendBellBtn.Size = new System.Drawing.Size(97, 23);
 			this.SendBellBtn.TabIndex = 18;
@@ -139,7 +140,7 @@ namespace WinTlx
 			// SendLettersBtn
 			// 
 			this.SendLettersBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.SendLettersBtn.Location = new System.Drawing.Point(688, 201);
+			this.SendLettersBtn.Location = new System.Drawing.Point(688, 228);
 			this.SendLettersBtn.Name = "SendLettersBtn";
 			this.SendLettersBtn.Size = new System.Drawing.Size(97, 23);
 			this.SendLettersBtn.TabIndex = 14;
@@ -150,7 +151,7 @@ namespace WinTlx
 			// SendFiguresBtn
 			// 
 			this.SendFiguresBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.SendFiguresBtn.Location = new System.Drawing.Point(688, 230);
+			this.SendFiguresBtn.Location = new System.Drawing.Point(688, 257);
 			this.SendFiguresBtn.Name = "SendFiguresBtn";
 			this.SendFiguresBtn.Size = new System.Drawing.Size(97, 23);
 			this.SendFiguresBtn.TabIndex = 15;
@@ -170,19 +171,19 @@ namespace WinTlx
 			// 
 			// TlnPortTb
 			// 
-			this.TlnPortTb.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.TlnPortTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.TlnPortTb.Location = new System.Drawing.Point(396, 65);
 			this.TlnPortTb.Name = "TlnPortTb";
-			this.TlnPortTb.Size = new System.Drawing.Size(46, 22);
+			this.TlnPortTb.Size = new System.Drawing.Size(46, 20);
 			this.TlnPortTb.TabIndex = 5;
 			this.TlnPortTb.Leave += new System.EventHandler(this.PortTb_Leave);
 			// 
 			// TlnAddressTb
 			// 
-			this.TlnAddressTb.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.TlnAddressTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.TlnAddressTb.Location = new System.Drawing.Point(212, 65);
 			this.TlnAddressTb.Name = "TlnAddressTb";
-			this.TlnAddressTb.Size = new System.Drawing.Size(178, 22);
+			this.TlnAddressTb.Size = new System.Drawing.Size(178, 20);
 			this.TlnAddressTb.TabIndex = 4;
 			this.TlnAddressTb.Leave += new System.EventHandler(this.AddressTb_Leave);
 			// 
@@ -216,7 +217,7 @@ namespace WinTlx
 			// SendCarriageReturnBtn
 			// 
 			this.SendCarriageReturnBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.SendCarriageReturnBtn.Location = new System.Drawing.Point(688, 294);
+			this.SendCarriageReturnBtn.Location = new System.Drawing.Point(688, 321);
 			this.SendCarriageReturnBtn.Name = "SendCarriageReturnBtn";
 			this.SendCarriageReturnBtn.Size = new System.Drawing.Size(97, 23);
 			this.SendCarriageReturnBtn.TabIndex = 16;
@@ -227,7 +228,7 @@ namespace WinTlx
 			// SendLineFeedBtn
 			// 
 			this.SendLineFeedBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.SendLineFeedBtn.Location = new System.Drawing.Point(688, 323);
+			this.SendLineFeedBtn.Location = new System.Drawing.Point(688, 350);
 			this.SendLineFeedBtn.Name = "SendLineFeedBtn";
 			this.SendLineFeedBtn.Size = new System.Drawing.Size(97, 23);
 			this.SendLineFeedBtn.TabIndex = 17;
@@ -265,15 +266,15 @@ namespace WinTlx
 			// 
 			// TlnExtensionTb
 			// 
-			this.TlnExtensionTb.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.TlnExtensionTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.TlnExtensionTb.Location = new System.Drawing.Point(448, 65);
 			this.TlnExtensionTb.Name = "TlnExtensionTb";
-			this.TlnExtensionTb.Size = new System.Drawing.Size(46, 22);
+			this.TlnExtensionTb.Size = new System.Drawing.Size(46, 20);
 			this.TlnExtensionTb.TabIndex = 6;
 			// 
 			// SendHBtn
 			// 
-			this.SendHBtn.Location = new System.Drawing.Point(755, 387);
+			this.SendHBtn.Location = new System.Drawing.Point(755, 414);
 			this.SendHBtn.Name = "SendHBtn";
 			this.SendHBtn.Size = new System.Drawing.Size(30, 23);
 			this.SendHBtn.TabIndex = 22;
@@ -283,7 +284,7 @@ namespace WinTlx
 			// 
 			// SendGBtn
 			// 
-			this.SendGBtn.Location = new System.Drawing.Point(721, 387);
+			this.SendGBtn.Location = new System.Drawing.Point(721, 414);
 			this.SendGBtn.Name = "SendGBtn";
 			this.SendGBtn.Size = new System.Drawing.Size(30, 23);
 			this.SendGBtn.TabIndex = 21;
@@ -293,7 +294,7 @@ namespace WinTlx
 			// 
 			// SendFBtn
 			// 
-			this.SendFBtn.Location = new System.Drawing.Point(688, 387);
+			this.SendFBtn.Location = new System.Drawing.Point(688, 414);
 			this.SendFBtn.Name = "SendFBtn";
 			this.SendFBtn.Size = new System.Drawing.Size(30, 23);
 			this.SendFBtn.TabIndex = 20;
@@ -301,15 +302,15 @@ namespace WinTlx
 			this.SendFBtn.UseVisualStyleBackColor = true;
 			this.SendFBtn.Click += new System.EventHandler(this.SendFBtn_Click);
 			// 
-			// SendNullBtn
+			// SendCod32Btn
 			// 
-			this.SendNullBtn.Location = new System.Drawing.Point(688, 259);
-			this.SendNullBtn.Name = "SendNullBtn";
-			this.SendNullBtn.Size = new System.Drawing.Size(97, 23);
-			this.SendNullBtn.TabIndex = 19;
-			this.SendNullBtn.Text = "NUL";
-			this.SendNullBtn.UseVisualStyleBackColor = true;
-			this.SendNullBtn.Click += new System.EventHandler(this.SendNullBtn_Click);
+			this.SendCod32Btn.Location = new System.Drawing.Point(688, 286);
+			this.SendCod32Btn.Name = "SendCod32Btn";
+			this.SendCod32Btn.Size = new System.Drawing.Size(97, 23);
+			this.SendCod32Btn.TabIndex = 19;
+			this.SendCod32Btn.Text = "Code 32";
+			this.SendCod32Btn.UseVisualStyleBackColor = true;
+			this.SendCod32Btn.Click += new System.EventHandler(this.SendCod32Btn_Click);
 			// 
 			// panel2
 			// 
@@ -372,11 +373,11 @@ namespace WinTlx
 			// 
 			// AnswerbackTb
 			// 
-			this.AnswerbackTb.Font = new System.Drawing.Font("Consolas", 9F);
+			this.AnswerbackTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
 			this.AnswerbackTb.Location = new System.Drawing.Point(8, 65);
 			this.AnswerbackTb.Name = "AnswerbackTb";
 			this.AnswerbackTb.ReadOnly = true;
-			this.AnswerbackTb.Size = new System.Drawing.Size(198, 22);
+			this.AnswerbackTb.Size = new System.Drawing.Size(198, 20);
 			this.AnswerbackTb.TabIndex = 0;
 			this.AnswerbackTb.TabStop = false;
 			this.AnswerbackTb.WordWrap = false;
@@ -587,12 +588,23 @@ namespace WinTlx
 			this.LocalBufferStatusLbl.TabIndex = 83;
 			this.LocalBufferStatusLbl.Text = "LocBuf:";
 			// 
+			// DeactivateAnswerbackBtn
+			// 
+			this.DeactivateAnswerbackBtn.Location = new System.Drawing.Point(688, 135);
+			this.DeactivateAnswerbackBtn.Name = "DeactivateAnswerbackBtn";
+			this.DeactivateAnswerbackBtn.Size = new System.Drawing.Size(97, 23);
+			this.DeactivateAnswerbackBtn.TabIndex = 84;
+			this.DeactivateAnswerbackBtn.Text = "Answerback On";
+			this.DeactivateAnswerbackBtn.UseVisualStyleBackColor = true;
+			this.DeactivateAnswerbackBtn.Click += new System.EventHandler(this.DeactivateAnswerbackBtn_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
 			this.ClientSize = new System.Drawing.Size(804, 525);
+			this.Controls.Add(this.DeactivateAnswerbackBtn);
 			this.Controls.Add(this.LocalBufferStatusLbl);
 			this.Controls.Add(this.RemoteBufferStatusLbl);
 			this.Controls.Add(this.CharSetLbl);
@@ -608,7 +620,7 @@ namespace WinTlx
 			this.Controls.Add(this.SendGBtn);
 			this.Controls.Add(this.SendFBtn);
 			this.Controls.Add(this.ScrollDownBtn);
-			this.Controls.Add(this.SendNullBtn);
+			this.Controls.Add(this.SendCod32Btn);
 			this.Controls.Add(this.SendBellBtn);
 			this.Controls.Add(this.SendHereIsBtn);
 			this.Controls.Add(this.SendLineFeedBtn);
@@ -625,7 +637,7 @@ namespace WinTlx
 			this.Controls.Add(this.panel2);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
-			this.MinimumSize = new System.Drawing.Size(750, 480);
+			this.MinimumSize = new System.Drawing.Size(750, 520);
 			this.Name = "MainForm";
 			this.Text = "WinTlx";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
@@ -674,7 +686,7 @@ namespace WinTlx
 		private System.Windows.Forms.Label AnswerbackLbl;
 		private System.Windows.Forms.TextBox TimeTb;
 		private System.Windows.Forms.TextBox DateTb;
-		private System.Windows.Forms.Button SendNullBtn;
+		private System.Windows.Forms.Button SendCod32Btn;
 		private System.Windows.Forms.Panel LinealPnl;
 		private SelectablePictureBox TerminalPb;
 		private System.Windows.Forms.Button ScrollStartBtn;
@@ -698,6 +710,7 @@ namespace WinTlx
 		private System.Windows.Forms.Label CharSetLbl;
 		private System.Windows.Forms.Label RemoteBufferStatusLbl;
 		private System.Windows.Forms.Label LocalBufferStatusLbl;
+		private System.Windows.Forms.Button DeactivateAnswerbackBtn;
 	}
 }
 

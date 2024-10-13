@@ -27,7 +27,7 @@ namespace WinTlx.Languages
 				{ LngKeys.MainForm_Extension, "Extension" },
 				{ LngKeys.MainForm_PeerType, "Peer Type" },
 				{ LngKeys.MainForm_PeerTypeHelp,
-					"0 - gelöscht\r\n" + 
+					"0 - gelöscht\r\n" +
 					"1 - texting baudot / Hostname\r\n" +
 					"2 - texting baudot / feste IP\r\n" +
 					"3 - ascii texting / Hostname\r\n" +
@@ -44,6 +44,8 @@ namespace WinTlx.Languages
 				{ LngKeys.MainForm_PeerType6, "Emailadresse" },
 				{ LngKeys.MainForm_ConnectButton, "Verbinden" },
 				{ LngKeys.MainForm_DisconnectButton, "Trennen" },
+				{ LngKeys.MainForm_AnswerbackActiveButton, "KG ein" },
+				{ LngKeys.MainForm_AnswerbackDeactiveButton, "KG aus" },
 				{ LngKeys.MainForm_SendWruButton, "✠ WRU" },
 				{ LngKeys.MainForm_SendHereisButton, "✧ Hier ist" },
 				{ LngKeys.MainForm_SendLettersButton, "Bu" },
@@ -51,8 +53,8 @@ namespace WinTlx.Languages
 				{ LngKeys.MainForm_SendReturnButton, "<" },
 				{ LngKeys.MainForm_SendLinefeedButton, "\u2261" },
 				{ LngKeys.MainForm_SendBellButton, "⍾ Klingel" },
-				{ LngKeys.MainForm_SendNullButton, "NUL" },
-				{ LngKeys.MainForm_SendNullButton_ToolTip, "Code32/NULL Zeichen senden" },
+				{ LngKeys.MainForm_SendCod32Button, "Code 32" },
+				{ LngKeys.MainForm_SendCod32Button_ToolTip, "Code32 (Null) Zeichen senden" },
 				{ LngKeys.MainForm_SendThirdLevelButton, "PYC" },
 				{ LngKeys.MainForm_SendThirdLevelButton_ToolTip, "Umschalten auf 3. Ebene" },
 				{ LngKeys.MainForm_LineLabel, "Zeile" },
@@ -98,6 +100,7 @@ namespace WinTlx.Languages
 				{ LngKeys.Setup_RemoteBufferSize, "Max. Remote-Puffergröße (Byte)" },
 				{ LngKeys.Setup_ShowTechnicalMessages, "Zeige technische Meldungen" },
 				{ LngKeys.Setup_CodeSet, "Zeichensatz" },
+				{ LngKeys.Setup_UpperCaseChar, "Großbuchstaben" },
 				{ LngKeys.Setup_DefaultProtocolOut, "Standard-Protokoll (ausgehend)" },
 				{ LngKeys.Setup_SubscribeServer, "Teilnehmer-Server" },
 				{ LngKeys.Setup_SubscribeServerAddress, "Tln-Server-Adresse" },
@@ -193,12 +196,12 @@ namespace WinTlx.Languages
 				{ LngKeys.Message_CentralexConnected, "centralex verbunden" },
 				{ LngKeys.Message_CentralexError, "centralex fehler" },
 
-				{ LngKeys.Message_Pangram, "prall vom whisky flog quax den jet zu bruch. 1234567890/(:-),=?" },
+				//{ LngKeys.Message_Pangram, "prall vom whisky flog quax den jet zu bruch. 1234567890/(:-),=?" },
 				//{ LngKeys.Message_Pangram, "kaufen sie jede woche vier gute bequeme pelze xy 1234567890/(:-),=?" },
-				{ LngKeys.Message_EyeballCharActive, "bildlocher aktiv - starte lochstreifenstanzer" },
+				{ LngKeys.Message_EyeballCharActive, "bildlocher aktiv - lochstreifenstanzer starten" },
 
 				{ LngKeys.Editor_Header, "Text Editor" },
-				{ LngKeys.Editor_Clear, "Löschen" },
+				{ LngKeys.Editor_New, "Neu" },
 				{ LngKeys.Editor_Load, "Laden" },
 				{ LngKeys.Editor_Save, "Speichern" },
 				{ LngKeys.Editor_Send, "Senden" },
@@ -246,7 +249,7 @@ namespace WinTlx.Languages
 				{ LngKeys.TestPattern_Pelze, "Pelze" },
 				{ LngKeys.TestPattern_Quax, "Quax" },
 				{ LngKeys.TestPattern_Line, "Linie" },
-				{ LngKeys.TestPattern_DateTime, "Datum/Zeit" },
+				{ LngKeys.TestPattern_DateTime, "Datum/Zeit" }
 			};
 
 			return lng;

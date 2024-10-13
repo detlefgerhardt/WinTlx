@@ -79,6 +79,8 @@ namespace WinTlx
 
 		private bool _recvOn;
 
+		private bool _answerbackActive;
+
 		private PeerTypeItem[] _tlnTypes;
 		
 		public MainForm()
@@ -133,6 +135,8 @@ namespace WinTlx
 			//ScrollEndBtn.Text = "\u22BB";
 
 			_recvOn = false;
+
+			_answerbackActive = true;
 
 			_itelex = ItelexProtocol.Instance;
 			_itelex.Send += SendHandler;
@@ -200,6 +204,10 @@ namespace WinTlx
 			ConnectBtn.Text = LngText(LngKeys.MainForm_ConnectButton);
 			DisconnectBtn.Text = LngText(LngKeys.MainForm_DisconnectButton);
 
+			DeactivateAnswerbackBtn.Text = _answerbackActive ? 
+				LngText(LngKeys.MainForm_AnswerbackActiveButton) : 
+				LngText(LngKeys.MainForm_AnswerbackDeactiveButton);
+
 			SendWruBtn.Text = LngText(LngKeys.MainForm_SendWruButton);
 			SendHereIsBtn.Text = LngText(LngKeys.MainForm_SendHereisButton);
 			SendLettersBtn.Text = LngText(LngKeys.MainForm_SendLettersButton);
@@ -214,23 +222,23 @@ namespace WinTlx
 			UpdateMainMenu();
 			ShowScreen();
 			Itelex_UpdateHandler();
-			SetNullBtnText();
+			SetCod32BtnText();
 			SetPeerTypes();
 		}
 
-		private void SetNullBtnText()
+		private void SetCod32BtnText()
 		{
-			Helper.ControlInvokeRequired(SendNullBtn, () =>
+			Helper.ControlInvokeRequired(SendCod32Btn, () =>
 			{
 				if (_configData.CodeSet != CodeSets.CYRILL)
 				{
-					SendNullBtn.Text = LngText(LngKeys.MainForm_SendNullButton);
-					Helper.SetToolTip(SendNullBtn, LngText(LngKeys.MainForm_SendNullButton_ToolTip));
+					SendCod32Btn.Text = LngText(LngKeys.MainForm_SendCod32Button);
+					Helper.SetToolTip(SendCod32Btn, LngText(LngKeys.MainForm_SendCod32Button_ToolTip));
 				}
 				else
 				{
-					SendNullBtn.Text = LngText(LngKeys.MainForm_SendThirdLevelButton);
-					Helper.SetToolTip(SendNullBtn, LngText(LngKeys.MainForm_SendThirdLevelButton_ToolTip));
+					SendCod32Btn.Text = LngText(LngKeys.MainForm_SendThirdLevelButton);
+					Helper.SetToolTip(SendCod32Btn, LngText(LngKeys.MainForm_SendThirdLevelButton_ToolTip));
 				}
 			});
 		}
@@ -388,11 +396,11 @@ namespace WinTlx
 				new ToolStripMenuItem("Copy"),
 				new ToolStripMenuItem("Paste")
 			};
-			contextMenu.ItemClicked += ConectMenu_ItemClicked;
+			contextMenu.ItemClicked += ConnectMenu_ItemClicked;
 			return contextMenu;
 		}
 
-		private void ConectMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+		private void ConnectMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
 		{
 			// hide context menu
 			ContextMenuStrip cms = (ContextMenuStrip)sender;
@@ -470,7 +478,7 @@ namespace WinTlx
 					SendAsciiChar(CodeManager.ASC_SHIFTH);
 					break;
 				case Keys.C | Keys.Alt:
-					SendAsciiChar(CodeManager.ASC_NUL);
+					SendAsciiChar(CodeManager.ASC_CODE32);
 					break;
 			}
 
@@ -596,10 +604,11 @@ namespace WinTlx
 		{
 			if (!_itelex.IsConnected)
 			{
-				return 0;
+				return -1;
 			}
+			//Debug.WriteLine($"{_configData.IdleTimeout} {_itelex.IdleTimerMs}");
 			int timeout = _configData.IdleTimeout - _itelex.IdleTimerMs / 1000;
-			if (timeout<0)
+			if (timeout < 0)
 			{
 				timeout = 0;
 			}
@@ -733,10 +742,7 @@ namespace WinTlx
 			*/
 
 			SearchCb.Text = SearchCb.Text.Trim();
-			if (string.IsNullOrWhiteSpace(SearchCb.Text))
-			{
-				return;
-			}
+			if (string.IsNullOrWhiteSpace(SearchCb.Text)) return;
 
 			string searchStr = SearchCb.Text;
 
@@ -764,7 +770,7 @@ namespace WinTlx
 				{
 					PeerQueryReply queryReply = _subscriberServer.DoPeerQuery(
 						_configData.SubscribeServerAddresses, _configData.SubscribeServerPort, num.ToString());
-					if (!queryReply.Valid)
+					if (queryReply == null || !queryReply.Valid)
 					{
 						_bufferManager.LocalOutputMessage(queryReply.Error, true);
 						return;
@@ -837,6 +843,22 @@ namespace WinTlx
 			SetFocus();
 			Disconnect();
 			_bufferManager.LocalOutputBufferClear(false);
+		}
+
+		private void DeactivateAnswerbackBtn_Click(object sender, EventArgs e)
+		{
+			if (_answerbackActive)
+			{
+				_answerbackActive = false;
+				DeactivateAnswerbackBtn.ForeColor = Color.Red;
+				DeactivateAnswerbackBtn.Text = LngText(LngKeys.MainForm_AnswerbackDeactiveButton);
+			}
+			else
+			{
+				_answerbackActive = true;
+				DeactivateAnswerbackBtn.ForeColor = Color.Black;
+				DeactivateAnswerbackBtn.Text = LngText(LngKeys.MainForm_AnswerbackActiveButton);
+			}
 		}
 
 		private void SendWruBtn_Click(object sender, EventArgs e)
@@ -927,7 +949,7 @@ namespace WinTlx
 
 		private void OpenTestPattern()
 		{
-			if (_testPatternForm==null)
+			if (_testPatternForm == null)
 			{
 				_testPatternForm = new TestPatternForm(this.Bounds);
 				_testPatternForm.Show();
@@ -952,10 +974,10 @@ namespace WinTlx
 			SendAsciiText(asciiText);
 		}
 
-		private void SendNullBtn_Click(object sender, EventArgs e)
+		private void SendCod32Btn_Click(object sender, EventArgs e)
 		{
 			SetFocus();
-			SendAsciiChar(CodeManager.ASC_NUL);
+			SendAsciiChar(CodeManager.ASC_CODE32);
 		}
 
 		private void ClearBtn_Click(object sender, EventArgs e)
@@ -1051,7 +1073,7 @@ namespace WinTlx
 						SubscriberServer subSrv = new SubscriberServer();
 						PeerQueryReply reply = subSrv.DoPeerQuery(_configData.SubscribeServerAddresses, _configData.SubscribeServerPort,
 							_configData.OwnNumber.ToString());
-						_bufferManager.LocalOutputMessage($"server-data: {reply.Data.Address}:{reply.Data.PortNumber} {reply.Data.ExtensionNumber}", true);
+						_bufferManager.LocalOutputMessage($"server-data: {reply.Data.Address}:{reply.Data.PortNumber} extention={reply.Data.ExtensionNumber}", true);
 					}
 				}
 			}
@@ -1110,7 +1132,7 @@ namespace WinTlx
 		{
 			if (!_itelex.EyeballCharActive)
 			{
-				SendAsciiText($"\r\n{LngText(LngKeys.Message_EyeballCharActive)}\r\n");
+				_bufferManager.LocalOutputMessage($"{LngText(LngKeys.Message_EyeballCharActive)}", false);
 				_itelex.EyeballCharActive = true;
 				_mainMenu.SetChecked(MainStripMenu.MenuTypes.EyeballCharOnOff, true);
 			}
@@ -1160,7 +1182,7 @@ namespace WinTlx
 				char c = asciiText[i];
 				switch (c)
 				{
-					case CodeManager.ASC_NUL:
+					case CodeManager.ASC_CODE32:
 						continue;
 					case CodeManager.ASC_BEL:
 						SystemSounds.Beep.Play();
@@ -1183,7 +1205,7 @@ namespace WinTlx
 
 		private void Itelex_UpdateHandler()
 		{
-			SetNullBtnText();
+			SetCod32BtnText();
 
 			_itelex.OwnVersion = _configData.OptionVersion;
 
@@ -1225,7 +1247,8 @@ namespace WinTlx
 
 			Helper.ControlInvokeRequired(LocalBufferStatusLbl, () =>
 			{
-				string valueStr = _itelex.IsConnected ? $"{_bufferManager.LocalOutputBufferCount}" : "-";
+				//string valueStr = _itelex.IsConnected ? $"{_bufferManager.LocalOutputBufferCount}" : "-";
+				string valueStr = $"{_bufferManager.LocalOutputBufferCount}";
 				LocalBufferStatusLbl.Text = $"{LngText(LngKeys.MainForm_LocalBufferStatus)}: {valueStr}";
 			});
 
@@ -1266,15 +1289,15 @@ namespace WinTlx
 				}
 			});
 
-			Helper.ControlInvokeRequired(SendNullBtn, () =>
+			Helper.ControlInvokeRequired(SendCod32Btn, () =>
 			{
 				if (_itelex.ShiftState != ShiftStates.Third)
 				{
-					SendNullBtn.ForeColor = Color.Black;
+					SendCod32Btn.ForeColor = Color.Black;
 				}
 				else
 				{
-					SendNullBtn.ForeColor = Color.Green;
+					SendCod32Btn.ForeColor = Color.Green;
 				}
 			});
 
@@ -1376,6 +1399,7 @@ namespace WinTlx
 				_itelex.SendEndCmd();
 				Thread.Sleep(2000);
 				_itelex.Disconnect();
+				_bufferManager.LocalOutputBufferClear(false);
 			}
 		}
 
@@ -1415,6 +1439,7 @@ namespace WinTlx
 		private void TapePunch_ShowBufferEvt(string asciiText)
 		{
 			ClearScreen();
+			if (_configData.UpperCaseChar) asciiText = asciiText.ToUpper();
 			OutputText(asciiText, CharAttributes.Recv);
 			ShowScreen();
 		}
@@ -1443,17 +1468,17 @@ namespace WinTlx
 					SystemSounds.Beep.Play();
 					break;
 				case CodeManager.ASC_WRU:
-					if (screenChar.Attr == CharAttributes.Recv) SendHereIs();
+					if (_answerbackActive)
+					{
+						if (screenChar.Attr == CharAttributes.Recv) SendHereIs();
+					}
 					break;
 			}
 		}
 
 		private void OutputText(string asciiText, CharAttributes attr)
 		{
-			if (string.IsNullOrEmpty(asciiText))
-			{
-				return;
-			}
+			if (string.IsNullOrEmpty(asciiText)) return;
 
 			for (int i = 0; i < asciiText.Length; i++)
 			{
@@ -1666,10 +1691,10 @@ namespace WinTlx
 
 		private void TerminalDrawChar(Graphics g, Font font, int x, int y, ScreenChar scrChr)
 		{
-			//for (int c = 0; c < scrChr.Chars.Count; c++)
+			for (int c = 0; c < scrChr.Chars.Count; c++)
 			{
-				//char chr = scrChr.Chars[c];
-				char chr = scrChr.Char;
+				char chr = scrChr.Chars[c];
+				//char chr = scrChr.Char;
 				if (chr != ' ' && chr != 0x00)
 				{
 					Point p = new Point(x * CHAR_WIDTH, y * CHAR_HEIGHT);
@@ -2151,6 +2176,5 @@ namespace WinTlx
 			TlnTypeCb.DataSource = _tlnTypes;
 			TlnTypeCb.DisplayMember = "ShortDesc";
 		}
-
 	}
 }

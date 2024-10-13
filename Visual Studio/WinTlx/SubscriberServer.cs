@@ -5,18 +5,22 @@ using System.Net.Sockets;
 using System.Text;
 using WinTlx.Debugging;
 using WinTlx.Languages;
+using WinTlx.Tools;
 
 namespace WinTlx
 {
 	class SubscriberServer
 	{
+		private const string TAG = nameof(SubscriberServer);
+
 		public delegate void MessageEventHandler(string message, bool isTechMsg);
 		public event MessageEventHandler Message;
 
-		private const string TAG = nameof(SubscriberServer);
+		private const int TIMEOUT = 2000;
 
-		private TcpClient client = null;
-		private NetworkStream stream = null;
+		private TcpClientWithTimeout _client = null;
+		private TcpClient _tcpClient = null;
+		private NetworkStream _stream = null;
 
 		public ClientUpdateReply DoClientUpdate(string[] serverAddresses, int serverPort, int clientNumber, int clientPin, int clientPort)
 		{
@@ -58,8 +62,21 @@ namespace WinTlx
 		{
 			try
 			{
-				client = new TcpClient(address, port);
-				stream = client.GetStream();
+				_client = new TcpClientWithTimeout(address, port, TIMEOUT);
+				_tcpClient = _client.Connect();
+				_tcpClient.ReceiveTimeout = TIMEOUT;
+				_stream = _tcpClient.GetStream();
+
+				// check connection (work-around)
+				PeerSearchReply reply = SendPeerSearch("abc");
+				if (!reply.Valid)
+				{
+					string errStr = $"error in subscribe server communication {address}:{port}";
+					Logging.Instance.Error(TAG, nameof(Connect), errStr);
+					_stream?.Close();
+					_tcpClient?.Close();
+					return false;
+				}
 				return true;
 			}
 			catch(Exception ex)
@@ -67,17 +84,17 @@ namespace WinTlx
 				string errStr = $"error connecting to subscribe server {address}:{port}";
 				DebugManager.Instance.Write("{errStr}\r\n", DebugManager.Modes.Message);
 				Logging.Instance.Error(TAG, nameof(Connect), errStr, ex);
-				stream?.Close();
-				client?.Close();
-				client = null;
+				_stream?.Close();
+				_tcpClient?.Close();
+				_client = null;
 				return false;
 			}
 		}
 
 		private bool Disconnect()
 		{
-			stream?.Close();
-			client?.Close();
+			_stream?.Close();
+			_tcpClient?.Close();
 			return true;
 		}
 
@@ -164,7 +181,7 @@ namespace WinTlx
 
 			PeerQueryReply reply = new PeerQueryReply();
 
-			if (client == null)
+			if (_client == null)
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), "no server connection");
 				reply.Error = "no server connection";
@@ -190,11 +207,11 @@ namespace WinTlx
 			sendData[1] = 0x05; // length
 			byte[] numData = BitConverter.GetBytes(num);
 			Buffer.BlockCopy(numData, 0, sendData, 2, 4);
-			sendData[6] = 0x01; ; // version 1
+			sendData[6] = 0x01; // version 1
 
 			try
 			{
-				stream.Write(sendData, 0, sendData.Length);
+				_stream.Write(sendData, 0, sendData.Length);
 			}
 			catch (Exception ex)
 			{
@@ -207,7 +224,7 @@ namespace WinTlx
 			int recvLen;
 			try
 			{
-				recvLen = stream.Read(recvData, 0, recvData.Length);
+				recvLen = _stream.Read(recvData, 0, recvData.Length);
 			}
 			catch (Exception ex)
 			{
@@ -271,7 +288,7 @@ namespace WinTlx
 			Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendPeerSearch), $"name='{name}'");
 			PeerSearchReply reply = new PeerSearchReply();
 
-			if (client == null)
+			if (_client == null)
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerSearch), "no server connection");
 				reply.Error = "no server connection";
@@ -292,7 +309,7 @@ namespace WinTlx
 			Buffer.BlockCopy(txt, 0, sendData, 3, txt.Length);
 			try
 			{
-				stream.Write(sendData, 0, sendData.Length);
+				_stream.Write(sendData, 0, sendData.Length);
 			}
 			catch(Exception ex)
 			{
@@ -312,7 +329,7 @@ namespace WinTlx
 				int recvLen = 0;
 				try
 				{
-					recvLen = stream.Read(recvData, 0, recvData.Length);
+					recvLen = _stream.Read(recvData, 0, recvData.Length);
 				}
 				catch(Exception ex)
 				{
@@ -358,7 +375,7 @@ namespace WinTlx
 				// send ack
 				try
 				{
-					stream.Write(ack, 0, ack.Length);
+					_stream.Write(ack, 0, ack.Length);
 				}
 				catch(Exception ex)
 				{
@@ -412,7 +429,7 @@ namespace WinTlx
 			Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendClientUpdate), $"number='{number}'");
 			ClientUpdateReply reply = new ClientUpdateReply();
 
-			if (client == null)
+			if (_client == null)
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), "no server connection");
 				reply.Error = "no server connection";
@@ -431,12 +448,12 @@ namespace WinTlx
 
 			try
 			{
-				stream.Write(sendData, 0, sendData.Length);
+				_stream.Write(sendData, 0, sendData.Length);
 			}
 			catch (Exception ex)
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error sending data to subscribe server", ex);
-				reply.Error = "reply server error";
+				reply.Error = "reply server error (send)";
 				return reply;
 			}
 
@@ -444,12 +461,12 @@ namespace WinTlx
 			int recvLen = 0;
 			try
 			{
-				recvLen = stream.Read(recvData, 0, recvData.Length);
+				recvLen = _stream.Read(recvData, 0, recvData.Length);
 			}
 			catch (Exception ex)
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error receiving data from subscribe server", ex);
-				reply.Error = "reply server error";
+				reply.Error = "reply server error (recv)";
 				return reply;
 			}
 

@@ -7,7 +7,6 @@ namespace WinTlx
 
 	class ScreenChar
 	{
-		/*
 		public List<char> Chars { get; set; }
 
 		public char Char
@@ -32,9 +31,8 @@ namespace WinTlx
 				}
 			}
 		}
-		*/
 
-		public char Char { get; set; }
+		//public char Char { get; set; }
 
 		public CharAttributes Attr { get; set; }
 
@@ -61,24 +59,22 @@ namespace WinTlx
 
 		public ScreenChar()
 		{
-			//Chars = new List<char>();
+			Chars = new List<char>();
 			Char = ' ';
 			Attr = CharAttributes.Message;
 			AckCount = 0;
 		}
 
-		/*
 		public ScreenChar(char chr)
 		{
 			Chars = new List<char>();
 			Char = chr;
 			Attr = CharAttributes.Message;
 		}
-		*/
 
 		public ScreenChar(char chr, CharAttributes attr, int ackCount)
 		{
-			//Chars = new List<char>();
+			Chars = new List<char>();
 			Char = chr;
 			Attr = attr;
 			AckCount = ackCount;

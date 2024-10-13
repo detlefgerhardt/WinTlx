@@ -31,6 +31,8 @@ namespace WinTlx.Languages
 		MainForm_PeerType6,
 		MainForm_ConnectButton,
 		MainForm_DisconnectButton,
+		MainForm_AnswerbackActiveButton,
+		MainForm_AnswerbackDeactiveButton,
 		MainForm_SendWruButton,
 		MainForm_SendHereisButton,
 		MainForm_SendLettersButton,
@@ -38,8 +40,8 @@ namespace WinTlx.Languages
 		MainForm_SendReturnButton,
 		MainForm_SendLinefeedButton,
 		MainForm_SendBellButton,
-		MainForm_SendNullButton,
-		MainForm_SendNullButton_ToolTip,
+		MainForm_SendCod32Button,
+		MainForm_SendCod32Button_ToolTip,
 		MainForm_SendThirdLevelButton,
 		MainForm_SendThirdLevelButton_ToolTip,
 		MainForm_LineLabel,
@@ -85,6 +87,7 @@ namespace WinTlx.Languages
 		Setup_RemoteBufferSize,
 		Setup_ShowTechnicalMessages,
 		Setup_CodeSet,
+		Setup_UpperCaseChar,
 		Setup_DefaultProtocolOut,
 		Setup_SubscribeServer,
 		Setup_SubscribeServerAddress,
@@ -176,11 +179,11 @@ namespace WinTlx.Languages
 		//Message_ConnectionTimeout,
 		Message_CentralexConnected,
 		Message_CentralexError,
-		Message_Pangram,
+		//Message_Pangram,
 		Message_EyeballCharActive,
 
 		Editor_Header,
-		Editor_Clear,
+		Editor_New,
 		Editor_Load,
 		Editor_Save,
 		Editor_Send,
@@ -228,7 +231,7 @@ namespace WinTlx.Languages
 		TestPattern_Quax,
 		TestPattern_Line,
 		TestPattern_DateTime,
-		TestPattern_DamperTest,
+		TestPattern_DamperTest
 	}
 
 	class Language

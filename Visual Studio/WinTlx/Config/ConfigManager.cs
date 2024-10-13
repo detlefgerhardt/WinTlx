@@ -37,6 +37,7 @@ namespace WinTlx.Config
 				RemoteBufferSize = Constants.DEFAULT_REMOTE_BUFFER_SIZE,
 				ShowTechnicalMessages = true,
 				CodeSet = CodeSets.ITA2,
+				UpperCaseChar = false,
 				DefaultProtocolAscii = false,
 				IncomingLocalPort = Constants.DEFAULT_INCOMING_PORT,
 				IncomingPublicPort = Constants.DEFAULT_INCOMING_PORT,
@@ -88,7 +89,7 @@ namespace WinTlx.Config
 			}
 		}
 
-		public void ChanceConfig()
+		public void ChangeConfig()
 		{
 			ConfigChanged?.Invoke();
 		}

@@ -24,9 +24,6 @@ namespace WinTlx.Languages
 		public static LanguageManager Instance => instance ?? (instance = new LanguageManager());
 
 		public delegate void LanguageChangedEventHandler();
-		/// <summary>
-		/// Language changed event
-		/// </summary>
 		public event LanguageChangedEventHandler LanguageChanged;
 
 		public List<Language> LanguageList { get; private set; }

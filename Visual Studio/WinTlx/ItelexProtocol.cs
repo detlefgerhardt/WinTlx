@@ -45,8 +45,6 @@ namespace WinTlx
 			Disconnected,
 			TcpConnected, // after TCP connect and before first data (texting mode unknown)
 			Connected, // after direct dial cmd was received or direct dial = 0
-			//AsciiTexting,
-			//ItelexTexting, // = baudot texting
 			ItelexDisconnected // waiting for reconnect
 		}
 
@@ -122,6 +120,7 @@ namespace WinTlx
 
 		private long _lastSendRecvIdleMs;
 		private long _lastSentMs;
+
 		public int IdleTimerMs
 		{
 			get
@@ -167,7 +166,7 @@ namespace WinTlx
 				else
 				{
 					int secs = (int)(DateTime.Now.Subtract(_connStartTime.Value).Ticks / 10000000);
-					if (secs<120)
+					if (secs < 120)
 					{
 						return $"{secs} s";
 					}
@@ -223,7 +222,7 @@ namespace WinTlx
 			set
 			{
 				_connectionState = value;
-				_debugManager.Write($"connectionState = {_connectionState}\r\n", DebugManager.Modes.Message);
+				_debugManager.WriteLine($"connectionState = {_connectionState}", DebugManager.Modes.Message);
 			}
 		}
 
@@ -383,8 +382,9 @@ namespace WinTlx
 			else
 			{
 				// no direct dial command neccessary
-				ConnectInit();
+				//ConnectInit();
 			}
+			ConnectInit();
 			ConnectionState = ConnectionStates.TcpConnected;
 			_connectionDirection = ConnectionDirections.In;
 			StartReceive();
@@ -411,26 +411,16 @@ namespace WinTlx
 			}
 			if (Texting == Textings.Unknown) Texting = Textings.Ascii;
 			Logging.Instance.Debug(TAG, nameof(Listener), $"ConnectionState={ConnectionState} Texting={Texting} ElapsedMilliseconds={timer.ElapsedMilliseconds}ms");
-			//_debugManager.Write($"Texting = {Texting}\r\n", DebugManager.Modes.Message);
+			//_debugManager.WriteLine($"Texting = {Texting}", DebugManager.Modes.Message);
 			ConnectionState = ConnectionStates.Connected;
 
-			while (true)
-			{
-				if (_client == null)
-					return;
-				if (!_client.Connected)
-					break;
-			}
-
-			Disconnect();
-			_connectionDirection = ConnectionDirections.Out;
-
+			return;
 		}
 
 		public async Task<bool> ConnectOut(string host, int port, int? extensionNumber, bool asciiMode = false)
 		{
 			RejectReason = null;
-			bool status = await Task.Run(async () =>
+			bool status = await Task.Run(() =>
 			{
 				string logMsg;
 				try
@@ -456,7 +446,7 @@ namespace WinTlx
 					}
 
 					string asciiMsg = asciiMode ? "(ascii)" : "";
-					_debugManager.Write($"connect to {host}:{port} ext={extensionNumber} {asciiMsg} ipv4={ipv4Str}\r\n", DebugManager.Modes.Message);
+					_debugManager.WriteLine($"connect to {host}:{port} ext={extensionNumber} {asciiMsg} ipv4={ipv4Str}", DebugManager.Modes.Message);
 
 					_tcpClientWithTimeout = new TcpClientWithTimeout(ipv4Str, port, Constants.TCPCLIENT_TIMEOUT);
 					_client = _tcpClientWithTimeout.Connect();
@@ -468,7 +458,7 @@ namespace WinTlx
 						return false;
 					}
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
 					logMsg = "connect failed, timeout";
 					BufferManager.Instance.LocalOutputMessage(LngText(LngKeys.Message_ConnectionError), logMsg, true, true);
@@ -488,48 +478,53 @@ namespace WinTlx
 
 				StartReceive();
 
+				//SendEndCmd();
+				//return false;
+
+				TickTimer waitTexting = new TickTimer();
+				while (!waitTexting.IsElapsedMilliseconds(2000) && Texting == Textings.Unknown)
+				{
+				}
+				if (Texting == Textings.Ascii) asciiMode = true;
+
+				Debug.WriteLine($"Connect out: {asciiMode} ");
+
 				if (!asciiMode)
 				{
-					return await ConnectOutItelex(extensionNumber);
-					//if (Texting == Textings.Ascii)
-					//{
-					//	return await ConnectOutAscii(extensionNumber);
-					//}
+					return ConnectOutItelex(extensionNumber);
 				}
 				else
 				{
-					return await ConnectOutAscii(extensionNumber);
+					return ConnectOutAscii(extensionNumber);
 				}
 			});
 			return status;
 		}
 
-		private async Task<bool> ConnectOutItelex(int? extensionNumber)
+		private bool ConnectOutItelex(int? extensionNumber)
 		{
-			// wait 2 seconds for ascii code (ascii texting)
-
 			TickTimer timer = new TickTimer();
-			while (timer.ElapsedMilliseconds < 2000)
+			while (timer.ElapsedMilliseconds < 500)
 			{
 				if (Texting != Textings.Unknown) break;
 				if (ConnectionState == ConnectionStates.Disconnected) return false;
-				await Task.Delay(100);
+				//await Task.Delay(100);
+				Thread.Sleep(100);
 			}
-			Logging.Instance.Debug(TAG, nameof(ConnectOutItelex), $"ConnectionState={ConnectionState} Texting={Texting} ElapsedMilliseconds={timer.ElapsedMilliseconds}ms");
 
-			if (ConnectionState == ConnectionStates.Disconnected) return false;
-			if (Texting == Textings.Ascii) return true;
- 
+			SendHeartbeatCmd();
 			SendVersionCodeCmd();
 
-			// wait 4 seconds for version cmd and extension cmd from remote
+			// wait 10 seconds for version cmd and extension cmd from remote
 
+			timer = new TickTimer();
 			timer.Start();
 			while (!timer.IsElapsedMilliseconds(10000))
 			{
 				if (RemoteVersion != null) break;
 				if (ConnectionState == ConnectionStates.Disconnected) return false;
-				await Task.Delay(100);
+				//await Task.Delay(100);
+				Thread.Sleep(100);
 			}
 
 			if (RemoteVersion == null)
@@ -553,7 +548,7 @@ namespace WinTlx
 			if (Texting == Textings.Unknown)
 			{
 				Texting = _config.DefaultProtocolAscii ? Textings.Ascii : Textings.Itelex;
-				_debugManager.Write($"set protocol to default {Texting}\r\n", DebugManager.Modes.Message);
+				_debugManager.WriteLine($"set protocol to default {Texting}", DebugManager.Modes.Message);
 			}
 
 			if (Texting == Textings.Ascii) return true;
@@ -572,15 +567,16 @@ namespace WinTlx
 			while (timer.ElapsedMilliseconds < 2000)
 			{
 				if (ConnectionState == ConnectionStates.Disconnected) return false;
-				await Task.Delay(100);
+				//await Task.Delay(100);
+				Thread.Sleep(100);
 			}
 
 			return true;
 		}
 
-		public async Task<bool> ConnectOutAscii(int? extensionNumber)
+		public bool ConnectOutAscii(int? extensionNumber)
 		{
-			await Task.Delay(1000);
+			//await Task.Delay(1000);
 
 			Texting = Textings.Ascii;
 			if (_config.ShowTechnicalMessages)
@@ -588,13 +584,13 @@ namespace WinTlx
 				Message?.Invoke($"ascii texting", true);
 			}
 			Logging.Instance.Info(TAG, nameof(ConnectOut), $"ascii texting");
-			_debugManager.Write($"ConnectionState1 = {ConnectionState}", DebugManager.Modes.Recv);
+			//_debugManager.WriteLine($"ConnectionState1 = {ConnectionState}", DebugManager.Modes.Recv);
 			int ext = extensionNumber.GetValueOrDefault();
 			if (extensionNumber.GetValueOrDefault() != 0)
 			{
 				SendAsciiText($"*{ext}*");
 			}
-			SendAsciiText("\r\n");
+			//SendAsciiText("\r\n");
 			ConnectionState = ConnectionStates.Connected;
 			Update?.Invoke();
 			return true;
@@ -613,7 +609,7 @@ namespace WinTlx
 			{
 				case CentralexConnectResults.Ok:
 					msg = $"connected to centralex {host}:{port}";
-					_debugManager.Write($"ConnectionState1 = {ConnectionState}", DebugManager.Modes.Recv);
+					_debugManager.WriteLine($"CentralexState = {CentralexState} {msg}", DebugManager.Modes.Recv);
 					RecvOn = true;
 					success = true;
 					break;
@@ -639,7 +635,7 @@ namespace WinTlx
 			}
 
 			Logging.Instance.Info(TAG, nameof(CentralexConnectAsync), msg);
-			_debugManager.Write(msg, DebugManager.Modes.Message);
+			_debugManager.WriteLine(msg, DebugManager.Modes.Message);
 			if (_config.ShowTechnicalMessages)
 			{
 				Message?.Invoke(msg, true);
@@ -677,6 +673,8 @@ namespace WinTlx
 			}
 
 			CentralexState = CentralexStates.CentralexConnect;
+			_debugManager.WriteLine($"CentralexState = {CentralexState}", DebugManager.Modes.Message);
+
 			StartReceive();
 
 			SendConnectRemoteCmd(_config.OwnNumber, _config.SubscribeServerUpdatePin);
@@ -689,7 +687,7 @@ namespace WinTlx
 				{
 					break;
 				}
-				if (sw.ElapsedMilliseconds > 5000)
+				if (sw.ElapsedMilliseconds > 10000)
 				{
 					Disconnect();
 					return CentralexConnectResults.TimeoutError;
@@ -713,8 +711,9 @@ namespace WinTlx
 		{
 			SendEndCmd();
 			Thread.Sleep(2000);
-			Disconnect();
 			CentralexState = CentralexStates.None;
+			_debugManager.WriteLine($"CentralexState = {CentralexState}", DebugManager.Modes.Message);
+			Disconnect();
 			RecvOn = false;
 		}
 
@@ -798,6 +797,8 @@ namespace WinTlx
 
 			if (CentralexState == CentralexStates.CentralexConnected)
 			{
+				//CentralexState = CentralexStates.CentralexConnect;
+				//_debugManager.WriteLine($"CentralexState = {CentralexState}", DebugManager.Modes.Message);
 				_centralexReconnectTimer.Interval = 5000;
 				_centralexReconnectTimer.Start();
 			}
@@ -900,7 +901,7 @@ namespace WinTlx
 					}
 					if (timeout != null)
 					{
-						_debugManager.Write($"{timeout} {_ack.LastAckChanged.ElapsedMilliseconds}", DebugManager.Modes.Message);
+						_debugManager.WriteLine($"{timeout} {_ack.LastAckChanged.ElapsedMilliseconds}", DebugManager.Modes.Message);
 						//_ack.SendCnt = _ack.SendAckCnt;
 					}
 				}
@@ -925,10 +926,7 @@ namespace WinTlx
 
 		public void SendAsciiText(string asciiStr)
 		{
-			if (string.IsNullOrEmpty(asciiStr))
-			{
-				return;
-			}
+			if (string.IsNullOrEmpty(asciiStr)) return;
 
 			string telexData = CodeManager.AsciiStringToTelex(asciiStr, _config.CodeSet);
 			Send?.Invoke(CodeManager.AsciiWithBaudotEscCodeToAscii(asciiStr, _keyStates));
@@ -1008,12 +1006,13 @@ namespace WinTlx
 			}
 			List<byte> data = new List<byte>();
 			data.Add(VersionCode);
-			for (int i=0; i<version.Length; i++)
+			int len = version.Length <= 5 ? version.Length : 5;
+			for (int i=0; i<len; i++)
 			{
 				//if (char.IsDigit(version[i])) data.Add((byte)version[i]);
 				data.Add((byte)version[i]);
 			}
-			data.Add(0x00);
+			if (data.Count < 6) data.Add(0x00);
 
 			SendCmd(ItelexCommands.ProtocolVersion, data.ToArray());
 		}
@@ -1140,6 +1139,8 @@ namespace WinTlx
 
 			_debugManager.WriteCmd(packet, DebugManager.Modes.Send, _ack);
 
+			if (_client?.Client == null) return;
+
 			try
 			{
 				_client.Client.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, EndSend, null);
@@ -1226,16 +1227,17 @@ namespace WinTlx
 			{
 				if (newData[0] <= 0x09 || newData[0] >= 0x10 && newData[0] < 0x1F)
 				{
-					_debugManager.Write($"Recv char {newData[0]:X02} -> i-Telex\r\n", DebugManager.Modes.Recv);
+					_debugManager.WriteLine($"Recv char {newData[0]:X02} -> i-Telex", DebugManager.Modes.Recv);
 					List<string> dmp = Helper.DumpByteArrayStr(newData, 0);
-					_debugManager.Write($"Recv dump {dmp[0]}", DebugManager.Modes.Recv);
+					_debugManager.WriteLine($"Recv dump {dmp[0]}", DebugManager.Modes.Recv);
 					Texting = Textings.Itelex;
 				}
 				else
 				{
-					_debugManager.Write($"Recv char {newData[0]:X02} -> ASCII\r\n", DebugManager.Modes.Recv);
+					_debugManager.WriteLine($"Recv char {newData[0]:X02} -> ASCII", DebugManager.Modes.Recv);
 					Texting = Textings.Ascii;
 				}
+				Debug.WriteLine($"recv {Texting}");
 			}
 
 			try
@@ -1243,6 +1245,7 @@ namespace WinTlx
 				if (Texting == Textings.Ascii)
 				{   // ascii
 					string asciiText = Encoding.ASCII.GetString(newData, 0, newData.Length);
+					Debug.WriteLine($"recv ascii: {asciiText}");
 					asciiText = asciiText.Replace('@', CodeManager.ASC_WRU);
 					Received?.Invoke(asciiText);
 					_lastSendRecvIdleMs = Helper.GetTicksMs();
@@ -1344,13 +1347,15 @@ namespace WinTlx
 						ConnectInit();
 					}
 					else
-					{   // not connected
-						byte[] data = Encoding.ASCII.GetBytes("nc" + 0x00);
+					{   // invalid extension
+						byte[] data = Encoding.ASCII.GetBytes("nc" + (char)0x00);
 						SendCmd(ItelexCommands.Reject, data);
 						if (_config.ShowTechnicalMessages)
 						{
-							Message?.Invoke($"send reject ncc", true);
+							Message?.Invoke($"send reject nc", true);
 						}
+						SendEndCmd();
+						Thread.Sleep(2000);
 						Disconnect();
 					}
 					break;
@@ -1390,6 +1395,7 @@ namespace WinTlx
 					if (CentralexState == CentralexStates.CentralexConnect && RejectReason == "na")
 					{
 						CentralexState = CentralexStates.CentralexRejected;
+						_debugManager.WriteLine($"CentralexState = {CentralexState}", DebugManager.Modes.Message);
 					}
 					else
 					{
@@ -1430,6 +1436,7 @@ namespace WinTlx
 
 				case ItelexCommands.RemoteConfirm:
 					CentralexState = CentralexStates.CentralexConnected;
+					_debugManager.WriteLine($"CentralexState = {CentralexState}", DebugManager.Modes.Message);
 					break;
 
 				case ItelexCommands.RemoteCall:
@@ -1440,6 +1447,7 @@ namespace WinTlx
 					*/
 					Message?.Invoke($"{LngText(LngKeys.Message_IncomingConnection)} centralex", true);
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"incoming connection from centralex");
+					_debugManager.WriteLine($"Centralex RemoteCall", DebugManager.Modes.Message);
 					ConnectIn();
 					/*
 					if (_config.IncomingExtensionNumber != 0)
@@ -1497,7 +1505,6 @@ namespace WinTlx
 		{
 			Disconnect();
 		}
-
 	}
 
 	public class Acknowledge
@@ -1557,7 +1564,7 @@ namespace WinTlx
 		{
 			if (RemoteBufferCount > 0 && LastAckChanged.IsElapsedSeconds(5))
 			{
-				Debug.WriteLine($"Ackchange timeout {RemoteBufferCount} {LastAckChanged.ElapsedMilliseconds}");
+				//Debug.WriteLine($"Ackchange timeout {RemoteBufferCount} {LastAckChanged.ElapsedMilliseconds}");
 			}
 			return RemoteBufferCount > 0 && LastAckChanged.IsElapsedSeconds(5);
 		}
@@ -1567,8 +1574,7 @@ namespace WinTlx
 			get
 			{
 				int send = SendCnt;
-				if (SendAckCnt > send)
-					send += 256;
+				if (SendAckCnt > send) send += 256;
 				return send - SendAckCnt;
 			}
 		}
@@ -1578,8 +1584,7 @@ namespace WinTlx
 			get
 			{
 				int recv = ReceivedCnt;
-				if (ReceivedAckCnt > recv)
-					recv += 256;
+				if (ReceivedAckCnt > recv) recv += 256;
 				return recv - ReceivedAckCnt;
 			}
 		}

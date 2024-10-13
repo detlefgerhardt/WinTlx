@@ -34,7 +34,8 @@ namespace WinTlx
 			string buildTime = Properties.Resources.BuildDate.Trim(new char[] { '\n', '\r' });
 			buildTime = buildTime.Substring(0, 10);
 #endif
-			return $"{Constants.PROGRAM_NAME}  V{Application.ProductVersion}  (Build={buildTime})";
+			string betaStr = Constants.BETA ? "beta" : "";
+			return $"{Constants.PROGRAM_NAME}  V{Application.ProductVersion}{betaStr}  (Build={buildTime})";
 		}
 
 		public static string GetVersionString()
@@ -68,6 +69,12 @@ namespace WinTlx
 				return null;
 			}
 			return dt;
+		}
+
+		public static void DumpStr(string str)
+		{
+			byte[] bytes = Encoding.ASCII.GetBytes(str);
+			DumpByteArray(bytes, 0);
 		}
 
 		public static void DumpByteArray(byte[] buffer, int pos, int len = -1)

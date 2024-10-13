@@ -12,7 +12,7 @@ namespace WinTlx.Codes
 
 		public AsciiConvItem[] AsciiTab => new AsciiConvItem[]
 		{
-			new AsciiConvItem(0x00, CodeManager.ASC_NUL),
+			new AsciiConvItem(0x00, CodeManager.ASC_CODE32),
 			new AsciiConvItem(0x05, CodeManager.ASC_WRU),
 			new AsciiConvItem(0x07, CodeManager.ASC_BEL),
 			new AsciiConvItem(0x0A, CodeManager.ASC_LF),
@@ -24,6 +24,8 @@ namespace WinTlx.Codes
 			new AsciiConvItem(0x1F, CodeManager.ASC_FIGS),
 			new AsciiConvItem(0x20, ' '),
 			new AsciiConvItem(0x22, "''"), // "
+			new AsciiConvItem(0x25, "o/o"), // %
+			new AsciiConvItem(0x26, '+'), // &
 			new AsciiConvItem(0x27, '\''),
 			new AsciiConvItem(0x28, '('),
 			new AsciiConvItem(0x29, ')'),
@@ -47,7 +49,7 @@ namespace WinTlx.Codes
 			new AsciiConvItem(0x60, '\''), // `
 			new AsciiConvItem(0x61, 0x7A, 'a'), // a..z
 			new AsciiConvItem(0x7B, "(,"), // {
-			new AsciiConvItem(0x7C, '/'),
+			new AsciiConvItem(0x7C, '/'), // |
 			new AsciiConvItem(0x7D, ",)"), // }
 			new AsciiConvItem(0x7E, '-'), // ~
 		};
@@ -56,7 +58,7 @@ namespace WinTlx.Codes
 		{
 			new CodeItem(
 				0x00,
-				CodeManager.ASC_NUL, "NUL"
+				CodeManager.ASC_CODE32, "COD32"
 			),
 			new CodeItem(
 				0x01,

@@ -91,7 +91,7 @@ namespace WinTlx.TextEditor
 			Logging.Instance.Log(LogTypes.Info, TAG, nameof(LanguageChanged), $"switch language to {LanguageManager.Instance.CurrentLanguage.Key}");
 
 			ShowTitle();
-			ClearBtn.Text = LngText(LngKeys.Editor_Clear);
+			NewBtn.Text = LngText(LngKeys.Editor_New);
 			LoadBtn.Text = LngText(LngKeys.Editor_Load);
 			SaveBtn.Text = LngText(LngKeys.Editor_Save);
 			SendBtn.Text = LngText(LngKeys.Editor_Send);
@@ -154,10 +154,11 @@ namespace WinTlx.TextEditor
 			ShowTitle();
 		}
 
-		private void ClearBtn_Click(object sender, EventArgs e)
+		private void NewBtn_Click(object sender, EventArgs e)
 		{
-			_tem.Text = "";
+			_tem.New();
 			EditorRtb.Text = _tem.Text;
+			SetTitle();
 		}
 
 		private void LoadBtn_Click(object sender, EventArgs e)

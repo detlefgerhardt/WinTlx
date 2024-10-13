@@ -55,6 +55,8 @@
 			this.LimitedClientCb = new System.Windows.Forms.CheckBox();
 			this.LimitedClientLbl = new System.Windows.Forms.Label();
 			this.GeneralGb = new System.Windows.Forms.GroupBox();
+			this.UpperCaseChrCb = new System.Windows.Forms.CheckBox();
+			this.UpperCaseChrLbl = new System.Windows.Forms.Label();
 			this.LogFilePathTb = new System.Windows.Forms.TextBox();
 			this.LogfilePathLbl = new System.Windows.Forms.Label();
 			this.LanguageLbl = new System.Windows.Forms.Label();
@@ -67,6 +69,8 @@
 			this.SubscribeServerAddress2Tb = new System.Windows.Forms.TextBox();
 			this.SubscribeServerAddress2Lbl = new System.Windows.Forms.Label();
 			this.ItelexGb = new System.Windows.Forms.GroupBox();
+			this.ShowTechnicalMessagesCb = new System.Windows.Forms.CheckBox();
+			this.ShowTechnicalMessagesLbl = new System.Windows.Forms.Label();
 			this.RemoteBufferSizeTb = new System.Windows.Forms.TextBox();
 			this.RemoteBufferSizeLbl = new System.Windows.Forms.Label();
 			this.DefaultProtocolOutAsciiRb = new System.Windows.Forms.RadioButton();
@@ -80,8 +84,6 @@
 			this.ServerDataHintLbl = new System.Windows.Forms.Label();
 			this.OptionsLbl = new System.Windows.Forms.Label();
 			this.OptionsTb = new System.Windows.Forms.TextBox();
-			this.ShowTechnicalMessagesLbl = new System.Windows.Forms.Label();
-			this.ShowTechnicalMessagesCb = new System.Windows.Forms.CheckBox();
 			this.IncomingGb.SuspendLayout();
 			this.GeneralGb.SuspendLayout();
 			this.SubscribeServerGb.SuspendLayout();
@@ -156,7 +158,7 @@
 			// SaveBtn
 			// 
 			this.SaveBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.SaveBtn.Location = new System.Drawing.Point(501, 415);
+			this.SaveBtn.Location = new System.Drawing.Point(501, 438);
 			this.SaveBtn.Name = "SaveBtn";
 			this.SaveBtn.Size = new System.Drawing.Size(75, 23);
 			this.SaveBtn.TabIndex = 29;
@@ -167,7 +169,7 @@
 			// CancelBtn
 			// 
 			this.CancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.CancelBtn.Location = new System.Drawing.Point(418, 415);
+			this.CancelBtn.Location = new System.Drawing.Point(418, 438);
 			this.CancelBtn.Name = "CancelBtn";
 			this.CancelBtn.Size = new System.Drawing.Size(75, 23);
 			this.CancelBtn.TabIndex = 28;
@@ -227,7 +229,7 @@
 			// 
 			// IdleTimeoutTb
 			// 
-			this.IdleTimeoutTb.Location = new System.Drawing.Point(184, 41);
+			this.IdleTimeoutTb.Location = new System.Drawing.Point(184, 67);
 			this.IdleTimeoutTb.Name = "IdleTimeoutTb";
 			this.IdleTimeoutTb.Size = new System.Drawing.Size(54, 20);
 			this.IdleTimeoutTb.TabIndex = 9;
@@ -235,7 +237,7 @@
 			// IdleTimeoutLbl
 			// 
 			this.IdleTimeoutLbl.AutoSize = true;
-			this.IdleTimeoutLbl.Location = new System.Drawing.Point(10, 44);
+			this.IdleTimeoutLbl.Location = new System.Drawing.Point(11, 70);
 			this.IdleTimeoutLbl.Name = "IdleTimeoutLbl";
 			this.IdleTimeoutLbl.Size = new System.Drawing.Size(87, 13);
 			this.IdleTimeoutLbl.TabIndex = 17;
@@ -244,7 +246,7 @@
 			// OutputSpeedLbl
 			// 
 			this.OutputSpeedLbl.AutoSize = true;
-			this.OutputSpeedLbl.Location = new System.Drawing.Point(10, 70);
+			this.OutputSpeedLbl.Location = new System.Drawing.Point(11, 44);
 			this.OutputSpeedLbl.Name = "OutputSpeedLbl";
 			this.OutputSpeedLbl.Size = new System.Drawing.Size(105, 13);
 			this.OutputSpeedLbl.TabIndex = 18;
@@ -252,7 +254,7 @@
 			// 
 			// OutputSpeedTb
 			// 
-			this.OutputSpeedTb.Location = new System.Drawing.Point(184, 67);
+			this.OutputSpeedTb.Location = new System.Drawing.Point(184, 41);
 			this.OutputSpeedTb.Name = "OutputSpeedTb";
 			this.OutputSpeedTb.Size = new System.Drawing.Size(54, 20);
 			this.OutputSpeedTb.TabIndex = 10;
@@ -311,6 +313,8 @@
 			// 
 			// GeneralGb
 			// 
+			this.GeneralGb.Controls.Add(this.UpperCaseChrCb);
+			this.GeneralGb.Controls.Add(this.UpperCaseChrLbl);
 			this.GeneralGb.Controls.Add(this.LogFilePathTb);
 			this.GeneralGb.Controls.Add(this.LogfilePathLbl);
 			this.GeneralGb.Controls.Add(this.LanguageLbl);
@@ -321,10 +325,27 @@
 			this.GeneralGb.Controls.Add(this.CodeSetCb);
 			this.GeneralGb.Location = new System.Drawing.Point(12, 12);
 			this.GeneralGb.Name = "GeneralGb";
-			this.GeneralGb.Size = new System.Drawing.Size(307, 133);
+			this.GeneralGb.Size = new System.Drawing.Size(307, 155);
 			this.GeneralGb.TabIndex = 1;
 			this.GeneralGb.TabStop = false;
 			this.GeneralGb.Text = "General";
+			// 
+			// UpperCaseChrCb
+			// 
+			this.UpperCaseChrCb.Location = new System.Drawing.Point(141, 128);
+			this.UpperCaseChrCb.Name = "UpperCaseChrCb";
+			this.UpperCaseChrCb.Size = new System.Drawing.Size(15, 14);
+			this.UpperCaseChrCb.TabIndex = 27;
+			this.UpperCaseChrCb.UseVisualStyleBackColor = true;
+			// 
+			// UpperCaseChrLbl
+			// 
+			this.UpperCaseChrLbl.AutoSize = true;
+			this.UpperCaseChrLbl.Location = new System.Drawing.Point(10, 127);
+			this.UpperCaseChrLbl.Name = "UpperCaseChrLbl";
+			this.UpperCaseChrLbl.Size = new System.Drawing.Size(117, 13);
+			this.UpperCaseChrLbl.TabIndex = 25;
+			this.UpperCaseChrLbl.Text = "Show upper case char.";
 			// 
 			// LogFilePathTb
 			// 
@@ -396,7 +417,7 @@
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortLbl);
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerAddress1Lbl);
 			this.SubscribeServerGb.Controls.Add(this.SubscribeServerPortTb);
-			this.SubscribeServerGb.Location = new System.Drawing.Point(12, 306);
+			this.SubscribeServerGb.Location = new System.Drawing.Point(12, 329);
 			this.SubscribeServerGb.Name = "SubscribeServerGb";
 			this.SubscribeServerGb.Size = new System.Drawing.Size(307, 128);
 			this.SubscribeServerGb.TabIndex = 12;
@@ -448,12 +469,29 @@
 			this.ItelexGb.Controls.Add(this.IdleTimeoutLbl);
 			this.ItelexGb.Controls.Add(this.OutputSpeedTb);
 			this.ItelexGb.Controls.Add(this.OutputSpeedLbl);
-			this.ItelexGb.Location = new System.Drawing.Point(12, 151);
+			this.ItelexGb.Location = new System.Drawing.Point(12, 174);
 			this.ItelexGb.Name = "ItelexGb";
 			this.ItelexGb.Size = new System.Drawing.Size(307, 149);
 			this.ItelexGb.TabIndex = 6;
 			this.ItelexGb.TabStop = false;
 			this.ItelexGb.Text = "i-Telex";
+			// 
+			// ShowTechnicalMessagesCb
+			// 
+			this.ShowTechnicalMessagesCb.Location = new System.Drawing.Point(184, 119);
+			this.ShowTechnicalMessagesCb.Name = "ShowTechnicalMessagesCb";
+			this.ShowTechnicalMessagesCb.Size = new System.Drawing.Size(15, 14);
+			this.ShowTechnicalMessagesCb.TabIndex = 27;
+			this.ShowTechnicalMessagesCb.UseVisualStyleBackColor = true;
+			// 
+			// ShowTechnicalMessagesLbl
+			// 
+			this.ShowTechnicalMessagesLbl.AutoSize = true;
+			this.ShowTechnicalMessagesLbl.Location = new System.Drawing.Point(10, 120);
+			this.ShowTechnicalMessagesLbl.Name = "ShowTechnicalMessagesLbl";
+			this.ShowTechnicalMessagesLbl.Size = new System.Drawing.Size(130, 13);
+			this.ShowTechnicalMessagesLbl.TabIndex = 27;
+			this.ShowTechnicalMessagesLbl.Text = "Show technical messages";
 			// 
 			// RemoteBufferSizeTb
 			// 
@@ -577,28 +615,11 @@
 			this.OptionsTb.Enter += new System.EventHandler(this.OptionsTb_Enter);
 			this.OptionsTb.Leave += new System.EventHandler(this.OptionsTb_Leave);
 			// 
-			// ShowTechnicalMessagesLbl
-			// 
-			this.ShowTechnicalMessagesLbl.AutoSize = true;
-			this.ShowTechnicalMessagesLbl.Location = new System.Drawing.Point(10, 120);
-			this.ShowTechnicalMessagesLbl.Name = "ShowTechnicalMessagesLbl";
-			this.ShowTechnicalMessagesLbl.Size = new System.Drawing.Size(130, 13);
-			this.ShowTechnicalMessagesLbl.TabIndex = 27;
-			this.ShowTechnicalMessagesLbl.Text = "Show technical messages";
-			// 
-			// ShowTechnicalMessagesCb
-			// 
-			this.ShowTechnicalMessagesCb.Location = new System.Drawing.Point(184, 119);
-			this.ShowTechnicalMessagesCb.Name = "ShowTechnicalMessagesCb";
-			this.ShowTechnicalMessagesCb.Size = new System.Drawing.Size(15, 14);
-			this.ShowTechnicalMessagesCb.TabIndex = 27;
-			this.ShowTechnicalMessagesCb.UseVisualStyleBackColor = true;
-			// 
 			// ConfigForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(590, 446);
+			this.ClientSize = new System.Drawing.Size(590, 469);
 			this.Controls.Add(this.OptionsTb);
 			this.Controls.Add(this.OptionsLbl);
 			this.Controls.Add(this.ServerDataHintLbl);
@@ -684,5 +705,7 @@
 		private System.Windows.Forms.TextBox OptionsTb;
 		private System.Windows.Forms.CheckBox ShowTechnicalMessagesCb;
 		private System.Windows.Forms.Label ShowTechnicalMessagesLbl;
+		private System.Windows.Forms.CheckBox UpperCaseChrCb;
+		private System.Windows.Forms.Label UpperCaseChrLbl;
 	}
 }

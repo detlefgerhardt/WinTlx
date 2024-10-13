@@ -17,26 +17,22 @@ namespace WinTlx.Codes
 		Both
 	}
 
-	//public enum ThirdLevelStates { Inactive = 0, Active = 1}
-
 	public static class CodeManager
 	{
-		// F=Quadrat ohne Inhalt., G=Quadrat mit Querstrich, H=Quadrat mit Schrägstrich
-
-		// special ASCII codes
+		// ASCII representation of special ITA2 codes
 		public const char ASC_INVALID = '~'; // replace invalid baudot character
-		public const char ASC_NUL = '\x00';
-		public const char ASC_WRU = '\x05'; // = enquire
-		public const char ASC_BEL = '\x07';
-		public const char ASC_HEREIS = '\x09';
-		public const char ASC_LF = '\x0A';
-		public const char ASC_CR = '\x0D';
-		public const char ASC_SHIFTF = '\x10';
-		public const char ASC_SHIFTG = '\x11';
-		public const char ASC_SHIFTH = '\x12';
+		public const char ASC_CODE32 = '\x00'; // ASCII Code32 (Null)
+		public const char ASC_WRU = '\x05'; // ASCII Enquire
+		public const char ASC_BEL = '\x07'; // ASCII Bell
+		public const char ASC_HEREIS = '\x09'; // ASCII Tab
+		public const char ASC_LF = '\x0A'; // ASCII Line Feed
+		public const char ASC_CR = '\x0D'; // ASCII Carriage Return
+		public const char ASC_SHIFTF = '\x10'; // Quadrat ohne Inhalt
+		public const char ASC_SHIFTG = '\x11'; // Quadrat mit Querstrich
+		public const char ASC_SHIFTH = '\x12'; // Quadrat mit Schrägstrich
 		public const char ASC_LTRS = '\x1E';
 		public const char ASC_FIGS = '\x1F';
-		public const char ASC_SPC = '\x20';
+		public const char ASC_SPC = '\x20'; // ASCII Space
 
 		// special ITA2 codes
 		public const byte BAU_NUL = 0x00;
@@ -77,7 +73,7 @@ namespace WinTlx.Codes
 					{
 						keyStates.ShiftState = ShiftStates.Third;
 					}
-					if (debug) asciiStr += ASC_NUL;
+					if (debug) asciiStr += ASC_CODE32;
 				}
 				else
 				{
@@ -343,7 +339,7 @@ namespace WinTlx.Codes
 				{
 					switch (ascCode)
 					{
-						case ASC_NUL:
+						case ASC_CODE32:
 							newChr = "[NU]";
 							break;
 						case ASC_WRU:
@@ -394,29 +390,6 @@ namespace WinTlx.Codes
 			return null;
 		}
 
-		/*
-		public static CodeItem FindBaudot(char asciiChar, KeyStates keyStates)
-		{
-			for (byte c = 0; c < 32; c++)
-			{
-				CodeItem codeItem = GetCodeItem(keyStates.CodeSet, c);
-
-				if (codeItem.GetChar(ShiftStates.Ltr, keyStates.ThirdLevelState) == asciiChar)
-				{
-					keyStates.ShiftState = ShiftStates.Ltr;
-					return codeItem;
-				}
-				if (codeItem.GetChar(ShiftStates.Figs, keyStates.ThirdLevelState) == asciiChar)
-				{
-					keyStates.ShiftState = ShiftStates.Figs;
-					return codeItem;
-				}
-			}
-			keyStates.ShiftState = ShiftStates.Unknown;
-			return null;
-		}
-		*/
-
 		private static string CodePageToPlainAscii(char asciiChar, CodeSets codeSet)
 		{
 			switch (asciiChar)
@@ -461,7 +434,7 @@ namespace WinTlx.Codes
 						return asciiChar.ToString();
 					}
 					else if (asciiChar >= 0x0410 && asciiChar <= 0x044F)
-					{
+					{	// russian characters
 						return asciiChar.ToString();
 					}
 					else
@@ -583,7 +556,7 @@ namespace WinTlx.Codes
 
 		private static Dictionary<char, string> _codeNamesDe = new Dictionary<char, string>()
 		{
-			{ ASC_NUL, "NUL" },
+			{ ASC_CODE32, "COD32" },
 			{ ASC_CR, "WR" },
 			{ ASC_SPC, "ZWR" },
 			{ ASC_LF, "ZL" },
@@ -595,7 +568,7 @@ namespace WinTlx.Codes
 
 		private static Dictionary<char, string> _codeNamesEn = new Dictionary<char, string>()
 		{
-			{ ASC_NUL, "NUL" },
+			{ ASC_CODE32, "COD32" },
 			{ ASC_CR, "CR" },
 			{ ASC_SPC, "SP" },
 			{ ASC_LF, "LF" },
@@ -607,7 +580,7 @@ namespace WinTlx.Codes
 
 		private static Dictionary<char, string> _codeNamesRu = new Dictionary<char, string>()
 		{
-			{ ASC_NUL, "PYC" },
+			{ ASC_CODE32, "PYC" },
 			{ ASC_CR, "CR" },
 			{ ASC_SPC, "SP" },
 			{ ASC_LF, "LF" },
