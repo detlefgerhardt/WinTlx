@@ -1,6 +1,11 @@
 ﻿# WinTlx
 A Windows test und diagnostic tool for the i-Telex network
 
+## Important notice
+Since WinTlx is intended exclusively as a diagnostic tool, no Telex number is assigned for it
+in the i-Telex network. Participation in the i-Telex network requires at least one real teleprinter.
+Participation only with WinTlx is not possible.
+
 ## Features
 - No i-telex hardware needed (direct TCP/IP connection)
 - Outgoing and incoming connections (with Centralex support)
