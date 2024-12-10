@@ -129,3 +129,5 @@ Version history
           Chg: Technical message in the console can be turned off
 2.2.0beta Chg: Many minor changes and fixes
           New: Config-switch capital letters
+2.2.1     Chg: New info text
+          Chg: Changed from beta to release version
