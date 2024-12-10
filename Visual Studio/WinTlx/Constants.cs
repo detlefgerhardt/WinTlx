@@ -4,7 +4,7 @@
 	{
 		public const string PROGRAM_NAME = "WinTlx";
 
-		public const bool BETA = true;
+		public const bool BETA = false;
 
 		public const string APP_CODE = "wt";
 

@@ -1161,11 +1161,29 @@ namespace WinTlx
 		private void ShowAbout()
 		{
 			SetFocus();
-			string text =
-				$"{Helper.GetVersion()}\r\r" +
-				"by *dg* Detlef Gerhardt\r\r" +
-				"Send feedback to\r" +
-				"feedback@dgerhardt.de or i-telex 211230";
+			string text;
+			if (_configData.Language == "de")
+			{
+				text =
+					$"{Helper.GetVersion()}\r\r" +
+					"von *dg* Detlef Gerhardt\r\r" +
+					"Feedback bitte an\r" +
+					"feedback@dgerhardt.de oder i-telex 7822222\r\r" +
+					"Da WinTlx als Diagnose-Tool gedacht ist, werden dafür keine Telex-Nummern im i-Telex-Netzwerk vergeben.\r" +
+					"Die Teilnahme am i-Telex-Netzwerk erfordert mindestens einen realen Fernschreiber. Eine Teilnahme nur mit WinTlx ist nicht möglich.\r" +
+					"Bitte rufe mit diesem Tool keine i-Telex-Nummern an, wenn du selbst kein Mitglied im i-Telex-Netzwerk bist!";
+			}
+			else
+			{
+				text =
+					$"{Helper.GetVersion()}\r\r" +
+					"by *dg* Detlef Gerhardt\r\r" +
+					"Send feedback to\r" +
+					"feedback@dgerhardt.de or i-telex 7822222\r\r" +
+					"Since WinTlx is intended exclusively as a diagnostic tool, no i-Telex number is assigned for it in the i-Telex network.\r" +
+					"Participation in the i-Telex network requires at least one real teleprinter. Participation only with WinTlx is not possible.\r" +
+					"Please do not use this tool to call i-Telex numbers if you are not a member of the i-Telex network!";
+			}
 			MessageBox.Show(
 				text,
 				$"About {Constants.PROGRAM_NAME}",

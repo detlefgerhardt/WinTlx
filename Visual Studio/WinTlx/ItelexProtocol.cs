@@ -410,6 +410,7 @@ namespace WinTlx
 				Thread.Sleep(100);
 			}
 			if (Texting == Textings.Unknown) Texting = Textings.Ascii;
+			_debugManager.WriteLine($"Texting mode unknown -> ASCII", DebugManager.Modes.Recv);
 			Logging.Instance.Debug(TAG, nameof(Listener), $"ConnectionState={ConnectionState} Texting={Texting} ElapsedMilliseconds={timer.ElapsedMilliseconds}ms");
 			//_debugManager.WriteLine($"Texting = {Texting}", DebugManager.Modes.Message);
 			ConnectionState = ConnectionStates.Connected;
@@ -1237,7 +1238,7 @@ namespace WinTlx
 					_debugManager.WriteLine($"Recv char {newData[0]:X02} -> ASCII", DebugManager.Modes.Recv);
 					Texting = Textings.Ascii;
 				}
-				Debug.WriteLine($"recv {Texting}");
+				//Debug.WriteLine($"recv {Texting}");
 			}
 
 			try
@@ -1270,6 +1271,7 @@ namespace WinTlx
 						{
 							ItelexPacket packet = new ItelexPacket(packetData);
 							DecodePacket(packet);
+							Debug.WriteLine($"{packet}");
 						}
 					}
 				}
