@@ -1572,6 +1572,7 @@ namespace WinTlx
 		public void AddTransCharCount(int n)
 		{
 			SendCnt = (SendCnt + n) % 256;
+			LastAckChanged.Start();
 		}
 
 		public bool IsLastAckCntTimeout()

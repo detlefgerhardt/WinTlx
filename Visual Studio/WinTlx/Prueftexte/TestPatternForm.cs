@@ -84,6 +84,7 @@ namespace WinTlx.Prueftexte
 		private void SendBtn_Click(object sender, EventArgs e)
 		{
 			string pattern = GetTestPattern();
+			PatternSelectCb.Focus();
 			SendEvent?.Invoke(pattern);
 		}
 
