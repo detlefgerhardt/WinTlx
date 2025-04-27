@@ -106,7 +106,7 @@ namespace WinTlx
 		private readonly object DisconnectLock = new object();
 
 		private TcpClientWithTimeout _tcpClientWithTimeout;
-		private TcpClient _client;
+		private TcpClient _tcpClient;
 
 		private readonly System.Timers.Timer _sendTimer;
 		private bool _sendTimerActive;
@@ -226,7 +226,12 @@ namespace WinTlx
 			}
 		}
 
-		public Textings Texting { get; set; }
+		private volatile Textings _texting;
+		public Textings Texting
+		{
+			get { return _texting; }
+			private set { _texting = value; }
+		}
 
 		private ConnectionDirections _connectionDirection;
 
@@ -351,13 +356,10 @@ namespace WinTlx
 			{
 				try
 				{
-					if (!RecvOn)
-					{
-						return;
-					}
+					if (!RecvOn) return;
 
 					// wait for connection
-					_client = _tcpListener.AcceptTcpClient();
+					_tcpClient = _tcpListener.AcceptTcpClient();
 
 					ConnectIn();
 				}
@@ -389,7 +391,7 @@ namespace WinTlx
 			_connectionDirection = ConnectionDirections.In;
 			StartReceive();
 
-			IPAddress remoteAddr = ((IPEndPoint)_client.Client.RemoteEndPoint).Address;
+			IPAddress remoteAddr = ((IPEndPoint)_tcpClient.Client.RemoteEndPoint).Address;
 			if (_config.ShowTechnicalMessages)
 			{
 				Message?.Invoke($"incomming connection {remoteAddr}", true);
@@ -403,14 +405,33 @@ namespace WinTlx
 			Update?.Invoke();
 
 			TickTimer timer = new TickTimer();
-			while (timer.ElapsedMilliseconds < 2000)
+			while (true)
 			{
-				if (Texting != Textings.Unknown) break;
-				if (ConnectionState == ConnectionStates.Disconnected) break;
+				if (timer.ElapsedMilliseconds > 3000)
+				{
+					_debugManager.WriteLine($"Texting mode timeout -> unknown", DebugManager.Modes.Recv);
+					break;
+				}
+				if (ConnectionState == ConnectionStates.Disconnected)
+				{
+					_debugManager.WriteLine($"Disconnected", DebugManager.Modes.Recv);
+					return;
+				}
+				if (Texting != Textings.Unknown)
+				{
+					break;
+				}
 				Thread.Sleep(100);
 			}
-			if (Texting == Textings.Unknown) Texting = Textings.Ascii;
-			_debugManager.WriteLine($"Texting mode unknown -> ASCII", DebugManager.Modes.Recv);
+			if (Texting == Textings.Unknown)
+			{
+				Texting = Textings.Ascii;
+				_debugManager.WriteLine($"Texting mode unknown -> ASCII", DebugManager.Modes.Recv);
+			}
+			else
+			{
+				_debugManager.WriteLine($"Texting mode = {Texting}", DebugManager.Modes.Recv);
+			}
 			Logging.Instance.Debug(TAG, nameof(Listener), $"ConnectionState={ConnectionState} Texting={Texting} ElapsedMilliseconds={timer.ElapsedMilliseconds}ms");
 			//_debugManager.WriteLine($"Texting = {Texting}", DebugManager.Modes.Message);
 			ConnectionState = ConnectionStates.Connected;
@@ -450,8 +471,8 @@ namespace WinTlx
 					_debugManager.WriteLine($"connect to {host}:{port} ext={extensionNumber} {asciiMsg} ipv4={ipv4Str}", DebugManager.Modes.Message);
 
 					_tcpClientWithTimeout = new TcpClientWithTimeout(ipv4Str, port, Constants.TCPCLIENT_TIMEOUT);
-					_client = _tcpClientWithTimeout.Connect();
-					if (_client == null || !_client.Connected)
+					_tcpClient = _tcpClientWithTimeout.Connect();
+					if (_tcpClient == null || !_tcpClient.Connected)
 					{
 						logMsg = "connect failed, timeout";
 						BufferManager.Instance.LocalOutputMessage(LngText(LngKeys.Message_ConnectionError), logMsg, true, true);
@@ -488,7 +509,7 @@ namespace WinTlx
 				}
 				if (Texting == Textings.Ascii) asciiMode = true;
 
-				Debug.WriteLine($"Connect out: {asciiMode} ");
+				//Debug.WriteLine($"Connect out: {asciiMode} ");
 
 				if (!asciiMode)
 				{
@@ -661,8 +682,8 @@ namespace WinTlx
 		{
 			try
 			{
-				_client = new TcpClient(_centralexHost, _centralexPort);
-				if (_client == null || !_client.Connected)
+				_tcpClient = new TcpClient(_centralexHost, _centralexPort);
+				if (_tcpClient == null || !_tcpClient.Connected)
 				{
 					return CentralexConnectResults.TcpError;
 				}
@@ -789,7 +810,7 @@ namespace WinTlx
 
 			ConnectionState = ConnectionStates.Disconnected;
 
-			_client?.Close();
+			_tcpClient?.Close();
 
 			Logging.Instance.Info(TAG, nameof(Disconnect), $"connection dropped");
 
@@ -813,7 +834,7 @@ namespace WinTlx
 			try
 			{
 				_sendTimerActive = true;
-				if (_client != null && !_client.Connected)
+				if (_tcpClient != null && !_tcpClient.Connected)
 				{
 					Logging.Instance.Info(TAG, nameof(SendTimer_Elapsed), $"!_client.Connected");
 					Disconnect();
@@ -934,8 +955,8 @@ namespace WinTlx
 
 			if (Texting == Textings.Ascii)
 			{
-				// TODO
-				if (_client.Client == null)
+				if (ConnectionState == ConnectionStates.Disconnected) return;
+				if (_tcpClient.Client == null)
 				{
 					Disconnect();
 					return;
@@ -949,7 +970,7 @@ namespace WinTlx
 				//asciiStr = asciiStr.Replace(CodeManager.ASC_BEL, '\x07');
 
 				byte[] data = Encoding.ASCII.GetBytes(asciiStr);
-				_client.Client.BeginSend(data, 0, data.Length, SocketFlags.None, EndSend, null);
+				_tcpClient.Client.BeginSend(data, 0, data.Length, SocketFlags.None, EndSend, null);
 			}
 			else
 			{
@@ -1008,6 +1029,7 @@ namespace WinTlx
 			List<byte> data = new List<byte>();
 			data.Add(VersionCode);
 			int len = version.Length <= 5 ? version.Length : 5;
+
 			for (int i=0; i<len; i++)
 			{
 				//if (char.IsDigit(version[i])) data.Add((byte)version[i]);
@@ -1015,6 +1037,7 @@ namespace WinTlx
 			}
 			if (data.Count < 6) data.Add(0x00);
 
+			// data = new List<byte>() { 1 };
 			SendCmd(ItelexCommands.ProtocolVersion, data.ToArray());
 		}
 
@@ -1109,7 +1132,12 @@ namespace WinTlx
 		{
 			if (ConnectionState == ConnectionStates.Disconnected && CentralexState == CentralexStates.None) return;
 
-			if (_client.Client == null)
+			if (cmdCode == 0x03)
+			{
+				Debug.Write("");
+			}
+
+			if (_tcpClient.Client == null)
 			{
 				Disconnect();
 				return;
@@ -1140,11 +1168,11 @@ namespace WinTlx
 
 			_debugManager.WriteCmd(packet, DebugManager.Modes.Send, _ack);
 
-			if (_client?.Client == null) return;
+			if (_tcpClient?.Client == null) return;
 
 			try
 			{
-				_client.Client.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, EndSend, null);
+				_tcpClient.Client.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, EndSend, null);
 			}
 			catch (Exception ex)
 			{
@@ -1157,7 +1185,7 @@ namespace WinTlx
 		{
 			if (ConnectionState == ConnectionStates.Disconnected && CentralexState == CentralexStates.None) return;
 
-			if (_client.Client==null)
+			if (_tcpClient.Client==null)
 			{
 				Disconnect();
 				return;
@@ -1166,7 +1194,7 @@ namespace WinTlx
 			byte[] buffer = new byte[RECV_BUFFERSIZE];
 			try
 			{
-				_client.Client.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, DataReceived, buffer);
+				_tcpClient.Client.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, DataReceived, buffer);
 			}
 			catch
 			{
@@ -1178,7 +1206,7 @@ namespace WinTlx
 		{
 			if (ConnectionState == ConnectionStates.Disconnected && CentralexState == CentralexStates.None) return;
 
-			if (_client.Client == null)
+			if (_tcpClient.Client == null)
 			{
 				Disconnect();
 				return;
@@ -1186,7 +1214,7 @@ namespace WinTlx
 
 			try
 			{
-				_client.Client.EndSend(ar);
+				_tcpClient.Client.EndSend(ar);
 			}
 			catch(Exception)
 			{
@@ -1197,7 +1225,7 @@ namespace WinTlx
 		{
 			if (ConnectionState == ConnectionStates.Disconnected && CentralexState == CentralexStates.None) return;
 
-			if (_client.Client == null)
+			if (_tcpClient.Client == null)
 			{
 				Disconnect();
 				return;
@@ -1207,7 +1235,7 @@ namespace WinTlx
 
 			try
 			{
-				dataReadCount = _client.Client.EndReceive(ar);
+				dataReadCount = _tcpClient.Client.EndReceive(ar);
 			}
 			catch
 			{
@@ -1246,7 +1274,7 @@ namespace WinTlx
 				if (Texting == Textings.Ascii)
 				{   // ascii
 					string asciiText = Encoding.ASCII.GetString(newData, 0, newData.Length);
-					Debug.WriteLine($"recv ascii: {asciiText}");
+					//Debug.WriteLine($"recv ascii: {asciiText}");
 					asciiText = asciiText.Replace('@', CodeManager.ASC_WRU);
 					Received?.Invoke(asciiText);
 					_lastSendRecvIdleMs = Helper.GetTicksMs();
@@ -1271,7 +1299,7 @@ namespace WinTlx
 						{
 							ItelexPacket packet = new ItelexPacket(packetData);
 							DecodePacket(packet);
-							Debug.WriteLine($"{packet}");
+							//Debug.WriteLine($"{packet}");
 						}
 					}
 				}
@@ -1442,28 +1470,12 @@ namespace WinTlx
 					break;
 
 				case ItelexCommands.RemoteCall:
+					_debugManager.WriteLine($"SendAcceptCallRemoteCmd", DebugManager.Modes.Message);
 					SendAcceptCallRemoteCmd();
-					/*
-					ConnectInit();
-					_connectionDirection = ConnectionDirections.In;
-					*/
 					Message?.Invoke($"{LngText(LngKeys.Message_IncomingConnection)} centralex", true);
 					Logging.Instance.Log(LogTypes.Info, TAG, nameof(Listener), $"incoming connection from centralex");
 					_debugManager.WriteLine($"Centralex RemoteCall", DebugManager.Modes.Message);
 					ConnectIn();
-					/*
-					if (_config.IncomingExtensionNumber != 0)
-					{
-						// set to connected and wait for direct dial command
-						ConnectionState = ConnectionStates.TcpConnected;
-					}
-					else
-					{
-						// no direct dial command neccessary
-						ConnectionState = ConnectionStates.TcpConnected;
-						//ConnectInit();
-					}
-					*/
 					Update?.Invoke();
 					break;
 			}
@@ -1564,10 +1576,6 @@ namespace WinTlx
 
 		public bool IsLastAckCntTimeout()
 		{
-			if (RemoteBufferCount > 0 && LastAckChanged.IsElapsedSeconds(5))
-			{
-				//Debug.WriteLine($"Ackchange timeout {RemoteBufferCount} {LastAckChanged.ElapsedMilliseconds}");
-			}
 			return RemoteBufferCount > 0 && LastAckChanged.IsElapsedSeconds(5);
 		}
 

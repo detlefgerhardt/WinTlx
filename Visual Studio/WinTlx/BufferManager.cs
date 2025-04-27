@@ -141,7 +141,8 @@ namespace WinTlx
 			while (true)
 			{
 				await Task.Delay(100);
-				if (_itelex.IdleTimerMs > 30 * 1000) return;
+				//Thread.Sleep(100);
+				if (_itelex.ConnectionState == ItelexProtocol.ConnectionStates.Connected && _itelex.IdleTimerMs > 30 * 1000) return;
 				if (SendBufferCount == 0 && _itelex.SendBufferCount == 0 && _itelex.GetRemoteBufferCount() == 0) return;
 			}
 		}

@@ -60,8 +60,6 @@ namespace WinTlx
 			this.TlnPeerTypeLbl = new System.Windows.Forms.Label();
 			this.AnswerbackLbl = new System.Windows.Forms.Label();
 			this.AnswerbackTb = new System.Windows.Forms.TextBox();
-			this.panel4 = new System.Windows.Forms.Panel();
-			this.DateTb = new System.Windows.Forms.TextBox();
 			this.TimeTb = new System.Windows.Forms.TextBox();
 			this.LinealPnl = new System.Windows.Forms.Panel();
 			this.TerminalPb = new WinTlx.Controls.SelectablePictureBox();
@@ -74,22 +72,23 @@ namespace WinTlx
 			this.ConnTimeLbl = new System.Windows.Forms.Label();
 			this.TimeoutLbl = new System.Windows.Forms.Label();
 			this.panel1 = new System.Windows.Forms.Panel();
+			this.RecvActiveLbl = new System.Windows.Forms.Label();
+			this.ConnectedLbl = new System.Windows.Forms.Label();
 			this.ConnectStatusLbl = new System.Windows.Forms.Label();
-			this.ReceiveStatusLbl = new System.Windows.Forms.Label();
 			this.SendBufferStatusLbl = new System.Windows.Forms.Label();
 			this.CharSetLbl = new System.Windows.Forms.Label();
 			this.RemoteBufferStatusLbl = new System.Windows.Forms.Label();
 			this.LocalBufferStatusLbl = new System.Windows.Forms.Label();
 			this.DeactivateAnswerbackBtn = new System.Windows.Forms.Button();
+			this.DateTb = new System.Windows.Forms.TextBox();
 			this.panel2.SuspendLayout();
-			this.panel4.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.TerminalPb)).BeginInit();
 			this.panel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// ConnectBtn
 			// 
-			this.ConnectBtn.Location = new System.Drawing.Point(8, 7);
+			this.ConnectBtn.Location = new System.Drawing.Point(5, 3);
 			this.ConnectBtn.Name = "ConnectBtn";
 			this.ConnectBtn.Size = new System.Drawing.Size(69, 23);
 			this.ConnectBtn.TabIndex = 9;
@@ -99,7 +98,7 @@ namespace WinTlx
 			// 
 			// DisconnectBtn
 			// 
-			this.DisconnectBtn.Location = new System.Drawing.Point(8, 36);
+			this.DisconnectBtn.Location = new System.Drawing.Point(5, 32);
 			this.DisconnectBtn.Name = "DisconnectBtn";
 			this.DisconnectBtn.Size = new System.Drawing.Size(69, 23);
 			this.DisconnectBtn.TabIndex = 10;
@@ -382,32 +381,10 @@ namespace WinTlx
 			this.AnswerbackTb.TabStop = false;
 			this.AnswerbackTb.WordWrap = false;
 			// 
-			// panel4
-			// 
-			this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.panel4.Controls.Add(this.ConnectBtn);
-			this.panel4.Controls.Add(this.DisconnectBtn);
-			this.panel4.Location = new System.Drawing.Point(585, 26);
-			this.panel4.Name = "panel4";
-			this.panel4.Size = new System.Drawing.Size(89, 100);
-			this.panel4.TabIndex = 0;
-			// 
-			// DateTb
-			// 
-			this.DateTb.Font = new System.Drawing.Font("Consolas", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.DateTb.Location = new System.Drawing.Point(6, 37);
-			this.DateTb.Name = "DateTb";
-			this.DateTb.ReadOnly = true;
-			this.DateTb.Size = new System.Drawing.Size(97, 25);
-			this.DateTb.TabIndex = 47;
-			this.DateTb.TabStop = false;
-			this.DateTb.Text = "00.00.0000";
-			this.DateTb.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-			// 
 			// TimeTb
 			// 
 			this.TimeTb.Font = new System.Drawing.Font("Consolas", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.TimeTb.Location = new System.Drawing.Point(6, 6);
+			this.TimeTb.Location = new System.Drawing.Point(589, 26);
 			this.TimeTb.Name = "TimeTb";
 			this.TimeTb.ReadOnly = true;
 			this.TimeTb.Size = new System.Drawing.Size(97, 25);
@@ -518,12 +495,36 @@ namespace WinTlx
 			// panel1
 			// 
 			this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.panel1.Controls.Add(this.TimeTb);
-			this.panel1.Controls.Add(this.DateTb);
-			this.panel1.Location = new System.Drawing.Point(681, 26);
+			this.panel1.Controls.Add(this.RecvActiveLbl);
+			this.panel1.Controls.Add(this.ConnectedLbl);
+			this.panel1.Controls.Add(this.ConnectBtn);
+			this.panel1.Controls.Add(this.DisconnectBtn);
+			this.panel1.Location = new System.Drawing.Point(589, 57);
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(111, 100);
+			this.panel1.Size = new System.Drawing.Size(203, 69);
 			this.panel1.TabIndex = 77;
+			// 
+			// RecvActiveLbl
+			// 
+			this.RecvActiveLbl.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.RecvActiveLbl.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+			this.RecvActiveLbl.Location = new System.Drawing.Point(79, 5);
+			this.RecvActiveLbl.Name = "RecvActiveLbl";
+			this.RecvActiveLbl.Size = new System.Drawing.Size(116, 19);
+			this.RecvActiveLbl.TabIndex = 85;
+			this.RecvActiveLbl.Text = "Centralex aktiv";
+			this.RecvActiveLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			// 
+			// ConnectedLbl
+			// 
+			this.ConnectedLbl.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.ConnectedLbl.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+			this.ConnectedLbl.Location = new System.Drawing.Point(79, 34);
+			this.ConnectedLbl.Name = "ConnectedLbl";
+			this.ConnectedLbl.Size = new System.Drawing.Size(116, 19);
+			this.ConnectedLbl.TabIndex = 84;
+			this.ConnectedLbl.Text = "Connected";
+			this.ConnectedLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
 			// ConnectStatusLbl
 			// 
@@ -535,17 +536,6 @@ namespace WinTlx
 			this.ConnectStatusLbl.TabIndex = 78;
 			this.ConnectStatusLbl.Text = "Offline";
 			this.ConnectStatusLbl.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			// 
-			// ReceiveStatusLbl
-			// 
-			this.ReceiveStatusLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.ReceiveStatusLbl.AutoSize = true;
-			this.ReceiveStatusLbl.Location = new System.Drawing.Point(575, 506);
-			this.ReceiveStatusLbl.Name = "ReceiveStatusLbl";
-			this.ReceiveStatusLbl.Size = new System.Drawing.Size(64, 13);
-			this.ReceiveStatusLbl.TabIndex = 79;
-			this.ReceiveStatusLbl.Text = "Receive Off";
-			this.ReceiveStatusLbl.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// SendBufferStatusLbl
 			// 
@@ -598,18 +588,31 @@ namespace WinTlx
 			this.DeactivateAnswerbackBtn.UseVisualStyleBackColor = true;
 			this.DeactivateAnswerbackBtn.Click += new System.EventHandler(this.DeactivateAnswerbackBtn_Click);
 			// 
+			// DateTb
+			// 
+			this.DateTb.Font = new System.Drawing.Font("Consolas", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.DateTb.Location = new System.Drawing.Point(694, 26);
+			this.DateTb.Name = "DateTb";
+			this.DateTb.ReadOnly = true;
+			this.DateTb.Size = new System.Drawing.Size(97, 25);
+			this.DateTb.TabIndex = 84;
+			this.DateTb.TabStop = false;
+			this.DateTb.Text = "00.00.0000";
+			this.DateTb.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
 			this.ClientSize = new System.Drawing.Size(804, 525);
+			this.Controls.Add(this.DateTb);
 			this.Controls.Add(this.DeactivateAnswerbackBtn);
+			this.Controls.Add(this.TimeTb);
 			this.Controls.Add(this.LocalBufferStatusLbl);
 			this.Controls.Add(this.RemoteBufferStatusLbl);
 			this.Controls.Add(this.CharSetLbl);
 			this.Controls.Add(this.SendBufferStatusLbl);
-			this.Controls.Add(this.ReceiveStatusLbl);
 			this.Controls.Add(this.ConnectStatusLbl);
 			this.Controls.Add(this.panel1);
 			this.Controls.Add(this.TimeoutLbl);
@@ -633,7 +636,6 @@ namespace WinTlx
 			this.Controls.Add(this.ScrollStartBtn);
 			this.Controls.Add(this.TerminalPb);
 			this.Controls.Add(this.LinealPnl);
-			this.Controls.Add(this.panel4);
 			this.Controls.Add(this.panel2);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
@@ -650,10 +652,8 @@ namespace WinTlx
 			this.Resize += new System.EventHandler(this.MainForm_Resize);
 			this.panel2.ResumeLayout(false);
 			this.panel2.PerformLayout();
-			this.panel4.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.TerminalPb)).EndInit();
 			this.panel1.ResumeLayout(false);
-			this.panel1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -681,11 +681,9 @@ namespace WinTlx
 		private System.Windows.Forms.Label TlnExtensionLbl;
 		private System.Windows.Forms.TextBox TlnExtensionTb;
 		private System.Windows.Forms.Panel panel2;
-		private System.Windows.Forms.Panel panel4;
 		private System.Windows.Forms.TextBox AnswerbackTb;
 		private System.Windows.Forms.Label AnswerbackLbl;
 		private System.Windows.Forms.TextBox TimeTb;
-		private System.Windows.Forms.TextBox DateTb;
 		private System.Windows.Forms.Button SendCod32Btn;
 		private System.Windows.Forms.Panel LinealPnl;
 		private SelectablePictureBox TerminalPb;
@@ -703,7 +701,6 @@ namespace WinTlx
 		private System.Windows.Forms.Label TimeoutLbl;
 		private System.Windows.Forms.Panel panel1;
 		private System.Windows.Forms.Label ConnectStatusLbl;
-		private System.Windows.Forms.Label ReceiveStatusLbl;
 		private System.Windows.Forms.Label SendBufferStatusLbl;
 		private System.Windows.Forms.ComboBox SearchCb;
 		private System.Windows.Forms.ComboBox TlnTypeCb;
@@ -711,6 +708,9 @@ namespace WinTlx
 		private System.Windows.Forms.Label RemoteBufferStatusLbl;
 		private System.Windows.Forms.Label LocalBufferStatusLbl;
 		private System.Windows.Forms.Button DeactivateAnswerbackBtn;
+		private System.Windows.Forms.TextBox DateTb;
+		private System.Windows.Forms.Label ConnectedLbl;
+		private System.Windows.Forms.Label RecvActiveLbl;
 	}
 }
 

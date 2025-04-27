@@ -18,7 +18,7 @@ namespace WinTlx
 
 		private const int TIMEOUT = 2000;
 
-		private TcpClientWithTimeout _client = null;
+		//private TcpClientWithTimeout _client = null;
 		private TcpClient _tcpClient = null;
 		private NetworkStream _stream = null;
 
@@ -32,7 +32,15 @@ namespace WinTlx
 
 		public PeerQueryReply DoPeerQuery(string[] serverAddresses, int serverPort, string number)
 		{
-			if (!ConnectToAnyServer(serverAddresses, serverPort)) return null;
+			if (!ConnectToAnyServer(serverAddresses, serverPort))
+			{
+				return new PeerQueryReply()
+				{
+					Valid = false,
+					Error = "connect error",
+					Data = null
+				};
+			}
 			PeerQueryReply reply = SendPeerQuery(number);
 			Disconnect();
 			return reply;
@@ -40,7 +48,15 @@ namespace WinTlx
 
 		public PeerSearchReply DoPeerSearch(string[] serverAddresses, int serverPort, string name)
 		{
-			if (!ConnectToAnyServer(serverAddresses, serverPort)) return null;
+			if (!ConnectToAnyServer(serverAddresses, serverPort))
+			{
+				return new PeerSearchReply()
+				{
+					Valid = false,
+					Error = "connect error",
+					List = null,
+				};
+			}
 			PeerSearchReply reply = SendPeerSearch(name);
 			Disconnect();
 			return reply;
@@ -62,11 +78,24 @@ namespace WinTlx
 		{
 			try
 			{
-				_client = new TcpClientWithTimeout(address, port, TIMEOUT);
-				_tcpClient = _client.Connect();
+				//_client = new TcpClientWithTimeout(address, port, TIMEOUT);
+				_tcpClient = new TcpClient();
+				//_tcpClient = _client.Connect();
 				_tcpClient.ReceiveTimeout = TIMEOUT;
+				if (!_tcpClient.ConnectAsync(address, port).Wait(TIMEOUT))
+				{
+					string errStr = $"error in subscribe server communication {address}:{port}";
+					Logging.Instance.Error(TAG, nameof(Connect), errStr);
+					_stream?.Close();
+					_tcpClient?.Close();
+					DebugManager.Instance.Write($"{errStr}\r\n", DebugManager.Modes.Message);
+					Message?.Invoke(LngText(LngKeys.Message_SubscribeServerError), false);
+					return false;
+				}
+
 				_stream = _tcpClient.GetStream();
 
+				/*
 				// check connection (work-around)
 				PeerSearchReply reply = SendPeerSearch("abc");
 				if (!reply.Valid)
@@ -75,18 +104,22 @@ namespace WinTlx
 					Logging.Instance.Error(TAG, nameof(Connect), errStr);
 					_stream?.Close();
 					_tcpClient?.Close();
+					DebugManager.Instance.Write($"{errStr}\r\n", DebugManager.Modes.Message);
+					Message?.Invoke(LngText(LngKeys.Message_SubscribeServerError), false);
 					return false;
 				}
+				*/
 				return true;
 			}
 			catch(Exception ex)
 			{
 				string errStr = $"error connecting to subscribe server {address}:{port}";
-				DebugManager.Instance.Write("{errStr}\r\n", DebugManager.Modes.Message);
+				DebugManager.Instance.Write($"{errStr}\r\n", DebugManager.Modes.Message);
+				Message?.Invoke(LngText(LngKeys.Message_SubscribeServerError), false);
 				Logging.Instance.Error(TAG, nameof(Connect), errStr, ex);
 				_stream?.Close();
 				_tcpClient?.Close();
-				_client = null;
+				_tcpClient = null;
 				return false;
 			}
 		}
@@ -181,16 +214,18 @@ namespace WinTlx
 
 			PeerQueryReply reply = new PeerQueryReply();
 
-			if (_client == null)
+			if (_tcpClient == null)
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), "no server connection");
 				reply.Error = "no server connection";
+				reply.Valid = false;
 				return reply;
 			}
 
 			if (string.IsNullOrEmpty(number))
 			{
 				reply.Error = "no query number";
+				reply.Valid = false;
 				return reply;
 			}
 
@@ -199,6 +234,7 @@ namespace WinTlx
 			if (!UInt32.TryParse(number, out uint num))
 			{
 				reply.Error = "invalid number";
+				reply.Valid = false;
 				return reply;
 			}
 
@@ -217,6 +253,7 @@ namespace WinTlx
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error sending data to subscribe server", ex);
 				reply.Error = "reply server error";
+				reply.Valid = false;
 				return reply;
 			}
 
@@ -230,12 +267,14 @@ namespace WinTlx
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error receiving data from subscribe server", ex);
 				reply.Error = "reply server error";
+				reply.Valid = false;
 				return reply;
 			}
 
 			if (recvLen == 0)
 			{
 				reply.Error = $"no data received";
+				reply.Valid = false;
 				return reply;
 			}
 
@@ -253,6 +292,7 @@ namespace WinTlx
 				// invalid packet
 				Logging.Instance.Log(LogTypes.Error, TAG, nameof(SendPeerSearch), $"invalid packet id ({recvData[0]:X02})");
 				reply.Error = $"invalid packet id ({recvData[0]:X02})";
+				reply.Valid = false;
 				return reply;
 			}
 
@@ -260,6 +300,7 @@ namespace WinTlx
 			{
 				Logging.Instance.Log(LogTypes.Error, TAG, nameof(SendPeerSearch), $"received data to short ({recvLen} bytes)");
 				reply.Error = $"received data to short ({recvLen} bytes)";
+				reply.Valid = false;
 				return reply;
 			}
 
@@ -267,6 +308,7 @@ namespace WinTlx
 			{
 				Logging.Instance.Log(LogTypes.Error, TAG, nameof(SendPeerSearch), $"invalid length value ({recvData[1]})");
 				reply.Error = $"invalid length value ({recvData[1]})";
+				reply.Valid = false;
 				return reply;
 			}
 
@@ -288,16 +330,18 @@ namespace WinTlx
 			Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendPeerSearch), $"name='{name}'");
 			PeerSearchReply reply = new PeerSearchReply();
 
-			if (_client == null)
+			if (_tcpClient == null)
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerSearch), "no server connection");
 				reply.Error = "no server connection";
+				reply.Valid = false;
 				return reply;
 			}
 
 			if (string.IsNullOrEmpty(name))
 			{
 				reply.Error = "no search name";
+				reply.Valid = false;
 				return reply;
 			}
 
@@ -344,6 +388,7 @@ namespace WinTlx
 				{
 					Logging.Instance.Log(LogTypes.Error, TAG, nameof(SendPeerSearch), $"recvLen=0");
 					reply.Error = $"no data received";
+					reply.Valid = false;
 					return reply;
 				}
 
@@ -356,14 +401,14 @@ namespace WinTlx
 				if (recvLen < 2 + 0x64)
 				{
 					Logging.Instance.Log(LogTypes.Warn, TAG, nameof(SendPeerSearch), $"received data to short ({recvLen} bytes)");
-					reply.Error = $"received data to short ({recvLen} bytes)";
+					//reply.Error = $"received data to short ({recvLen} bytes)";
 					continue;
 				}
 
 				if (recvData[1] != 0x64)
 				{
 					Logging.Instance.Log(LogTypes.Warn, TAG, nameof(SendPeerSearch), $"invalid length value ({recvData[1]})");
-					reply.Error = $"invalid length value ({recvData[1]})";
+					//reply.Error = $"invalid length value ({recvData[1]})";
 					continue;
 				}
 
@@ -380,7 +425,9 @@ namespace WinTlx
 				catch(Exception ex)
 				{
 					Logging.Instance.Error(TAG, nameof(SendPeerQuery), $"error sending data to subscribe server", ex);
-					return null;
+					reply.Error = ex.Message;
+					reply.Valid = false;
+					return reply;
 				}
 			}
 
@@ -429,7 +476,7 @@ namespace WinTlx
 			Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendClientUpdate), $"number='{number}'");
 			ClientUpdateReply reply = new ClientUpdateReply();
 
-			if (_client == null)
+			if (_tcpClient == null)
 			{
 				Logging.Instance.Error(TAG, nameof(SendPeerQuery), "no server connection");
 				reply.Error = "no server connection";

@@ -131,3 +131,6 @@ Version history
           New: Config-switch capital letters
 2.2.1     Chg: New info text
           Chg: Changed from beta to release version
+2.2.2     New: "New" button in text editor and LS editor windows
+          Fix: Some centralex issus
+          Fix: Missing packet types in debug windows

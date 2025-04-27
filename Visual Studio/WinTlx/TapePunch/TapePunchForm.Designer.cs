@@ -48,6 +48,7 @@
 			this.CropStartBtn = new System.Windows.Forms.Button();
 			this.CropEndBtn = new System.Windows.Forms.Button();
 			this.EditPl = new System.Windows.Forms.Panel();
+			this.MirrorBufferBtn = new System.Windows.Forms.Button();
 			this.EditShowBtn = new System.Windows.Forms.Button();
 			this.MirrorCodeBtn = new System.Windows.Forms.Button();
 			this.EditUndoBtn = new System.Windows.Forms.Button();
@@ -55,7 +56,7 @@
 			this.StopBtn = new System.Windows.Forms.Button();
 			this.SlowerBtn = new System.Windows.Forms.Button();
 			this.FasterBtn = new System.Windows.Forms.Button();
-			this.MirrorBufferBtn = new System.Windows.Forms.Button();
+			this.NewBtn = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.PunchedTapePb)).BeginInit();
 			this.EditPl.SuspendLayout();
 			this.SuspendLayout();
@@ -86,9 +87,9 @@
 			// RecvCb
 			// 
 			this.RecvCb.Appearance = System.Windows.Forms.Appearance.Button;
-			this.RecvCb.Location = new System.Drawing.Point(82, 12);
+			this.RecvCb.Location = new System.Drawing.Point(341, 13);
 			this.RecvCb.Name = "RecvCb";
-			this.RecvCb.Size = new System.Drawing.Size(65, 24);
+			this.RecvCb.Size = new System.Drawing.Size(65, 23);
 			this.RecvCb.TabIndex = 4;
 			this.RecvCb.Text = "Recv";
 			this.RecvCb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -128,7 +129,7 @@
 			// 
 			// SendBtn
 			// 
-			this.SendBtn.Location = new System.Drawing.Point(153, 12);
+			this.SendBtn.Location = new System.Drawing.Point(153, 13);
 			this.SendBtn.Name = "SendBtn";
 			this.SendBtn.Size = new System.Drawing.Size(65, 23);
 			this.SendBtn.TabIndex = 9;
@@ -265,6 +266,17 @@
 			this.EditPl.Size = new System.Drawing.Size(232, 54);
 			this.EditPl.TabIndex = 22;
 			// 
+			// MirrorBufferBtn
+			// 
+			this.MirrorBufferBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F);
+			this.MirrorBufferBtn.Location = new System.Drawing.Point(56, 28);
+			this.MirrorBufferBtn.Name = "MirrorBufferBtn";
+			this.MirrorBufferBtn.Size = new System.Drawing.Size(45, 22);
+			this.MirrorBufferBtn.TabIndex = 29;
+			this.MirrorBufferBtn.Text = "Mir LS";
+			this.MirrorBufferBtn.UseVisualStyleBackColor = true;
+			this.MirrorBufferBtn.Click += new System.EventHandler(this.MirrorLsBtn_Click);
+			// 
 			// EditShowBtn
 			// 
 			this.EditShowBtn.Location = new System.Drawing.Point(5, 28);
@@ -300,7 +312,7 @@
 			// StepBtn
 			// 
 			this.StepBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.StepBtn.Location = new System.Drawing.Point(224, 12);
+			this.StepBtn.Location = new System.Drawing.Point(224, 13);
 			this.StepBtn.Name = "StepBtn";
 			this.StepBtn.Size = new System.Drawing.Size(65, 23);
 			this.StepBtn.TabIndex = 23;
@@ -320,6 +332,7 @@
 			// 
 			// SlowerBtn
 			// 
+			this.SlowerBtn.Enabled = false;
 			this.SlowerBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.SlowerBtn.Location = new System.Drawing.Point(224, 41);
 			this.SlowerBtn.Name = "SlowerBtn";
@@ -331,6 +344,7 @@
 			// 
 			// FasterBtn
 			// 
+			this.FasterBtn.Enabled = false;
 			this.FasterBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.FasterBtn.Location = new System.Drawing.Point(266, 41);
 			this.FasterBtn.Name = "FasterBtn";
@@ -340,22 +354,23 @@
 			this.FasterBtn.UseVisualStyleBackColor = true;
 			this.FasterBtn.Click += new System.EventHandler(this.FasterBtn_Click);
 			// 
-			// MirrorLsBtn
+			// NewBtn
 			// 
-			this.MirrorBufferBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F);
-			this.MirrorBufferBtn.Location = new System.Drawing.Point(56, 28);
-			this.MirrorBufferBtn.Name = "MirrorLsBtn";
-			this.MirrorBufferBtn.Size = new System.Drawing.Size(45, 22);
-			this.MirrorBufferBtn.TabIndex = 29;
-			this.MirrorBufferBtn.Text = "Mir LS";
-			this.MirrorBufferBtn.UseVisualStyleBackColor = true;
-			this.MirrorBufferBtn.Click += new System.EventHandler(this.MirrorLsBtn_Click);
+			this.NewBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.NewBtn.Location = new System.Drawing.Point(82, 12);
+			this.NewBtn.Name = "NewBtn";
+			this.NewBtn.Size = new System.Drawing.Size(65, 23);
+			this.NewBtn.TabIndex = 27;
+			this.NewBtn.Text = "New";
+			this.NewBtn.UseVisualStyleBackColor = true;
+			this.NewBtn.Click += new System.EventHandler(this.NewBtn_Click);
 			// 
 			// TapePunchForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(504, 291);
+			this.Controls.Add(this.NewBtn);
 			this.Controls.Add(this.FasterBtn);
 			this.Controls.Add(this.SlowerBtn);
 			this.Controls.Add(this.StopBtn);
@@ -418,5 +433,6 @@
 		private System.Windows.Forms.Button MirrorCodeBtn;
 		private System.Windows.Forms.Button EditShowBtn;
 		private System.Windows.Forms.Button MirrorBufferBtn;
+		private System.Windows.Forms.Button NewBtn;
 	}
 }

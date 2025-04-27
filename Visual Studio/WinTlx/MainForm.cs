@@ -120,6 +120,8 @@ namespace WinTlx
 
 			SendLineFeedBtn.Text = "\u2261";
 
+			//ConnectedLbl.Visible = false;
+
 			ScrollStartBtn.Text = "";
 			ScrollStartBtn.BackgroundImage = SpecialCharacters.Instance.GetScrollStart(Color.Black);
 			ScrollUpBtn.Text = "";
@@ -770,7 +772,7 @@ namespace WinTlx
 				{
 					PeerQueryReply queryReply = _subscriberServer.DoPeerQuery(
 						_configData.SubscribeServerAddresses, _configData.SubscribeServerPort, num.ToString());
-					if (queryReply == null || !queryReply.Valid)
+					if (!queryReply.Valid)
 					{
 						_bufferManager.LocalOutputMessage(queryReply.Error, true);
 						return;
@@ -798,7 +800,8 @@ namespace WinTlx
 				}
 			});
 
-			_bufferManager.LocalOutputMessage($"{list?.Length} {LngText(LngKeys.Message_QueryResult)}", false);
+			int count = list != null ? list.Length : 0;
+			_bufferManager.LocalOutputMessage($"{count} {LngText(LngKeys.Message_QueryResult)}", false);
 
 			TlnNameCb.DataSource = list;
 			TlnNameCb.DisplayMember = "Display";
@@ -1073,7 +1076,14 @@ namespace WinTlx
 						SubscriberServer subSrv = new SubscriberServer();
 						PeerQueryReply reply = subSrv.DoPeerQuery(_configData.SubscribeServerAddresses, _configData.SubscribeServerPort,
 							_configData.OwnNumber.ToString());
-						_bufferManager.LocalOutputMessage($"server-data: {reply.Data.Address}:{reply.Data.PortNumber} extention={reply.Data.ExtensionNumber}", true);
+						if (reply.Valid)
+						{
+							_bufferManager.LocalOutputMessage($"server-data: {reply.Data.Address}:{reply.Data?.PortNumber} extention={reply.Data.ExtensionNumber}", true);
+						}
+						else
+						{
+							_bufferManager.LocalOutputMessage($"DoPeerQuery: {reply.Error}", true);
+						}
 					}
 				}
 			}
@@ -1237,6 +1247,20 @@ namespace WinTlx
 				DisconnectBtn.Enabled = _itelex.IsConnected;
 			});
 
+			Helper.ControlInvokeRequired(ConnectedLbl, () =>
+			{
+				if (!_itelex.IsConnected)
+				{
+					ConnectedLbl.Visible = false;
+					//ConnectedLbl.ForeColor = Color.Green;
+				}
+				else
+				{
+					ConnectedLbl.Visible = true;
+					//ConnectedLbl.ForeColor = Color.Black;
+				}
+			});
+
 			Helper.ControlInvokeRequired(ConnectStatusLbl, () =>
 			{
 				if (!_itelex.IsConnected)
@@ -1270,11 +1294,29 @@ namespace WinTlx
 				LocalBufferStatusLbl.Text = $"{LngText(LngKeys.MainForm_LocalBufferStatus)}: {valueStr}";
 			});
 
+			Helper.ControlInvokeRequired(RecvActiveLbl, () =>
+			{
+				if (_recvOn)
+				{
+					RecvActiveLbl.Text = _configData.LimitedClient ? LngText(LngKeys.MainForm_CentralexActive) :
+							LngText(LngKeys.MainForm_RecvActive);
+					RecvActiveLbl.Visible = true;
+					RecvActiveLbl.Enabled = true;
+				}
+				else
+				{
+					RecvActiveLbl.Text = LngText(LngKeys.MainForm_RecvInactive);
+					RecvActiveLbl.Enabled = false;
+				}
+			});
+
+			/*
 			Helper.ControlInvokeRequired(ReceiveStatusLbl, () =>
 			{
 				ReceiveStatusLbl.Text = _recvOn ? LngText(LngKeys.MainForm_ReceiveStatusOn) : LngText(LngKeys.MainForm_ReceiveStatusOff);
 				ReceiveStatusLbl.ForeColor = _recvOn ? Color.Green : Color.Black;
 			});
+			*/
 
 			Helper.ControlInvokeRequired(CharSetLbl, () =>
 			{
@@ -2092,22 +2134,19 @@ namespace WinTlx
 				{
 					PeerQueryReply queryReply = _subscriberServer.DoPeerQuery(
 						_configData.SubscribeServerAddresses, _configData.SubscribeServerPort, favItem.Number);
-					if (!queryReply.Valid)
+					if (!queryReply.Valid || queryReply.Data == null)
 					{
 						_bufferManager.LocalOutputMessage(queryReply.Error, true);
 						return;
 					}
-					if (queryReply.Data != null)
+					favItem = new FavoriteItem()
 					{
-						favItem = new FavoriteItem()
-						{
-							Number = favItem.Number,
-							Name = queryReply.Data.LongName,
-							Address = queryReply.Data.Address,
-							Port = queryReply.Data.PortNumber,
-							DirectDial = queryReply.Data.ExtensionNumber
-						};
-					}
+						Number = favItem.Number,
+						Name = queryReply.Data.LongName,
+						Address = queryReply.Data.Address,
+						Port = queryReply.Data.PortNumber,
+						DirectDial = queryReply.Data.ExtensionNumber
+					};
 				}
 
 				Helper.ControlInvokeRequired(SearchCb, () => SearchCb.Text = favItem.Number);

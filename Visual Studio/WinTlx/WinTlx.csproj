@@ -172,6 +172,8 @@
       <DependentUpon>TextEditorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditor\TextEditorManager.cs" />
+    <Compile Include="Tools\TcpTester.cs" />
+    <Compile Include="Tools\JingleBells.cs" />
     <Compile Include="Tools\TcpClientWithTimeout.cs" />
     <Compile Include="Tools\TickTimer.cs" />
     <EmbeddedResource Include="Config\ConfigForm.resx">

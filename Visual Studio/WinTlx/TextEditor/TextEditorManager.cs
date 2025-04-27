@@ -58,6 +58,8 @@ namespace WinTlx.TextEditor
 
 		private bool _stopScript;
 
+		private bool _sendingActive;
+
 		private string _recvString = null;
 
 		public delegate void DialEventHandler(string number);
@@ -694,60 +696,73 @@ namespace WinTlx.TextEditor
 
 		public async Task SendTextAsync(string[] lines)
 		{
-			_stopScript = false;
-			bool script = false;
+			if (_sendingActive) return;
 
-			_connectState = _itelex.IsConnected;
-
-			foreach (string line in lines)
+			try
 			{
-				if (ConnectStateChanged()) return;
+				_sendingActive = true;
 
-				if (line.StartsWith("{script}"))
-				{
-					script = true;
-					continue;
-				}
-				if (line.StartsWith("{endscript}"))
-				{
-					script = false;
-					continue;
-				}
+				_stopScript = false;
+				bool script = false;
 
-				if (!script)
+				_connectState = _itelex.IsConnected;
+
+				foreach (string line in lines)
 				{
-					List<string> wrappedLines = WrapLine(line, LineWidth);
-					/*
-					for (int i=0; i<newLines.Count; i++)
+					Debug.WriteLine(line);
+
+					if (ConnectStateChanged()) return;
+
+					if (line.StartsWith("{script}"))
 					{
-						if (_stopScript) return;
-						//await SendTextLine(nl.TrimEnd() + "\r\n");
-						if (i==0)
-						{
-							newLines[i] = newLines[i].Trim();
-						}
-						else
-						{
-							newLines[i] = newLines[i].TrimEnd();
-						}
-						await SendTextLine(newLines[i].Trim() + "\r\n");
+						script = true;
+						continue;
 					}
-					*/
-					foreach(string wrappedLine in wrappedLines)
+					if (line.StartsWith("{endscript}"))
 					{
-						if (_stopScript) return;
-						await SendTextLine(wrappedLine + "\r\n");
+						script = false;
+						continue;
+					}
+
+					if (!script)
+					{
+						List<string> wrappedLines = WrapLine(line, LineWidth);
+						/*
+						for (int i=0; i<newLines.Count; i++)
+						{
+							if (_stopScript) return;
+							//await SendTextLine(nl.TrimEnd() + "\r\n");
+							if (i==0)
+							{
+								newLines[i] = newLines[i].Trim();
+							}
+							else
+							{
+								newLines[i] = newLines[i].TrimEnd();
+							}
+							await SendTextLine(newLines[i].Trim() + "\r\n");
+						}
+						*/
+						foreach (string wrappedLine in wrappedLines)
+						{
+							if (_stopScript) return;
+							await SendTextLine(wrappedLine + "\r\n");
+						}
+					}
+					else
+					{
+						string scriptLine = line.Trim();
+						if (!string.IsNullOrEmpty(scriptLine) && !scriptLine.StartsWith("//"))
+						{
+							//SendDebugText(scriptLine, DebugForm.Modes.Command);
+							await DoScriptCmd(scriptLine);
+						}
 					}
 				}
-				else
-				{
-					string scriptLine = line.Trim();
-					if (!string.IsNullOrEmpty(scriptLine) && !scriptLine.StartsWith("//"))
-					{
-						//SendDebugText(scriptLine, DebugForm.Modes.Command);
-						await DoScriptCmd(scriptLine);
-					}
-				}
+			}
+			finally
+			{
+				_sendingActive = false;
 			}
 		}
 
@@ -794,31 +809,40 @@ namespace WinTlx.TextEditor
 
 		private async Task SendTextLine(string line)
 		{
-			while (true)
+			try
 			{
-				if (_stopScript) return;
-
-				int pos = line.IndexOf('{');
-				if (pos == -1)
+				while (true)
 				{
-					await SendLocalAndText(line);
-					break;
-				}
+					if (_stopScript) return;
 
-				string line1 = line.Substring(0, pos);
-				string line2 = line.Substring(pos + 1);
-				int pos2 = line2.IndexOf('}');
-				if (pos2 == -1)
-				{
-					await SendLocalAndText(line);
-					break;
+					int pos = line.IndexOf('{');
+					if (pos == -1)
+					{
+						await SendLocalAndText(line);
+						break;
+					}
+
+					string line1 = line.Substring(0, pos);
+					string line2 = line.Substring(pos + 1);
+					int pos2 = line2.IndexOf('}');
+					if (pos2 == -1)
+					{
+						await SendLocalAndText(line);
+						break;
+					}
+
+					// script command
+
+					await SendLocalAndText(line1);
+					//await _bufferManager.WaitLocalOutpuBufferEmpty();
+					string cmd = line2.Substring(0, pos2);
+					await DoScriptCmd(cmd);
+					line = line2.Substring(pos2 + 1);
 				}
-				await SendLocalAndText(line1);
-				//await _bufferManager.WaitLocalOutpuBufferEmpty();
-				string cmd = line2.Substring(0, pos2);
-				await DoScriptCmd(cmd);
+			}
+			finally
+			{
 				await _bufferManager.WaitSendBufferEmptyAsync();
-				line = line2.Substring(pos2 + 1);
 			}
 		}
 

@@ -115,6 +115,9 @@ namespace WinTlx.TapePunch
 			RecvCb.Text = LngText(LngKeys.TapePunch_RecvButton);
 			Helper.SetToolTip(RecvCb, LngText(LngKeys.TapePunch_RecvButton_ToolTip));
 
+			NewBtn.Text = LngText(LngKeys.TapePunch_NewButton);
+			Helper.SetToolTip(NewBtn, LngText(LngKeys.TapePunch_NewButton_ToolTip));
+
 			ClearBtn.Text = LngText(LngKeys.TapePunch_ClearButton);
 			Helper.SetToolTip(ClearBtn, LngText(LngKeys.TapePunch_ClearButton_ToolTip));
 
@@ -193,6 +196,12 @@ namespace WinTlx.TapePunch
 		{
 			Graphics g = e.Graphics;
 			_tapePunch.DrawTapeHorizontal(g, PunchedTapePb.Width, PunchedTapePb.Height);
+		}
+
+		private void NewBtn_Click(object sender, EventArgs e)
+		{
+			SetAndShowFilename(null);
+			_tapePunch.Clear();
 		}
 
 		private void ClearBtn_Click(object sender, EventArgs e)
@@ -449,7 +458,7 @@ namespace WinTlx.TapePunch
 
 		private void SlowerBtn_Click(object sender, EventArgs e)
 		{
-			if (_sendSpeed<1000)
+			if (_sendSpeed < 1000)
 			{
 				_sendSpeed += 10;
 			}

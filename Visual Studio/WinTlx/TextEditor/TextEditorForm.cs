@@ -176,7 +176,10 @@ namespace WinTlx.TextEditor
 
 		private async void SendBtn_Click(object sender, EventArgs e)
 		{
+			SendBtn.Enabled = false;
 			await _tem.SendTextAsync(EditorRtb.Lines);
+			EditorRtb.Focus();
+			SendBtn.Enabled = true;
 		}
 
 		private void SaveAsLsNtm_Click(object sender, EventArgs e)
