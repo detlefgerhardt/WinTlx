@@ -92,7 +92,7 @@ namespace WinTlx
 			lock(_lock)
 			{
 				string fullName = "";
-				string prefix = $"{DateTime.Now:dd.MM.yyyy HH:mm:ss} {logType.ToString().PadRight(5)} [{section}]";
+				string prefix = $"{DateTime.Now:dd.MM.yyyy HH:mm:ss.fff} {logType.ToString().PadRight(5)} [{section}]";
 				string logStr = $"{prefix} [{method}] {text}\r\n";
 				try
 				{

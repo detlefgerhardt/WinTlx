@@ -1132,10 +1132,10 @@ namespace WinTlx
 		{
 			if (ConnectionState == ConnectionStates.Disconnected && CentralexState == CentralexStates.None) return;
 
-			if (cmdCode == 0x03)
-			{
-				Debug.Write("");
-			}
+			//if (cmdCode == 0x03)
+			//{
+			//	Debug.Write("");
+			//}
 
 			if (_tcpClient.Client == null)
 			{
@@ -1162,8 +1162,17 @@ namespace WinTlx
 
 			if (packet.CommandType != ItelexCommands.Ack)
 			{
-				Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendCmd),
-						$"Send packet {packet.CommandType} {packet.GetDebugPacket()}");
+				if (packet.CommandType == ItelexCommands.BaudotData)
+				{
+					Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendCmd),
+							$"Send packet {packet.CommandType} {packet.GetDebugPacket()} " + 
+							$"(rem_ack={_ack.SendAckCnt} send={_ack.SendCnt} rem_buf={_ack.RemoteBufferCount})");
+				}
+				else
+				{
+					Logging.Instance.Log(LogTypes.Debug, TAG, nameof(SendCmd),
+							$"Send packet {packet.CommandType} {packet.GetDebugPacket()}");
+				}
 			}
 
 			_debugManager.WriteCmd(packet, DebugManager.Modes.Send, _ack);
@@ -1435,7 +1444,8 @@ namespace WinTlx
 
 				case ItelexCommands.Ack:
 					_ack.SendAckCnt = packet.Data[0];
-					Logging.Instance.Debug(TAG, nameof(DecodePacket), $"recv ack cmd  {packet.GetDebugPacket()} ack={_ack.SendAckCnt} ({_ack.RemoteBufferCount})");
+					Logging.Instance.Debug(TAG, nameof(DecodePacket),
+						$"recv ack cmd  {packet.GetDebugPacket()} (rem_ack={_ack.SendAckCnt} send={_ack.SendCnt} rem_buf={_ack.RemoteBufferCount})");
 					Update?.Invoke();
 					break;
 
