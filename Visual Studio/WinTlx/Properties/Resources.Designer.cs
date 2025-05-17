@@ -61,7 +61,7 @@ namespace WinTlx.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 04.07.2022 17:00 
+        ///   Looks up a localized string similar to 12.07.2023  7:26 
         ///.
         /// </summary>
         internal static string BuildDate {

@@ -23,6 +23,7 @@
 		public const string DEFAULT_ANSWERBACK = "wintlx";
 		public const int DEFAULT_IDLE_TIMEOUT = 120; // disconnect after 2 minutes without communication
 		public const int DEFAULT_REMOTE_BUFFER_SIZE = 16; // byte
+		public const int DEFAULT_SEND_FREQ_MS = 100; // ms
 		public const int DEFAULT_OUTPUT_SPEED = 50; // baud
 		public const int DEFAULT_INCOMING_PORT = 134;
 

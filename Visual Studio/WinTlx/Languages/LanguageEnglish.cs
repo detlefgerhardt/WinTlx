@@ -103,7 +103,7 @@ namespace WinTlx.Languages
 				{ LngKeys.Setup_Answerback_Tooltip, "Example: '\\r\\n12345 name d'" },
 				{ LngKeys.Setup_IdleTimeout, "Idle timeout (s)" },
 				{ LngKeys.Setup_OutputSpeed, "Output speed (Baud)" },
-				{ LngKeys.Setup_RemoteBufferSize, "Max. remote buffer size (Byte)" },
+				{ LngKeys.Setup_RemoteBufferSize, "Remote buf. size (Byte) / Freq (ms)" },
 				{ LngKeys.Setup_ShowTechnicalMessages, "Show technical messages" },
 				{ LngKeys.Setup_CodeSet, "Code set" },
 				{ LngKeys.Setup_UpperCaseChar, "Upper case chars." },

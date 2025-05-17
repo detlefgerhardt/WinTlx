@@ -312,12 +312,18 @@ namespace WinTlx
 			ConfigManager.Instance.ConfigChanged += Instance_ConfigChanged;
 
 			_keyStates = new KeyStates(ShiftStates.Unknown, _config.CodeSet);
-
 		}
 
 		private void Instance_ConfigChanged()
 		{
 			_keyStates = new KeyStates(_keyStates.ShiftState, _config.CodeSet);
+			if (IsConnected)
+			{
+				int ms = _config.SendFreqMs == 0 ? Constants.DEFAULT_SEND_FREQ_MS : _config.SendFreqMs;
+				_sendTimer.Stop();
+				_sendTimer.Interval = ms;
+				_sendTimer.Start();
+			}
 		}
 
 		public bool SetRecvOn(int port)
@@ -768,7 +774,7 @@ namespace WinTlx
 
 			_sendTimerActive = false;
 			_sendTimer.Stop();
-			_sendTimer.Interval = 100;
+			_sendTimer.Interval = _config.SendFreqMs;
 			_sendTimer.Start();
 
 			EyeballCharActive = false;
@@ -1445,7 +1451,7 @@ namespace WinTlx
 				case ItelexCommands.Ack:
 					_ack.SendAckCnt = packet.Data[0];
 					Logging.Instance.Debug(TAG, nameof(DecodePacket),
-						$"recv ack cmd  {packet.GetDebugPacket()} (rem_ack={_ack.SendAckCnt} send={_ack.SendCnt} rem_buf={_ack.RemoteBufferCount})");
+						$"recv ack cmd  {packet.GetDebugPacket()} (rem_ack={_ack.SendAckCnt} send={_ack.SendCnt} rem_buf={_ack.RemoteBufferCount}/{ConfigManager.Instance.Config.RemoteBufferSize})");
 					Update?.Invoke();
 					break;
 

@@ -84,6 +84,7 @@
 			this.ServerDataHintLbl = new System.Windows.Forms.Label();
 			this.OptionsLbl = new System.Windows.Forms.Label();
 			this.OptionsTb = new System.Windows.Forms.TextBox();
+			this.SendFreqMsTb = new System.Windows.Forms.TextBox();
 			this.IncomingGb.SuspendLayout();
 			this.GeneralGb.SuspendLayout();
 			this.SubscribeServerGb.SuspendLayout();
@@ -458,6 +459,7 @@
 			// 
 			// ItelexGb
 			// 
+			this.ItelexGb.Controls.Add(this.SendFreqMsTb);
 			this.ItelexGb.Controls.Add(this.ShowTechnicalMessagesCb);
 			this.ItelexGb.Controls.Add(this.ShowTechnicalMessagesLbl);
 			this.ItelexGb.Controls.Add(this.RemoteBufferSizeTb);
@@ -497,7 +499,7 @@
 			// 
 			this.RemoteBufferSizeTb.Location = new System.Drawing.Point(184, 93);
 			this.RemoteBufferSizeTb.Name = "RemoteBufferSizeTb";
-			this.RemoteBufferSizeTb.Size = new System.Drawing.Size(54, 20);
+			this.RemoteBufferSizeTb.Size = new System.Drawing.Size(40, 20);
 			this.RemoteBufferSizeTb.TabIndex = 11;
 			// 
 			// RemoteBufferSizeLbl
@@ -505,9 +507,9 @@
 			this.RemoteBufferSizeLbl.AutoSize = true;
 			this.RemoteBufferSizeLbl.Location = new System.Drawing.Point(10, 96);
 			this.RemoteBufferSizeLbl.Name = "RemoteBufferSizeLbl";
-			this.RemoteBufferSizeLbl.Size = new System.Drawing.Size(146, 13);
+			this.RemoteBufferSizeLbl.Size = new System.Drawing.Size(173, 13);
 			this.RemoteBufferSizeLbl.TabIndex = 25;
-			this.RemoteBufferSizeLbl.Text = "Max. remote buffer size (Byte)";
+			this.RemoteBufferSizeLbl.Text = "Remote buf. size (Byte) / Freq (ms))";
 			// 
 			// DefaultProtocolOutAsciiRb
 			// 
@@ -615,6 +617,13 @@
 			this.OptionsTb.Enter += new System.EventHandler(this.OptionsTb_Enter);
 			this.OptionsTb.Leave += new System.EventHandler(this.OptionsTb_Leave);
 			// 
+			// SendFreqMsTb
+			// 
+			this.SendFreqMsTb.Location = new System.Drawing.Point(246, 93);
+			this.SendFreqMsTb.Name = "SendFreqMsTb";
+			this.SendFreqMsTb.Size = new System.Drawing.Size(40, 20);
+			this.SendFreqMsTb.TabIndex = 28;
+			// 
 			// ConfigForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -707,5 +716,6 @@
 		private System.Windows.Forms.Label ShowTechnicalMessagesLbl;
 		private System.Windows.Forms.CheckBox UpperCaseChrCb;
 		private System.Windows.Forms.Label UpperCaseChrLbl;
+		private System.Windows.Forms.TextBox SendFreqMsTb;
 	}
 }

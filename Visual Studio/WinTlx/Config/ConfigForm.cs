@@ -115,6 +115,7 @@ namespace WinTlx.Config
 			DefaultProtocolOutAsciiRb.Checked = _config.DefaultProtocolAscii;
 			DefaultProtocolOutItelexRb.Checked = !_config.DefaultProtocolAscii;
 			RemoteBufferSizeTb.Text = IntToStr(_config.RemoteBufferSize);
+			SendFreqMsTb.Text = IntToStr(_config.SendFreqMs);
 			ShowTechnicalMessagesCb.Checked = _config.ShowTechnicalMessages;
 			OutputSpeedTb.Text = IntToStr(_config.OutputSpeed);
 			SubscribeServerAddress1Tb.Text = _config.SubscribeServerAddress;
@@ -141,6 +142,7 @@ namespace WinTlx.Config
 			_config.UpperCaseChar = UpperCaseChrCb.Checked;
 			_config.DefaultProtocolAscii = DefaultProtocolOutAsciiRb.Checked;
 			_config.RemoteBufferSize = StrToInt(RemoteBufferSizeTb.Text);
+			_config.SendFreqMs = StrToInt(SendFreqMsTb.Text);
 			_config.ShowTechnicalMessages = ShowTechnicalMessagesCb.Checked;
 			_config.OutputSpeed = StrToInt(OutputSpeedTb.Text);
 			_config.SubscribeServerAddress = SubscribeServerAddress1Tb.Text.Trim();
@@ -201,7 +203,6 @@ namespace WinTlx.Config
 
 		private void SaveBtn_Click(object sender, EventArgs e)
 		{
-			ConfigManager.Instance.ChangeConfig();
 			Close();
 			Canceled = false;
 		}
@@ -217,6 +218,7 @@ namespace WinTlx.Config
 			if (!Canceled)
 			{
 				GetData();
+				ConfigManager.Instance.ChangeConfig();
 			}
 		}
 

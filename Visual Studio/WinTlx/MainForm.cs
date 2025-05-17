@@ -1106,7 +1106,8 @@ namespace WinTlx
 
 		private void UpdateIpAddress()
 		{
-			if (_configData.SubscribeServerUpdatePin == 0 || _configData.OwnNumber == 0 || _configData.IncomingLocalPort == 0) return;
+			//if (_configData.SubscribeServerUpdatePin == 0 || _configData.OwnNumber == 0 || _configData.IncomingLocalPort == 0) return;
+			if (_configData.OwnNumber == 0 || _configData.IncomingLocalPort == 0) return;
 			SendClientUpdate(_configData.OwnNumber, _configData.SubscribeServerUpdatePin, _configData.IncomingPublicPort);
 		}
 

@@ -54,6 +54,9 @@ namespace WinTlx.Config
 		public int RemoteBufferSize { get; set; }
 
 		[DataMember]
+		public int SendFreqMs { get; set; }
+
+		[DataMember]
 		public int OwnNumber { get; set; }
 
 		[DataMember]
@@ -111,6 +114,10 @@ namespace WinTlx.Config
 			if (RemoteBufferSize == 0)
 			{
 				RemoteBufferSize = Constants.DEFAULT_REMOTE_BUFFER_SIZE;
+			}
+			if (SendFreqMs == 0)
+			{
+				SendFreqMs = Constants.DEFAULT_SEND_FREQ_MS;
 			}
 			if (string.IsNullOrEmpty(Language))
 			{
